@@ -93,3 +93,7 @@
 ### 本轮结论
 
 当前没有可以在不调用 mandatory brainstorming、不给产品方向做重大猜测、且不制造空壳交付物的进一步规约工作。下一有效动作仍是用户在 Codex App/CLI 安装 Superpowers 并新建会话；Open Design 可随后按 `DECISIONS_NEEDED.md` 安装。
+
+### 第三次阻塞复查（2026-07-17T18:21:22+08:00）
+
+Superpowers 插件、核心 skills 与 Open Design 仍均为 `none`。这是连续第三次相同结果，且没有新的用户决策或外部状态变化；当前完成审计仍显示 mandatory brainstorming 是所有后续工作的最早未满足前置条件。因此持续 Goal 应暂停为 blocked，恢复条件是安装 Superpowers、开启能暴露其 skills 的新会话并重新读取本仓库约束。
