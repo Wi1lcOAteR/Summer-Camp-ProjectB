@@ -71,4 +71,25 @@
 ## 已验证与未验证边界
 
 - **已验证**：文件存在性与内容、工具命令可发现性、列出的本地版本、官方 release/安装/许可证信息、`git init` 的实际结果。
-- **未验证**：任何业务行为、测试、构建、Docker daemon、CI、凭据扫描、WebUI、云部署、远程仓库与冷启动智能体。
+- **未验证**：任何业务行为、测试、构建、Docker daemon、CI、正式 Gitleaks 扫描、WebUI、云部署、远程仓库与冷启动智能体。
+
+## 持续 Goal 完成审计（2026-07-17T18:19:47+08:00）
+
+| 明确要求 | 权威证据 | 当前判定 |
+| --- | --- | --- |
+| 完整读取四类启动材料 | `AGENT_LOG.md` PRE-001 与已提交原文 | 已完成 |
+| 检查开发环境 | PRE-001 工具版本输出与本审计 | 已完成；Docker daemon 等实现期能力未验证 |
+| 检查 Superpowers 并列出相关 skills | PRE-001、PRE-004；插件和 skill 目录复查均为 `none` | 已完成检查；安装/可用性未达成 |
+| 进入正确 Superpowers 阶段 | 必须实际调用 `superpowers:brainstorming` | 未达成；skill 不可用 |
+| 检查 Open Design | PRE-001、PRE-004；`Get-Command od` 为 `none` | 已完成检查；安装未达成 |
+| 梳理课程差距 | 本文件“主要差距”矩阵 | 已完成当前状态梳理 |
+| 完成当前阶段所有无需决策工作 | 日志、审计、决策清单、Git 基线、凭据启发式扫描 | 已完成已识别的安全工作；等待门禁外部状态变化 |
+| 持续沉淀 SPEC | 合规证据必须来自 brainstorming 与用户确认 | 尚不能开始；不得用模板冒充 |
+| 生成 PLAN | 用户确认 SPEC + `writing-plans` | 门禁未开放 |
+| 冷启动验证 | 不同类型新 session，仅提供 SPEC/PLAN | 门禁未开放 |
+| 实现与 TDD | 实现门禁全部满足 + 用户批准 | 门禁未开放 |
+| 最终课程交付全部完成 | 文件、测试、构建、CI、部署 URL、学生反思等逐项证据 | 远未完成，持续 Goal 必须保持活动状态 |
+
+### 本轮结论
+
+当前没有可以在不调用 mandatory brainstorming、不给产品方向做重大猜测、且不制造空壳交付物的进一步规约工作。下一有效动作仍是用户在 Codex App/CLI 安装 Superpowers 并新建会话；Open Design 可随后按 `DECISIONS_NEEDED.md` 安装。

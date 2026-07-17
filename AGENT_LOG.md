@@ -56,3 +56,18 @@
 - `writing-plans`、`PLAN.md`、陌生智能体冷启动验证
 - 任何实现、测试、构建、静态检查、UI 验证、凭据扫描或 CI
 - 远程仓库、PR/MR、push、部署与发布
+
+## 2026-07-17T18:19:47+08:00 — PRE-004 外部状态复查
+
+- **Task 编号**：PRE-004
+- **触发的 Superpowers skill**：无。再次检查后，插件缓存与 skills 目录仍未检测到 Superpowers。
+- **关键 prompt / context**：持续 Goal 自动推进；要求以当前工作区和外部状态为准，不沿用旧结论。
+- **复查结果**：
+  - Git 工作区干净，HEAD 为 `1cd4427`。
+  - Superpowers 插件目录：无；核心 skill 目录：无。
+  - Open Design `od` 命令：无。
+  - `SPEC_PROCESS.md`、`AGENT_LOG.md`、`DECISIONS_NEEDED.md` 存在；`SPEC.md`、`PLAN.md`、`README.md`、`REFLECTION.md`、`.gitlab-ci.yml` 不存在。
+  - 后五项缺失并非可在当前阶段随意补空壳：`SPEC.md` 必须来自 mandatory brainstorming；`PLAN.md` 必须在用户确认 SPEC 后生成；README/CI 依赖已确认产品和技术栈；REFLECTION 仅能由学生本人撰写。
+- **subagent 输出 / commit hash**：未派发 subagent；冷启动阶段尚未开放。
+- **人工修改及原因**：无学生输入或外部状态变化。
+- **经验教训**：持续任务每次恢复都应重新检查门禁依赖；“文件不存在”既可能是缺口，也可能是遵守阶段顺序的正确状态。
