@@ -1,0 +1,48 @@
+# AGENT_LOG
+
+> 本文件只记录实际发生的过程。未执行的步骤明确标为“尚未执行”。
+
+## 2026-07-17T18:14:41+08:00 — PRE-001 启动审计
+
+- **Task 编号**：PRE-001
+- **主智能体**：OpenAI Codex（GPT-5；Codex App 的精确构建版本未向当前会话暴露）
+- **触发的 Superpowers skill**：无。课程要求当前必须触发 `superpowers:brainstorming`，但当前会话技能目录、插件缓存与已暴露技能清单均未检测到 Superpowers，故未伪装或替代调用。
+- **关键 prompt / context**：读取根目录 `AGENTS.md`、`SKILLS_SETUP.md`、`docs/requirements/项目要求.md`、`docs/requirements/AI4SE_Final_Project_B_应用类项目.md`；用户要求在不越过人工门禁的前提下持续推进。
+- **检查结果**：
+  - 仓库仅包含流程与课程文档，无既有源码或产品规约。
+  - `SPEC.md`、`PLAN.md`、`SPEC_PROCESS.md`、`README.md`、`REFLECTION.md`、`.gitlab-ci.yml` 均不存在（本次仅创建真实过程所需的 `SPEC_PROCESS.md`，不创建虚假的 SPEC/PLAN/CI 证据）。
+  - Superpowers 未安装/未暴露；所需核心 skills 均不可用。
+  - Open Design 的 `od` 命令、skill 与 MCP 均未检测到。
+  - 已从官方上游核验：Superpowers 最新 release 为 v5.1.0（commit `f2cbfbe`，MIT）；Open Design 最新 release 为 v0.15.0（commit `79e257d`，Apache-2.0）。
+  - Open Design 官方当前支持 `od mcp install codex`；Windows x64 提供安装器。安装/运行新软件属于必须由用户在操作时确认或亲自完成的系统级操作，本次未执行。
+  - 本地工具：Git 2.53.0.windows.3、Node 24.14.0、pnpm 11.9.0、Python 3.14.3、uv 0.11.14、Docker CLI 29.1.2。`npm.ps1` 被 PowerShell 执行策略阻止；可在后续使用 `npm.cmd`。`gh`、`gitleaks`、`claude`、`od` 未找到。
+  - 已执行 `git init`。Git 随后因沙箱账号与目录所有者不同报告 `dubious ownership`；未修改用户全局 Git 配置，后续可使用 `git -c safe.directory=...` 做局部操作。
+- **subagent 输出 / commit hash**：未派发 subagent；课程规定的冷启动阶段尚未到达。启动基线 commit：`4b72ced9ecfc3da0ee5691f4dbfebf8e9b593390`（课程原文、约束、Codex 配置与 `.gitignore`；commit message 已标注 Codex GPT-5）。
+- **人工修改及原因**：尚无学生人工修改记录。
+- **偏离、替代措施与影响**：
+  - 无法调用 mandatory `brainstorming`。替代措施仅限启动审计、差距梳理和文档骨架；不得据此产出或声称产出合规 `SPEC.md`。
+  - 无法自动操作 Codex App 插件界面：电脑控制规则禁止自动化 Codex 桌面应用及其扩展。需用户手动安装 Superpowers 并新建会话。
+  - Open Design 未安装；在其可用前不得进行正式 UI 方向设计。
+- **经验教训**：搜索摘要可能滞后；Open Design 版本必须以完整 Releases 页面为准。本次将初步摘要中的 v0.8.0 更正为 v0.15.0，未把错误版本写入正式状态。
+
+## 2026-07-17T18:14:41+08:00 — PRE-002 提交前验证
+
+- **Task 编号**：PRE-002
+- **触发的 Superpowers skill**：无；`verification-before-completion` 同样不可用，故仅执行明确列出的手工验证，不能声称完成 Superpowers 验证步骤。
+- **关键 prompt / context**：在首次本地提交前进行凭据与格式检查，不访问或输出真实凭据。
+- **验证结果**：
+  - 使用只返回文件名的启发式规则扫描 OpenAI/GitHub/AWS key 与私钥头：`POTENTIAL_SECRET_FILES: none`。
+  - `npm.cmd --version`：11.9.0；这确认可绕过被执行策略拦截的 `npm.ps1`。
+  - `git diff --cached --check` 首次指出 `.gitignore` 末尾多一个空行；已在后续过程文档提交前修正。
+  - Gitleaks 尚未安装，因此本次结果是有限启发式扫描，不替代实现阶段的正式凭据扫描。
+- **subagent 输出 / commit hash**：无 subagent。启动基线 commit 为 `4b72ced9ecfc3da0ee5691f4dbfebf8e9b593390`。
+- **人工修改及原因**：尚无学生人工修改记录。
+- **经验教训**：即使仓库只有文档，也应在首次提交前运行凭据模式扫描与 Git whitespace 检查，并明确工具能力边界。
+
+## 尚未执行
+
+- `superpowers:brainstorming` 与项目需求逐项澄清
+- `SPEC.md` 的生成与用户确认
+- `writing-plans`、`PLAN.md`、陌生智能体冷启动验证
+- 任何实现、测试、构建、静态检查、UI 验证、凭据扫描或 CI
+- 远程仓库、PR/MR、push、部署与发布
