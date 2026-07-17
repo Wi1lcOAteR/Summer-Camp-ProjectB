@@ -1,0 +1,32 @@
+# Credentials and local environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Editor and OS metadata
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Common dependency, cache, test, and build outputs
+node_modules/
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage/
+dist/
+build/
+.next/
+
+# Local Open Design artifacts unless deliberately promoted later
+.open-design/
+
