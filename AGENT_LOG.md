@@ -82,3 +82,20 @@
 - **人工修改及原因**：连续三轮没有收到学生决策或观察到插件安装状态变化。
 - **阻塞判定**：mandatory `superpowers:brainstorming` 无法调用；项目方向仍是占位文本，禁止替学生猜测；所有不依赖该门禁的审计、环境检查、过程证据与决策清单均已完成。符合持续 Goal 的第三次同条件阻塞阈值，应将 Goal 标记为 blocked，等待用户安装 Superpowers 后恢复。
 - **经验教训**：无人值守流程应在真实外部依赖未变化时停止并留下可恢复入口，而不是通过重复检查制造虚假进展。
+
+## 2026-07-17T22:05:24+08:00 — PRE-006 Superpowers 恢复与 Open Design 安装尝试
+
+- **Task 编号**：PRE-006
+- **触发的 Superpowers skill**：`using-superpowers`、`brainstorming`。已完整读取插件 v6.1.1 对应的两份 `SKILL.md`；brainstorming 的实现硬门禁继续生效。
+- **关键 prompt / context**：用户要求自行安装 Open Design；只允许官方来源，不使用第三方镜像，不录入 API Key。
+- **外部状态变化**：检测到官方 Codex 插件缓存已出现 Superpowers v6.1.1，包含 `brainstorming`、`writing-plans`、worktree、TDD、评审、调试与验证等核心 skills。此前的 Superpowers 阻塞已解除。
+- **Open Design 官方核验**：最新版 v0.15.0（release commit `79e257d`），Windows x64，Apache-2.0；官方安装器与 `.sha256` 均由 GitHub Release 提供。
+- **安装尝试与证据**：
+  - 沙箱内 `curl` 无法连接 GitHub；按规则提升网络权限后仍无法连接 `github.com:443`。
+  - Codex 内置浏览器打开官方下载页时超时并重置，未触发下载。
+  - 成功从 `open-design.ai/install.sh` 下载并检查官方包装脚本，SHA-256 为 `5866B8465CC3475A0CE63BE379F04A3E5E9A01BA579E6E7FB54304C82EDE06B3`；脚本明确要求本机先已有 `od`，不能替代桌面安装，因此已删除临时副本。
+  - 项目中不存在残留或零字节安装器。
+- **人工恢复入口**：用户将从官方 GitHub Release 下载 `open-design-0.15.0-win-x64-setup.exe` 及同名 `.sha256`；安装完成后由智能体验证并执行 `od mcp install codex`。
+- **subagent 输出 / commit hash**：未派发 subagent；当前仍处于阶段 A。
+- **人工修改及原因**：用户选择在自动下载受阻时手动下载官方安装器。
+- **经验教训**：Open Design 的 hosted `install.sh` 只是已有 CLI 的 MCP 包装器，不是桌面/CLI bootstrap；应避免把“接入 agent”和“安装产品”混为一谈。

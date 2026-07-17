@@ -97,3 +97,9 @@
 ### 第三次阻塞复查（2026-07-17T18:21:22+08:00）
 
 Superpowers 插件、核心 skills 与 Open Design 仍均为 `none`。这是连续第三次相同结果，且没有新的用户决策或外部状态变化；当前完成审计仍显示 mandatory brainstorming 是所有后续工作的最早未满足前置条件。因此持续 Goal 应暂停为 blocked，恢复条件是安装 Superpowers、开启能暴露其 skills 的新会话并重新读取本仓库约束。
+
+### 外部状态恢复（2026-07-17T22:05:24+08:00）
+
+- Superpowers v6.1.1 已安装到官方 Codex 插件缓存；核心 skills 完整，mandatory brainstorming 前置环境已恢复。
+- 已完整读取 `using-superpowers` 与 `brainstorming` skill，并保持“用户批准设计前不得实现”的硬门禁。
+- Open Design 仍未安装。自动下载受 GitHub 网络连接与内置浏览器超时阻塞，用户改为手动下载官方 v0.15.0 安装器；安装后继续 MCP 接入验证。
