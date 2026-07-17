@@ -53,4 +53,3 @@
   2. 使用另一种课程允许的智能体（Cursor Agent、Gemini CLI、OpenCode 等），确保全新 session 且仅提供 SPEC/PLAN。
 - **推荐方案及影响**：方案 1 与现有准备文档一致；可在 PLAN 完成前再安装。
 - **阻塞范围**：不阻塞阶段 A/B；阻塞阶段 C 冷启动验证。
-
