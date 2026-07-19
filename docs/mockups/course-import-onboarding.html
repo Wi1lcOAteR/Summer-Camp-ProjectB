@@ -23,7 +23,7 @@
       --blue-soft: #e9f1fa;
       --danger: #a33a35;
       --shadow: 0 12px 34px rgba(24, 35, 46, 0.09);
-      font-family: Inter, "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+      font-family: "Segoe UI", "Microsoft YaHei UI", "PingFang SC", system-ui, sans-serif;
     }
 
     * { box-sizing: border-box; }
@@ -52,8 +52,6 @@
     .app-shell {
       width: min(1180px, 100%);
       min-height: 760px;
-      display: grid;
-      grid-template-columns: 224px minmax(0, 1fr);
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -61,13 +59,17 @@
       overflow: hidden;
     }
 
-    .rail {
-      padding: 28px 22px;
+    .onboarding-header {
+      padding: 18px 34px 20px;
       background: #202830;
       color: #ffffff;
+    }
+
+    .brand-row {
       display: flex;
-      flex-direction: column;
-      gap: 28px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
     }
 
     .product {
@@ -85,59 +87,116 @@
       place-items: center;
       background: #ffffff;
       color: var(--accent);
-      font-weight: 500;
+      font-family: "Segoe UI Semibold", "Microsoft YaHei", sans-serif;
+      font-weight: 700;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .guard-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #cbd3da;
+      font-size: 13px;
+    }
+
+    .guard-note .ui-icon {
+      color: #77d4ad;
+      font-weight: 700;
+    }
+
+    .timeline-shell {
+      margin-top: 20px;
+      padding: 0 6px;
     }
 
     .steps {
+      --progress: 25%;
       margin: 0;
       padding: 0;
       list-style: none;
       display: grid;
-      gap: 8px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      position: relative;
+    }
+
+    .steps::before,
+    .steps::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      top: 15px;
+      left: 12.5%;
+      height: 2px;
+    }
+
+    .steps::before {
+      right: 12.5%;
+      background: #59636d;
+    }
+
+    .steps::after {
+      width: var(--progress);
+      background: #77d4ad;
+      transition: width 180ms ease;
+    }
+
+    .steps li {
+      position: relative;
+      z-index: 1;
     }
 
     .step-button {
       width: 100%;
       border: 0;
-      border-radius: 6px;
-      padding: 12px;
-      display: grid;
-      grid-template-columns: 28px 1fr;
+      padding: 0 6px;
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 7px;
       color: #cbd3da;
       background: transparent;
-      text-align: left;
+      text-align: center;
       cursor: pointer;
+      font-size: 13px;
     }
 
-    .step-button:hover { background: rgba(255, 255, 255, 0.07); }
+    .step-button:hover { color: #ffffff; }
 
     .step-button[aria-current="step"] {
       color: #ffffff;
-      background: rgba(255, 255, 255, 0.12);
+      font-weight: 700;
     }
 
     .step-number {
       width: 28px;
       height: 28px;
-      border: 1px solid #66717b;
+      border: 2px solid #66717b;
       border-radius: 50%;
       display: grid;
       place-items: center;
+      background: #202830;
       font-size: 13px;
+      font-weight: 700;
+    }
+
+    .step-button[aria-current="step"] .step-number {
+      border-color: #ffffff;
+      background: #ffffff;
+      color: var(--accent);
     }
 
     .step-button.is-complete .step-number {
       border-color: #6ed0a8;
       background: #146548;
       color: #ffffff;
-    }
-
-    .rail-note {
-      margin-top: auto;
-      color: #abb6bf;
-      font-size: 13px;
     }
 
     .workspace {
@@ -161,8 +220,8 @@
     .course-chip {
       padding: 7px 10px;
       border-radius: 999px;
-      background: var(--surface-subtle);
-      color: var(--muted);
+      background: rgba(255, 255, 255, 0.09);
+      color: #f0f3f5;
       font-size: 13px;
     }
 
@@ -174,9 +233,10 @@
     .screen[hidden] { display: none; }
 
     h1, h2, h3, p { margin-top: 0; }
-    h1 { margin-bottom: 10px; font-size: 28px; font-weight: 500; }
-    h2 { margin-bottom: 8px; font-size: 20px; font-weight: 500; }
-    h3 { margin-bottom: 5px; font-size: 16px; font-weight: 500; }
+    h1, h2, h3 { font-family: "Segoe UI Semibold", "Microsoft YaHei", sans-serif; }
+    h1 { margin-bottom: 10px; font-size: 30px; font-weight: 700; }
+    h2 { margin-bottom: 8px; font-size: 19px; font-weight: 700; }
+    h3 { margin-bottom: 5px; font-size: 17px; font-weight: 700; }
     p { line-height: 1.65; }
 
     .lede {
@@ -197,7 +257,7 @@
       flex-wrap: wrap;
     }
 
-    .summary-band p { margin: 3px 0 0; color: #5f4050; }
+    .summary-band p { margin: 3px 0 0; color: #5f4050; font-size: 14px; }
 
     .metrics {
       display: flex;
@@ -243,15 +303,24 @@
       accent-color: var(--accent);
     }
 
-    .mode-code {
-      width: 36px;
-      height: 36px;
+    .mode-heading {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      align-items: start;
+      gap: 12px;
+      padding-right: 24px;
+    }
+
+    .mode-icon {
+      width: 40px;
+      height: 40px;
       border-radius: 8px;
       display: grid;
       place-items: center;
       background: var(--surface-subtle);
       color: var(--accent);
-      font-weight: 500;
+      font-size: 22px;
+      font-weight: 700;
     }
 
     .mode p { margin-bottom: 0; color: var(--muted); font-size: 14px; }
@@ -269,12 +338,26 @@
     .badge.amber { background: var(--amber-soft); color: var(--amber); }
     .badge.blue { background: var(--blue-soft); color: var(--blue); }
 
-    .mode-list {
+    .mode-facts {
       margin: auto 0 0;
-      padding-left: 18px;
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.6;
+      display: grid;
+      gap: 8px;
+    }
+
+    .mode-facts span {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+    }
+
+    .fact-icon {
+      width: 18px;
+      flex: 0 0 18px;
+      color: var(--green);
+      font-weight: 700;
+      text-align: center;
     }
 
     .notice {
@@ -285,6 +368,24 @@
       background: var(--amber-soft);
       color: #644513;
       line-height: 1.55;
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+    }
+
+    .notice-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #f6d88f;
+      font-weight: 700;
+    }
+
+    .notice strong { display: block; font-weight: 700; }
+    .notice p { margin: 2px 0 0; font-size: 13px; }
     }
 
     .file-table, .permission-table {
@@ -307,6 +408,7 @@
     }
 
     .file-table td, .permission-table td { font-size: 14px; }
+    .permission-table td:nth-child(2) { font-weight: 700; }
 
     .check-row {
       margin-top: 18px;
@@ -336,7 +438,53 @@
     }
 
     .ready-item span { display: block; color: var(--muted); font-size: 12px; }
-    .ready-item strong { display: block; margin-top: 4px; font-weight: 500; }
+    .ready-item strong { display: block; margin-top: 4px; font-weight: 700; }
+
+    .ready-item-heading {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ready-item-heading .ui-icon {
+      color: var(--accent);
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .settings-callout {
+      margin-top: 24px;
+      padding: 18px;
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent-soft);
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .settings-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--accent);
+      color: #ffffff;
+      font-size: 22px;
+    }
+
+    .settings-kicker {
+      display: block;
+      margin-bottom: 3px;
+      color: #6c4256;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .settings-callout h2 { margin-bottom: 3px; color: var(--accent); }
+    .settings-callout p { margin: 0; color: #5f4050; font-size: 13px; }
 
     .actions {
       min-height: 76px;
@@ -359,6 +507,10 @@
       color: var(--text);
       font-weight: 500;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     .button:hover { background: var(--surface-subtle); }
@@ -376,12 +528,10 @@
 
     @media (max-width: 900px) {
       .viewport { padding: 14px; align-items: start; }
-      .app-shell { min-height: 0; grid-template-columns: 1fr; }
-      .rail { padding: 16px 18px; gap: 14px; }
-      .product { justify-content: center; }
-      .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .step-button { grid-template-columns: 1fr; justify-items: center; padding: 8px 4px; text-align: center; font-size: 12px; }
-      .rail-note { display: none; }
+      .app-shell { min-height: 0; }
+      .onboarding-header { padding: 16px 18px 18px; }
+      .timeline-shell { margin-top: 16px; padding: 0; }
+      .step-button { padding: 0 3px; font-size: 12px; }
       .workspace { min-height: 690px; }
       .mode-grid { grid-template-columns: 1fr; }
       .mode { min-height: 0; }
@@ -391,13 +541,13 @@
     @media (max-width: 560px) {
       .viewport { padding: 0; }
       .app-shell { border: 0; border-radius: 0; box-shadow: none; }
-      .product { justify-content: flex-start; }
+      .brand-row { align-items: flex-start; }
       .product span:last-child { display: none; }
-      .steps { gap: 2px; }
       .step-button { font-size: 11px; }
       .step-number { width: 24px; height: 24px; }
+      .steps::before, .steps::after { top: 11px; }
+      .guard-note { display: none; }
       .topbar { padding: 14px 18px; align-items: flex-start; }
-      .course-chip { display: none; }
       .content { padding: 24px 18px; }
       h1 { font-size: 24px; }
       .actions { padding: 14px 18px; flex-wrap: wrap; }
@@ -407,30 +557,39 @@
       .summary-band { align-items: flex-start; }
       .metrics { gap: 8px 12px; }
       .permission-table { display: block; overflow-x: auto; }
+      .settings-callout { grid-template-columns: 36px minmax(0, 1fr); padding: 15px; }
+      .settings-icon { width: 34px; height: 34px; font-size: 18px; }
     }
   </style>
 </head>
 <body>
   <main class="viewport">
     <section class="app-shell" aria-label="课程导入引导">
-      <aside class="rail">
-        <div class="product">
-          <div class="product-mark" aria-hidden="true">学</div>
-          <span>学习辅导工作台</span>
+      <header class="onboarding-header">
+        <div class="brand-row">
+          <div class="product">
+            <div class="product-mark" aria-hidden="true">学</div>
+            <span>学习辅导工作台</span>
+          </div>
+          <div class="header-meta">
+            <span class="guard-note"><span class="ui-icon" aria-hidden="true">✓</span>外发范围变更需再次确认</span>
+            <span class="course-chip">操作系统基础 · 2026 春</span>
+          </div>
         </div>
-        <ol class="steps" aria-label="导入步骤">
-          <li><button class="step-button is-complete" type="button" data-step="0"><span class="step-number">✓</span><span>检查课程</span></button></li>
-          <li><button class="step-button" type="button" data-step="1" aria-current="step"><span class="step-number">2</span><span>处理方式</span></button></li>
-          <li><button class="step-button" type="button" data-step="2"><span class="step-number">3</span><span>确认权限</span></button></li>
-          <li><button class="step-button" type="button" data-step="3"><span class="step-number">4</span><span>开始学习</span></button></li>
-        </ol>
-        <p class="rail-note">任何扩大课件外发范围的修改都会再次确认。</p>
-      </aside>
+        <nav class="timeline-shell" aria-label="课程导入进度">
+          <ol class="steps" aria-label="导入步骤">
+            <li><button class="step-button is-complete" type="button" data-step="0"><span class="step-number">✓</span><span>检查课程</span></button></li>
+            <li><button class="step-button" type="button" data-step="1" aria-current="step"><span class="step-number">2</span><span>处理方式</span></button></li>
+            <li><button class="step-button" type="button" data-step="2"><span class="step-number">3</span><span>确认权限</span></button></li>
+            <li><button class="step-button" type="button" data-step="3"><span class="step-number">4</span><span>开始学习</span></button></li>
+          </ol>
+        </nav>
+      </header>
 
       <div class="workspace">
         <header class="topbar">
           <div class="topbar-title">导入课程</div>
-          <div class="course-chip">操作系统基础 · 2026 春</div>
+          <span class="step-status" id="top-step-status">第 2 步，共 4 步</span>
         </header>
 
         <div class="content">
@@ -463,29 +622,26 @@
             <div class="mode-grid" role="radiogroup" aria-label="课件处理方式">
               <label class="mode" data-mode="local">
                 <input type="radio" name="mode" value="local">
-                <span class="mode-code">L</span>
-                <div><h3>本地解析</h3><p>课件不离开本机，解释时始终提供原页对照。</p></div>
+                <div class="mode-heading"><span class="mode-icon" aria-hidden="true">⌂</span><div><h3>本地解析</h3><p>课件不离开本机，解释时始终提供原页对照。</p></div></div>
                 <div class="badges"><span class="badge green">隐私强</span><span class="badge amber">保真度中</span><span class="badge green">无云端费用</span></div>
-                <ul class="mode-list"><li>公式和分栏可能失真</li><li>低置信度页面只提示，不自动上传</li></ul>
+                <div class="mode-facts"><span><b class="fact-icon" aria-hidden="true">!</b>公式和分栏可能失真</span><span><b class="fact-icon" aria-hidden="true">✓</b>低置信度页面只提示</span></div>
               </label>
 
               <label class="mode is-selected" data-mode="page-cloud">
                 <input type="radio" name="mode" value="page-cloud" checked>
-                <span class="mode-code">P</span>
-                <div><h3>按页云端处理</h3><p>本地管理课程，只发送当前任务所需并经确认的页面。</p></div>
+                <div class="mode-heading"><span class="mode-icon" aria-hidden="true">◫</span><div><h3>按页云端处理</h3><p>本地管理课程，只发送当前任务所需并经确认的页面。</p></div></div>
                 <div class="badges"><span class="badge blue">外发可控</span><span class="badge green">保真度高</span><span class="badge amber">按次计费</span></div>
-                <ul class="mode-list"><li>调用前预览页面与供应商</li><li>适合图表、公式和代码页面</li></ul>
+                <div class="mode-facts"><span><b class="fact-icon" aria-hidden="true">✓</b>调用前预览页面与供应商</span><span><b class="fact-icon" aria-hidden="true">✓</b>适合图表、公式和代码</span></div>
               </label>
 
               <label class="mode" data-mode="full-cloud">
                 <input type="radio" name="mode" value="full-cloud">
-                <span class="mode-code">F</span>
-                <div><h3>整份云端处理</h3><p>上传原始 PDF，由云端服务处理完整文档上下文。</p></div>
+                <div class="mode-heading"><span class="mode-icon" aria-hidden="true">↑</span><div><h3>整份云端处理</h3><p>上传原始 PDF，由云端服务处理完整文档上下文。</p></div></div>
                 <div class="badges"><span class="badge amber">外发范围大</span><span class="badge green">保真度最高</span><span class="badge amber">费用较高</span></div>
-                <ul class="mode-list"><li>需独立授权和删除状态</li><li>可能受文件与供应商限制</li></ul>
+                <div class="mode-facts"><span><b class="fact-icon" aria-hidden="true">!</b>需要独立授权和删除状态</span><span><b class="fact-icon" aria-hidden="true">!</b>受文件与供应商限制</span></div>
               </label>
             </div>
-            <div class="notice" role="note">系统不会因为本地解析质量较低而自动切换到云端。任何扩大外发范围的修改都会再次展示实际文件或页面并等待确认。</div>
+            <div class="notice" role="note"><span class="notice-icon" aria-hidden="true">!</span><div><strong>不会静默切换处理方式</strong><p>扩大外发范围前，系统会展示实际文件或页面并再次等待确认。</p></div></div>
           </section>
 
           <section class="screen" data-screen="2" hidden>
@@ -511,10 +667,14 @@
               <div class="metrics"><span>15 份材料</span><span>4 个主题组</span></div>
             </div>
             <div class="ready-list">
-              <div class="ready-item"><span>处理方式</span><strong id="ready-mode">按页云端处理</strong></div>
-              <div class="ready-item"><span>课程设置</span><strong id="ready-remember">已按课程记住</strong></div>
-              <div class="ready-item"><span>原始幻灯片</span><strong>始终可查看</strong></div>
-              <div class="ready-item"><span>扩大外发范围</span><strong>需要重新确认</strong></div>
+              <div class="ready-item"><div class="ready-item-heading"><span class="ui-icon" aria-hidden="true">◫</span><span>处理方式</span></div><strong id="ready-mode">按页云端处理</strong></div>
+              <div class="ready-item"><div class="ready-item-heading"><span class="ui-icon" aria-hidden="true">✓</span><span>课程设置</span></div><strong id="ready-remember">已按课程记住</strong></div>
+              <div class="ready-item"><div class="ready-item-heading"><span class="ui-icon" aria-hidden="true">□</span><span>原始幻灯片</span></div><strong>始终可查看</strong></div>
+              <div class="ready-item"><div class="ready-item-heading"><span class="ui-icon" aria-hidden="true">!</span><span>扩大外发范围</span></div><strong>需要重新确认</strong></div>
+            </div>
+            <div class="settings-callout" role="note">
+              <span class="settings-icon" aria-hidden="true">⚙</span>
+              <div><span class="settings-kicker">以后需要调整？</span><h2>课程设置 › 材料与隐私</h2><p>可在这里修改处理方式、查看授权记录或清除材料；扩大外发范围仍会再次确认。</p></div>
             </div>
           </section>
         </div>
@@ -522,8 +682,8 @@
         <footer class="actions">
           <span class="step-status" id="step-status">第 2 步，共 4 步</span>
           <div class="button-group">
-            <button class="button" id="back" type="button">上一步</button>
-            <button class="button primary" id="next" type="button">继续</button>
+            <button class="button" id="back" type="button"><span aria-hidden="true">←</span><span>上一步</span></button>
+            <button class="button primary" id="next" type="button"><span id="next-label">继续</span><span aria-hidden="true">→</span></button>
           </div>
         </footer>
       </div>
@@ -536,7 +696,10 @@
     const modes = [...document.querySelectorAll('.mode')];
     const back = document.getElementById('back');
     const next = document.getElementById('next');
+    const nextLabel = document.getElementById('next-label');
     const status = document.getElementById('step-status');
+    const topStatus = document.getElementById('top-step-status');
+    const steps = document.querySelector('.steps');
     const remember = document.getElementById('remember');
     let current = 1;
     let selectedMode = 'page-cloud';
@@ -557,8 +720,10 @@
         number.textContent = index < current ? '✓' : String(index + 1);
       });
       status.textContent = `第 ${current + 1} 步，共 4 步`;
+      topStatus.textContent = status.textContent;
+      steps.style.setProperty('--progress', `${(current / 3) * 75}%`);
       back.disabled = current === 0;
-      next.textContent = current === 3 ? '进入课程' : '继续';
+      nextLabel.textContent = current === 3 ? '开始学习' : '继续';
       const label = modeLabels[selectedMode];
       document.getElementById('permission-mode').textContent = label.name;
       document.getElementById('permission-scope').textContent = label.scope;

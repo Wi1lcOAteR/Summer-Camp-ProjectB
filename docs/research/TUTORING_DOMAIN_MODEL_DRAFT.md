@@ -108,7 +108,7 @@ processing -> ready | ready_with_warnings | failed
 ready/ready_with_warnings -> deleting -> deleted | delete_incomplete
 ```
 
-D-009 将决定 `awaiting_policy` 是否必须由用户显式完成，以及课程设置如何记住。
+D-009 已确认：`awaiting_policy` 必须由用户在首次导入引导中显式完成；选择按课程记住，任何扩大外发范围的切换仍需新的 `ConsentRecord`。
 
 ### 学习闭环
 
@@ -152,7 +152,7 @@ choose goal
 
 ## 仍需 brainstorming 确认
 
-- D-009：首次导入策略与课程级设置记忆；
+- 正式支持的处理模式目录，尤其是否提供整份 PDF 云端处理；
 - 目标用户是否只限单个学生，还是支持多用户/教师；
 - 第一版必需材料类型与是否导入个人笔记/作业；
 - “看懂”的具体知识点、诊断方法和成功标准；
