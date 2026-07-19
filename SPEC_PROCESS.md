@@ -236,6 +236,13 @@
 - **安全边界**：F 的远端文件/索引不能替代本地来源与页码；切回 L/P 后立即禁止新 F 请求并异步删除；删除无法确认时显示 `delete_incomplete`。
 - **仍未决定**：provider、模型、区域、留存/训练政策、费用/容量、凭据适配和实际操作系统课件的权利边界。
 
+### D-015 人工门禁前的 Provider 策略准备（2026-07-20T01:02:00+08:00，无学生新回答）
+
+- **已核验资料**：通过 OpenAI Developer Docs MCP 阅读 File Search、Files/Vector Stores 删除参考和 Data controls；确认其官方文档存在文件上传/索引/引用/删除入口，并明确文件/向量库应用状态和数据控制说明。Google/Anthropic 官方站点本轮连接失败，未将其能力写成事实。
+- **候选比较**：新增 `docs/research/PROVIDER_STRATEGY_OPTIONS.md`，比较统一适配器 + 一个真实参考 provider、单 provider 紧耦合、多个真实 provider 三种策略。
+- **推荐但未代选**：推荐统一适配器 + 一个真实参考 provider；先验证 provider-neutral 生命周期、mock 和一条真实适配器，再扩展其他 provider。
+- **未执行**：未选择 provider、读取/提交凭据、调用真实 API 或创建适配器代码；D-015 等待学生人工选择。
+
 ## 2. SPEC 签字确认
 
 尚未执行。`SPEC.md` 已创建为阶段 A 工作草案，但仍包含需要逐项确认的候选设计与未决问题，用户尚未签字确认。
