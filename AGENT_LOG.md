@@ -475,3 +475,26 @@
 - **subagent 输出 / commit hash**：未派发 subagent；本次审计以 `b917d58` 为基线，只追加过程日志，不产生功能或规约修改。
 - **人工修改及原因**：没有替学生选择 provider、凭据、API 或 adapter，也没有生成 `PLAN.md`；只记录第三次真实复查与阻断条件。
 - **经验教训**：同一人工门禁连续三次没有变化时，应正式标记 Goal 阻塞，而不是继续重复审计或消耗运行资源。
+
+## 2026-07-20T01:33:25+08:00 — BRAIN-017 用户配置 Provider 与统一适配器确认
+
+- **Task 编号**：BRAIN-017
+- **触发的 Superpowers skill**：续接 `brainstorming`；学生恢复此前因 D-015 阻塞的 Goal，并给出 provider 适配架构方向。没有进入 `writing-plans`。
+- **关键 prompt / context**：学生原始回答为“供应商让用户自己在config里面配置喽，我们写好适配器就行”。按最小语义确认统一 `ProviderAdapterRegistry`，用户在本地设置中选择平台已实现的 adapter/profile，领域层不硬编码供应商。
+- **安全与范围解释**：普通 config 只含 adapter ID、模型、受控参数、预算和 `credential_ref`；key/token 仍由隐藏录入进入本机安全凭据存储。未把回答解释为允许任意 endpoint、第三方插件、明文 secret，或已选择具体 provider/模型/区域/政策。未知/坏配置与能力不足在联网前失败关闭；配置/政策变化使旧 consent 失效。
+- **规约产出**：D-015 标为已确认架构方向；`SPEC.md` 新增 profile/能力快照与 AC-30 至 AC-32；同步远端生命周期、模型端口、威胁、领域模型、处理模式和历史候选。D-016 缩小为首版交付一个还是多个真实 adapter 的人工门禁。
+- **subagent 输出 / commit hash**：`/root/d015_audit` 先完成只读交叉审计，后只修改四份 provider/生命周期研究合同；`/root/next_gate_audit` 只读梳理后续门禁，后只修改三份威胁/领域/处理模式文档。两者均报告 scoped `git diff --check`、围栏、链接与强特征凭据扫描通过，未提交 Git。主智能体在基线 `0e06cbc` 上整合核心规约；本轮最终 commit 在任务输出记录。
+- **人工修改及原因**：学生决定 provider 由最终用户配置、平台负责 adapter；智能体仅补充课程强制的 secret 分离、失败关闭和授权隔离，没有替学生选择真实 adapter 数量或厂商。
+- **经验教训**：“用户可配置 provider”必须拆成注册表、非秘密 profile、凭据引用和能力/政策快照；否则容易同时退化成明文 key、任意 URL 和无法审计的兼容性承诺。
+
+## 2026-07-20T01:46:35+08:00 — AUDIT-002 Requirements 当前符合性复核
+
+- **Task 编号**：AUDIT-002
+- **触发的 Superpowers skill**：当前仍在 `brainstorming` 阶段；按 `verification-before-completion` 的证据纪律逐项读取命令输出，但本会话未注册该 skill，因此不把手工复核虚报为正式调用。
+- **关键 prompt / context**：学生要求确认项目当前是否仍符合 requirements 文件夹文档。实际课程原文位于 `docs/requirements/`；完整读取通用要求与 Project B 应用类要求，并与 `AGENTS.md`、当前 SPEC/过程文档、文件清单和 Git 历史对照。
+- **实际检查**：确认 `SPEC.md`、`SPEC_PROCESS.md`、`AGENT_LOG.md` 存在；`PLAN.md`、README、REFLECTION、正式源码、测试命令、GitHub/GitLab CI、分发产物和部署 URL 不存在；`od` 仍不可用；非文档正式源码计数为 0。检查到 `SPEC_PROCESS.md` 页首仍错误写“尚未形成 SPEC”，已立即修正。
+- **审计结论**：项目仍符合 Project B 选题边界，并基本遵守阶段 A 门禁；当前不满足最终交付要求。缺失的 PLAN/实现/TDD/CI/分发等大多是阶段门禁后的硬任务，不等于豁免；Open Design、Superpowers 阶段 B 注册、技术/分发选型、双远程平台策略和过程反思是签字或后续阶段前的明确缺口。
+- **产出与证据边界**：新增 `docs/REQUIREMENTS_COMPLIANCE_AUDIT.md` 四态矩阵，并将 `docs/PROJECT_AUDIT.md` 明确标为启动历史快照；没有创建空壳 PLAN、README、CI、测试或 REFLECTION，也没有声称任何实现验证通过。
+- **subagent 输出 / commit hash**：`/root/requirements_audit` 只读核对课程条款与仓库证据，指出 SPEC_PROCESS 旧页首、最新决策日志缺口及最终交付缺项；未修改文件或提交。主智能体负责修订和最终验证，本轮 commit 在任务输出记录。
+- **人工修改及原因**：学生主动要求 requirements 复核；智能体将结果分为当前满足、文档覆盖未验证、阶段门禁延后和明确缺口，避免用“阶段正确”冒充“项目最终合规”。
+- **经验教训**：门禁既禁止提前造实现证据，也不能成为遗漏最终硬项的理由；合规审计必须同时报告当前阶段正确性和截止提交时仍欠缺的证据。

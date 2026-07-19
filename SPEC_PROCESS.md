@@ -1,6 +1,6 @@
 # SPEC_PROCESS
 
-> 当前状态：阶段 A 的需求澄清已开始，尚未形成 `SPEC.md`。Superpowers v6.1.1 已安装且此前会话已记录触发 `brainstorming`；本次会话未将 `superpowers:*` 注册到可调用 skill 清单，因此仅按已安装的上游指令续接流程，并如实保留这一证据限制。
+> 当前状态：阶段 A 的需求澄清持续进行；`SPEC.md` 已形成未签字工作草案，但仍含人工门禁和未决技术/分发项，不得触发 `writing-plans` 或实现。Superpowers v6.1.1 已安装且此前会话已记录触发 `brainstorming`；本次会话未将 `superpowers:*` 注册到可调用 skill 清单，因此仅按已安装的上游指令续接流程，并如实保留这一证据限制。
 
 ## 0. 启动审计（2026-07-17）
 
@@ -242,6 +242,25 @@
 - **候选比较**：新增 `docs/research/PROVIDER_STRATEGY_OPTIONS.md`，比较统一适配器 + 一个真实参考 provider、单 provider 紧耦合、多个真实 provider 三种策略。
 - **推荐但未代选**：推荐统一适配器 + 一个真实参考 provider；先验证 provider-neutral 生命周期、mock 和一条真实适配器，再扩展其他 provider。
 - **未执行**：未选择 provider、读取/提交凭据、调用真实 API 或创建适配器代码；D-015 等待学生人工选择。
+
+### 第 14 轮：统一适配器与用户配置 Provider（2026-07-20T01:33:25+08:00）
+
+- **学生原始回答**：“供应商让用户自己在config里面配置喽，我们写好适配器就行”。
+- **最小解释**：D-015 的架构方向采用 provider-neutral `ProviderAdapter`/registry；产品不硬编码或静默指定供应商，用户在本地 config/设置中选择平台已经实现的 adapter 与 provider profile。领域层只接收统一能力、状态和错误码。
+- **配置与凭据分离**：普通 config 只保存 adapter ID、模型、受控参数、预算与 `credential_ref`；API key/token 仍由隐藏录入进入本机安全凭据存储，不回显、不进入 Git、日志、快照或浏览器持久化。学生原回答不构成明文 secret 授权。
+- **授权与失败边界**：未知/无效配置、缺少凭据或能力不足在网络调用前失败关闭；L 仍可使用。切换 adapter/profile、受控 endpoint 或政策指纹后，旧同意不能复用，旧远端对象继续独立追踪与清理。
+- **未过度解释**：没有把该回答解释为允许任意 endpoint、加载第三方插件或已选择具体 provider/模型/区域/政策。首版交付一个还是多个真实 adapter 仍由 D-016 单独确认。
+- **规约同步**：D-015 标为已确认架构方向；`SPEC.md` 增加 `ProviderProfile`/能力快照、配置失败关闭和 adapter contract 验收，研究合同同步 adapter/profile/config/policy 指纹语义。
+- **未执行**：未创建 adapter、配置解析器、凭据代码、SDK 依赖或 `PLAN.md`，未读取凭据或调用真实 API；`SPEC.md` 仍未签字。
+
+### 阶段 A Requirements 符合性复核（2026-07-20T01:46:35+08:00）
+
+- **学生请求**：确认当前项目是否仍符合 requirements 文件夹内的文档要求；实际权威文件位于 `docs/requirements/`。
+- **核验方式**：完整重读通用要求与 Project B 要求，对照 `AGENTS.md`、SPEC 章节、14 轮过程记录、文件清单、Git 历史、Superpowers/Open Design 状态和当前缺失交付物；没有把计划中的行为当作已完成证据。
+- **结论**：选题仍符合 B 类应用边界，阶段 A 流程基本合规；最终项目尚不合规。三模块、用户故事、安全/凭据、架构和验收已在规约覆盖但尚未实现验证；PLAN、冷启动、源码、TDD、CI、分发、README、PR/MR、公开 URL 与学生反思均未完成。
+- **即时修正**：本文件页首过时地写着“尚未形成 SPEC”，已改为“SPEC 是未签字工作草案”；新增 `docs/REQUIREMENTS_COMPLIANCE_AUDIT.md` 四态矩阵，并将旧 `docs/PROJECT_AUDIT.md` 标明为启动历史快照。
+- **仍需学生参与**：签字前仍需收敛真实 adapter 范围、技术栈、分发/目标平台、公开演示、远程平台与 Open Design；本文件要求的 brainstorming 优点/不足反思也需要学生表达，不能从智能体日志推断成学生观点。
+- **门禁保持**：本次复核没有创建 `PLAN.md`、正式实现、CI 空壳或 `REFLECTION.md`，也没有越过 D-016 或 SPEC 签字。
 
 ## 2. SPEC 签字确认
 

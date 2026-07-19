@@ -4,14 +4,16 @@
 
 ## 状态与范围
 
-D-013 已确认第一版使用受约束 AI 功能，不包含课程定义的 agent。本文件把“模型可以做什么”与“应用权威状态由谁决定”分开，供后续 `SPEC.md`、技术选型和 PLAN 使用。它不选择 provider、具体模型、SDK、部署平台或提示词模板。
+D-013 已确认第一版使用受约束 AI 功能，不包含课程定义的 agent。D-015 又确认平台采用统一 `ProviderAdapterRegistry`，由用户配置平台已支持的 provider profile。本文件把“模型可以做什么”与“应用权威状态由谁决定”分开，供后续 `SPEC.md`、技术选型和 PLAN 使用。它不选择具体 provider、模型、SDK、适配器目录、任意 endpoint、部署平台或提示词模板。
 
 ## 总体边界
 
 ```text
 domain state + approved source scope
   -> ModelPort request
-  -> provider adapter
+  -> configured provider profile
+  -> ProviderAdapterRegistry
+  -> registered provider adapter
   -> schema/size/source validation
   -> candidate result
   -> deterministic policy + user confirmation
@@ -25,11 +27,16 @@ domain state + approved source scope
 - 允许读取的来源 ID、页码或已脱敏证据 ID；
 - 输入内容的大小、图像数量、token/时间预算和取消信号；
 - 可重试的幂等键、provider 追踪 ID 和最小化审计元数据；
+- 非秘密 `provider_profile_id`、`config_fingerprint`、能力与政策快照 ID；
 - 结构化响应 schema、schema 版本和拒绝原因。
 
 模型输出默认是 `candidate`，不能直接成为课件事实、知识覆盖、计划、优先级、掌握状态、授权或删除结果。
 
-在模式 F 中，端口仍只使用应用内部 `source_id`；provider 文件/索引 ID 由适配器通过 `RemoteMaterialObject` 解析，不暴露为任意工具参数。模型引用必须映射回本地材料与页码，不能以“整份文件已上传”代替来源定位。
+provider profile 只保存 adapter 允许的非秘密配置和指向本机安全存储的 `credential_ref`。模型端口请求、响应、普通配置文件、浏览器持久化、日志与快照均不得包含凭据值；只有 X1 凭据边界可在调用 adapter 时解析 `credential_ref`。
+
+未知 adapter/profile、无效配置、缺失凭据、无法验证的能力/政策快照或当前端口能力不足时，必须在读取或发送远端 payload 前失败关闭；不得猜测配置、自动选择另一 provider 或静默扩大来源范围。模式 L 不依赖远端 profile，仍可继续使用。
+
+在模式 F 中，端口仍只使用应用内部 `source_id`；provider 文件/索引 ID 由已配置适配器通过绑定相同 profile/config/policy 指纹的 `RemoteMaterialObject` 解析，不暴露为任意工具参数。模型引用必须映射回本地材料与页码，不能以“整份文件已上传”代替来源定位。
 
 ## 端口目录
 
@@ -52,6 +59,10 @@ domain state + approved source scope
   "request_id": "opaque-id",
   "course_id": "opaque-id",
   "task_id": "opaque-id-or-null",
+  "provider_profile_id": "opaque-profile-id",
+  "config_fingerprint": "non-secret-config-digest",
+  "capability_snapshot_id": "opaque-capability-snapshot",
+  "policy_snapshot_id": "opaque-policy-snapshot",
   "source_scope": ["source-id"],
   "evidence_scope": ["evidence-id"],
   "input_digest": "non-secret-digest",
@@ -64,7 +75,7 @@ domain state + approved source scope
 }
 ```
 
-示例中的预算数值仅用于展示字段，不是已确认默认值。真实实现可以采用其他序列化格式，但必须保留同等字段语义。请求不能携带任意本地路径、凭据、未批准的原文范围或可执行工具参数；`source_scope` 为空时，端口只能返回“来源不足”，不能自行搜索。
+示例中的预算数值仅用于展示字段，不是已确认默认值。真实实现可以采用其他序列化格式，但必须保留同等字段语义。请求不能携带任意本地路径、`credential_ref` 或凭据值、未批准的原文范围或可执行工具参数；`source_scope` 为空时，端口只能返回“来源不足”，不能自行搜索。profile/config/policy 指纹与当前 consent 不一致时，调用必须在 adapter 前被拒绝。
 
 ## 通用响应合同
 
@@ -82,7 +93,7 @@ domain state + approved source scope
 }
 ```
 
-允许的顶层状态至少包括 `candidate`、`source_insufficient`、`schema_rejected`、`provider_failed`、`cancelled` 和 `budget_exceeded`。除 `candidate` 外，状态不能进入权威写入路径；`content` 在错误状态下必须为空或仅含脱敏恢复信息。
+允许的顶层状态至少包括 `candidate`、`source_insufficient`、`schema_rejected`、`provider_config_invalid`、`credential_unavailable`、`capability_unsupported`、`policy_unknown`、`provider_failed`、`cancelled` 和 `budget_exceeded`。除 `candidate` 外，状态不能进入权威写入路径；`content` 在错误状态下必须为空或仅含脱敏恢复信息。
 
 ## 端口专属约束
 
@@ -130,6 +141,7 @@ domain state + approved source scope
 requested -> provider_pending
 provider_pending -> candidate -> validated -> awaiting_confirmation
 provider_pending -> provider_failed/cancelled/budget_exceeded
+requested -> provider_config_invalid/credential_unavailable/capability_unsupported/policy_unknown
 candidate -> schema_rejected/source_insufficient
 ```
 
@@ -138,10 +150,11 @@ candidate -> schema_rejected/source_insufficient
 - 来源不存在或权限改变：拒绝候选并要求重新检索/覆盖确认。
 - 同一幂等键重复请求：返回同一候选或明确的已取消状态，不重复计费或写入。
 - provider 返回提示注入、工具指令或越权请求：把它当普通输出数据拒绝，不执行其中动作。
+- profile/config/policy 指纹变化：旧 consent 不再匹配；已有候选可保留为历史但不能用于新权威写入，新请求等待配置校验与用户确认。
 
 ## Provider mock 与确定性测试合同
 
-核心测试必须能在没有真实 LLM、网络和凭据时运行。mock 至少支持按 `request_id`/测试种子返回：成功候选、低置信候选、无来源、坏 schema、超时、限流、注入文本、重复响应和不同措辞但相同结构的反馈。
+核心测试必须能在没有真实 LLM、网络和凭据时运行。registry/mock 至少支持未知 adapter、坏配置、缺失凭据、能力不足、政策未知，以及按 `request_id`/测试种子返回成功候选、低置信候选、无来源、坏 schema、超时、限流、注入文本、重复响应和不同措辞但相同结构的反馈。
 
 必测不变量：
 
@@ -152,10 +165,13 @@ candidate -> schema_rejected/source_insufficient
 5. 相同请求、规则、来源和时钟下，候选校验与应用状态机结果可重放。
 6. 任何模型输出都不能调用文件、凭据、网络或删除工具；工具分发层不存在 agent loop。
 7. 日志、错误和审计只含端口、对象 ID、状态、耗时和计量，不含原文、回答或 key。
+8. profile/config/policy 指纹变化后旧 consent 不匹配，provider mock 调用为 0；旧远端引用不能被新 profile 使用。
+9. 未知 adapter、坏配置、缺失凭据或能力不足时失败关闭，不自动切换 provider；本地模式仍可运行。
 
 ## 尚未选择的技术项
 
-- provider、模型版本、区域、留存/训练政策和成本上限；
+- 首版支持的 adapter/provider 目录、模型版本、区域、留存/训练政策和成本上限；
+- 是否允许任意自定义 endpoint；D-015 未对此授权；
 - 本地模型、远端最小片段或混合路由的具体实现；
 - token/图像/页数预算的最终数值；
 - schema 序列化库、重试策略和凭据存储适配器；

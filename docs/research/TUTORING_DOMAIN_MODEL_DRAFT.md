@@ -4,7 +4,7 @@
 
 ## 状态
 
-本文依据已确认的产品方向整理候选模块、接口与数据约束，供后续 brainstorming 和 `SPEC.md` 使用。它不是已批准架构，不决定数据库、框架、模型供应商或部署方式。D-013 已确认第一版使用受约束 AI 功能而不包含课程定义的 agent。
+本文依据已确认的产品方向整理候选模块、接口与数据约束，供后续 brainstorming 和 `SPEC.md` 使用。它不是已批准架构，不决定数据库、框架、具体 provider endpoint 或部署方式。D-013 已确认第一版使用受约束 AI 功能而不包含课程定义的 agent；D-015 已确认由 provider-neutral adapter registry 隔离供应商差异，用户从平台支持的配置中选择 provider。
 
 ## 已确认的输入
 
@@ -17,6 +17,7 @@
 - 首个纵向学习闭环选择互斥与竞态条件，使用合成线程轨迹的确定性 oracle、来源约束解释和后续变式复习。
 - 课程材料按学期进度增量导入；每批材料先形成候选知识覆盖，经用户确认后才修订未来学习计划，不能清空既有证据。
 - 学期中默认 `continuous` 持续模式；录入考试日期并由用户显式进入后才使用 `finals` 期末周模式。往年卷和老师重点是显式材料角色，不表示模型训练或原题预测。
+- Provider 不是领域层常量：平台维护支持的 adapter registry，用户配置非敏感的 endpoint、模型、区域和预算并选择 profile；API key 等 secret 只通过安全凭据存储的引用关联。未知 adapter、未确认 endpoint 或能力不足的 profile 不能启用相应 P/F 能力。
 
 ## 候选职责模块
 
@@ -66,7 +67,7 @@
 
 ### X1 安全、凭据与审计（跨模块）
 
-**职责**：凭据安全存储、数据外发预览、所有权检查、预算/超时、错误脱敏、同意与删除审计。
+**职责**：provider adapter registry 与能力校验、非敏感 profile 配置、凭据安全存储、数据外发预览、所有权检查、预算/超时、错误脱敏、同意与删除审计。
 
 它是跨模块控制面，不应被包装成一个独立、可绕过的“安全页面”。M1-M3 的每个外发、存储和删除操作都要经过相同策略。
 
@@ -79,9 +80,11 @@
 | `MaterialBatch` | `id`, `course_id`, `role`, `state`, `created_at` | 批次内文件状态独立；失败不能覆盖成功；重复导入幂等 |
 | `Material` | `id`, `course_id`, `original_name`, `content_hash`, `mime_type`, `size`, `page_count`, `state` | 原文件身份不可被提取文本替代；禁止重复/越界导入 |
 | `MaterialPage` | `material_id`, `page_number`, `render_ref`, `raw_text`, `normalized_text`, `quality_flags`, `parser_version` | `(material_id, page_number)` 唯一；原始与归一化文本并存 |
-| `ProcessingPolicy` | `id`, `course_id`, `mode`, `provider_scope`, `version`, `chosen_at` | 课程级有效；扩大外发需新的同意记录 |
-| `ConsentRecord` | `id`, `course_id`, `from_mode`, `to_mode`, `payload_scope`, `provider`, `approved_at`, `revoked_at` | 追加式记录；不得覆盖旧授权历史；不保存正文 |
-| `RemoteMaterialObject` / `RemoteJob` | `material_id`, `provider`, `content_hash`, `state`, `consent_record_id`, `provider_refs`, `job_type` | 模式 F 文件/索引/删除可观察；幂等、引用保护和 `delete_incomplete` |
+| `ProviderProfile` | `id`, `adapter_kind`, `endpoint`, `model_ids`, `region`, `budget_policy`, `credential_ref`, `config_version` | 只能引用 registry 支持的 adapter；config 不含 secret；任一变更创建新版本而非原地改写 |
+| `ProviderPolicySnapshot` | `id`, `profile_id`, `config_version`, `capabilities`, `retention`, `training_use`, `deletion_semantics`, `verified_at`, `source_refs` | 未知字段保持未知；能力不足时失败关闭；政策变化不能改写旧快照 |
+| `ProcessingPolicy` | `id`, `course_id`, `mode`, `provider_profile_id`, `config_version`, `policy_snapshot_id`, `version`, `chosen_at` | 课程级有效；扩大外发或切换 profile/config/policy snapshot 需新的同意记录 |
+| `ConsentRecord` | `id`, `course_id`, `from_mode`, `to_mode`, `payload_scope`, `provider_profile_id`, `config_version`, `policy_snapshot_id`, `approved_at`, `revoked_at` | 追加式记录；与实际 profile/config/policy snapshot 精确绑定；不得覆盖旧授权历史；不保存正文或 secret |
+| `RemoteMaterialObject` / `RemoteJob` | `material_id`, `provider_profile_id`, `config_version`, `policy_snapshot_id`, `content_hash`, `state`, `consent_record_id`, `provider_refs`, `job_type` | 模式 F 文件/索引/删除可观察；远端引用仅由创建它的 adapter/profile 使用；幂等、引用保护和 `delete_incomplete` |
 | `KnowledgeConcept` | `id`, `course_id`, `title`, `description`, `prerequisite_ids`, `status` | 必须至少有一个来源或标为学生自建；依赖不能形成非法循环 |
 | `SourceReference` | `id`, `concept_id`, `material_id`, `page_number`, `region`, `kind` | 页码必须存在；区分课件、学生笔记和模型补充 |
 | `ConceptCoverage` | `id`, `batch_id`, `concept_id`, `source_ids`, `relation`, `confidence`, `extractor_version` | 候选映射不等于权威知识；低置信与冲突需确认 |
@@ -94,14 +97,15 @@
 | `LearningPlan` | `id`, `course_id`, `mode`, `goal_version`, `policy_version`, `created_at` | 输入可重放；活动版本唯一；旧版本保留 |
 | `PlanRevision` | `from_version`, `to_version`, `reason_codes`, `input_ids`, `created_at` | 只替换允许变更的未来任务，不覆盖历史 |
 | `ReviewTask` | `id`, `concept_id`, `due_at`, `reason`, `task_type`, `status`, `attempt_ids` | 到期原因可见；完成必须关联实际尝试 |
-| `CredentialStatus` | `provider`, `storage_ref`, `configured`, `updated_at` | `storage_ref` 只指向安全存储；查看状态不回显值 |
-| `AuditEvent` | `id`, `actor_id`, `event_type`, `data_category`, `provider`, `scope_ids`, `occurred_at`, `result` | 白名单元数据，不记录课件正文、作答或凭据 |
+| `CredentialStatus` | `provider_profile_id`, `storage_ref`, `configured`, `updated_at` | `storage_ref` 只指向安全存储；profile config 不含 secret；查看状态不回显值 |
+| `AuditEvent` | `id`, `actor_id`, `event_type`, `data_category`, `provider_profile_id`, `config_version`, `scope_ids`, `occurred_at`, `result` | 白名单元数据，不记录课件正文、作答或凭据 |
 
 ## 关键关系
 
 ```text
 Course
-  -> ProcessingPolicy -> ConsentRecord[]
+  -> ProcessingPolicy -> ProviderProfile -> ProviderPolicySnapshot[]
+                      -> ConsentRecord[]
                       -> RemoteMaterialObject[] -> RemoteJob[]
   -> MaterialBatch[] -> Material[] -> MaterialPage[]
   -> ConceptCoverage[] -> CoverageDecision[]
@@ -113,7 +117,7 @@ Course
   -> CourseReviewGoal -> LearningPlan[] -> PlanRevision[]
 ```
 
-`LearningEvidence` 是 M2 与 M3 的主要合同；`SourceReference` 是 M1 与 M2/M3 的主要合同；`ProcessingPolicy`/`ConsentRecord` 约束所有可能跨越本地边界的操作。
+`LearningEvidence` 是 M2 与 M3 的主要合同；`SourceReference` 是 M1 与 M2/M3 的主要合同；adapter registry、`ProviderProfile`、`ProviderPolicySnapshot`、`ProcessingPolicy` 和 `ConsentRecord` 共同约束所有可能跨越本地边界的操作。
 
 ## 候选状态流
 
@@ -129,6 +133,8 @@ ready/ready_with_warnings -> deleting -> deleted | delete_incomplete
 D-009 已确认：`awaiting_policy` 必须由用户在首次导入引导中显式完成；选择按课程记住，任何扩大外发范围的切换仍需新的 `ConsentRecord`。
 
 D-014 已确认 L/P/F 都进入第一版；F 的文件级 consent、远端对象、任务、切换和删除状态见 `docs/research/REMOTE_FILE_LIFECYCLE_CONTRACT.md`。
+
+D-015 已确认 provider-neutral adapter registry。用户只能选择 registry 中已支持且能力检查通过的 profile；选择或变更 adapter、endpoint、模型、区域或政策快照都创建新的 config/policy 版本，并在远端处理前获取新的 `ConsentRecord`。旧 `provider_refs` 保留给创建它们的 adapter/profile 做对账或删除，不得复用到新配置。具体支持哪些 endpoint 尚未确认，因此当前不能把任何 endpoint 写成默认可用。
 
 材料在 `ready` / `ready_with_warnings` 后只产生候选覆盖；`CoverageDecision` 确认后才触发新计划版本。后续增量批次沿用同一流程，不假设整门课资料已经到齐。
 
@@ -173,6 +179,8 @@ choose goal
 8. 未经用户确认的 `ConceptCoverage` / `StudyFocus` 不能进入权威计划；provider 输出只能作为候选。
 9. 新材料、材料删除、日期或模式变化都不删除 `Attempt`、`LearningEvidence`、用户修正和旧计划；失效来源必须可见。
 10. `finals` 必须同时存在有效考试日期和显式进入记录；材料角色和考试日期均不构成外发授权。
+11. Provider config 不保存 key/token 等 secret，只保存安全凭据引用；未知 adapter、未确认 endpoint 或能力不足的 profile 不能进入远端调用。
+12. `ConsentRecord`、`RemoteMaterialObject` 和 `RemoteJob` 必须引用同一不可变 profile/config/policy snapshot；配置切换不得迁移或复用旧 consent、幂等键或 `provider_refs`。
 
 ## Agent 边界：已确认第一版不包含
 
@@ -195,6 +203,9 @@ choose goal
 - 新覆盖确认前计划不变，确认后产生带原因的新计划版本；
 - 仅设置考试日期不改变 `continuous`，显式进入/退出 `finals` 只重排未来任务；
 - provider 失败、提示注入或候选映射变化不能改变权威覆盖、计划和掌握状态；
+- 未注册 adapter、未确认 endpoint、缺少 P/F 所需能力或政策字段未知时，相应远端调用为 0，L 模式仍可用；
+- provider profile/config/policy snapshot 与 consent 不一致时拒绝请求；切换配置后旧 `provider_refs` 不能出现在新 profile 的请求中；
+- provider config schema 拒绝 key/token 等 secret 字段，凭据状态只暴露是否配置；
 - 往年卷流程没有模型训练、微调、自动上传或预测原题路径。
 
 ## 仍需 brainstorming 确认
@@ -204,5 +215,6 @@ choose goal
 - `past_paper` / `teacher_focus` 的文件格式，以及是否导入答案、个人笔记/作业；
 - 互斥/竞态正式题目内容；
 - 期末模式启用窗口、考试后状态、每日投入、计划粒度与具体调度算法；
-- 受约束模型端口的具体 provider、模型、预算参数和部署适配；
-- 部署、供应商、凭据与分发方案。
+- Adapter registry 首版具体支持哪些 adapter、endpoint 和模型；每个 endpoint 的能力、区域、留存/训练、删除政策及核验来源尚未确认，不能假定通用 endpoint 自动满足 P/F；
+- 受约束模型端口的预算参数、凭据存储适配和部署适配；
+- 部署、凭据与分发方案。
