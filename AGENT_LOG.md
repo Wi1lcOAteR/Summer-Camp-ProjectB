@@ -249,3 +249,27 @@
 - **subagent 输出 / commit hash**：未派发 subagent；阶段 A 无 PLAN task。提交 hash 将在任务输出中记录。
 - **人工修改及原因**：无新的学生输入；未创建 `SPEC.md`、未选择数据库/框架/模型/部署，也未决定 D-009。
 - **经验教训**：跨模块合同应围绕可追溯来源和学习证据，而不是共享聊天文本；这样保真、学习与复习才能形成可测试闭环。
+
+## 2026-07-19T22:50:40+08:00 — BRAIN-006 首次导入规则解释与确认
+
+- **Task 编号**：BRAIN-006
+- **触发的 Superpowers skill**：续接 `brainstorming`；对不清楚的候选规则先解释，不把困惑当作同意；首次真正适合视觉呈现时按 just-in-time 规则提供 visual companion 邀请。
+- **关键 prompt / context**：学生询问 D-009 推荐规则的详细含义。智能体以操作系统课件为例说明三种处理模式、课程级设置、逐次外发预览、扩大授权和远端删除。
+- **澄清结果**：学生确认首次导入直接询问用户，通过多个引导步骤/对话框完成说明与选择；课程级记住设置，扩大外发仍需确认。D-009 已解除。
+- **subagent 输出 / commit hash**：未派发 subagent；阶段 A 无 PLAN task。首次导入决策与 mockup 提交：`a5b1dcf`。
+- **人工修改及原因**：学生采纳显式首次引导，并要求提供界面展示；仍未创建 `SPEC.md` 或正式 UI 实现。
+- **经验教训**：用户提出“是什么意思”说明抽象安全规则不足以支持决策；解释必须落到具体数据流。即便解释充分，也不能把没有反对当作默认同意。
+
+## 2026-07-19T23:00:55+08:00 — BRAIN-007 首次导入可交互 mockup
+
+- **Task 编号**：BRAIN-007
+- **触发的 Superpowers skill**：续接 `brainstorming` 的 visual companion just-in-time 流程；使用 `visualize` skill 制作可交互 UI mockup，并按前端视觉 QA 要求检查桌面/移动视图。
+- **关键 prompt / context**：学生从未见过 visual companion，明确要求用界面展示已确认的首次导入引导。
+- **工具故障与替代**：visual companion 第一次因 Git Bash PATH 缺少标准工具失败，第二次到端口绑定时因 `127.0.0.1:55535` EACCES 失败；未继续重试或申请提权。Open Design `od` 仍不存在。替代为项目内自包含 HTML mockup和本地截图，影响是无法通过 companion 事件文件收集点击数据，需以聊天反馈为准。
+- **产出**：`docs/mockups/course-import-onboarding.html`、`course-import-onboarding-desktop.png`、`course-import-onboarding-mobile.png`；`.superpowers/` 已加入 `.gitignore`，会话密钥和失败会话文件不提交。
+- **浏览器验证**：bundled Playwright 缺少 Chromium executable，未下载；使用 Microsoft Edge 150.0.4078.83。桌面 1440 × 900：body overflow=false、clipped=[]、mode overlap=false；移动 390 × 844：body overflow=false、outside=[]、mode overlap=false；page/console errors=[]。
+- **交互验证**：默认 `page-cloud`；连续点击“继续”后 `permission-mode` 与 `ready-mode` 均为“按页云端处理”。
+- **全路径验证**：`local`、`page-cloud`、`full-cloud` 三条路径的权限名称、外发范围和完成页名称均与选择一致；三条路径在取消课程级记忆后均显示“仅本次导入”。
+- **subagent 输出 / commit hash**：未派发 subagent；阶段 A 无 PLAN task。首次导入决策与 mockup 提交：`a5b1dcf`。
+- **人工修改及原因**：学生确认用多步引导并要求视觉展示；mockup 只验证信息架构与交互节奏，不替代 Open Design design system/skill 选择。
+- **经验教训**：安全同意页不能只讲隐私；将真实课程规模与解析证据放在模式选择前，用户更容易理解为什么存在不同处理方式。
