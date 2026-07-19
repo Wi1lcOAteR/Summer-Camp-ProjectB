@@ -266,10 +266,24 @@
 - **触发的 Superpowers skill**：续接 `brainstorming` 的 visual companion just-in-time 流程；使用 `visualize` skill 制作可交互 UI mockup，并按前端视觉 QA 要求检查桌面/移动视图。
 - **关键 prompt / context**：学生从未见过 visual companion，明确要求用界面展示已确认的首次导入引导。
 - **工具故障与替代**：visual companion 第一次因 Git Bash PATH 缺少标准工具失败，第二次到端口绑定时因 `127.0.0.1:55535` EACCES 失败；未继续重试或申请提权。Open Design `od` 仍不存在。替代为项目内自包含 HTML mockup和本地截图，影响是无法通过 companion 事件文件收集点击数据，需以聊天反馈为准。
-- **产出**：`docs/mockups/course-import-onboarding.html`、`course-import-onboarding-desktop.png`、`course-import-onboarding-mobile.png`；`.superpowers/` 已加入 `.gitignore`，会话密钥和失败会话文件不提交。
+- **产出**：`docs/mockups/course-import-onboarding.html`、`course-import-onboarding-v1-desktop.png`、`course-import-onboarding-v1-mobile.png`；`.superpowers/` 已加入 `.gitignore`，会话密钥和失败会话文件不提交。截图在 BRAIN-008 更新界面后加上 `v1` 标识，以免被误认为新版视觉证据。
 - **浏览器验证**：bundled Playwright 缺少 Chromium executable，未下载；使用 Microsoft Edge 150.0.4078.83。桌面 1440 × 900：body overflow=false、clipped=[]、mode overlap=false；移动 390 × 844：body overflow=false、outside=[]、mode overlap=false；page/console errors=[]。
 - **交互验证**：默认 `page-cloud`；连续点击“继续”后 `permission-mode` 与 `ready-mode` 均为“按页云端处理”。
 - **全路径验证**：`local`、`page-cloud`、`full-cloud` 三条路径的权限名称、外发范围和完成页名称均与选择一致；三条路径在取消课程级记忆后均显示“仅本次导入”。
 - **subagent 输出 / commit hash**：未派发 subagent；阶段 A 无 PLAN task。首次导入决策与 mockup 提交：`a5b1dcf`。
 - **人工修改及原因**：学生确认用多步引导并要求视觉展示；mockup 只验证信息架构与交互节奏，不替代 Open Design design system/skill 选择。
 - **经验教训**：安全同意页不能只讲隐私；将真实课程规模与解析证据放在模式选择前，用户更容易理解为什么存在不同处理方式。
+
+## 2026-07-19T23:32:52+08:00 — BRAIN-008 导入引导信息层级修订
+
+- **Task 编号**：BRAIN-008
+- **触发的 Superpowers skill**：续接 `brainstorming` 与 visual companion 迭代；使用 `visualize` skill 修改已批准的需求阶段 mockup，并使用 `browser:control-in-app-browser` 尝试双端验证。
+- **关键 prompt / context**：学生认可第一版，并要求用字体大小、颜色、字重和字体建立二级展示，使用图标减少冗余文字；桌面端与移动端均采用 X 轴时间线；“开始学习”页需强调配置修改位置。
+- **采纳内容**：将左侧竖向阶段栏改为顶部四节点横向时间线；在桌面端和移动端保持同一 X 轴阅读方向；处理模式改为“图标 + 标题 + 简述 + 短事实”；强调“不会静默切换”；完成页突出路径“课程设置 › 材料与隐私”，最终主操作改为“开始学习”。
+- **验证故障与替代**：项目外置 Node 依赖暴露 `playwright` 但缺少配套 `playwright-core`，首次自动化脚本未启动。随后按 Browser skill 使用应用内浏览器，但 `file://` 页面被其 URL 安全策略拒绝；遵守策略未改用本地端口、其他浏览器或间接绕过。
+- **本次验证证据**：临时 Node 静态检查通过，覆盖交互脚本语法、成对标签、四列横向时间线与进度更新、900/560 px 响应式规则、模式图标/短事实、设置路径、最终按钮文案及无外部资源依赖；`failures=[]`。这只能证明结构与脚本约束，不证明新版视觉没有裁切或重叠。
+- **截图证据边界**：旧桌面/移动截图重命名为 `course-import-onboarding-v1-*.png`，只保留第一版历史证据；新版尚无浏览器截图或视觉验收，不得引用 v1 截图证明 v2。
+- **规约沉淀**：创建 `SPEC.md` 阶段 A 工作草案，并更新候选领域模型中已经过时的 D-009 状态；未决产品/部署/技术选择仍明确保留，没有作为已批准设计写入。
+- **subagent 输出 / commit hash**：未派发 subagent；阶段 A 无 PLAN task。第二版 mockup、阶段 A `SPEC.md` 草案与过程修订提交：`64a1cde`。
+- **人工修改及原因**：学生直接确认视觉方向并给出具体修订，不涉及正式框架、模型、数据库或部署选择；仍未进入正式 UI 实现。
+- **经验教训**：阶段进度、关键风险和后续配置入口属于不同视觉层级；把它们都写成正文会增加扫描负担，应该分别用时间线、强调条与位置路径承载。
