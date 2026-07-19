@@ -34,3 +34,6 @@ open-design-*-setup.exe.sha256
 
 # Superpowers visual companion sessions contain local URLs and session keys
 .superpowers/
+
+# Local PDF renders and other disposable verification artifacts
+tmp/
