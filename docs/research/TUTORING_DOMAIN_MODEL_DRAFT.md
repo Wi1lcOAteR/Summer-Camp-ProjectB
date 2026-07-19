@@ -15,6 +15,8 @@
 - 本地解析不能冒充原始页面；任何扩大外发范围的模式切换不能静默发生。
 - 第一版只服务单个学生并采用本地优先 WebUI；私有课程数据默认在本机，不实现账号、多租户或分享。
 - 首个纵向学习闭环选择互斥与竞态条件，使用合成线程轨迹的确定性 oracle、来源约束解释和后续变式复习。
+- 课程材料按学期进度增量导入；每批材料先形成候选知识覆盖，经用户确认后才修订未来学习计划，不能清空既有证据。
+- 学期中默认 `continuous` 持续模式；录入考试日期并由用户显式进入后才使用 `finals` 期末周模式。往年卷和老师重点是显式材料角色，不表示模型训练或原题预测。
 
 ## 候选职责模块
 
@@ -25,8 +27,10 @@
 **主要操作**：
 
 - `inspect_material`：在处理前读取文件元数据、类型、页数和限制；
-- `import_material`：保存材料身份、内容哈希、原页引用和解析版本；
+- `import_material_batch`：保存增量批次、材料角色、材料身份、内容哈希、原页引用、独立文件状态和解析版本；
 - `set_processing_policy`：记录课程模式及用户同意；
+- `propose_concept_coverage`：生成 `added/reinforced/changed/unmapped/duplicate` 候选覆盖；
+- `confirm_concept_coverage`：追加用户确认/纠正，只有确认结果能进入计划；
 - `retrieve_context`：按知识点返回页码、原始/归一化文本、页面图和质量标记；
 - `delete_material`：级联清理本地派生数据并协调远端删除状态。
 
@@ -53,11 +57,12 @@
 
 - `record_learning_evidence`：追加一次可追溯的学习事件；
 - `derive_mastery_estimate`：根据证据与版本化规则计算候选掌握状态；
-- `schedule_review`：结合目标日期、最近表现与知识依赖生成复习任务；
+- `revise_learning_plan`：结合已确认覆盖、最近表现、知识依赖和当前模式生成版本化计划；
+- `schedule_review`：在 `continuous` 中持续安排；仅在日期有效且用户显式进入 `finals` 后，才结合剩余时间、已确认老师重点和往年卷模式调整未来任务；
 - `serve_review_task`：先要求主动提取，再按结果显示解释；
 - `reschedule_from_result`：复习结果反向更新状态与后续解释深度。
 
-**边界**：不删除历史证据来改写结果；不把概率/分数表述为客观真值；没有足够证据时保持“未知”。
+**边界**：不删除历史证据来改写结果；不把概率/分数表述为客观真值；没有足够证据时保持“未知”。模型/provider 不直接决定权威覆盖、优先级、计划或掌握状态；“拟合往年卷”只表示结构、知识点、题型和难度分析及同类练习。
 
 ### X1 安全、凭据与审计（跨模块）
 
@@ -70,16 +75,23 @@
 | 实体 | 核心字段（候选） | 关键约束 |
 | --- | --- | --- |
 | `UserProfile` | `id`, `timezone`, `learning_preferences` | 第一版为本地 actor；不存供应商密钥明文；偏好不能代替实际学习证据 |
-| `Course` | `id`, `owner_id`, `title`, `target_date`, `processing_policy_id` | 第一版绑定本地 actor；所有课程对象仍继承 owner scope；处理策略可查看/修改 |
+| `Course` | `id`, `owner_id`, `title`, `processing_policy_id`, `active_plan_id` | 第一版绑定本地 actor；所有课程对象仍继承 owner scope；处理策略可查看/修改 |
+| `MaterialBatch` | `id`, `course_id`, `role`, `state`, `created_at` | 批次内文件状态独立；失败不能覆盖成功；重复导入幂等 |
 | `Material` | `id`, `course_id`, `original_name`, `content_hash`, `mime_type`, `size`, `page_count`, `state` | 原文件身份不可被提取文本替代；禁止重复/越界导入 |
 | `MaterialPage` | `material_id`, `page_number`, `render_ref`, `raw_text`, `normalized_text`, `quality_flags`, `parser_version` | `(material_id, page_number)` 唯一；原始与归一化文本并存 |
 | `ProcessingPolicy` | `id`, `course_id`, `mode`, `provider_scope`, `version`, `chosen_at` | 课程级有效；扩大外发需新的同意记录 |
 | `ConsentRecord` | `id`, `course_id`, `from_mode`, `to_mode`, `payload_scope`, `provider`, `approved_at`, `revoked_at` | 追加式记录；不得覆盖旧授权历史；不保存正文 |
 | `KnowledgeConcept` | `id`, `course_id`, `title`, `description`, `prerequisite_ids`, `status` | 必须至少有一个来源或标为学生自建；依赖不能形成非法循环 |
 | `SourceReference` | `id`, `concept_id`, `material_id`, `page_number`, `region`, `kind` | 页码必须存在；区分课件、学生笔记和模型补充 |
+| `ConceptCoverage` | `id`, `batch_id`, `concept_id`, `source_ids`, `relation`, `confidence`, `extractor_version` | 候选映射不等于权威知识；低置信与冲突需确认 |
+| `CoverageDecision` | `id`, `coverage_id`, `decision`, `actor`, `reason`, `decided_at` | 追加式保留确认/纠正历史 |
+| `StudyFocus` | `id`, `source_id`, `concept_id`, `kind`, `weight`, `confidence`, `status` | 老师明确重点、往年卷模式和系统推断分开；用户可纠正 |
 | `ExplanationSession` | `id`, `course_id`, `concept_id`, `goal`, `baseline_evidence_ids`, `source_ids`, `processing_mode`, `created_at` | 输出与来源/模式绑定；不直接更新掌握状态 |
 | `LearningEvidence` | `id`, `concept_id`, `type`, `prompt_ref`, `response_ref`, `outcome`, `source_ids`, `occurred_at` | 追加式；保留评分依据；删除正文时仍保持脱敏审计一致性 |
 | `MasteryEstimate` | `id`, `concept_id`, `level`, `confidence`, `evidence_ids`, `algorithm_version`, `derived_at`, `corrected_by_user` | 每次估计可解释/重算；无证据不得标为已掌握 |
+| `CourseReviewGoal` | `course_id`, `mode`, `target_local_date`, `timezone_id`, `version`, `finals_entered_at` | 默认 `continuous`；`finals` 同时需要有效日期与显式进入记录 |
+| `LearningPlan` | `id`, `course_id`, `mode`, `goal_version`, `policy_version`, `created_at` | 输入可重放；活动版本唯一；旧版本保留 |
+| `PlanRevision` | `from_version`, `to_version`, `reason_codes`, `input_ids`, `created_at` | 只替换允许变更的未来任务，不覆盖历史 |
 | `ReviewTask` | `id`, `concept_id`, `due_at`, `reason`, `task_type`, `status`, `attempt_ids` | 到期原因可见；完成必须关联实际尝试 |
 | `CredentialStatus` | `provider`, `storage_ref`, `configured`, `updated_at` | `storage_ref` 只指向安全存储；查看状态不回显值 |
 | `AuditEvent` | `id`, `actor_id`, `event_type`, `data_category`, `provider`, `scope_ids`, `occurred_at`, `result` | 白名单元数据，不记录课件正文、作答或凭据 |
@@ -89,12 +101,14 @@
 ```text
 Course
   -> ProcessingPolicy -> ConsentRecord[]
-  -> Material[] -> MaterialPage[]
-  -> KnowledgeConcept[] -> SourceReference[]
+  -> MaterialBatch[] -> Material[] -> MaterialPage[]
+  -> ConceptCoverage[] -> CoverageDecision[]
+  -> KnowledgeConcept[] -> SourceReference[] / StudyFocus[]
                          -> ExplanationSession[]
                          -> LearningEvidence[]
                          -> MasteryEstimate[]
                          -> ReviewTask[]
+  -> CourseReviewGoal -> LearningPlan[] -> PlanRevision[]
 ```
 
 `LearningEvidence` 是 M2 与 M3 的主要合同；`SourceReference` 是 M1 与 M2/M3 的主要合同；`ProcessingPolicy`/`ConsentRecord` 约束所有可能跨越本地边界的操作。
@@ -111,6 +125,23 @@ ready/ready_with_warnings -> deleting -> deleted | delete_incomplete
 ```
 
 D-009 已确认：`awaiting_policy` 必须由用户在首次导入引导中显式完成；选择按课程记住，任何扩大外发范围的切换仍需新的 `ConsentRecord`。
+
+材料在 `ready` / `ready_with_warnings` 后只产生候选覆盖；`CoverageDecision` 确认后才触发新计划版本。后续增量批次沿用同一流程，不假设整门课资料已经到齐。
+
+### 模式与计划修订
+
+```text
+continuous
+  -> import batch -> coverage confirmation -> plan revision -> guided learning
+  -> exam date set -> finals available
+  -> explicit enter -> finals
+
+finals
+  -> confirmed past-paper/teacher-focus mapping -> plan revision
+  -> explicit exit/date cleared -> continuous
+```
+
+录入考试日期本身不切换模式。模式、日期、覆盖或规则变更都创建版本记录，只重排未开始的未来任务。
 
 ### 学习闭环
 
@@ -135,6 +166,9 @@ choose goal
 5. 处理模式保存在课程级，但每次扩大外发范围都需要独立 `ConsentRecord`。
 6. 删除课程材料时，所有派生页面、索引、来源引用和远端对象进入可观察的级联状态，不能只隐藏 UI。
 7. 凭据实体只暴露配置状态，不暴露值；日志与审计事件不保存课程正文或学生作答。
+8. 未经用户确认的 `ConceptCoverage` / `StudyFocus` 不能进入权威计划；provider 输出只能作为候选。
+9. 新材料、材料删除、日期或模式变化都不删除 `Attempt`、`LearningEvidence`、用户修正和旧计划；失效来源必须可见。
+10. `finals` 必须同时存在有效考试日期和显式进入记录；材料角色和考试日期均不构成外发授权。
 
 ## 是否构成 agent：尚未决定
 
@@ -151,13 +185,18 @@ choose goal
 - 没有 `LearningEvidence` 时不能产生“已掌握”状态；
 - 完成一次复习必须追加尝试证据，并能解释下一次到期时间的原因；
 - 删除材料后检索不能返回其页面，远端删除失败必须显示 `delete_incomplete`。
+- 重复文件导入幂等，批次部分失败保留文件级成功/失败状态；
+- 新覆盖确认前计划不变，确认后产生带原因的新计划版本；
+- 仅设置考试日期不改变 `continuous`，显式进入/退出 `finals` 只重排未来任务；
+- provider 失败、提示注入或候选映射变化不能改变权威覆盖、计划和掌握状态；
+- 往年卷流程没有模型训练、微调、自动上传或预测原题路径。
 
 ## 仍需 brainstorming 确认
 
 - 正式支持的处理模式目录，尤其是否提供整份 PDF 云端处理；
 - 公开演示 WebUI 与授权样例策略；
-- 第一版必需材料类型与是否导入个人笔记/作业；
-- 互斥/竞态真实来源页与正式题目内容；
-- 复习目标日期与计划粒度；
+- `past_paper` / `teacher_focus` 的文件格式，以及是否导入答案、个人笔记/作业；
+- 互斥/竞态正式题目内容；
+- 期末模式启用窗口、考试后状态、每日投入、计划粒度与具体调度算法；
 - 是否包含课程定义中的 agent；
 - 部署、供应商、凭据与分发方案。
