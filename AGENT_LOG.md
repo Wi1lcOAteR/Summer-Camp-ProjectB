@@ -443,3 +443,15 @@
 - **subagent 输出 / commit hash**：未派发 subagent；阶段 A 无 PLAN task。三模式与生命周期合同提交：`fe94963`。
 - **人工修改及原因**：学生选择让平台实现全部外发层级；智能体没有据此替学生选择 provider、数据政策、容量/费用、凭据或实际课件权利结论。
 - **经验教训**：课程级模式记忆不能代替新增文件的 payload 授权；否则“用户选择”会在后续增量导入时退化为静默整份上传。
+
+## 2026-07-20T01:02:00+08:00 — BRAIN-016 Provider 适配策略人工门禁
+
+- **Task 编号**：BRAIN-016
+- **触发的 Superpowers skill**：续接 `brainstorming`；D-014 解除后将 provider 选择拆成适配策略问题，避免同时决定厂商、模型、区域和凭据。
+- **关键 prompt / context**：平台已确认实现 L/P/F 三种能力，用户决定具体外发层级；模式 F 需要真实上传、索引、引用、删除和政策展示。Provider 仍未选。
+- **官方资料核验**：OpenAI Developer Docs MCP 读取 File Search、Files/Vector Stores 删除参考与 Data controls；确认官方文档展示 PDF 文件上传、vector store 状态、文件引用、删除入口、`expires_after` 说明及文件/向量库应用状态保留规则。Google/Anthropic 官方站点本轮通过 web/PowerShell 均连接失败，未将其能力写成事实。
+- **候选与推荐**：新增 `docs/research/PROVIDER_STRATEGY_OPTIONS.md`，比较统一适配器 + 一个真实参考 provider、单 provider 紧耦合、多个真实 provider；推荐方案 1。
+- **验证证据**：本地 Markdown 链接、代码围栏、`git diff --check` 和强特征凭据正则扫描通过；未读取或提交任何 API key，未调用真实 API。
+- **subagent 输出 / commit hash**：未派发 subagent；阶段 A 无 PLAN task。D-015 候选策略提交：`2444b87`。
+- **人工修改及原因**：尚未收到学生对 D-015 的选择；未创建 adapter、凭据流程实现、provider SDK 依赖或 PLAN task。
+- **经验教训**：先确定“适配器策略”再选择厂商，可以把用户外发控制和生命周期合同留在领域层，也能避免不完整的官方资料被误当成产品承诺。
