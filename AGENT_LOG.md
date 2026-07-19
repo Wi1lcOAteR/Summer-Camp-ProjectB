@@ -115,3 +115,19 @@
 - **人工修改及原因**：用户已把 Open Design 安装器和校验文件放入项目根目录；为防止 309 MB 第三方二进制误提交，智能体将这两个精确命名模式加入 `.gitignore`。
 - **偏离、替代措施与影响**：本次会话不能正式调用 `superpowers:brainstorming`；替代措施是按已安装的同版本上游指令续接 PRE-006 已开始的流程并明确证据边界。此限制不阻塞需求提问，但 `writing-plans` 前必须恢复正式 skill 注册。
 - **经验教训**：插件“缓存已安装”、会话“skill 已注册”和流程“实际调用”是三种不同证据，过程文档必须分别记录。
+
+## 2026-07-19T22:00:55+08:00 — PRE-008 提交后完成验证
+
+- **Task 编号**：PRE-008
+- **触发的 Superpowers skill**：`verification-before-completion`。本次会话未注册该 skill；完整读取已安装 v6.1.1 上游指令后执行其“识别命令、全量运行、读取输出、再陈述状态”门禁，证据限制同 PRE-007。
+- **关键 prompt / context**：验证 PRE-007 审计提交、阶段门禁、Superpowers 安装内容与 Open Design 状态，不验证尚不存在的业务功能。
+- **验证结果**：
+  - `git status --short --branch`：仅输出 `## master`；工作区干净。
+  - `git show --oneline --stat HEAD`：`e29d235 docs: resume phase A audit [agent: Codex GPT-5]`，5 个文件变更，61 行新增、27 行删除。
+  - `git diff HEAD^ HEAD --check`：退出码 0，无 whitespace 错误。
+  - 门禁文件检查：`SPEC.md`、`PLAN.md`、`README.md`、`REFLECTION.md`、`.gitlab-ci.yml` 均不存在；当前阶段这是预期状态，不作为最终交付完成证据。
+  - Superpowers manifest 版本为 6.1.1，skills 目录计数 14，必需核心项均存在。
+  - Open Design：安装器哈希与 `.sha256` 匹配；Authenticode 为 `NotSigned`；`od` 命令不存在；安装器已被 Git 忽略。
+- **subagent 输出 / commit hash**：无 subagent；被验证的过程提交为 `e29d235`。
+- **人工修改及原因**：无。
+- **经验教训**：阶段 A 的“完成验证”只证明启动审计和门禁状态，不能外推为 SPEC、实现、测试、CI 或部署完成。
