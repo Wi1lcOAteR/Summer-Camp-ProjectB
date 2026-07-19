@@ -13,6 +13,7 @@
 - 解释需要适配学生当前理解，且跨会话维护连续学习状态。
 - 课件处理路径由用户选择，必须显示保真度、外发、凭据/费用和解析限制。
 - 本地解析不能冒充原始页面；任何扩大外发范围的模式切换不能静默发生。
+- 第一版只服务单个学生并采用本地优先 WebUI；私有课程数据默认在本机，不实现账号、多租户或分享。
 
 ## 候选职责模块
 
@@ -67,8 +68,8 @@
 
 | 实体 | 核心字段（候选） | 关键约束 |
 | --- | --- | --- |
-| `UserProfile` | `id`, `timezone`, `learning_preferences` | 不存供应商密钥明文；偏好不能代替实际学习证据 |
-| `Course` | `id`, `owner_id`, `title`, `target_date`, `processing_policy_id` | 所有课程对象继承 owner；处理策略可查看/修改 |
+| `UserProfile` | `id`, `timezone`, `learning_preferences` | 第一版为本地 actor；不存供应商密钥明文；偏好不能代替实际学习证据 |
+| `Course` | `id`, `owner_id`, `title`, `target_date`, `processing_policy_id` | 第一版绑定本地 actor；所有课程对象仍继承 owner scope；处理策略可查看/修改 |
 | `Material` | `id`, `course_id`, `original_name`, `content_hash`, `mime_type`, `size`, `page_count`, `state` | 原文件身份不可被提取文本替代；禁止重复/越界导入 |
 | `MaterialPage` | `material_id`, `page_number`, `render_ref`, `raw_text`, `normalized_text`, `quality_flags`, `parser_version` | `(material_id, page_number)` 唯一；原始与归一化文本并存 |
 | `ProcessingPolicy` | `id`, `course_id`, `mode`, `provider_scope`, `version`, `chosen_at` | 课程级有效；扩大外发需新的同意记录 |
@@ -153,7 +154,7 @@ choose goal
 ## 仍需 brainstorming 确认
 
 - 正式支持的处理模式目录，尤其是否提供整份 PDF 云端处理；
-- 目标用户是否只限单个学生，还是支持多用户/教师；
+- 公开演示 WebUI 与授权样例策略；
 - 第一版必需材料类型与是否导入个人笔记/作业；
 - “看懂”的具体知识点、诊断方法和成功标准；
 - 复习目标日期与计划粒度；
