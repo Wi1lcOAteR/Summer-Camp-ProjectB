@@ -262,6 +262,22 @@
 - **仍需学生参与**：签字前仍需收敛真实 adapter 范围、技术栈、分发/目标平台、公开演示、远程平台与 Open Design；本文件要求的 brainstorming 优点/不足反思也需要学生表达，不能从智能体日志推断成学生观点。
 - **门禁保持**：本次复核没有创建 `PLAN.md`、正式实现、CI 空壳或 `REFLECTION.md`，也没有越过 D-016 或 SPEC 签字。
 
+### 第 15 轮：首版真实 Adapter 数量确认（2026-07-20T01:55:20+08:00）
+
+- **学生原始回答**：“1”。这是对 D-016 三个候选的明确选择：首版交付一个真实参考 adapter，同时保留统一接口、完整 provider mock 和共享 contract suite。
+- **采纳范围**：真实联网证据只要求一条参考实现；核心状态机、授权、能力声明、失败关闭、引用/删除语义必须在无网络、无真实 LLM、无凭据的 mock 下确定性验证。参考实现不是静默默认，用户仍需配置 profile、凭据并确认外发范围。
+- **未延伸决定**：回答没有选择具体 provider、模型、区域、留存/训练政策、费用上限、SDK、目标平台或分发方式；这些拆为下一项 D-017 及后续人工决定。
+- **下一步证据准备**：并行只读调查 OpenAI、Google Gemini 和 Anthropic 官方资料，核验 P/F 所需 PDF/图像、文件生命周期、引用、删除、政策和许可证；不调用真实 API、不读取 key、不上传课件。
+- **门禁变化**：D-016 已解除；`SPEC.md` 改为“一个真实参考 adapter + 完整 mock/contract suite”，D-017 暂为具体参考 provider 的人工门禁。仍未签字、未生成 PLAN、未实现。
+
+### D-017 候选 provider 官方资料准备与批量决策表（2026-07-20T02:07:29+08:00）
+
+- **调查范围**：并行只读核验 OpenAI、Google Gemini、Anthropic Claude 的官方开发文档、数据政策和官方 SDK 入口；没有读取凭据、调用 API 或上传课件。
+- **证据摘要**：OpenAI 的 File Search/Vector Stores 上传、异步 ready、删除/过期最接近现有 F 生命周期，但原生 citation 不足以直接证明课件页码，视觉保真需本地映射或失败关闭。Gemini 的 PDF/图像和 P 很强，但 Files 临时过期、File Search 多层对象、政策 tier 和页码引用需要额外治理。Claude 的 PDF/图像与页码 citations 有优势，但没有与当前合同直接对应的托管索引生命周期，F 需本地检索/分批编排。
+- **联网证据边界**：OpenAI 官方资料此前已通过 Developer Docs MCP 核验；本轮 Google/Anthropic 官方检索部分返回 503/TLS 错误，因此精确限制、政策、版本和许可证在锁定 provider 前必须重新现场核验。比较与官方链接写入 `docs/research/REFERENCE_PROVIDER_OPTIONS.md`，没有把推荐当成选择。
+- **批量问题准备**：按学生要求将剩余人工门禁整理为 D-017 至 D-024：参考 provider、任意 endpoint 边界、期末材料范围、调度预设、本地技术/凭据、公开演示、远程仓库/CI、Open Design。每项都有候选、推荐和阻塞范围，等待学生一次性回答。
+- **门禁保持**：在批量答案和后续 SPEC 签字前，不生成 `PLAN.md`、不加入 SDK、不开真实 provider、不实现 UI/后端；D-016 已确认但 D-017 及后续决定仍开放。
+
 ## 2. SPEC 签字确认
 
 尚未执行。`SPEC.md` 已创建为阶段 A 工作草案，但仍包含需要逐项确认的候选设计与未决问题，用户尚未签字确认。

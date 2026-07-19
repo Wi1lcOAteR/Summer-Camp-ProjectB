@@ -29,7 +29,7 @@
 | 30 秒说明真实价值 | `SPEC.md` 1.2 已有候选说明 | 文档覆盖，未验证 | SPEC 签字时确认措辞；实现后用真实流程而非演示页证明价值 |
 | 至少 3 个职责清晰模块 | M1 材料保真、M2 适配解释、M3 持续复习；X1/X2 为跨模块控制面 | 文档覆盖，未验证 | PLAN 按模块依赖拆分，核心路径需自动化测试 |
 | 至少 5 个 INVEST 用户故事 | `SPEC.md` 有 US-01 至 US-09 | 文档覆盖，未验证 | 当前仍标为候选，签字前逐项确认可独立价值与验收映射 |
-| SPEC 必需章节 | 问题、模块规约、NFR、架构/数据流、数据模型、凭据、AC、风险均已存在 | 明确缺口 | 技术栈、具体 adapter、分发/目标平台、公开部署、Open Design design system/skill 尚未收敛，不能签字 |
+| SPEC 必需章节 | 问题、模块规约、NFR、架构/数据流、数据模型、凭据、AC、风险均已存在；D-016 已确认一个真实参考 adapter + 完整 mock | 明确缺口 | 具体参考 provider、技术栈、分发/目标平台、公开部署、Open Design design system/skill 尚未收敛，不能签字 |
 | 无 agent 时不要求 harness 内核 | `SPEC.md` 明确模型只有具名受约束端口，无自主循环/工具分发 | 当前满足 | provider mock 是项目可靠性设计，不冒充 harness 交付物 |
 | API key 安全存储与生命周期 | `SPEC.md` 安全/凭据章节、provider profile/`credential_ref`、[威胁模型](research/COURSEWARE_THREAT_MODEL_BASELINE.md) | 文档覆盖，未验证 | 选择本机安全存储实现；TDD 验证隐藏录入、状态、更新、清除和失败关闭；普通 config 禁止 secret |
 | WebUI | localhost WebUI、首次导入流程和响应式 AC 已写；已有需求 mockup | 文档覆盖，未验证 | mockup 不算正式源码；最终必须提供可访问 URL 并做真实双端 UI 验证 |
@@ -59,4 +59,4 @@
 
 ## 当前最近门禁
 
-当前 `SPEC.md` 未签字，D-016 仍需确认第一版真实 adapter 的交付数量。此后还必须在签字前收敛技术栈、安全凭据后端、分发/目标平台、公开演示架构、GitHub/NJU Git 策略与 Open Design design system/skill。以上完成前不生成 `PLAN.md`，更不开始正式实现。
+当前 `SPEC.md` 未签字，D-016 已确认第一版只交付一个真实参考 adapter；D-017 至 D-024 的批量人工选择仍待学生回答（具体 provider、endpoint 边界、期末资料/调度、技术/分发、公开演示、远程平台和 Open Design）。以上完成前不生成 `PLAN.md`，更不开始正式实现。完整选项见 `DECISIONS_NEEDED.md`。

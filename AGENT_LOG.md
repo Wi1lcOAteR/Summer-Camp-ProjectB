@@ -498,3 +498,27 @@
 - **subagent 输出 / commit hash**：`/root/requirements_audit` 只读核对课程条款与仓库证据，指出 SPEC_PROCESS 旧页首、最新决策日志缺口及最终交付缺项；未修改文件或提交。主智能体负责修订和最终验证，本轮 commit 在任务输出记录。
 - **人工修改及原因**：学生主动要求 requirements 复核；智能体将结果分为当前满足、文档覆盖未验证、阶段门禁延后和明确缺口，避免用“阶段正确”冒充“项目最终合规”。
 - **经验教训**：门禁既禁止提前造实现证据，也不能成为遗漏最终硬项的理由；合规审计必须同时报告当前阶段正确性和截止提交时仍欠缺的证据。
+
+## 2026-07-20T01:55:20+08:00 — BRAIN-018 D-016 首版真实 Adapter 数量确认
+
+- **Task 编号**：BRAIN-018
+- **触发的 Superpowers skill**：续接 `brainstorming`；学生明确回答 D-016 为方案 `1`，没有进入 `writing-plans` 或实现。
+- **关键 prompt / context**：D-016 要求在“一个真实参考 adapter + 完整 mock”“多个真实 adapter”“仅接口/mock”中选择首版交付范围；学生回复“1”。
+- **确认结果**：首版实现统一 `ProviderAdapter`/registry、完整 provider mock、共享 contract suite 和一个真实参考 adapter。真实联网证据只覆盖该参考实现；参考实现不成为静默默认，用户仍配置 profile/凭据并逐次确认外发。
+- **未决定项**：具体 provider、模型、区域、SDK/许可证、留存/训练政策、费用上限、技术栈、分发与部署仍未决定；研究资料不能替学生选择。
+- **过程动作**：更新 `DECISIONS_NEEDED.md`、`SPEC.md`、`SPEC_PROCESS.md`、requirements 审计和 provider 策略研究的 D-016 状态；并行派发三个只读官方资料调查（OpenAI、Google Gemini、Anthropic），不读取 key、不调用付费 API、不上传课件。
+- **subagent 输出 / commit hash**：三个 provider 调查尚在进行；本条日志与规约修改将在资料核验后与下一批文档一并提交，当前基线为 `8858b6e`。
+- **人工修改及原因**：学生只决定真实 adapter 数量；智能体没有把任何 provider、模型或政策写成已选定事实。
+- **经验教训**：先确定真实实现数量再比较厂商，能保持 provider-neutral 领域合同，同时避免把“用户配置”误解为“首版无限兼容任意供应商”。
+
+## 2026-07-20T02:07:29+08:00 — BRAIN-019 D-017 Provider 候选与批量门禁准备
+
+- **Task 编号**：BRAIN-019
+- **触发的 Superpowers skill**：续接 `brainstorming`；学生要求把剩余问题一次性列出，以便离线时集中回答。没有进入 `writing-plans`。
+- **关键 prompt / context**：D-016 已选一个真实参考 adapter；需要在不替学生选厂商的前提下，准备具体 provider 候选和其余会影响 SPEC/交付的人工决定。
+- **subagent 输出**：`/root/openai_adapter_audit` 核验 OpenAI P/F、File Search、删除/过期、结构化输出和页码/视觉缺口；`/root/gemini_adapter_audit` 报告 Gemini P 强但 Files/Store 生命周期、政策 tier 和页码引用复杂；`/root/anthropic_adapter_audit` 报告 Claude P/citations 强但无直接匹配的托管索引生命周期。三者均只读、未改文件、未调用付费 API。
+- **官方资料边界**：OpenAI 既有官方 MCP 证据可复核；本轮主会话 web 请求返回 503，Google/Anthropic 部分页面也遇到 503/TLS。未把未现场复核的精确限制、政策或许可证写成已验证事实。
+- **规约产出**：新增 `docs/research/REFERENCE_PROVIDER_OPTIONS.md`；D-017 写入 `DECISIONS_NEEDED.md`，暂列 OpenAI/Gemini/Claude 与条件推荐；新增 D-018 至 D-024 批量问题，覆盖自定义 endpoint、期末材料、调度、技术/凭据、公开演示、远程平台和 Open Design。
+- **人工修改及原因**：学生明确要求一次性提问；智能体将问题按重大影响分组，并保留可由工程默认处理的小选择，不提前选择 provider、技术栈或部署。
+- **验证计划**：批量答案收到后逐项更新 SPEC/过程文档，再运行链接、围栏、凭据扫描；在 SPEC 签字前仍不生成 PLAN 或源码。
+- **经验教训**：为避免用户离线时反复被单个门禁唤醒，应一次暴露所有真正改变产品/交付的选择，同时给出安全推荐和不决定的阻塞范围。

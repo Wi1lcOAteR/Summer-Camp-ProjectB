@@ -81,11 +81,11 @@ Google/Anthropic 官方站点在 2026-07-20 本轮调查中连接失败，未把
 - 当时若选择策略 2：范围可缩小，但 provider 特性会进入领域层，替换成本更高。
 - 当时若选择策略 3：需要为每家 provider 分配独立凭据、政策核验和端到端测试。
 
-D-015 的最终回答没有指定参考 provider 或要求第一版同时支持多家真实供应商，而是确认统一 adapter registry 与用户配置。由此确定：
+D-015 的最终回答没有指定参考 provider 或要求第一版同时支持多家真实供应商，而是确认统一 adapter registry 与用户配置。D-016 随后选择方案 1：首版一个真实参考 adapter + 统一接口/完整 mock。由此确定：
 
 - 平台维护支持目录、adapter 代码、统一合同、mock 与适配器合同测试；
 - 用户只从已支持、能力可见的 provider profile 中选择，未配置时不产生远端调用；
-- 首版具体 adapter 目录及是否允许自定义 endpoint 仍未决定；在明确确认前，不能把任意 endpoint 当作已授权能力；
+- 首版只有一个真实参考 adapter；具体参考 provider、模型、SDK、政策及是否允许自定义 endpoint 仍未决定，在明确确认前不能把任意 endpoint 当作已授权能力；
 - 选择 provider profile 不代替材料外发 consent，配置切换也不能复用旧 consent 或远端对象引用。
 
 ## 不应由 provider 决定的事项

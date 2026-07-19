@@ -48,7 +48,7 @@ D-010 已选择单用户、本地优先路线。三种候选路线及选择依�
 | 输入 | 用户选择的课程、一个或多个 `MaterialBatch`、材料角色与课程级处理策略。首个真实样本为“操作系统基础”15 份 PDF；已确认需要表达 `lecture`、`past_paper` 和 `teacher_focus` 三种角色，具体格式仍未决。 |
 | 行为 | 先检查文件名、类型、大小、页数、加密状态、哈希、重复和限制；在用户明确选择前不解析正文、不上传内容。第一版提供 L（本地）、P（经确认页面/片段远端）和 F（整份 PDF/课程远端）三种能力，由用户显式选择。处理后保留原始页面、抽取结果、解析版本和质量标记的对应关系，生成 `added/reinforced/changed/unmapped/duplicate` 候选知识覆盖，并等待用户确认。 |
 | 输出 | 批次/文件状态、质量报告、可追溯页面上下文、候选 `ConceptCoverage`、追加式 `CoverageDecision`、课程级 `ProcessingPolicy`、`ConsentRecord`、`RemoteMaterialObject` 与可观察远端任务状态。 |
-| 边界 | 当前技术可读性只验证 PDF。新批次不代表完整教学范围；候选覆盖未经用户确认不得成为课程事实或进入计划。已确认使用统一 adapter registry，用户从平台支持的 `ProviderProfile` 中配置 provider，产品不设静默默认；具体内置 adapter 目录、留存/训练政策和预算仍未决。F 不能在缺少对象追踪、引用定位或删除语义时启用。 |
+| 边界 | 当前技术可读性只验证 PDF。新批次不代表完整教学范围；候选覆盖未经用户确认不得成为课程事实或进入计划。已确认使用统一 adapter registry，并在首版交付一个真实参考 adapter；用户从平台支持的 `ProviderProfile` 中配置 provider，产品不设静默默认。参考 provider、留存/训练政策和预算仍未决。F 不能在缺少对象追踪、引用定位或删除语义时启用。 |
 | 错误处理 | 加密、损坏、越界、解析失败、低文本页和远端删除失败必须指出受影响文件/页及恢复方式；不得静默丢页、替换原文或升级外发范围。 |
 
 ### M2 适配解释与理解检查
@@ -214,7 +214,7 @@ Local browser
   -> finals PlanRevision -> 同类练习/模拟 -> 新证据 -> 再规划
 ```
 
-`已确认`：第一版私有课件、索引和学习状态默认留在本机，由浏览器访问 localhost WebUI；不包含账号或多租户服务。远端能力经过统一适配器注册表，运行时 provider 由用户配置而不是产品硬编码。上述其余内容仍是职责边界，不决定语言、框架、数据库、具体内置 adapter 或桌面壳。
+`已确认`：第一版私有课件、索引和学习状态默认留在本机，由浏览器访问 localhost WebUI；不包含账号或多租户服务。远端能力经过统一适配器注册表，首版交付一个真实参考 adapter，运行时 provider 由用户配置而不是产品硬编码。上述其余内容仍是职责边界，不决定语言、框架、数据库、具体参考 provider 或桌面壳。
 
 ## 7. 候选数据模型
 
@@ -256,7 +256,7 @@ Local browser
 ### 未决实现
 
 - 第一版已确定为本地优先，因此凭据必须通过本机安全存储适配器管理。Windows Credential Manager 或跨平台钥匙串仍是候选，需在目标平台确认后选择。
-- Provider-neutral 适配策略和用户配置边界已确认；第一版真实 adapter 数量/目录、模型、区域、留存/训练政策、费用上限和具体配置 schema 未决。模式 F 只有在所选 adapter 声明并通过上传/索引/引用/删除 contract test 后才能启用。候选见 `docs/research/PROVIDER_STRATEGY_OPTIONS.md`。
+- Provider-neutral 适配策略和用户配置边界已确认；D-016 已确认首版一个真实参考 adapter + 完整 mock/contract suite。具体参考 provider、模型、区域、留存/训练政策、费用上限和配置 schema 未决。模式 F 只有在参考 adapter 声明并通过上传/索引/引用/删除 contract test 后才能启用。候选见 `docs/research/PROVIDER_STRATEGY_OPTIONS.md`。
 
 ## 9. 分发、部署、CI 与设计系统
 
@@ -269,7 +269,7 @@ Local browser
 
 ## 10. 技术选型
 
-当前不选择语言、前后端框架、本地数据库、向量索引、具体内置 provider adapter、公开演示平台或 agent 框架。已确认远端能力使用统一 adapter registry，用户只从平台已实现并验证的 adapter 中选择本地 profile；不把任意 endpoint 或第三方插件视为已批准范围。技术选型必须符合 localhost WebUI、本地私有数据、无账号/多租户和可选远端 provider 边界，并记录许可证与选择理由。
+当前不选择语言、前后端框架、本地数据库、向量索引、具体参考 provider、公开演示平台或 agent 框架。已确认远端能力使用统一 adapter registry，首版交付一个真实参考 adapter 与完整 mock/contract suite；用户只从平台已实现并验证的 adapter 中选择本地 profile，不把任意 endpoint 或第三方插件视为已批准范围。技术选型必须符合 localhost WebUI、本地私有数据、无账号/多租户和可选远端 provider 边界，并记录许可证与选择理由。
 
 **已确认：第一版采用受约束 AI 功能，不包含课程定义的 agent。** 模型只能通过具名、结构化且有来源范围的端口生成候选知识映射、适配解释、练习、反馈和期末资料分析；应用状态机、版本化规则、确定性 oracle 与用户确认拥有权威写入权。若未来加入自主多轮决策、自主工具调用和反馈自修正，必须重新取得学生确认，并自行编码可用 mock/stub 确定性测试的主循环、工具分发和治理护栏。方案比较与延期理由见 `docs/research/AGENT_BOUNDARY_OPTIONS.md`，端口合同见 `docs/research/CONSTRAINED_AI_PORT_CONTRACT.md`。
 
@@ -308,7 +308,7 @@ Local browser
 | AC-29 | provider 适配器若不能声明对象追踪、引用定位或删除/过期语义，模式 F 不可启用；界面不能把未知清理状态显示为 `deleted`。 |
 | AC-30 | 未配置 profile、adapter ID 未知、配置 schema 无效、凭据缺失或能力不足时，P/F 在网络调用前失败关闭且 L 仍可用；普通 config、日志、错误、快照和浏览器存储均不含 secret。 |
 | AC-31 | adapter/profile、受控 endpoint 或政策指纹变化后，旧 `ConsentRecord` 不可授权新调用；新调用等待精确确认，旧 profile 的远端对象与删除状态继续独立追踪。 |
-| AC-32 | 每个第一版内置 adapter 都通过同一 provider-neutral contract suite；真实 adapter 的措辞、ID 和 SDK 异常不会泄漏到领域状态或改变确定性 oracle。 |
+| AC-32 | 唯一第一版真实参考 adapter 与 provider mock 都通过同一 provider-neutral contract suite；真实 adapter 的措辞、ID 和 SDK 异常不会泄漏到领域状态或改变确定性 oracle。 |
 
 这些验收标准需随模块行为、技术栈和部署决策继续细化；目前没有正式实现测试证据。
 
@@ -318,12 +318,14 @@ Local browser
 | --- | --- |
 | 公开 WebUI 如何在不暴露私人课件/key 的前提下可体验 | 阻塞演示数据、部署配置和课程 URL 验收 |
 | 是否正式提供整份 PDF 云端处理 | 已确认第一版提供 F；统一适配器与用户配置边界已确认，具体内置 adapter、数据政策、容量和删除实现仍未决，见 `docs/research/REMOTE_FILE_LIFECYCLE_CONTRACT.md` |
-| Provider adapter 交付范围与数据政策 | D-015 架构方向已确认；D-016 当前人工门禁，阻塞真实 adapter 目录、凭据字段、远端留存/区域/预算和真实 F 端到端测试 |
-| 往年卷答案、个人笔记、作业与老师口头重点是否进入第一版 | 阻塞扩展材料类型、学术诚信与敏感数据范围；往年卷和老师给定重点的角色本身已确认 |
-| 期末模式启用窗口、考试后状态、每日投入与具体调度算法 | 阻塞 M3 参数、任务粒度与部分时间相关测试；双模式核心语义已确认 |
+| 第一版真实参考 provider 与数据政策 | D-016 已确认一个真实参考 adapter；D-017 当前人工门禁，阻塞具体 provider、SDK/许可证、凭据字段、远端留存/区域/预算和真实 F 端到端测试 |
+| Provider 自定义 endpoint 边界 | D-018 待确认；阻塞 config schema、SSRF/本地网络控制和能力快照范围 |
+| 往年卷答案、个人笔记、作业与老师口头重点是否进入第一版 | D-019 待确认；阻塞扩展材料类型、学术诚信与敏感数据范围；往年卷和老师给定重点的角色本身已确认 |
+| 期末模式启用窗口、考试后状态、每日投入与具体调度算法 | D-020 待确认；阻塞 M3 参数、任务粒度与部分时间相关测试；双模式核心语义已确认 |
 | 是否包含课程定义的 agent | 已确认第一版不包含；未来若改变范围，重新触发主循环、工具分发和 mock/stub 测试门禁 |
-| 分发、部署与远程平台 | 阻塞最终技术栈、CI/CD 和公开 WebUI 架构 |
-| Open Design 未接入 | 阻塞正式 design system/skill 选择与 UI 实现 |
+| 本地运行、技术/凭据预设与公开演示 | D-021/D-022 待确认；阻塞最终技术栈、凭据后端、分发和公开 WebUI 架构 |
+| 分发与远程平台 | D-023 待确认；阻塞 CI/CD、PR/MR 证据和最终提交策略 |
+| Open Design 未接入 | D-024 待确认/环境阻塞；阻塞正式 design system/skill 选择与 UI 实现 |
 | 操作系统课件许可证未知 | 阻塞远端整份处理、再分发和公开测试夹具 |
 
 未决项的候选方案、推荐理由和阻塞范围统一维护在 `DECISIONS_NEEDED.md`。
