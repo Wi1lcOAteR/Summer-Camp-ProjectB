@@ -29,3 +29,5 @@ build/
 
 # Local Open Design artifacts unless deliberately promoted later
 .open-design/
+open-design-*-setup.exe
+open-design-*-setup.exe.sha256

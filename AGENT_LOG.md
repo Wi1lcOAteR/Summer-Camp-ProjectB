@@ -99,3 +99,19 @@
 - **subagent 输出 / commit hash**：未派发 subagent；当前仍处于阶段 A。
 - **人工修改及原因**：用户选择在自动下载受阻时手动下载官方安装器。
 - **经验教训**：Open Design 的 hosted `install.sh` 只是已有 CLI 的 MCP 包装器，不是桌面/CLI bootstrap；应避免把“接入 agent”和“安装产品”混为一谈。
+
+## 2026-07-19T21:57:09+08:00 — PRE-007 阶段 A 恢复审计与 brainstorming 续接
+
+- **Task 编号**：PRE-007
+- **触发的 Superpowers skill**：沿用 PRE-006 已触发的 `using-superpowers`、`brainstorming` 流程。本次会话可调用 skill 清单未注册 `superpowers:*`；已完整读取官方缓存 v6.1.1 的两份 `SKILL.md` 并按 checklist 续接，但不把磁盘读取虚报为本次正式调用。
+- **关键 prompt / context**：用户要求完整复读课程/仓库、检查 Superpowers 与 Open Design、完成当前阶段所有无决策工作，并在人工确认门禁停止；项目方向仍为占位文本。
+- **检查结果**：
+  - 根目录约束、`SKILLS_SETUP.md`、两份课程原文、全部已有过程文档、`.codex/config.toml`、`.gitignore` 与最近 Git 历史均已重新读取。
+  - 官方插件缓存存在 Superpowers v6.1.1（MIT）及 14 个 skills；当前会话未注册这些 skills，因此阶段 B 前仍须新建/确认可调用插件的会话。
+  - Open Design 官方 release v0.15.0（commit `79e257d`，Apache-2.0）与 Windows x64 资产存在。本地 309,298,247-byte 安装器的 SHA-256 与同名校验文件一致：`63fc2e609489474e99187cdf94d01d063c1dbee733aaf2464d835cdc1e96f6b5`。Authenticode 为 `NotSigned`，与上游 Windows 未签名说明一致。
+  - `od`、Open Design skill/MCP、MCP resources/templates 均未检测到。安装会写入项目外目录且可能触发 SmartScreen；当前环境只允许写项目目录，未运行安装器，也未反复申请提权。
+  - 当前工具版本：Git 2.55.0.windows.3、Node 24.14.0、npm 11.9.0、pnpm 11.9.0、Python 3.13.5、uv 0.11.14、Docker CLI 29.1.2；`gh`、`gitleaks`、`claude`、`od` 未找到。Docker 因用户配置读取权限警告，daemon 未验证。
+- **subagent 输出 / commit hash**：未派发 subagent；当前阶段 A 且尚无 PLAN task。commit hash 将在本条过程文档提交后记录于任务输出，不递归修改本条。
+- **人工修改及原因**：用户已把 Open Design 安装器和校验文件放入项目根目录；为防止 309 MB 第三方二进制误提交，智能体将这两个精确命名模式加入 `.gitignore`。
+- **偏离、替代措施与影响**：本次会话不能正式调用 `superpowers:brainstorming`；替代措施是按已安装的同版本上游指令续接 PRE-006 已开始的流程并明确证据边界。此限制不阻塞需求提问，但 `writing-plans` 前必须恢复正式 skill 注册。
+- **经验教训**：插件“缓存已安装”、会话“skill 已注册”和流程“实际调用”是三种不同证据，过程文档必须分别记录。

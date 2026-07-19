@@ -1,17 +1,17 @@
 # DECISIONS_NEEDED
 
-## D-001 — 手动安装 Superpowers（当前硬阻塞）
+## D-001 — Superpowers 安装与会话注册
 
-**状态复查：2026-07-17T18:21:22+08:00 仍未安装；已连续三次检查到同一阻塞，持续 Goal 将暂停为 blocked。安装后可直接恢复。**
+**状态：安装阻塞已解除。2026-07-19 复查确认官方插件缓存中存在 Superpowers v6.1.1 及完整核心 skills；此前会话已记录触发 `using-superpowers` 与 `brainstorming`。本次会话未将这些 skills 暴露到可调用清单，属于证据/注册限制，不再阻塞继续阶段 A 的逐项澄清，但在后续正式调用 `writing-plans` 前必须确认新会话能注册 Superpowers。**
 
-- **问题**：当前 Codex 会话未检测到 Superpowers，无法按课程要求触发 `superpowers:brainstorming`。
-- **为什么必须由你处理**：官方 Codex App 安装流程需要在侧栏 Plugins 中点击安装；当前电脑控制规则禁止智能体自动化 Codex 桌面应用及其扩展。
+- **问题**：插件已安装，但本次会话的可调用 skill 清单未注册 `superpowers:*`。
+- **为什么必须由你处理**：Codex 的插件启用与会话注册发生在应用层；当前项目工作区不能修改该状态。
 - **候选方案**：
-  1. **推荐：Codex App** — Plugins → Coding → Superpowers → `+`，安装后新建项目会话。
-  2. **Codex CLI** — 输入 `/plugins`，搜索 Superpowers，选择 Install Plugin，然后重新进入项目会话。
-  3. 暂停本项目；不安装则无法形成课程认可的 brainstorming 证据。
-- **推荐方案及影响**：选择方案 1，与当前主智能体环境一致；安装后应能看到 `superpowers:brainstorming`、`writing-plans`、`using-git-worktrees`、`subagent-driven-development`、`test-driven-development`、评审、调试与完成验证等 skills。
-- **阻塞范围**：阶段 A、`SPEC.md`，以及全部后续阶段。
+  1. **推荐：当前会话继续需求澄清，在进入阶段 B 前新建已加载插件的 Codex 会话**。
+  2. 在 Codex App 的 Plugins 中确认 Superpowers 已启用后，再新建项目会话。
+  3. 使用 Codex CLI `/plugins` 确认安装并重新进入项目会话。
+- **推荐方案及影响**：方案 1 不丢失当前 brainstorming 过程，同时确保 `writing-plans` 有正式调用证据。
+- **阻塞范围**：不阻塞阶段 A 的问题澄清；阻塞阶段 B 的 `writing-plans` 正式调用。
 
 ## D-002 — 项目方向（安装后首个 brainstorming 问题）
 
@@ -26,10 +26,10 @@
 
 ## D-003 — 安装 Open Design（WebUI 必需流程）
 
-**状态更新：自动下载因执行环境无法连接 GitHub 且内置浏览器超时而失败；用户已选择手动下载官方 v0.15.0 Windows x64 安装器。等待安装后验证 `od` 并执行 `od mcp install codex`。**
+**状态更新：项目根目录已有官方 v0.15.0 Windows x64 安装器及同名 `.sha256`；2026-07-19 复算 SHA-256 一致（`63fc2e...f6b5`），安装器未签名，与上游 Windows 发布说明一致。`od`、Open Design MCP 和 MCP resources/templates 仍不可用，说明尚未安装/接入。安装器已被精确加入 `.gitignore`，避免 309 MB 二进制误提交。**
 
 - **问题**：课程最终要求 WebUI，而本项目约束规定含 UI 时使用 Open Design；当前 `od`、skill 与 MCP 均不可用。
-- **为什么必须由你处理**：Windows 安装器属于系统级新软件安装/首次运行，智能体不能在没有操作时人工确认的情况下替你执行；当前自动化规则也要求安装动作由用户确认或接管。
+- **为什么必须由你处理**：安装会写入项目工作区之外的用户/系统目录并可能触发 SmartScreen；当前执行环境只允许写项目目录且不能申请提权，不能合规完成该动作。
 - **候选方案**：
   1. **推荐：安装官方 Windows x64 v0.15.0**，之后运行 `od mcp install codex`，再新建 Codex 会话验证 MCP/skills。
   2. 从源码运行（Node 24、pnpm 10.33.x），隔离性更强但维护成本显著更高，不适合作为课程项目默认路径。
