@@ -31,3 +31,6 @@ build/
 .open-design/
 open-design-*-setup.exe
 open-design-*-setup.exe.sha256
+
+# Superpowers visual companion sessions contain local URLs and session keys
+.superpowers/

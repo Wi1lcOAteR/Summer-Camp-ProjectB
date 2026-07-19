@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>课程导入引导 Mockup</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f8;
+      --surface: #ffffff;
+      --surface-subtle: #f8fafb;
+      --text: #17202a;
+      --muted: #65717d;
+      --border: #d9dee3;
+      --accent: #5b193d;
+      --accent-soft: #f4e9ef;
+      --green: #167451;
+      --green-soft: #e6f4ee;
+      --amber: #925d08;
+      --amber-soft: #fff3d7;
+      --blue: #255c99;
+      --blue-soft: #e9f1fa;
+      --danger: #a33a35;
+      --shadow: 0 12px 34px rgba(24, 35, 46, 0.09);
+      font-family: Inter, "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    button, input { font: inherit; }
+
+    button:focus-visible, input:focus-visible, .mode:focus-within {
+      outline: 3px solid rgba(37, 92, 153, 0.28);
+      outline-offset: 2px;
+    }
+
+    .viewport {
+      min-height: 100vh;
+      padding: 28px;
+      display: grid;
+      place-items: center;
+    }
+
+    .app-shell {
+      width: min(1180px, 100%);
+      min-height: 760px;
+      display: grid;
+      grid-template-columns: 224px minmax(0, 1fr);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .rail {
+      padding: 28px 22px;
+      background: #202830;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .product {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+    }
+
+    .product-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #ffffff;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .steps {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .step-button {
+      width: 100%;
+      border: 0;
+      border-radius: 6px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      align-items: center;
+      gap: 10px;
+      color: #cbd3da;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .step-button:hover { background: rgba(255, 255, 255, 0.07); }
+
+    .step-button[aria-current="step"] {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .step-number {
+      width: 28px;
+      height: 28px;
+      border: 1px solid #66717b;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+    }
+
+    .step-button.is-complete .step-number {
+      border-color: #6ed0a8;
+      background: #146548;
+      color: #ffffff;
+    }
+
+    .rail-note {
+      margin-top: auto;
+      color: #abb6bf;
+      font-size: 13px;
+    }
+
+    .workspace {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    .topbar {
+      min-height: 72px;
+      padding: 18px 34px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar-title { font-weight: 500; }
+
+    .course-chip {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: var(--surface-subtle);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .content {
+      padding: 34px;
+      overflow: auto;
+    }
+
+    .screen[hidden] { display: none; }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 10px; font-size: 28px; font-weight: 500; }
+    h2 { margin-bottom: 8px; font-size: 20px; font-weight: 500; }
+    h3 { margin-bottom: 5px; font-size: 16px; font-weight: 500; }
+    p { line-height: 1.65; }
+
+    .lede {
+      margin-bottom: 26px;
+      color: var(--muted);
+      max-width: 760px;
+    }
+
+    .summary-band {
+      margin-bottom: 24px;
+      padding: 16px 18px;
+      border-left: 4px solid var(--accent);
+      background: var(--accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .summary-band p { margin: 3px 0 0; color: #5f4050; }
+
+    .metrics {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      color: #5f4050;
+      font-size: 13px;
+    }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .mode {
+      position: relative;
+      min-height: 286px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+    }
+
+    .mode:hover { border-color: #9aa5ae; }
+
+    .mode.is-selected {
+      border: 2px solid var(--accent);
+      padding: 17px;
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .mode input {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
+
+    .mode-code {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-subtle);
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .mode p { margin-bottom: 0; color: var(--muted); font-size: 14px; }
+
+    .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .badge {
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .badge.green { background: var(--green-soft); color: var(--green); }
+    .badge.amber { background: var(--amber-soft); color: var(--amber); }
+    .badge.blue { background: var(--blue-soft); color: var(--blue); }
+
+    .mode-list {
+      margin: auto 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .notice {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border: 1px solid #ead39e;
+      border-radius: 6px;
+      background: var(--amber-soft);
+      color: #644513;
+      line-height: 1.55;
+    }
+
+    .file-table, .permission-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .file-table th, .file-table td,
+    .permission-table th, .permission-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .file-table th, .permission-table th {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .file-table td, .permission-table td { font-size: 14px; }
+
+    .check-row {
+      margin-top: 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: var(--text);
+    }
+
+    .check-row input {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: var(--accent);
+    }
+
+    .ready-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 24px;
+      margin-top: 24px;
+    }
+
+    .ready-item {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ready-item span { display: block; color: var(--muted); font-size: 12px; }
+    .ready-item strong { display: block; margin-top: 4px; font-weight: 500; }
+
+    .actions {
+      min-height: 76px;
+      padding: 16px 34px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .button-group { display: flex; gap: 10px; }
+
+    .button {
+      min-height: 42px;
+      padding: 9px 16px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .button:hover { background: var(--surface-subtle); }
+    .button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .button.primary:hover { background: #46122f; }
+
+    .step-status { color: var(--muted); font-size: 13px; }
+
+    @media (max-width: 900px) {
+      .viewport { padding: 14px; align-items: start; }
+      .app-shell { min-height: 0; grid-template-columns: 1fr; }
+      .rail { padding: 16px 18px; gap: 14px; }
+      .product { justify-content: center; }
+      .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .step-button { grid-template-columns: 1fr; justify-items: center; padding: 8px 4px; text-align: center; font-size: 12px; }
+      .rail-note { display: none; }
+      .workspace { min-height: 690px; }
+      .mode-grid { grid-template-columns: 1fr; }
+      .mode { min-height: 0; }
+      .ready-list { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .viewport { padding: 0; }
+      .app-shell { border: 0; border-radius: 0; box-shadow: none; }
+      .product { justify-content: flex-start; }
+      .product span:last-child { display: none; }
+      .steps { gap: 2px; }
+      .step-button { font-size: 11px; }
+      .step-number { width: 24px; height: 24px; }
+      .topbar { padding: 14px 18px; align-items: flex-start; }
+      .course-chip { display: none; }
+      .content { padding: 24px 18px; }
+      h1 { font-size: 24px; }
+      .actions { padding: 14px 18px; flex-wrap: wrap; }
+      .step-status { width: 100%; }
+      .button-group { width: 100%; }
+      .button-group .button { flex: 1; }
+      .summary-band { align-items: flex-start; }
+      .metrics { gap: 8px 12px; }
+      .permission-table { display: block; overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="viewport">
+    <section class="app-shell" aria-label="课程导入引导">
+      <aside class="rail">
+        <div class="product">
+          <div class="product-mark" aria-hidden="true">学</div>
+          <span>学习辅导工作台</span>
+        </div>
+        <ol class="steps" aria-label="导入步骤">
+          <li><button class="step-button is-complete" type="button" data-step="0"><span class="step-number">✓</span><span>检查课程</span></button></li>
+          <li><button class="step-button" type="button" data-step="1" aria-current="step"><span class="step-number">2</span><span>处理方式</span></button></li>
+          <li><button class="step-button" type="button" data-step="2"><span class="step-number">3</span><span>确认权限</span></button></li>
+          <li><button class="step-button" type="button" data-step="3"><span class="step-number">4</span><span>开始学习</span></button></li>
+        </ol>
+        <p class="rail-note">任何扩大课件外发范围的修改都会再次确认。</p>
+      </aside>
+
+      <div class="workspace">
+        <header class="topbar">
+          <div class="topbar-title">导入课程</div>
+          <div class="course-chip">操作系统基础 · 2026 春</div>
+        </header>
+
+        <div class="content">
+          <section class="screen" data-screen="0" hidden>
+            <h1>检查课程材料</h1>
+            <p class="lede">系统只读取了文件名、大小和页数，尚未解析正文，也没有向云端发送内容。</p>
+            <div class="summary-band">
+              <div><h2>操作系统基础</h2><p>15 份 PDF，分为 4 个主题组</p></div>
+              <div class="metrics"><span>932 页</span><span>195.4 MB</span><span>未加密</span></div>
+            </div>
+            <table class="file-table">
+              <thead><tr><th>主题组</th><th>文件</th><th>页数</th><th>状态</th></tr></thead>
+              <tbody>
+                <tr><td>绪论</td><td>2</td><td>138</td><td>可读取</td></tr>
+                <tr><td>并发</td><td>6</td><td>279</td><td>可读取</td></tr>
+                <tr><td>虚拟化</td><td>4</td><td>296</td><td>可读取</td></tr>
+                <tr><td>持久化</td><td>3</td><td>219</td><td>可读取</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section class="screen" data-screen="1">
+            <h1>这门课程如何处理？</h1>
+            <p class="lede">不同方式在课件保真度、隐私和费用之间有不同取舍。此选择只应用于“操作系统基础”，以后可以修改。</p>
+            <div class="summary-band">
+              <div><h2>真实材料检查</h2><p>95 页文字较少，所有页面都包含图像对象；纯文本不能完全替代原始幻灯片。</p></div>
+              <div class="metrics"><span>原页始终保留</span><span>无静默上传</span></div>
+            </div>
+
+            <div class="mode-grid" role="radiogroup" aria-label="课件处理方式">
+              <label class="mode" data-mode="local">
+                <input type="radio" name="mode" value="local">
+                <span class="mode-code">L</span>
+                <div><h3>本地解析</h3><p>课件不离开本机，解释时始终提供原页对照。</p></div>
+                <div class="badges"><span class="badge green">隐私强</span><span class="badge amber">保真度中</span><span class="badge green">无云端费用</span></div>
+                <ul class="mode-list"><li>公式和分栏可能失真</li><li>低置信度页面只提示，不自动上传</li></ul>
+              </label>
+
+              <label class="mode is-selected" data-mode="page-cloud">
+                <input type="radio" name="mode" value="page-cloud" checked>
+                <span class="mode-code">P</span>
+                <div><h3>按页云端处理</h3><p>本地管理课程，只发送当前任务所需并经确认的页面。</p></div>
+                <div class="badges"><span class="badge blue">外发可控</span><span class="badge green">保真度高</span><span class="badge amber">按次计费</span></div>
+                <ul class="mode-list"><li>调用前预览页面与供应商</li><li>适合图表、公式和代码页面</li></ul>
+              </label>
+
+              <label class="mode" data-mode="full-cloud">
+                <input type="radio" name="mode" value="full-cloud">
+                <span class="mode-code">F</span>
+                <div><h3>整份云端处理</h3><p>上传原始 PDF，由云端服务处理完整文档上下文。</p></div>
+                <div class="badges"><span class="badge amber">外发范围大</span><span class="badge green">保真度最高</span><span class="badge amber">费用较高</span></div>
+                <ul class="mode-list"><li>需独立授权和删除状态</li><li>可能受文件与供应商限制</li></ul>
+              </label>
+            </div>
+            <div class="notice" role="note">系统不会因为本地解析质量较低而自动切换到云端。任何扩大外发范围的修改都会再次展示实际文件或页面并等待确认。</div>
+          </section>
+
+          <section class="screen" data-screen="2" hidden>
+            <h1>确认这门课程的权限</h1>
+            <p class="lede">以下内容会按当前选择保存。每次云端调用前仍会显示实际发送页面。</p>
+            <table class="permission-table">
+              <thead><tr><th>项目</th><th>当前设置</th><th>用户可见性</th></tr></thead>
+              <tbody>
+                <tr><td>课程模式</td><td id="permission-mode">按页云端处理</td><td>课程设置中可修改</td></tr>
+                <tr><td>本地保存</td><td>文件索引、原页、学习状态</td><td>可查看和清除</td></tr>
+                <tr><td>云端发送</td><td id="permission-scope">每次确认的页面图与文本</td><td>调用前预览</td></tr>
+                <tr><td>模式升级</td><td>必须再次确认</td><td>显示新增外发范围</td></tr>
+              </tbody>
+            </table>
+            <label class="check-row"><input id="remember" type="checkbox" checked><span><strong>为“操作系统基础”记住此设置</strong><br><span style="color:var(--muted)">不会应用到其他课程，也不会代替每次扩大外发范围的确认。</span></span></label>
+          </section>
+
+          <section class="screen" data-screen="3" hidden>
+            <h1>课程已准备好</h1>
+            <p class="lede">首次导入引导完成。下一步可以选择一个知识点进行诊断，系统会基于课件页码记录理解证据和复习计划。</p>
+            <div class="summary-band">
+              <div><h2>操作系统基础</h2><p>课件、处理方式与权限记录已经关联到这门课程。</p></div>
+              <div class="metrics"><span>15 份材料</span><span>4 个主题组</span></div>
+            </div>
+            <div class="ready-list">
+              <div class="ready-item"><span>处理方式</span><strong id="ready-mode">按页云端处理</strong></div>
+              <div class="ready-item"><span>课程设置</span><strong id="ready-remember">已按课程记住</strong></div>
+              <div class="ready-item"><span>原始幻灯片</span><strong>始终可查看</strong></div>
+              <div class="ready-item"><span>扩大外发范围</span><strong>需要重新确认</strong></div>
+            </div>
+          </section>
+        </div>
+
+        <footer class="actions">
+          <span class="step-status" id="step-status">第 2 步，共 4 步</span>
+          <div class="button-group">
+            <button class="button" id="back" type="button">上一步</button>
+            <button class="button primary" id="next" type="button">继续</button>
+          </div>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const screens = [...document.querySelectorAll('[data-screen]')];
+    const stepButtons = [...document.querySelectorAll('[data-step]')];
+    const modes = [...document.querySelectorAll('.mode')];
+    const back = document.getElementById('back');
+    const next = document.getElementById('next');
+    const status = document.getElementById('step-status');
+    const remember = document.getElementById('remember');
+    let current = 1;
+    let selectedMode = 'page-cloud';
+
+    const modeLabels = {
+      local: { name: '本地解析', scope: '不发送课件内容到云端' },
+      'page-cloud': { name: '按页云端处理', scope: '每次确认的页面图与文本' },
+      'full-cloud': { name: '整份云端处理', scope: '经独立授权的原始 PDF' }
+    };
+
+    function renderStep() {
+      screens.forEach((screen, index) => { screen.hidden = index !== current; });
+      stepButtons.forEach((button, index) => {
+        button.removeAttribute('aria-current');
+        button.classList.toggle('is-complete', index < current);
+        if (index === current) button.setAttribute('aria-current', 'step');
+        const number = button.querySelector('.step-number');
+        number.textContent = index < current ? '✓' : String(index + 1);
+      });
+      status.textContent = `第 ${current + 1} 步，共 4 步`;
+      back.disabled = current === 0;
+      next.textContent = current === 3 ? '进入课程' : '继续';
+      const label = modeLabels[selectedMode];
+      document.getElementById('permission-mode').textContent = label.name;
+      document.getElementById('permission-scope').textContent = label.scope;
+      document.getElementById('ready-mode').textContent = label.name;
+      document.getElementById('ready-remember').textContent = remember.checked ? '已按课程记住' : '仅本次导入';
+    }
+
+    modes.forEach((mode) => {
+      mode.addEventListener('click', () => {
+        selectedMode = mode.dataset.mode;
+        modes.forEach((item) => item.classList.toggle('is-selected', item === mode));
+        mode.querySelector('input').checked = true;
+        renderStep();
+      });
+    });
+
+    stepButtons.forEach((button) => button.addEventListener('click', () => {
+      current = Number(button.dataset.step);
+      renderStep();
+    }));
+
+    back.addEventListener('click', () => { if (current > 0) { current -= 1; renderStep(); } });
+    next.addEventListener('click', () => { if (current < 3) { current += 1; renderStep(); } });
+    remember.addEventListener('change', renderStep);
+    renderStep();
+  </script>
+</body>
+</html>
