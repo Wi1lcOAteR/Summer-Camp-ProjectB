@@ -29,6 +29,8 @@ domain state + approved source scope
 
 模型输出默认是 `candidate`，不能直接成为课件事实、知识覆盖、计划、优先级、掌握状态、授权或删除结果。
 
+在模式 F 中，端口仍只使用应用内部 `source_id`；provider 文件/索引 ID 由适配器通过 `RemoteMaterialObject` 解析，不暴露为任意工具参数。模型引用必须映射回本地材料与页码，不能以“整份文件已上传”代替来源定位。
+
 ## 端口目录
 
 | 端口 | 用途 | 必需输入 | 输出 | 权威写入 |

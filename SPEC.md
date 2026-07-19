@@ -46,9 +46,9 @@ D-010 已选择单用户、本地优先路线。三种候选路线及选择依�
 | 项目 | 规约 |
 | --- | --- |
 | 输入 | 用户选择的课程、一个或多个 `MaterialBatch`、材料角色与课程级处理策略。首个真实样本为“操作系统基础”15 份 PDF；已确认需要表达 `lecture`、`past_paper` 和 `teacher_focus` 三种角色，具体格式仍未决。 |
-| 行为 | 先检查文件名、类型、大小、页数、加密状态、哈希、重复和限制；在用户明确选择前不解析正文、不上传内容。处理后保留原始页面、抽取结果、解析版本和质量标记的对应关系，生成 `added/reinforced/changed/unmapped/duplicate` 候选知识覆盖，并等待用户确认。 |
-| 输出 | 批次/文件状态、质量报告、可追溯页面上下文、候选 `ConceptCoverage`、追加式 `CoverageDecision`、课程级 `ProcessingPolicy` 与 `ConsentRecord`。 |
-| 边界 | 当前技术可读性只验证 PDF。新批次不代表完整教学范围；候选覆盖未经用户确认不得成为课程事实或进入计划。mockup 展示本地、按页云端、整份云端三个候选模式，但“整份云端”是否正式提供、供应商与留存策略仍未决。 |
+| 行为 | 先检查文件名、类型、大小、页数、加密状态、哈希、重复和限制；在用户明确选择前不解析正文、不上传内容。第一版提供 L（本地）、P（经确认页面/片段远端）和 F（整份 PDF/课程远端）三种能力，由用户显式选择。处理后保留原始页面、抽取结果、解析版本和质量标记的对应关系，生成 `added/reinforced/changed/unmapped/duplicate` 候选知识覆盖，并等待用户确认。 |
+| 输出 | 批次/文件状态、质量报告、可追溯页面上下文、候选 `ConceptCoverage`、追加式 `CoverageDecision`、课程级 `ProcessingPolicy`、`ConsentRecord`、`RemoteMaterialObject` 与可观察远端任务状态。 |
+| 边界 | 当前技术可读性只验证 PDF。新批次不代表完整教学范围；候选覆盖未经用户确认不得成为课程事实或进入计划。L/P/F 的具体 provider、留存/训练政策、预算和适配器能力仍未决；F 不能在缺少对象追踪/删除语义时启用。 |
 | 错误处理 | 加密、损坏、越界、解析失败、低文本页和远端删除失败必须指出受影响文件/页及恢复方式；不得静默丢页、替换原文或升级外发范围。 |
 
 ### M2 适配解释与理解检查
@@ -94,7 +94,7 @@ D-010 已选择单用户、本地优先路线。三种候选路线及选择依�
 
 ### X1 安全、凭据与审计（跨模块）
 
-所有材料读取、外发、状态更新和删除都必须经过同一策略层；安全不能只是一个可绕过的设置页面。该控制面负责所有权检查、请求预览、凭据状态、预算/超时、错误脱敏、同意记录、删除审计和最小化日志。
+所有材料读取、外发、状态更新和删除都必须经过同一策略层；安全不能只是一个可绕过的设置页面。该控制面负责所有权检查、请求预览、文件级授权、凭据状态、预算/超时、错误脱敏、同意记录、远端对象生命周期、删除审计和最小化日志。模式 F 的 provider 无关合同见 `docs/research/REMOTE_FILE_LIFECYCLE_CONTRACT.md`。
 
 ### X2 受约束 AI 模型端口（已确认边界）
 
@@ -176,7 +176,7 @@ Local browser
        -> M1 Material / Fidelity
        -> M2 Explanation / Understanding Check
        -> M3 Mastery / Review
-       -> X1 Policy / Credential / Audit
+       -> X1 Policy / Credential / Audit / Remote Lifecycle
        -> X2 Constrained Model Ports
             -> local persistent store
             -> OS credential store adapter
@@ -192,6 +192,14 @@ Local browser
   -> 本地解析或经确认的远端调用
   -> 原页/抽取/质量报告 -> 候选知识覆盖 -> 用户确认
   -> 计划新版本 -> 带来源的解释/复习上下文
+```
+
+模式 F 的额外数据流为：
+
+```text
+文件批次 -> 文件级 consent -> upload -> index -> ready
+         -> 受约束端口按本地 source_id 引用
+         -> 切换/撤销 -> delete_requested -> deleted | delete_incomplete
 ```
 
 新材料与期末模式的数据流为：
@@ -215,6 +223,7 @@ Local browser
 | `Material` / `MaterialPage` | 保存原文件身份、页面、抽取与质量 | 原页和抽取独立版本；页码唯一且可追溯 |
 | `ProcessingPolicy` | 保存当前课程模式 | 扩大外发不能仅覆盖原值 |
 | `ConsentRecord` | 追加记录授权和撤销 | 不保存课件正文；保留 from/to mode 与 payload scope |
+| `RemoteMaterialObject` / `RemoteJob` | 追踪模式 F 的远端文件/索引及上传、索引、删除任务 | provider 引用不进普通日志；状态、哈希、授权和删除结果可观察 |
 | `KnowledgeConcept` / `SourceReference` | 将知识点绑定课件来源 | 课件事实必须指向存在页面；模型补充单独标记 |
 | `ConceptCoverage` / `CoverageDecision` | 表示材料到知识点的候选映射与用户确认 | 候选/确认分离；低置信、冲突项不能自动进入计划 |
 | `StudyFocus` | 表示老师重点或往年卷模式到知识点的映射 | 来源、种类、置信度和确认状态可见；不得与模型推断混淆 |
@@ -242,7 +251,7 @@ Local browser
 ### 未决实现
 
 - 第一版已确定为本地优先，因此凭据必须通过本机安全存储适配器管理。Windows Credential Manager 或跨平台钥匙串仍是候选，需在目标平台确认后选择。
-- LLM 供应商、区域、留存/训练政策、费用上限和远端删除能力未决。
+- LLM 供应商、区域、留存/训练政策、费用上限和具体远端适配器未决；模式 F 只有在适配器声明上传/索引/删除能力后才能启用。
 
 ## 9. 分发、部署、CI 与设计系统
 
@@ -287,6 +296,11 @@ Local browser
 | AC-22 | provider 返回坏 schema、注入文本、超时、限流、取消或预算耗尽时，权威知识覆盖、计划版本、`due_at`、掌握状态、授权与删除结果保持不变。 |
 | AC-23 | 无网络、真实 LLM 和凭据时，provider mock 可确定性覆盖成功、低置信、无来源、坏 schema、失败和重复响应；模型措辞变化不改变 oracle/rubric 与领域状态结果。 |
 | AC-24 | 第一版不存在自主 agent loop 或模型可调用的任意工具分发；模型输出只能进入候选校验、用户确认或解释展示路径。 |
+| AC-25 | 第一版 WebUI 显示并支持 L/P/F 三种能力；没有用户选择和精确文件/批次 `ConsentRecord` 时，不产生远端上传调用。 |
+| AC-26 | 模式 F 的文件/索引状态至少可观察 `awaiting_consent`、`uploading`、`indexing`、`ready`、失败、删除中、`deleted` 与 `delete_incomplete`；部分失败不假报全成功。 |
+| AC-27 | 模式 F 使用内容哈希与幂等键避免重复对象/计费；进程重启、取消、离线恢复和新增批次不会丢失远端对象追踪。 |
+| AC-28 | 从 F 切回 L/P 或撤销授权后，新请求立即拒绝 F 远端来源；对象进入删除流程，删除未确认时显示 `delete_incomplete`，历史本地证据不被删除。 |
+| AC-29 | provider 适配器若不能声明对象追踪、引用定位或删除/过期语义，模式 F 不可启用；界面不能把未知清理状态显示为 `deleted`。 |
 
 这些验收标准需随模块行为、技术栈和部署决策继续细化；目前没有正式实现测试证据。
 
@@ -295,7 +309,7 @@ Local browser
 | 问题 | 状态/影响 |
 | --- | --- |
 | 公开 WebUI 如何在不暴露私人课件/key 的前提下可体验 | 阻塞演示数据、部署配置和课程 URL 验收 |
-| 是否正式提供整份 PDF 云端处理 | D-014 当前人工门禁；阻塞模式目录、版权/隐私、成本与删除协议，候选见 `docs/research/REMOTE_MATERIAL_CAPABILITY_OPTIONS.md` |
+| 是否正式提供整份 PDF 云端处理 | 已确认第一版提供 F；具体 provider、数据政策、容量和删除适配仍未决，见 `docs/research/REMOTE_FILE_LIFECYCLE_CONTRACT.md` |
 | 供应商与数据政策 | 阻塞凭据、远端留存、区域、预算与适配器合同 |
 | 往年卷答案、个人笔记、作业与老师口头重点是否进入第一版 | 阻塞扩展材料类型、学术诚信与敏感数据范围；往年卷和老师给定重点的角色本身已确认 |
 | 期末模式启用窗口、考试后状态、每日投入与具体调度算法 | 阻塞 M3 参数、任务粒度与部分时间相关测试；双模式核心语义已确认 |

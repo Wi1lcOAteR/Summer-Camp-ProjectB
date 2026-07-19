@@ -11,7 +11,7 @@
 - 目标场景是大学学业中的“看懂”和“持续复习”。
 - 首个真实课程是操作系统基础，材料为 15 份、932 页的混合文本/代码/公式/图表 PDF。
 - 解释需要适配学生当前理解，且跨会话维护连续学习状态。
-- 课件处理路径由用户选择，必须显示保真度、外发、凭据/费用和解析限制。
+- 第一版正式提供 L（本地）、P（经确认页面/片段远端）和 F（整份 PDF/课程远端）三种路径；由用户选择，并显示保真度、外发、凭据/费用和解析限制。
 - 本地解析不能冒充原始页面；任何扩大外发范围的模式切换不能静默发生。
 - 第一版只服务单个学生并采用本地优先 WebUI；私有课程数据默认在本机，不实现账号、多租户或分享。
 - 首个纵向学习闭环选择互斥与竞态条件，使用合成线程轨迹的确定性 oracle、来源约束解释和后续变式复习。
@@ -81,6 +81,7 @@
 | `MaterialPage` | `material_id`, `page_number`, `render_ref`, `raw_text`, `normalized_text`, `quality_flags`, `parser_version` | `(material_id, page_number)` 唯一；原始与归一化文本并存 |
 | `ProcessingPolicy` | `id`, `course_id`, `mode`, `provider_scope`, `version`, `chosen_at` | 课程级有效；扩大外发需新的同意记录 |
 | `ConsentRecord` | `id`, `course_id`, `from_mode`, `to_mode`, `payload_scope`, `provider`, `approved_at`, `revoked_at` | 追加式记录；不得覆盖旧授权历史；不保存正文 |
+| `RemoteMaterialObject` / `RemoteJob` | `material_id`, `provider`, `content_hash`, `state`, `consent_record_id`, `provider_refs`, `job_type` | 模式 F 文件/索引/删除可观察；幂等、引用保护和 `delete_incomplete` |
 | `KnowledgeConcept` | `id`, `course_id`, `title`, `description`, `prerequisite_ids`, `status` | 必须至少有一个来源或标为学生自建；依赖不能形成非法循环 |
 | `SourceReference` | `id`, `concept_id`, `material_id`, `page_number`, `region`, `kind` | 页码必须存在；区分课件、学生笔记和模型补充 |
 | `ConceptCoverage` | `id`, `batch_id`, `concept_id`, `source_ids`, `relation`, `confidence`, `extractor_version` | 候选映射不等于权威知识；低置信与冲突需确认 |
@@ -101,6 +102,7 @@
 ```text
 Course
   -> ProcessingPolicy -> ConsentRecord[]
+                      -> RemoteMaterialObject[] -> RemoteJob[]
   -> MaterialBatch[] -> Material[] -> MaterialPage[]
   -> ConceptCoverage[] -> CoverageDecision[]
   -> KnowledgeConcept[] -> SourceReference[] / StudyFocus[]
@@ -125,6 +127,8 @@ ready/ready_with_warnings -> deleting -> deleted | delete_incomplete
 ```
 
 D-009 已确认：`awaiting_policy` 必须由用户在首次导入引导中显式完成；选择按课程记住，任何扩大外发范围的切换仍需新的 `ConsentRecord`。
+
+D-014 已确认 L/P/F 都进入第一版；F 的文件级 consent、远端对象、任务、切换和删除状态见 `docs/research/REMOTE_FILE_LIFECYCLE_CONTRACT.md`。
 
 材料在 `ready` / `ready_with_warnings` 后只产生候选覆盖；`CoverageDecision` 确认后才触发新计划版本。后续增量批次沿用同一流程，不假设整门课资料已经到齐。
 
