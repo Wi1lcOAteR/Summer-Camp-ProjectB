@@ -2,6 +2,7 @@
 
 初次审计时间：2026-07-17T18:14:41+08:00
 最近历史复查时间：2026-07-19T21:57:09+08:00
+最近阶段 A 决策复查：2026-07-20（D-017 至 D-024）
 
 > 当前（2026-07-20）要求符合性请以 [`REQUIREMENTS_COMPLIANCE_AUDIT.md`](REQUIREMENTS_COMPLIANCE_AUDIT.md) 为准。本文件前半部分保留启动阶段的历史快照，不能用其中“SPEC 不存在”等旧状态判断当前工作区。
 
@@ -35,6 +36,7 @@
 ### Open Design
 
 - 当前未找到 `od` 命令、Open Design skill 或 MCP；MCP resources/templates 均为空。
+- D-024 已确认采用“安装并使用 Open Design”，因此该缺口不再是产品选择问题，而是正式 UI 前必须满足的外部环境门禁。
 - 官方 release：v0.15.0（2026-07-14，commit `79e257d`），Apache-2.0，提供 Windows x64 安装器。
 - 本地安装器大小 309,298,247 bytes；SHA-256 与同名 `.sha256` 一致，值为 `63fc2e609489474e99187cdf94d01d063c1dbee733aaf2464d835cdc1e96f6b5`；Authenticode 状态为 `NotSigned`，与上游 Windows 未签名发布说明一致。
 - 官方说明支持 Codex，接入命令为 `od mcp install codex`，也支持 `--print` 预览配置。
@@ -114,3 +116,21 @@ Superpowers 插件、核心 skills 与 Open Design 仍均为 `none`。这是连�
 - Superpowers v6.1.1 缓存和 14 个 skills 均存在；本次任务的可调用 skill 清单没有注册它们。已完整读取 `using-superpowers` 与 `brainstorming`，按其清单续接阶段 A，并在日志保留证据限制。
 - Open Design v0.15.0 官方 release、Windows x64 资产、本地哈希一致性与未签名状态已核对；`od`/MCP 均不存在。安装因工作区外写入限制交由用户处理，不重复尝试提权。
 - Git 工作区原本只有两份 Open Design 下载文件未跟踪；已精确加入 `.gitignore`，防止大文件误提交。
+
+### 阶段 A 交付边界更新（2026-07-20）
+
+学生对 D-017 至 D-024 全部选择方案 A，最新 `SPEC.md` 已把这些选择收敛为规约。下表区分“文档已覆盖”与“已有实现/运行证据”；后者当前仍为空。
+
+| 决策 | 已确认方向 | 当前证据边界 |
+| --- | --- | --- |
+| D-017/D-018 OpenAI 边界 | 首版唯一真实实现为内置 OpenAI adapter，并保留 deterministic mock/contract；不接受任意 endpoint/plugin | 只有合同与官方政策研究；OpenAI Python SDK 许可证/精确版本尚未核验，P/F 真实集成测试尚未执行 |
+| D-021 + 分发候选 | D-021 确认 Windows x64、Python/FastAPI + React/Vite、SQLite、Credential Manager；SPEC 另提单文件 `ProjectB.exe`，待整体签字 | 无依赖/源码/凭据测试/冻结构建/干净机/SmartScreen 证据；不得把 exe 候选归因成原 D-021 答案 |
+| D-022 + 部署候选 | D-022 确认许可夹具 + mock/无真实 key；SPEC 另提 OCI、HF Spaces、无上传/egress、隔离 session/限额，待整体签字 | 无镜像/build/run/URL/隔离证据；官方页面 502/curl 超时，签字前须重核；账号/部署需执行时授权 |
+| D-023 远程仓库/CI | NJU Git/GitLab 主仓 + GitHub 镜像；GitLab `unit-test` + GitHub Actions 双 CI | 当前没有远程 push、PR/MR、镜像或 CI 运行；这些动作仍需执行当时的用户授权 |
+| D-024 Open Design | 安装并使用 Open Design | `od`、MCP 与 skill 仍不可用；当前环境禁止工作区外安装，正式 UI 仍被此外部门禁阻塞 |
+
+OpenAI 的 Responses 能力/政策快照还须在每次 P/F 同意前刷新并记录，覆盖 application state、abuse monitoring、prompt cache、文件审查例外和 Files/Vector Stores 生命周期；`store:false` 不得表述为 ZDR。
+
+详细拓扑、分发完成标准、公开 demo 隔离/限额、依赖许可证门禁与远程操作边界见 [`research/TECH_STACK_DISTRIBUTION_BASELINE.md`](research/TECH_STACK_DISTRIBUTION_BASELINE.md)。这些选择解决了产品/交付方向问题，但不能充当实现或最终课程交付证据。
+
+当前进入阶段 B 前仍有以下门禁：恢复联网后重核 Hugging Face Spaces 当前官方条款；Open Design 安装/MCP 接入并记录实际 design system/skill；Superpowers `writing-plans` 在可调用的新会话中正式使用；学生本人补充 brainstorming 过程的优点、不足与关键取舍；学生明确整体签字确认 `SPEC.md`。之后仍须依次完成 PLAN、陌生智能体冷启动验证、规约修订复核和实现批准。

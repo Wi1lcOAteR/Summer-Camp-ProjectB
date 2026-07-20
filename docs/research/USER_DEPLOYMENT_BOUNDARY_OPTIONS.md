@@ -1,6 +1,7 @@
 # 第一版用户与运行边界对比基线
 
 记录时间：2026-07-19
+最近决策更新：2026-07-20（D-021 至 D-024）
 
 ## 状态与目的
 
@@ -18,7 +19,10 @@
 - 课程硬性要求 WebUI，因此基线是浏览器访问 localhost 应用；桌面窗口可作为后续可选壳，但不能替代 WebUI；
 - 第一版不实现注册、登录、多租户、课件分享、资料协作、教师视角或跨设备同步；
 - 核心实体仍使用本地 actor/owner scope，目的是明确归属、支持测试和降低未来迁移风险，不代表实现多用户；
-- 公开演示部署、授权样例、目标平台与本地分发方式仍需后续确认。
+- D-021 已确认 Windows x64、React/Vite/TypeScript + Python/FastAPI + SQLite 和 Windows Credential Manager；为满足课程分发硬项，SPEC 另提单文件 `ProjectB.exe` 候选，待整体签字；
+- D-022 已确认公开演示只用合成/许可材料与 provider mock、无真实 key；SPEC 另提 OCI、隔离到期 session/限额与 Hugging Face Spaces Docker SDK 候选，待整体签字且当前官方复核受 502/超时阻塞；
+- D-023 已确认 NJU Git/GitLab 为主仓、GitHub 为镜像，并保留 GitLab `unit-test` 与 GitHub Actions 双 CI 证据；任何远程 push、PR/MR 或镜像操作仍需执行当时的用户授权；
+- D-024 已确认安装并使用 Open Design。当前 `od`、MCP 与 skill 仍不可用，且本执行环境禁止向工作区外安装，因此正式 UI 设计与实现仍受此外部环境门禁约束。
 
 ## 共同硬约束
 
@@ -41,7 +45,7 @@
 | 私有课件位置 | 用户本机 | 受控服务器/对象存储 | 多租户服务器/对象存储 |
 | 学习状态位置 | 本地数据库 | 服务器数据库 | 带 owner/tenant 的服务器数据库 |
 | 身份边界 | 本机操作系统会话 | 一个已认证 owner | 每请求认证 + 每对象授权 |
-| 凭据候选 | OS 钥匙串/本地加密存储 | 服务端 secret store 或 owner 级加密记录 | 平台密钥或每用户密钥，按租户隔离 |
+| 凭据 | Windows Credential Manager（keyring） | 服务端 secret store 或 owner 级加密记录 | 平台密钥或每用户密钥，按租户隔离 |
 | 公开 WebUI | 同构的公开演示部署，使用授权样例 | 同一实例或独立演示账号 | 主服务本身 |
 | 私人数据暴露面 | 最小；仅确认片段外发 | 课件、状态、日志均进入服务端边界 | 再增加跨用户与滥用风险 |
 | 离线能力 | 可保留导入、原页和本地状态 | 通常不可用 | 通常不可用 |
@@ -54,17 +58,20 @@
 ### 候选拓扑
 
 ```text
-Local browser
-  -> localhost application
-       -> local database / page cache / index
-       -> OS credential store
-       -> parser and renderer
-       -> confirmed page/fragment -> remote model provider
+Windows x64 browser
+  -> single-file ProjectB.exe
+       -> embedded React/Vite/TypeScript WebUI
+       -> Python/FastAPI bound to loopback
+            -> SQLite / local page cache / index
+            -> keyring -> Windows Credential Manager
+            -> parser and renderer
+            -> built-in OpenAI adapter for confirmed scope
 
-Public course URL
-  -> same WebUI build in demo configuration
-       -> licensed/synthetic fixtures
-       -> no private courseware or real credentials
+Public HTTPS URL (preferred: Hugging Face Spaces Docker SDK)
+  -> OCI container / same WebUI and domain contracts
+       -> licensed/synthetic fixtures only
+       -> isolated expiring sessions + provider mock only
+       -> no upload, private courseware, secret entry or provider egress
 ```
 
 ### 优点
@@ -80,11 +87,12 @@ Public course URL
 - 本地服务、浏览器打开、端口冲突、系统钥匙串和跨平台打包都要测试；
 - 公开 URL 需要单独的演示配置，必须证明它仍是可体验应用而非静态截图；
 - 公开演示与本地真实模式可能发生配置漂移，必须由同一核心测试套件约束；
+- 正式 UI 前必须在可写用户环境中安装并接入 Open Design，随后记录所选 design system 与 skill；当前需求 mockup 不能替代这项证据；
 - 跨设备同步不是第一版能力，备份由用户承担或另行设计。
 
 ### 课程 URL 的保守处理
 
-公开部署使用同一 WebUI 与业务状态机，预装有明确许可证或自行构造的材料，只允许在演示数据范围内体验导入后流程。它不能持有学生私人课件或真实 API key。课程原文没有明确“公开演示配置”是否足以替代真实私有数据运行，因此最终提交前应向课程方确认，或确保公开实例可在安全限制内完成完整核心流程。
+公开部署必须使用同一 WebUI、领域合同与业务状态机，并在许可夹具范围内完整体验导入、覆盖确认、学习检查、计划修订/撤销和考后暂停。模型路径固定 mock；任意上传、真实凭据/provider egress 和私人材料持久化均关闭。每浏览器随机隔离 session，30 分钟无活动/2 小时总寿命后清除，并执行 `SPEC.md` 中的资源/速率上限。首选 Hugging Face Spaces Docker SDK；官方 Docker/HTTPS/费用/临时存储条款在网络恢复后重核，不满足无付费边界时必须走 SPEC 变更。
 
 ## 路线 2：单用户、云端个人实例
 
@@ -151,12 +159,12 @@ Browsers
 | --- | --- | --- |
 | `ActorContext` | 当前 actor/owner 身份与权限范围 | 本地固定 actor、个人实例 owner session、多用户 tenant session |
 | `MaterialRepository` | 按 owner/course 保存和读取材料身份、页面与质量 | 本地文件/数据库或服务器对象存储/数据库 |
-| `CredentialStore` | `status`, `set`, `clear`, provider scope；从不返回明文给 WebUI | OS 钥匙串或服务端 secret store |
+| `CredentialStore` | `status`, `set`, `clear`, provider scope；从不返回明文给 WebUI | 首版由成熟 keyring 适配 Windows Credential Manager；未来部署可替换服务端 secret store |
 | `ProcessingPolicyService` | 当前课程策略、追加式同意记录、外发判定 | 三条路线行为相同，持久化不同 |
 | `ProviderGateway` | 有界、可取消的页面/片段请求与脱敏结果 | 本地进程调用或服务端调用 |
 | `AuditSink` | 白名单事件元数据 | 本地审计或 tenant 分区审计 |
 
-这些是候选边界，不代表已选择具体语言、框架或数据库。
+这些合同边界不依赖精确依赖版本。D-021 已确认 Windows x64、Python/FastAPI + React/Vite/TypeScript、SQLite 和 Windows Credential Manager；单文件 `ProjectB.exe` 是待整体 SPEC 签字的分发候选。精确版本/冻结工具在 PLAN 前按许可证与验证要求固化。
 
 ## 数据位置对比
 
@@ -167,14 +175,14 @@ Browsers
 | 学习证据/复习任务 | 本机数据库 | owner 数据库 | 每对象 owner/tenant 约束 |
 | 同意/审计 | 本机追加记录 | owner 审计 | tenant 分区、管理员不可见正文 |
 | 云端 provider payload | 经确认页面/片段 | 经确认页面/片段或待决定整份文件 | 同上，并需每请求 owner 授权 |
-| API 凭据 | OS 钥匙串 | 服务端 secret store | 平台级或用户级隔离 secret |
+| API 凭据 | keyring 引用的 Windows Credential Manager 项；config 仅存 adapter/profile 与 `credential_ref` | 服务端 secret store | 平台级或用户级隔离 secret |
 | 普通日志 | 无正文、作答、路径、key | 同左 | 同左，并去除可跨用户关联信息 |
 
 ## 测试影响
 
 ### 三条路线共同测试
 
-- 无同意记录时 provider mock 调用为 0；
+- 无同意记录时捕获式 adapter/contract spy 调用为 0；
 - 扩大外发范围必须追加新的 `ConsentRecord`；
 - 原页、抽取和来源引用不互相覆盖；
 - 无学习证据时不能提升掌握状态；
@@ -187,8 +195,9 @@ Browsers
 - 非受信 `Host`/`Origin`、开放 CORS 和无 CSRF 证明的状态变更请求均被拒绝，防止恶意网页访问 localhost；
 - 端口冲突给出可恢复错误，不随机暴露到局域网；
 - WebUI 无法读取钥匙串明文；
+- 钥匙串状态、更新和清除通过后端完成；config、SQLite、日志、错误和前端状态均不出现 secret；
 - 本地数据库/缓存删除与重新导入幂等；
-- 演示配置拒绝私人文件持久化和真实凭据录入。
+- 演示配置拒绝任意上传、私人文件持久化、真实凭据和 provider egress；跨 session 读取为 0，到期/限额可复现，模型路径只允许 mock。
 
 ### 云端个人实例新增测试
 
@@ -220,13 +229,16 @@ Browsers
 
 当前证据只证明一个学生、一个真实课程和本地私有课件的需求，没有证明注册、多用户协作或教师端价值。学生据此采用方案 1，使第一版以最小的新信任边界满足真实自用，并把工程深度集中到项目独有难点。
 
+D-017/D-018/D-021 至 D-024 确认内置 OpenAI、Windows 本地栈、许可夹具/mock、双远程 CI 和 Open Design；单文件/OCI/HF/隔离限额是随后写入 SPEC 的待签字工程候选。详见 [`TECH_STACK_DISTRIBUTION_BASELINE.md`](TECH_STACK_DISTRIBUTION_BASELINE.md)。
+
 选择方案 2 的充分理由应是“跨设备和统一公开实例是首版核心价值”，而不仅是部署看起来方便。选择方案 3 的充分理由应来自真实的第二类用户或多人隔离需求，而不是为了让项目显得更大。
 
-## D-010 确认后需要收敛的内容
+## 已确认方向与后续验证
 
-1. `SPEC.md` 的目标用户、数据位置与 owner 语义（已同步）；
-2. 凭据存储与首次录入/更新/清除流程；
-3. 认证是否存在及其最小边界；
-4. 分发形态、公开 WebUI 与演示数据策略；
-5. 删除、备份和迁移验收；
-6. 技术栈候选的评价标准。
+1. `SPEC.md` 已同步目标用户、数据位置、owner 语义及 D-017 至 D-024；当前等待外部工具/平台复核、学生反思和整体签字；
+2. 凭据后端已选 Windows Credential Manager + 成熟 keyring 适配，但首次录入、状态、更新、清除和失败关闭仍需 TDD 证明；
+3. 本地运行不引入登录；loopback、Host/Origin、CORS 与 CSRF 边界仍需实现和测试；
+4. 首版提议 Windows x64 单文件 `ProjectB.exe`，随整体 SPEC 签字确认；具体冻结工具按许可证与干净机证据选择；
+5. 公开 demo 提议 OCI + Hugging Face Spaces Docker SDK，随整体签字确认；官方条款复核、账号、URL、CI/CD 和可访问性尚未执行；
+6. 双平台仓库/CI 策略已定，但远程 push、PR/MR、镜像与部署仍需执行当时授权；
+7. Open Design 使用方向已定，但必须先在工作区外完成安装/MCP 接入并在新会话验证，之后才能选择 design system/skill 和开始正式 UI。

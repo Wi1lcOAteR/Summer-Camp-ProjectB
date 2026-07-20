@@ -8,7 +8,7 @@
 
 已确认的不变量：第一版单用户、本地优先；用户首次导入时显式选择处理方式；选择按课程记住；低保真检测不得静默上传；扩大外发范围必须再次确认；模型只能通过受约束端口处理已批准来源。
 
-本决策只回答“第一版产品提供到哪一级远端材料能力”，不选择具体 provider、模型、数据区域、留存政策、价格或凭据实现。D-015 后续确认平台使用统一 adapter registry，用户在配置/设置中选择平台已支持的 provider profile；它仍不决定某门课程具体选择哪种模式，那由用户在导入引导中决定。
+本决策首先回答“第一版产品提供到哪一级远端材料能力”。D-015 后续确认平台使用统一 adapter registry，用户在配置/设置中选择平台已支持的 provider profile；D-016 确认首版一个真实 adapter + 完整 mock；D-017 选择 OpenAI 作为唯一真实参考 adapter；D-018 确认只允许平台内置 adapter，不开放任意自定义 endpoint 或第三方 plugin。上述决定仍不替某门课程选择 L/P/F 模式，那由用户在导入引导中决定；具体 OpenAI 模型、区域、费用、SDK 和用户组织政策资格仍待核验。
 
 ## 三种能力目录
 
@@ -46,7 +46,13 @@
 - 证明解释引用具体页，而不是把整份文件存在远端当成来源正确性；
 - 公共演示绝不使用真实受限课件。
 
-最低测试除方案 1 外，还包括分片/重试幂等、部分上传失败、索引未完成、删除失败、供应商对象泄漏、过期清理和大文件预算终止。
+最低测试除方案 1 外，还包括本地幂等 + at-least-once 恢复、响应丢失后的重复对象发现/隔离/对账/清理、部分上传失败、索引未完成、删除失败、供应商对象泄漏、过期清理和大文件预算终止。真实 provider 不承诺 exactly-once 或绝不重复计费；deterministic mock 才要求相同测试键可重放。
+
+对 D-017 已选的 OpenAI reference adapter，官方快照进一步限定方案 2：Responses 的 PDF `input_file` 在具备视觉能力的模型上同时使用抽取文本与逐页图像；File Search 则通过 Files/Vector Stores 对已上传文件做托管检索，文件关联需达到 `completed`。File Search 示例 citation 只有 `file_id`/`filename`，没有原 PDF 页码或页面区域，其视觉保真也未被证明，因此整份模式不能绕过本地 `SourceLocator`。映射失败时 coverage/exam-analysis 返回空 `source_insufficient`，解释/练习/反馈最多为 `model_supplement`，均不得进入材料事实/覆盖/计划。
+
+[Data controls](https://developers.openai.com/api/docs/guides/your-data#storage-requirements-and-retention-controls-per-endpoint) 的 2026-07-20 快照显示：首版 `/v1/responses` 虽固定前台 `store:false`，该设置仍不消除默认最长 30 天 abuse-monitoring 日志、非 ZDR 组织支持模型最长 24 小时 prompt cache 和图像/文件特殊安全审查例外；`/v1/files` 和 `/v1/vector_stores` 非 ZDR，应用状态保留到删除。`policy_snapshot_id` 必须共同覆盖 Responses、abuse monitoring、prompt cache、图像/文件审查例外、Files 和 Vector Stores，不能用“默认不用于训练”替代留存说明。首版禁用 background、Conversations、远程 MCP 和 Hosted Shell/Code Interpreter 等执行型 hosted tools；F 的 File Search 只由 adapter 绑定已授权 store。OpenAI SDK 许可证本轮尚未现场核验。
+
+每个课程/profile/config 使用独占 Vector Store。删除单份材料只删除其 association + File，store 和其他材料继续可用；只有删除课程/F 且对账证明无剩余 association 时才删除 store。强制清除凭据会使未完成删除进入隔离的 `credential_unavailable`/`delete_incomplete`；同 profile 重新录入凭据并由用户显式恢复后才做一次有界对账，否则只能提示人工清理，不能假报删除成功。
 
 ## 方案 3：课程材料完全不外发
 
@@ -65,6 +71,7 @@ PDF、页面图、抽取和索引始终留在本机。模型若需要课程内�
 7. 日志不保存课件正文、页面图、文件路径、学生作答或凭据。
 8. provider profile 只保存非秘密配置与 `credential_ref`；未知 adapter、坏配置、缺失凭据、政策未知或能力不足时远端调用为 0，不能自动切换供应商。
 9. 更换 profile 或影响 endpoint、区域、模型路由、能力/政策的配置时创建新的配置/政策快照和 `ConsentRecord`；旧远端对象引用不能复用。
+10. local production 只注册内置 OpenAI adapter；deterministic mock 只用于 test/demo，配置失败不能回退到 mock。
 
 ## 原推荐与学生选择
 
@@ -74,10 +81,11 @@ PDF、页面图、抽取和索引始终留在本机。模型若需要课程内�
 
 学生选择方案 2，优先保障用户自行决定外发层级。项目因此必须实现整份模式的独立授权、上传/索引/删除状态和失败恢复；不能只在 UI 中展示选项。生命周期合同见 `docs/research/REMOTE_FILE_LIFECYCLE_CONTRACT.md`。
 
-D-015 随后确认统一 `ProviderAdapterRegistry` 与用户配置受支持 provider 的边界。该决定没有选择具体 provider、模型、SDK、首版适配器数量或任意自定义 endpoint；这些不能从“用户在 config 里配置”过度推断。平台负责 adapter 与能力合同，配置只选择已实现且可验证的 profile，凭据值与普通配置分离。
+D-015 随后确认统一 `ProviderAdapterRegistry` 与用户配置受支持 provider 的边界；D-016/D-017/D-018 进一步把首版收敛为一个真实 OpenAI adapter + 完整 mock，并明确只允许平台内置 adapter。平台负责 adapter、固定 endpoint 映射与能力合同，配置只选择已实现且可验证的 OpenAI profile，凭据值与普通配置分离；任意 `base_url`、自定义 endpoint、动态 adapter 或第三方 plugin 不属于首版能力。
 
 ## 选择后的影响
 
 - 若选择方案 1：SPEC 的正式模式目录为 L/P；模式 F 作为延期项，PLAN 不实现远端文件生命周期。
 - 选择方案 2：SPEC 加入 F 的上传/索引/删除状态与验收；用户配置的 provider profile 只有在 adapter 支持明确文件生命周期、配置/政策快照和删除语义时才能启用 F。
+- D-017/D-018：首版真实路径只验收平台内置 OpenAI adapter；Google/Anthropic 等候选保留为历史过程证据，不进入首版实现或配置。OpenAI 的页码/视觉缺口、Files/Vector Stores 非 ZDR 与直到删除政策必须进入 SPEC 验收。
 - 选择方案 3：SPEC 删除课程内容远端端口，重新评估本地模型、硬件、分发和视觉保真验收，不能只关闭网络后沿用现有承诺。

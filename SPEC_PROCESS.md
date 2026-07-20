@@ -1,6 +1,6 @@
 # SPEC_PROCESS
 
-> 当前状态：阶段 A 的需求澄清持续进行；`SPEC.md` 已形成未签字工作草案，但仍含人工门禁和未决技术/分发项，不得触发 `writing-plans` 或实现。Superpowers v6.1.1 已安装且此前会话已记录触发 `brainstorming`；本次会话未将 `superpowers:*` 注册到可调用 skill 清单，因此仅按已安装的上游指令续接流程，并如实保留这一证据限制。
+> 当前状态：阶段 A 的产品、数据、安全、技术、分发与部署方向已通过 D-017 至 D-024 收敛进未签字 `SPEC.md`；当前仍有 Open Design 外部安装/实际 design system、Hugging Face Spaces 官方连通性复核、学生本人 brainstorming 反思与 SPEC 整体签字门禁，不得触发 `writing-plans` 或实现。Superpowers v6.1.1 缓存和核心 skills 可检测，但本次会话未将 `superpowers:*` 注册到可调用清单，进入阶段 B 前必须在新会话正式调用 `writing-plans`。
 
 ## 0. 启动审计（2026-07-17）
 
@@ -278,9 +278,61 @@
 - **批量问题准备**：按学生要求将剩余人工门禁整理为 D-017 至 D-024：参考 provider、任意 endpoint 边界、期末材料范围、调度预设、本地技术/凭据、公开演示、远程仓库/CI、Open Design。每项都有候选、推荐和阻塞范围，等待学生一次性回答。
 - **门禁保持**：在批量答案和后续 SPEC 签字前，不生成 `PLAN.md`、不加入 SDK、不开真实 provider、不实现 UI/后端；D-016 已确认但 D-017 及后续决定仍开放。
 
+### 第 16 轮：D-017 至 D-024 全部采用方案 A（2026-07-20，断网前收到）
+
+- **学生原始回答**：“感觉可以全A，你继续执行吧”。原消息没有可核验的到秒时间，本记录不补造时间戳。
+- **确认结果**：D-017 OpenAI 唯一真实参考 adapter；D-018 只允许平台内置 adapter、无任意 endpoint/plugin；D-019 `lecture` + 无答案 `past_paper` + `teacher_focus`；D-020 保守确定性调度；D-021 Windows x64/Python+FastAPI/React+Vite+TypeScript/SQLite/Windows Credential Manager；D-022 合成/许可 demo + provider mock；D-023 NJU Git/GitLab 主仓 + GitHub 镜像与双 CI；D-024 安装并使用 Open Design。
+- **没有过度解释**：该回答不授权真实 key、付费 API、远程 push/PR、建仓或部署；不把 OpenAI 设为静默默认，不开放兼容协议 URL；也不替代 Open Design 安装、SPEC 整体签字或后续冷启动/实现门禁。
+- **断网影响**：回答后规约整合尚未完整写入核心 `SPEC.md` 时会话中断；共享工作区留下按文件分组的未提交研究文档修改，没有 `PLAN.md` 或实现代码。
+
+### 断网恢复与并行产出复核（2026-07-20T15:10:50+08:00 起）
+
+- **学生恢复指令**：“昨天断网了，你继续推进”。恢复时 HEAD 为 `ccaa5734c8d91dd747c55d7daf6d1270d2f42c56`；`DECISIONS_NEEDED.md`、14 份研究/审计文件有未提交改动，另有新建 `TECH_STACK_DISTRIBUTION_BASELINE.md`。三个断网前 subagent 已不再运行，未发现需要等待的 exec session。
+- **先审后合并**：主智能体没有直接提交断网前产出，而是分别审查 provider、调度/材料、分发/审计 diff；另派三个只读审计检查 SPEC 缺口、决策台账过期状态和研究合同事实/授权边界。
+- **只读审计暴露的关键差距**：Responses 留存面遗漏、远端 exactly-once 过度承诺、共享 Vector Store 删除所有权不清、非 PDF 来源没有 locator、考后暂停提前到考试日零点、调度默认仍留给 PLAN 猜、原生包未明确满足课程“单文件二进制”、公开 demo session 可能串状态。以上均在本轮即时修订，不作为事后测试证据。
+
+### OpenAI 官方资料复核与策略修订（2026-07-20T15:39:25+08:00 前完成）
+
+- **使用的 skill/来源**：续用已完整读取的 `openai-docs` skill，并通过 OpenAI Developer Docs MCP 重新读取 [Your Data](https://developers.openai.com/api/docs/guides/your-data#data-retention-controls-for-abuse-monitoring)、[`/v1/responses`](https://developers.openai.com/api/docs/guides/your-data#v1responses) 与 Files OpenAPI；没有调用真实 API、读取 key 或上传材料。
+- **新增官方事实**：Responses 默认（或 `store:true`）有至少 30 天 application-state 保留；首版因此显式 `store:false` 并禁用 background/Conversations/远程 MCP/执行型 hosted tools。但这不消除默认最长 30 天、可能含 prompt/response 的 abuse-monitoring 日志，非 ZDR 组织支持模型还有最长 24 小时 prompt cache；图像/文件存在特殊安全审查例外。Files/Vector Stores 仍非 ZDR、应用状态保留到删除。
+- **幂等证据边界**：Files `POST /v1/files` 的当前 OpenAPI 没有文档化的 idempotency header；不能承诺真实上传 exactly-once 或绝不重复计费。合同改为本地幂等 + at-least-once、重复对象发现/隔离/对账/清理；deterministic mock 才可保证按键重放。
+- **SDK 许可证**：OpenAI Python SDK LICENSE 仍未现场取得；OpenAPI 自身的许可元数据不能替代 SDK 包许可证。选包/锁版本前继续作为依赖门禁。
+
+### 可验证工程候选的收敛（2026-07-20，待整体 SPEC 签字）
+
+- **M1 输入 v1**：固定 PDF/图片/UTF-8 文本/手工重点的 MIME、单文件与批次上限、损坏/加密/伪装处理；用户声明延期角色先拒绝，疑似答案/泄露只进入 `needs_user_review`，不冒充可靠自动识别。
+- **统一来源**：新增 `SourceLocator` 判别联合类型，覆盖 PDF 页/区域、图片、文本行范围和手工 entry；缺 locator 时 coverage/exam-analysis 空内容失败关闭，其他端口最多显示 `model_supplement`，不能写材料事实或计划。
+- **ReviewPolicy v1**：提出每日预算范围与 30/90 分钟默认、任务时长、`[1,3,7,14,30]` 日间隔、纯函数/fixtures、证据转换与稳定排序；`today_local > target_local_date` 才暂停。它不是 D-020 原答案逐字数值，须学生整体签字后才成为合同，不声称科学最优。
+- **远端所有权**：每课程/profile/config 独占 Vector Store；删单文件只删 association + File，课程/F 删除且无剩余关联才删 store。强制清凭据后遗留对象保持 `delete_incomplete`，只能同 profile 显式恢复或人工清理。
+- **分发/演示**：为满足课程硬项提出 Windows x64 单文件 `ProjectB.exe`、OCI demo、临时隔离 session 和 Hugging Face Spaces Docker SDK。D-021/D-022 未逐字确认这些细节，须整体 SPEC 签字。2026-07-20 web 返回 502、三个官方页面 `curl` 均 20 秒超时，故没有声称当前配额/可用性，签字前还须恢复联网复核。
+
+### 断网恢复后的阶段 A P1 跟进（2026-07-20T17:07:19+08:00）
+
+- 学生恢复指令为“昨天断网了，你继续推进”；D-017 至 D-024 的原始批量回答已经存在，因此本轮没有重复提出相同问题，也没有把恢复指令解释成 `SPEC.md` 整体签字。
+- 只读复核发现的最后两项 P1 已修正：`docs/REQUIREMENTS_COMPLIANCE_AUDIT.md` 不再把产品/分发/demo 写成无需选择；`SPEC.md` 的 M3 与 `plan_reviews_v1` 现在明确接收完整 `LearningEvidence` 历史、每个概念的 `ConceptReviewState` 和当前 `MasteryEstimate`，并将它们纳入 canonical hash；领域候选实体同步增加 `ConceptReviewState`。
+- 这次修订保留了谨慎边界：单文件 `ProjectB.exe`、OCI/Hugging Face demo、隔离限额和 ReviewPolicy v1 数值是工程候选，只有学生整体签字后才成为合同；OpenAI 官方文档已核验的留存、`store:false`、Files/Vector Stores 删除和无已证明 exactly-once 等事实继续留在研究合同，不扩写为未核验供应商承诺。
+- 下一步只执行可复现的静态审计（链接、围栏、必需章节、用户故事、AC-01..AC-50、模块契约、占位符、凭据特征、无 PLAN/源码）并记录实际输出；不会借此生成计划或实现。
+
+### 阶段 A 静态审计实际结果（2026-07-20T17:16:44+08:00）
+
+- Markdown 27 个；本地链接 11 个且坏链接 0；代码围栏不平衡 0。
+- `SPEC.md` 必需章节缺失 0；US-01 至 US-10 共 10 个且无缺失/重复；AC-01 至 AC-50 共 50 个且无缺失/重复；M1/M2/M3 五项模块契约字段缺失 0。
+- 占位符扫描 0、强特征凭据扫描 0、`git diff --check` 无错误；正式源码计数 0，`PLAN.md`/`README.md`/`REFLECTION.md` 仍不存在。
+- 该结果只证明当前规约和过程文档的静态一致性，不能替代 Open Design、Superpowers 新会话、学生反思、SPEC 签字、冷启动、实现、测试、CI、分发或部署证据。
+
+### 独立一致性复核后的收口（2026-07-20T17:22:25+08:00）
+
+- 独立只读审计指出 M3 表格的“已固定”措辞和领域模型对 D-020 的 ReviewPolicy attribution 不够准确；已改为“待整体签字的工程候选”和“D-020 只确认确定性方向”。
+- 修订后再次检查没有发现 P1；所有精确 ReviewPolicy、单文件分发、OCI/Hugging Face、隔离限额仍明确标为候选，不会被当成用户已确认事实。
+
+### 学生本人过程反思门禁（尚未执行）
+
+- 课程审计要求学生本人评价 brainstorming 的优点、不足和关键取舍。目前学生尚未提供这段个人判断；智能体只记录实际决策与工程分析，不把自身总结冒充学生反思，也不创建/代写 `REFLECTION.md`。
+- 后续只需学生用自己的话回答：哪些提问真正帮助收敛、哪些显得冗余、最满意/最不满意的一个取舍。智能体可在收到初稿后做结构或措辞校对，并记录辅助范围。
+
 ## 2. SPEC 签字确认
 
-尚未执行。`SPEC.md` 已创建为阶段 A 工作草案，但仍包含需要逐项确认的候选设计与未决问题，用户尚未签字确认。
+尚未执行。D-017 至 D-024 已确认并写入，`SPEC.md` 已完成本次最终静态自审但仍未由学生整体签字；Open Design 实际 design system/skill、Hugging Face Spaces 官方复核和学生本人 brainstorming 反思仍未补齐。
 
 ## 3. PLAN 生成
 

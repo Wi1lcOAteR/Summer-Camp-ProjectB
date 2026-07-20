@@ -4,7 +4,7 @@
 
 ## 状态与范围
 
-D-013 已确认第一版使用受约束 AI 功能，不包含课程定义的 agent。D-015 又确认平台采用统一 `ProviderAdapterRegistry`，由用户配置平台已支持的 provider profile。本文件把“模型可以做什么”与“应用权威状态由谁决定”分开，供后续 `SPEC.md`、技术选型和 PLAN 使用。它不选择具体 provider、模型、SDK、适配器目录、任意 endpoint、部署平台或提示词模板。
+D-013 已确认第一版使用受约束 AI 功能，不包含课程定义的 agent。D-015 又确认平台采用统一 `ProviderAdapterRegistry`，由用户配置平台已支持的 provider profile；D-016 确认首版一个真实 adapter + 完整 mock；D-017 选择 OpenAI 作为唯一真实参考 adapter；D-018 确认只允许平台内置 adapter，不开放任意自定义 endpoint 或第三方 plugin。本文件把“模型可以做什么”与“应用权威状态由谁决定”分开，供后续 `SPEC.md`、技术选型和 PLAN 使用。具体 OpenAI 模型版本、SDK/HTTP 客户端、部署平台和提示词模板仍未选择。
 
 ## 总体边界
 
@@ -34,9 +34,23 @@ domain state + approved source scope
 
 provider profile 只保存 adapter 允许的非秘密配置和指向本机安全存储的 `credential_ref`。模型端口请求、响应、普通配置文件、浏览器持久化、日志与快照均不得包含凭据值；只有 X1 凭据边界可在调用 adapter 时解析 `credential_ref`。
 
+首版 OpenAI profile 只能包含平台 schema 明确允许的模型/预算等非秘密字段和 `credential_ref`，不得包含任意 `base_url`、自定义 endpoint、动态 adapter 路径或第三方 plugin。平台内置 adapter 的 endpoint 与能力映射由代码/版本化注册表决定，用户 config 不能把兼容 OpenAI 协议的其他服务升级为受支持 provider。
+
 未知 adapter/profile、无效配置、缺失凭据、无法验证的能力/政策快照或当前端口能力不足时，必须在读取或发送远端 payload 前失败关闭；不得猜测配置、自动选择另一 provider 或静默扩大来源范围。模式 L 不依赖远端 profile，仍可继续使用。
 
-在模式 F 中，端口仍只使用应用内部 `source_id`；provider 文件/索引 ID 由已配置适配器通过绑定相同 profile/config/policy 指纹的 `RemoteMaterialObject` 解析，不暴露为任意工具参数。模型引用必须映射回本地材料与页码，不能以“整份文件已上传”代替来源定位。
+在模式 F 中，端口只使用应用内部 `SourceLocator`/source-scope token；provider File/association/store ID 由适配器通过同一 profile/config/policy 指纹的 `RemoteMaterialObject` 解析，不暴露为任意工具参数。模型引用必须映射回本地 locator，不能以“整份文件已上传”代替来源定位。
+
+## OpenAI reference adapter 的端口能力边界
+
+- 首版所有 `/v1/responses` 调用都是前台调用并显式发送 `store:false`。禁用 background、Conversations、远程 MCP，以及 Hosted Shell/Code Interpreter 等执行型 hosted tools；模式 F 所需的 File Search 只能由 adapter 绑定已授权、课程独占的 Vector Store，不向模型开放任意工具选择或参数分发。
+- [File inputs](https://developers.openai.com/api/docs/guides/file-inputs#how-it-works) 证明：具备视觉能力的模型通过 Responses 接收 PDF `input_file` 时，会同时获得抽取文本与逐页图像。模式 P 可利用该路径，但调用仍只发送已授权来源。
+- [File Search](https://developers.openai.com/api/docs/guides/tools-file-search) 证明 Responses 可检索 vector store 中已上传并达到 `completed` 的文件，并支持按 vector-store-file attributes 做 [metadata filtering](https://developers.openai.com/api/docs/guides/tools-file-search#metadata-filtering)；其示例 citation 仍只有文件级信息，未证明原 PDF 页码/页面视觉。
+- [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) 可约束 Responses 输出 schema，并提供独立 refusal 路径；结构化输出仍可能有内容错误，因此 adapter 解析成功后仍必须通过来源、页码和领域规则验证。
+- [Data controls](https://developers.openai.com/api/docs/guides/your-data#storage-requirements-and-retention-controls-per-endpoint) 的 2026-07-20 快照显示：`store:false` 只关闭 Responses application-state 存储，不能消除默认最长 30 天、可能含 prompt/response 的 abuse-monitoring 日志，也不能消除非 ZDR 组织支持模型最长 24 小时的 prompt cache；图像/文件存在特殊安全审查例外。`/v1/files`、`/v1/vector_stores` 仍非 ZDR 且应用状态直到删除。每个 `policy_snapshot_id` 必须同时覆盖 Responses、abuse monitoring、prompt cache、图像/文件审查例外、Files 和 Vector Stores；“默认不用于训练”不能被解释为请求后不留存。
+
+因此 OpenAI 返回的 file citation 只是 provider 候选证据。只有本地映射成功、得到版本匹配的 `SourceLocator` 并通过 `source_scope` 存在性校验后，响应合同才可产生 `source_locator`。缺少该 locator 时，`propose_concept_coverage`/`analyze_exam_material` 必须返回空内容的 `source_insufficient`；`generate_explanation`/`generate_practice_candidate`/`generate_feedback` 最多返回明确标为 `model_supplement` 的一般知识，不能产生“基于材料”的事实、进入 `ConceptCoverage`/`StudyFocus`/计划或作为来源证据。不得要求模型猜 locator，也不得把文件名当 locator。OpenAI Python SDK 的许可证尚未现场核验，正式选择 SDK 前必须另行检查并记录。
+
+每次 F request 还必须从有效 consent 生成 association `scope_token` allowlist，在 File Search tool 上使用 `in` metadata filter，并包含/验证每个 result/citation File ID。撤销 token 立即移出 allowlist；出现越界 File ID 时整次响应为 `provider_scope_violation`，所有 content 丢弃。若 attributes/filter/results 能力或 allowlist 上限无法证明，则该 store `source_disabled`，不得仅靠 prompt 隔离来源。locator 文本证明采用与 `SPEC.md` 相同的 NFKC/空白规范化和唯一 >=32 code-point 页内 span；歧义或视觉-only 必须失败。
 
 ## 端口目录
 
@@ -93,7 +107,7 @@ provider profile 只保存 adapter 允许的非秘密配置和指向本机安全
 }
 ```
 
-允许的顶层状态至少包括 `candidate`、`source_insufficient`、`schema_rejected`、`provider_config_invalid`、`credential_unavailable`、`capability_unsupported`、`policy_unknown`、`provider_failed`、`cancelled` 和 `budget_exceeded`。除 `candidate` 外，状态不能进入权威写入路径；`content` 在错误状态下必须为空或仅含脱敏恢复信息。
+允许的顶层状态至少包括 `candidate`、`source_insufficient`、`schema_rejected`、`provider_scope_violation`、`provider_config_invalid`、`credential_unavailable`、`capability_unsupported`、`policy_unknown`、`provider_failed`、`cancelled` 和 `budget_exceeded`。除 `candidate` 外，状态不能进入权威写入路径；`content` 在错误状态下必须为空或仅含脱敏恢复信息。
 
 ## 端口专属约束
 
@@ -130,7 +144,7 @@ provider profile 只保存 adapter 允许的非秘密配置和指向本机安全
 | 来源片段与候选引用 | 是 | 是（存在性校验） | 低置信/冲突时 |
 | `ConceptCoverage` | 是 | 是（去重/冲突分类） | 是 |
 | `StudyFocus` | 是 | 是（频度/权重候选） | 是 |
-| `LearningPlan` / `PlanRevision` | 否，最多提供候选输入 | 是 | 激活重大修订时 |
+| `LearningPlan` / `PlanRevision` | 否，最多提供候选输入 | 是（ReviewPolicy v1） | 自动修订无需二次确认；覆盖决定、进入 finals、手动覆盖等输入动作本身需确认 |
 | `ReviewTask.due_at` / priority | 否 | 是 | 手动覆盖时 |
 | `MasteryEstimate` | 否 | 是（证据/rubric） | 纠正/撤销时 |
 | `ConsentRecord`、凭据、删除结果 | 否 | 是 | 是 |
@@ -147,14 +161,16 @@ candidate -> schema_rejected/source_insufficient
 
 - provider 超时、限流、格式错误或预算耗尽：保留当前权威状态，候选标为可重试失败。
 - schema 失败：不尝试从自由文本猜字段；记录脱敏错误和端口版本。
+- Structured Outputs refusal、解析失败或字段虽合法但引用无法映射：分别归一化为白名单状态，不从自由文本补字段、猜页码或绕过本地来源校验。
 - 来源不存在或权限改变：拒绝候选并要求重新检索/覆盖确认。
-- 同一幂等键重复请求：返回同一候选或明确的已取消状态，不重复计费或写入。
+- 同一幂等键重复请求：本地只合并为同一逻辑 job/候选写入，但真实 provider 按 at-least-once 语义处理；超时或响应丢失后先用请求引用对账，不能承诺返回同一 provider 响应、绝不产生重复对象或绝不重复计费。发现重复对象时先隔离，再选择 canonical 对象并排队清理；mock 可按键确定性返回同一结果。
 - provider 返回提示注入、工具指令或越权请求：把它当普通输出数据拒绝，不执行其中动作。
 - profile/config/policy 指纹变化：旧 consent 不再匹配；已有候选可保留为历史但不能用于新权威写入，新请求等待配置校验与用户确认。
+- 凭据被强制清除：所有新 provider 调用失败关闭；尚未完成的删除/对账对象保持隔离和 `credential_unavailable`/`delete_incomplete`。只有同 profile 凭据重新录入且用户显式恢复时才执行一次有界对账，不能自动换 profile、回退 mock 或把未知远端状态标为 `deleted`。
 
 ## Provider mock 与确定性测试合同
 
-核心测试必须能在没有真实 LLM、网络和凭据时运行。registry/mock 至少支持未知 adapter、坏配置、缺失凭据、能力不足、政策未知，以及按 `request_id`/测试种子返回成功候选、低置信候选、无来源、坏 schema、超时、限流、注入文本、重复响应和不同措辞但相同结构的反馈。
+核心测试必须能在没有真实 LLM、网络和凭据时运行。deterministic mock 只注册在 test/demo profile；local production registry 只注册平台内置 OpenAI adapter，不能在配置失败时回退到 mock。registry/mock 至少支持未知 adapter、坏配置、缺失凭据、能力不足、政策未知，以及按 `request_id`/测试种子返回成功候选、低置信候选、无来源、坏 schema、超时、限流、注入文本、重复响应和不同措辞但相同结构的反馈。
 
 必测不变量：
 
@@ -167,11 +183,16 @@ candidate -> schema_rejected/source_insufficient
 7. 日志、错误和审计只含端口、对象 ID、状态、耗时和计量，不含原文、回答或 key。
 8. profile/config/policy 指纹变化后旧 consent 不匹配，provider mock 调用为 0；旧远端引用不能被新 profile 使用。
 9. 未知 adapter、坏配置、缺失凭据或能力不足时失败关闭，不自动切换 provider；本地模式仍可运行。
+10. OpenAI File Search 只返回 file citation 或无法证明页面视觉时，不产生伪造 locator；本地映射失败时 coverage/exam-analysis 返回空 `source_insufficient`，解释/练习/反馈最多返回 `model_supplement`，且不进入 `ConceptCoverage`/`StudyFocus`/计划或来源证据。
+11. profile 出现 `base_url`、未知 endpoint、动态 adapter/plugin 字段时 schema 拒绝，provider mock/真实调用均为 0。
+12. policy snapshot 同时覆盖 Responses `store:false` 的边界、最长 30 天 abuse monitoring、最长 24 小时 prompt cache、图像/文件审查例外，以及 Files/Vector Stores 的“非 ZDR、应用状态直到删除”；不能被“默认不训练”字段覆盖。
+13. 真实 adapter 的超时/响应丢失按 at-least-once 对账，测试不声称 provider exactly-once/绝不重复计费；deterministic mock 才能按相同请求键返回可重放结果。
+14. local production registry 不注册 mock；test/demo profile 不解析真实凭据或调用真实 provider。
 
 ## 尚未选择的技术项
 
-- 首版支持的 adapter/provider 目录、模型版本、区域、留存/训练政策和成本上限；
-- 是否允许任意自定义 endpoint；D-015 未对此授权；
+- OpenAI reference adapter 的模型版本、SDK/HTTP 客户端、区域、成本上限与用户组织数据控制资格；SDK 许可证尚未现场核验；
+- 平台内置 OpenAI adapter 的稳定 endpoint 清单和版本化非秘密配置 schema；任意自定义 endpoint/plugin 已由 D-018 排除；
 - 本地模型、远端最小片段或混合路由的具体实现；
 - token/图像/页数预算的最终数值；
 - schema 序列化库、重试策略和凭据存储适配器；

@@ -4,11 +4,13 @@
 
 ## 状态与目的
 
-D-012 已于 2026-07-20 确认：学期中使用持续安排；考试日期通常稍后给定，用户录入日期后可以显式进入期末周模式。本文保留三种候选的比较证据，并固定已选双模式的时间/证据/测试合同；它仍不选择 BKT、FSRS、固定间隔表或其他具体调度算法。
+D-012 已于 2026-07-20 确认：学期中使用持续安排；考试日期通常稍后给定，用户录入日期后可以显式进入期末周模式。D-020 又确认第一版采用保守确定性预设：版本化的简单间隔/证据规则、可选每日预算、自动但可撤销的未来任务重排，以及考试本地日期完整结束后的归档/暂停与新目标询问。本文保留历史候选的比较证据；D-020 不授权第一版使用 BKT、FSRS 或模型生成的权威调度。
 
 学习科学基线只支持有限结论：主动提取和分散练习通常有价值，合适间隔会随目标保持时长变化；它不支持把某一套间隔当作所有课程和学生的普适真理。
 
 ## 三种方案比较
+
+下表保留 D-012 阶段对目标语义的历史比较；第一列中的“自适应”仅表示会根据新证据重排，不代表 D-020 采用 FSRS/BKT。
 
 | 维度 | 可选目标日期 + 自适应 | 仅长期掌握 | 手动日期为主 |
 | --- | --- | --- | --- |
@@ -33,23 +35,58 @@ continuous
 finals
   -> exam_date_changed -> revise future tasks
   -> explicit_exit/date_cleared -> continuous
-  -> exam_reached -> unresolved post-exam transition
+  -> today_local > target_local_date -> post_exam_paused
+
+post_exam_paused
+  -> archive finals plan
+  -> ask for new goal
+  -> new_goal_set/explicit_resume -> continuous
 ```
 
 课程可以没有考试日期，且默认持续安排。录入日期只使期末模式可用，不自动切换；用户显式进入后，调度输入才增加剩余可用天数、知识依赖、薄弱证据、老师重点、往年卷映射与已存在任务。不能把目标日期写成“每天任务越多越好”。学生修改/清除日期或退出期末模式时，只重算未开始的未来任务，历史 `Attempt` 和 `LearningEvidence` 不变。
 
-### 仍需学生后续确认的参数
+### D-020 已确认的保守确定性预设
 
-- 目标表示考试的本地日期，还是精确时间；
-- 是否记录每天可投入量、不可用日期或最后冲刺上限；
-- 目标到期后是归档课程、转长期保持，还是询问新目标；
-- 自动重排是否需要逐次确认。
+- 第一版目标使用考试的本地日期与 IANA 时区；不存在“距考试 N 天自动进入”的隐藏窗口，日期有效后仍必须由用户显式进入 `finals`。
+- 每日投入是可选的用户预算。用户未填写时，调度仍可运行，但必须显示正在使用的版本化工程默认容量，不能把缺省值藏在 prompt 或自然语言建议中。
+- 第一版使用简单、可解释且版本化的间隔/证据规则；不使用 FSRS/BKT，也不让 provider/LLM 直接计算权威到期时间或优先级。
+- 新学习证据、目标日期或已确认覆盖变化会自动创建 `PlanRevision`，只替换未开始的未来任务。无需逐次弹窗确认，但界面必须显示变更原因并允许撤销；撤销通过新修订恢复先前计划，不删除中间版本或学习证据。
+- 考试本地日期完整结束后，即仅当 `today_local > target_local_date`，系统归档本次 `finals` 计划并暂停继续自动生成未来任务，随后询问新的学习目标。考试当天（`today_local == target_local_date`）仍可学习；课程数据和历史证据不删除，设置新目标也不会自动再次进入 `finals`。
 
-这些参数不改变 D-012 已确认的“持续模式为默认、日期 + 显式操作才进入期末模式”。
+### 数值参数归属
+
+| 参数 | 第一版归属 | 当前状态 |
+| --- | --- | --- |
+| 考试本地日期 | 用户配置 | 必填后才可显式进入 `finals`；不是工程默认日期 |
+| 每日投入预算 | 用户可选配置 | 单位为分钟；10-480 的整数、步长 5；界面显示值、来源和 policy version |
+| 未填写预算时的容量上限 | `ReviewPolicy v1` 工程默认 | `continuous` 30 分钟/日，`finals` 90 分钟/日 |
+| 单任务时长 | `ReviewPolicy v1` 工程默认 | 只允许 5/10/15/20/30 分钟，默认 10 分钟；剩余预算不足时不自动超额 |
+| 间隔阶梯 | `ReviewPolicy v1` 工程默认 | `[1, 3, 7, 14, 30]` 个本地日，`interval_index` 为 0-4 |
+| 证据转换与优先级 | `ReviewPolicy v1` 工程默认 | 使用下述离散转换和稳定字典序，不使用隐藏权重 |
+| 自动进入期末模式的提前天数 | 不存在 | 第一版始终依赖用户显式进入，不设置该数字 |
+
+不可用日期、通知时间和跨设备日历同步不在 D-020 第一版预设内，不能从“每日预算”推导为已批准功能。
+
+### `ReviewPolicy v1` 精确候选合同（待整体 SPEC 签字）
+
+1. **预算装入**：按稳定优先级依次装入任务。若当日第一项也超过剩余预算，不自动超额；提示用户修改预算或拆分任务。
+2. **证据转换**：新知识、错误、拒答或来源不足将 `interval_index` 设为 0；部分正确降一级且不低于 0；满足 rubric 的主动提取通过升一级且不高于 4；跳过不产生证据、不提升等级。
+3. **保持证据**：`retained` 除当前通过外，还要求至少一次相隔一个本地日的变式主动提取通过。
+4. **依赖与稳定排序**：先过滤尚未满足前置依赖的任务；存在可学习前置时先安排前置。其余按“逾期天数降序 -> `finals` 中已确认老师重点 -> 往年卷重复覆盖次数降序（封顶 5）-> 证据弱度降序 -> 到期时间升序 -> `concept_id` 升序”排序。每项输出稳定 `reason_code`，不使用模型排序。
+5. **可重放**：固定课程、证据、目标、时钟、tzdata 与 policy version 时必须得到相同任务和原因。调整这些工程默认必须发布新的 SPEC/策略版本、迁移说明和回归测试，不能在 prompt 中静默修改。
+
+唯一实现语义以最新 `SPEC.md` 的 `plan_reviews_v1` 纯函数、local-date/DST 规则、UUIDv5 输入哈希和 G-01 至 G-05 fixtures 为准；本文摘要不能被 PLAN 用来另写一套装箱/到期算法。该候选须学生整体签字后才成为 v1 合同，也不宣称科学最优。
 
 ### 期末资料与计划输入
 
-往年卷和老师重点作为用户显式导入的材料角色，先映射到用户已确认的课程知识，再参与排序。第一版的“拟合”仅表示结构、题型、知识点与难度分析，以及同类练习选择/生成；不触发模型训练或微调，不预测原题，也不扩大材料外发范围。完整增量流程见 `docs/research/INCREMENTAL_COURSE_WORKFLOW.md`。
+D-019 确认第一版只接收 `lecture`、无答案 `past_paper` 和 `teacher_focus`。文件输入支持 PDF、图片和文本；老师重点还可手工录入。答案、个人笔记、作业提交及其他材料角色延期。往年卷和老师重点先映射到用户已确认的课程知识，再参与排序；相关分析只覆盖结构、题型、知识点、难度与同类练习，不包含训练/微调或原题预测，也不扩大材料外发范围。完整增量流程见 `docs/research/INCREMENTAL_COURSE_WORKFLOW.md`。
+
+期末排序只能接收带有效 `SourceLocator`、经用户确认的映射。`propose_concept_coverage` 或 `analyze_exam_material` 无法校验 locator 时必须返回空候选与 `source_insufficient`，不能贡献老师重点、往年卷频度或 `target_pressure`；解释、练习与反馈可降级为明确标注的 `model_supplement`，但不能进入权威覆盖、排序或掌握证据。
+
+### D-020 未采用的历史候选
+
+- **自适应算法**：使用 FSRS/BKT 类状态或间隔模型并自动重排。它可能提升长期个性化，但需要更多数据、解释与验证，第一版不采用。
+- **手动优先**：每次重排都要求用户确认，系统只给建议。它降低自动变更风险，却削弱持续安排价值，第一版不采用。
 
 ## 方案 2：仅长期掌握
 
@@ -92,6 +129,8 @@ evidence appended
 | `mode` | 已确认的 `continuous` 或 `finals` |
 | `target_local_date` | 可选考试日；是进入 `finals` 的必要非充分条件，不是隐含 UTC 午夜 |
 | `timezone_id` | IANA 时区 ID，例如 `Asia/Shanghai`；不只存当前偏移量 |
+| `daily_budget_minutes` | 可选用户预算；10-480 的整数、步长 5，不填写时引用策略版本中的可见默认容量 |
+| `post_exam_state` | `active` 或 `post_exam_paused`；仅 `today_local > target_local_date` 后归档本次期末计划并暂停自动生成 |
 | `version` | 每次修改递增，用于解释重排 |
 | `changed_at` | UTC instant |
 | `change_reason` | 学生设置/清除日期、显式进入/退出期末模式等白名单原因 |
@@ -103,7 +142,7 @@ evidence appended
 | --- | --- |
 | `policy_id`, `version` | 可重放的规则身份 |
 | `mode` | 对应目标语义 |
-| `parameters` | 经过范围校验的显式参数；不能藏在 prompt |
+| `parameters` | v1 的预算范围/默认、任务时长白名单、间隔阶梯、离散证据转换、稳定排序和 tzdata version；不能藏在 prompt |
 | `effective_from` | UTC instant；历史证据仍引用旧版本 |
 
 ### `ReviewTask`
@@ -111,6 +150,8 @@ evidence appended
 | 字段 | 语义 |
 | --- | --- |
 | `id`, `concept_id` | 任务与知识点 |
+| `estimated_minutes` | 只允许 5/10/15/20/30，v1 默认 10 |
+| `interval_index` | 0-4；依据 v1 证据转换更新 |
 | `not_before` | 最早可开始的 UTC instant，可为空 |
 | `due_at` | 计算/手动到期的 UTC instant |
 | `display_timezone_id` | 用户看到日期时使用的时区 |
@@ -120,6 +161,7 @@ evidence appended
 | `priority` | 有界、可解释的排序值；不等于掌握真值 |
 | `status` | 当前任务状态 |
 | `supersedes_task_id` | 重排时链接旧任务，不覆盖历史 |
+| `plan_revision_id` | 生成或替换该任务的计划修订；用于解释和撤销 |
 
 ## 任务状态机
 
@@ -181,9 +223,13 @@ scheduled/due -> superseded
 | 离线后恢复 | Clock 从 t0 跳到 t1 | 一次对账，无任务风暴或逐 tick 补建 |
 | 录入日期但未进入期末模式 | goal 有日期、mode 为 `continuous` | 不产生 `target_pressure`，模式不改变 |
 | 显式进入期末模式 | 日期有效、用户动作、确认覆盖 | mode 变为 `finals`，只重排未来任务 |
+| 未填写每日预算 | 固定策略默认容量 | 计划使用已显示的版本化默认值，结果可重放 |
+| 填写/修改每日预算 | goal v1 -> v2 | 只重排未来未开始任务；预算值、单位与原因可见 |
 | 修改目标日期 | goal v1 -> v2 | 只重排未来未开始任务，历史 attempt 不变 |
 | 清除目标日期 | finals/continuous -> continuous | 不丢任务历史，后续不再产生 `target_pressure` |
-| 目标已过去 | Clock > target | 不创建过去无限任务；进入明确终态/询问流程 |
+| 考试当天 | `today_local == target_local_date` | 仍可学习，不进入 `post_exam_paused` |
+| 目标已过去 | `today_local > target_local_date` | 归档本次期末计划、暂停自动生成并询问新目标；不创建过去无限任务 |
+| 自动重排后撤销 | revision v1 -> v2 -> undo | 产生引用 v2 的新修订并恢复允许变更的未来安排；证据和旧版本均保留 |
 | 跨午夜 | 同一 instant，不同时区 | “今日/逾期”由指定时区一致计算 |
 | DST 跳变 | 有 DST 的测试时区 | 不产生不存在本地时间或重复任务 |
 | provider 失败 | 固定调度输入，provider mock error | `due_at`/priority 不变，反馈任务可重试 |
@@ -191,12 +237,10 @@ scheduled/due -> superseded
 
 测试使用 `FakeClock`/`Clock` port 和固定 IANA tzdata 版本；断言 domain instant/reason，而不是依赖本机格式化字符串。
 
-## 不在 D-012 中决定的内容
+## `ReviewPolicy v1` 后仍延期的功能
 
-- 具体间隔公式、阈值、优先级权重；
-- 每日任务上限与可用时间；
-- 系统通知、日历同步、邮件或移动推送；
-- 是否使用 FSRS/BKT 或模型生成调度建议；
+- 不可用日期、通知时间、最后冲刺上限和日历同步；
+- 邮件或移动推送；
 - UI 的日历/列表具体布局；
 - 考试日期是否属于敏感数据的保留期限（安全基线已要求最小化）。
 
@@ -204,6 +248,13 @@ scheduled/due -> superseded
 
 1. `CourseReviewGoal.mode` 固定为默认 `continuous` 与显式 `finals`；考试日期可选，且只是进入期末模式的必要非充分条件。
 2. 目标创建、修改、清除、显式模式切换与历史保留状态流写入 M3。
-3. `new_material`、`teacher_focus`、`past_paper_pattern` 与 `target_pressure` 作为可解释候选原因；具体权重未选择。
+3. `new_material`、`teacher_focus`、`past_paper_pattern` 与 `target_pressure` 作为可解释原因；v1 使用稳定字典序，不使用隐藏权重。
 4. 第一版必须覆盖测试矩阵中的日期/模式分离、目标修改/清除、离线恢复和 provider 失败。
-5. 后续单独确认调度算法/参数、期末启用窗口和资料格式，不把 D-012 授权扩大为这些选择。
+5. D-020 已确认保守确定性方向；最新 `SPEC.md` 提出的 v1 数值/纯函数须整体签字，签字后 PLAN 只能落实并测试。
+
+## D-019 / D-020 确认结果
+
+1. 第一版材料白名单是 `lecture`、无答案 `past_paper`、`teacher_focus`；支持 PDF、图片、文本和手工重点，答案、个人笔记、作业提交及其他角色延期。
+2. 第一版调度是版本化简单规则，不使用 FSRS/BKT 或模型权威调度；所有到期原因与输入可解释、可重放。
+3. 每日投入是 10-480 分钟、步长 5 的可选用户预算；缺省容量、任务时长、间隔与证据转换由 `ReviewPolicy v1` 的精确合同给出。
+4. 新证据自动重排未开始任务并生成可撤销 `PlanRevision`；仅在 `today_local > target_local_date` 后归档本次期末计划、暂停自动生成并询问新目标。

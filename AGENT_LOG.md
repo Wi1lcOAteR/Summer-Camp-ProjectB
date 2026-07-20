@@ -522,3 +522,31 @@
 - **人工修改及原因**：学生明确要求一次性提问；智能体将问题按重大影响分组，并保留可由工程默认处理的小选择，不提前选择 provider、技术栈或部署。
 - **验证计划**：批量答案收到后逐项更新 SPEC/过程文档，再运行链接、围栏、凭据扫描；在 SPEC 签字前仍不生成 PLAN 或源码。
 - **经验教训**：为避免用户离线时反复被单个门禁唤醒，应一次暴露所有真正改变产品/交付的选择，同时给出安全推荐和不决定的阻塞范围。
+
+## 2026-07-20T17:07:19+08:00 — BRAIN-020 / AUDIT-003 断网恢复后的阶段 A 规约整合
+
+- **Task 编号**：BRAIN-020、AUDIT-003。
+- **触发的 Superpowers skill**：续接 `brainstorming`；继续使用已完整读取的 `openai-docs` skill 所要求的官方 OpenAI Docs MCP 证据边界。`superpowers:*` 在本会话未注册，因此没有把手工审计冒充正式 `writing-plans`/`verification-before-completion` 调用。
+- **关键 prompt / context**：学生在断网前一次回答 D-017 至 D-024 均为方案 A（原始回答“感觉可以全A，你继续执行吧”），本轮恢复指令为“昨天断网了，你继续推进”。不得重复提问，不得越过 `SPEC.md` 签字、Open Design、冷启动和实现批准门禁。
+- **恢复证据**：恢复时工作区只有规约/研究文档未提交改动；HEAD 为 `ccaa5734c8d91dd747c55d7daf6d1270d2f42c56`；没有 `PLAN.md`、正式源码、测试、CI、README 或 `REFLECTION.md`。未启动安装器、未上传课件、未读取或写入真实 API key、未向远程仓库 push。
+- **只读审计输出**：`/root/spec_gap_audit` 指出 ReviewPolicy、SourceLocator、泄漏处理、输入限制、凭据清除、demo 隔离和 stale domain 文档缺口；`/root/decisions_audit` 指出 D-003/D-004/D-006 至 D-012/D-014/D-016/D-017/D-021 等台账状态过期；`/root/research_diff_review` 指出 Responses 留存、真实上传 exactly-once 过度承诺和 Vector Store 所有权缺口；`/root/final_stage_a_audit` 及其后续复核又指出 attribution、ReviewPolicy 唯一性、request-level store scope、locator 证明、预算、自动修订确认、合规审计 stale 文案和调度历史输入缺口。它们均为只读审计，没有提交代码。
+- **本轮人工整合**：修订 `SPEC.md`、`DECISIONS_NEEDED.md`、`SPEC_PROCESS.md`、`docs/PROJECT_AUDIT.md`、`docs/REQUIREMENTS_COMPLIANCE_AUDIT.md` 及 `docs/research/` 下相关合同；明确 D-017 至 D-024 的确认边界，保留单文件分发、OCI/Hugging Face demo、隔离限额和 ReviewPolicy 数值为待整体签字的工程候选；修正合规审计的“无需选择”误导表述。
+- **调度规约修订原因**：`plan_reviews_v1` 不能只接收最新证据，否则相同历史可能因快照截断得到不同计划。现在显式输入完整相关 `LearningEvidence[]`、每概念 `ConceptReviewState`（`interval_index`/`last_outcome`/`last_evidence_at`/`state_version`）和当前带版本/纠正信息的 `MasteryEstimate`，并将三者纳入 canonical `plan_input_hash`；快照不一致时返回 `state_inconsistent`，不静默覆盖。
+- **当前门禁状态**：阶段 A 静态审计正在由本轮命令完成；`SPEC.md` 仍未由学生整体确认。Open Design 安装/MCP 与 design system/skill、Hugging Face 官方现场复核、学生本人 brainstorming 反思、Superpowers 新会话正式 `writing-plans` 和后续冷启动仍未执行；本轮不生成 `PLAN.md` 或实现代码。
+- **经验教训**：过程文档必须区分“用户确认的方向”“待整体签字的工程候选”和“执行时才有证据的外部状态”；可重放调度也必须把历史状态完整纳入输入，而不是依赖一个易变的最新快照。
+
+## 2026-07-20T17:16:44+08:00 — AUDIT-004 阶段 A 静态验证结果
+
+- **Task 编号**：AUDIT-004。
+- **触发的 Superpowers skill**：阶段 A 续接 `brainstorming`；按课程要求执行手工 `verification-before-completion` 证据检查，但当前会话没有注册该 skill，故仅记录实际命令，不宣称正式 skill 调用。
+- **本次实际输出**：仓库 Markdown 文件 27 个；本地 Markdown 链接 11 个、坏链接 0；代码围栏不平衡 0；`SPEC.md` 必需章节缺失 0；用户故事 10 个（US-01 至 US-10，缺失/重复 0）；验收标准 50 个（AC-01 至 AC-50，缺失/重复 0）；M1/M2/M3 输入/行为/输出/边界/错误处理契约缺失 0；占位符扫描 0；强特征凭据扫描 0；`git diff --check` 无错误（仅报告工作树 LF/CRLF 转换警告）。
+- **门禁文件证据**：`PLAN.md` 不存在，正式源码样文件计数 0；`README.md` 与 `REFLECTION.md` 尚不存在，未把缺失文件伪报为完成。没有运行测试/构建/CI，因为课程门禁禁止在 SPEC 未签字前创建实现。
+- **工具环境复核**：Superpowers 缓存 `6.1.1` 存在并检测到 14 个核心 skill（含 `brainstorming`、`writing-plans`、TDD、worktree、评审和验证技能），但 `superpowers` CLI 与本会话 `superpowers:*` 均不可调用；Open Design 安装器 309,298,247 bytes，SHA-256 与 sidecar 均为 `63fc2e609489474e99187cdf94d01d063c1dbee733aaf2464d835cdc1e96f6b5`，Authenticode `NotSigned`，`od` 命令及 MCP resources/templates 仍为空/不可用。
+- **结果与影响**：阶段 A 文档结构和安全/归属边界通过本次静态检查；这不等于产品最终合规、实现可运行或公开部署完成。当前只剩学生/外部环境门禁和后续阶段任务，不创建 `PLAN.md`、源码或远程状态。
+
+## 2026-07-20T17:22:25+08:00 — AUDIT-005 独立复核后的最终规约收口
+
+- **Task 编号**：AUDIT-005。
+- **subagent 输出**：`/root/consistency_audit_final` 的只读复核发现两项 attribution/语义风险：M3 边界把待签字候选写成已固定，以及领域模型把精确 ReviewPolicy 归因于 D-020；没有发现 D-017 至 D-024、分发候选或 locator/历史输入的其他 P1。主智能体按报告修订 `SPEC.md` 与 `docs/research/TUTORING_DOMAIN_MODEL_DRAFT.md`，未让 subagent 写入或提交。
+- **修订后复核**：再次得到 Markdown 27、local links 11/坏链接 0、围栏 0、用户故事 10、AC 50 且无缺失/重复、模块契约缺失 0、源码 0、`PLAN.md` 不存在、占位符 0、强特征凭据 0、`git diff --check` 无错误。针对“已固定/已确认隔离/本地原生包/无需选择”等 stale attribution 的搜索仅剩明确标注“待整体签字”的候选或历史说明。
+- **门禁结果**：阶段 A 静态一致性收口；仍未执行 Open Design 外部安装/MCP、Superpowers 新会话 `writing-plans`、学生本人反思、SPEC 整体签字、PLAN、冷启动、实现、测试、CI、分发和部署。下一步提交只包含文档证据，不跨越门禁。

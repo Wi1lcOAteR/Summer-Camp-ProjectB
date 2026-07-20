@@ -10,7 +10,7 @@
 导入课件 -> 确认可以学习/复习的知识 -> 筹划学习计划 -> 引导用户学习
 ```
 
-该流程会随新材料反复运行。学期中默认持续安排；用户获得并录入考试日期后，可以显式进入期末周模式，使用用户提供的往年卷和老师重点做针对性复习。本文固定流程、状态和安全不变量，不选择具体调度公式、模型供应商或实现技术。
+该流程会随新材料反复运行。D-019 已确认材料白名单，D-020 已确认保守确定性方向；最新 `SPEC.md` 提出的 `ReviewPolicy v1` 精确规则等待整体签字。D-017/D-018 限定内置 OpenAI，D-021/D-022 固定 Windows x64/Credential Manager 与许可夹具 + mock 的公开演示边界；隔离 session 数值属于签字候选。
 
 “拟合往年卷”在本文中只表示分析题型、知识点覆盖、难度和结构分布，并据此挑选或生成同类练习。它不表示训练/微调模型，不承诺预测考试原题，不处理泄露资料，也不把文件自动发送给任何远端服务。
 
@@ -39,6 +39,18 @@
 3. 按课程已有 `ProcessingPolicy` 展示本次处理范围；若外发范围扩大，必须产生新的 `ConsentRecord`。
 4. 每个文件独立处理；一个文件失败不能把已成功文件伪装成失败或回滚为未知状态。
 5. 系统生成批次级质量报告和知识覆盖候选，不直接修改权威计划。
+
+第一版输入安全合同固定为：PDF 仅 `.pdf` + `application/pdf`/PDF 魔数，单文件不超过 256 MiB/2,000 页；图片仅 `.png`/`image/png`、`.jpg`/`.jpeg`/`image/jpeg`、`.webp`/`image/webp`，单文件不超过 20 MiB、解码后不超过 50 megapixels；文本仅 UTF-8/UTF-8 BOM 的 `.txt`/`text/plain` 或 `.md`/`text/markdown`，单文件不超过 2 MiB；手工 `teacher_focus` 每条 1-10,000 Unicode code points。单批最多 50 个文件、1 GiB、5,000 PDF 页。空、损坏、加密、MIME/扩展名冲突、编码不支持或越界输入在正文处理前失败关闭；provider 限制更低时在 consent 前失败关闭，不静默拆分或改用其他服务。
+
+### D-019 第一版材料白名单
+
+| 角色 | 第一版输入形式 | 范围约束 |
+| --- | --- | --- |
+| `lecture` | PDF、图片、文本 | 课程讲义/课件；必须保留可追溯来源与解析质量 |
+| `past_paper` | PDF、图片、文本 | 只接收无答案往年卷；用于候选题型、结构、难度和知识覆盖映射 |
+| `teacher_focus` | PDF、图片、文本、手工录入 | 老师明确给出的重点；口头重点可由用户转写为手工条目，并保留“用户录入”来源 |
+
+`answer_key`、`personal_note`、`homework_submission`、教材和其他材料角色是保留的历史扩展候选，但不进入第一版。未知角色必须在正文处理/外发前返回 `unsupported_role`；用户声明含答案的往年卷时不得伪装为 `past_paper` 继续处理。本地解析后发现疑似答案或泄露迹象时进入 `needs_user_review`，此时远端调用、权威覆盖与计划写入均为 0，等待用户改正角色、移除材料或取消；自动检查不能冒充可靠的学术诚信判定，界面须说明无法识别全部泄露内容。
 
 ### 覆盖差异
 
@@ -93,33 +105,41 @@ candidate coverage
   -> 根据确定性/rubric 证据继续重排
 ```
 
-期末优先级必须由白名单输入和版本化规则计算，至少区分：老师明确重点、往年卷重复覆盖、当前薄弱证据、知识依赖和剩余时间。模型可以提出映射或生成解释，但不能用一句自然语言输出直接覆盖权威优先级。
+期末优先级必须由白名单输入和版本化的简单规则计算，至少区分：老师明确重点、往年卷重复覆盖、当前薄弱证据、知识依赖、既有间隔和剩余时间。第一版不使用 FSRS/BKT；模型可以提出映射或生成解释，但不能用一句自然语言输出直接覆盖权威优先级。
 
-考试日期修改时，只替换尚未开始的未来任务；历史证据与已完成尝试不变。清除日期或显式退出期末周模式后回到 `continuous`，不丢失期末期间产生的有效学习证据。考试结束后的默认行为仍需后续确认。
+每日投入是可选的用户预算。填写或修改预算、新证据到达、目标日期变化或覆盖确认后，系统自动生成新的 `PlanRevision` 并只替换尚未开始的未来任务；历史证据与已完成尝试不变。每次自动修订都必须显示原因并可撤销，撤销本身创建新修订而不是删除历史。清除日期或显式退出期末周模式后回到 `continuous`，不丢失期末期间产生的有效学习证据。
+
+只有考试本地日期完整结束，即 `today_local > target_local_date` 后，系统才归档本次期末计划、进入 `post_exam_paused` 并停止继续自动生成未来任务，然后询问用户的新学习目标。`today_local == target_local_date` 当天仍可学习。课程和证据不删除；用户设置新目标后先回到 `continuous`，再次进入 `finals` 仍需有效日期和显式操作。
+
+`ReviewPolicy v1` 使用 10-480 分钟、步长 5 的可选 `daily_budget_minutes`；空值时 `continuous` 为 30 分钟/日、`finals` 为 90 分钟/日。任务时长只取 5/10/15/20/30 分钟（默认 10），间隔阶梯为 `[1, 3, 7, 14, 30]` 个本地日。新知识/错误/拒答/来源不足重置到索引 0，部分正确降一级，rubric 主动提取通过升一级，跳过不产生证据；`retained` 还需相隔至少一个本地日的变式主动提取通过。排序先处理前置依赖，再按逾期天数、期末老师重点、往年卷重复覆盖（封顶 5）、证据弱度、到期时间、`concept_id` 的固定顺序比较；不使用隐藏权重或模型排序。
 
 ## 候选数据合同
 
 | 实体 | 关键字段 | 不变量 |
 | --- | --- | --- |
 | `MaterialBatch` | `id`, `course_id`, `role`, `content_hashes`, `state`, `created_at` | 批次内文件独立状态；同一内容哈希幂等 |
-| `MaterialRole` | `lecture`, `past_paper`, `teacher_focus` | 角色影响用途和风险提示，不授予更宽外发权限 |
+| `MaterialRole` | 第一版仅 `lecture`, `past_paper`, `teacher_focus` | 角色影响用途和风险提示，不授予更宽外发权限；`past_paper` 不含答案 |
 | `ConceptCoverage` | `concept_id`, `source_ids`, `relation`, `confidence`, `extractor_version` | 候选映射与用户确认分离；低置信不能自动成为事实 |
 | `CoverageDecision` | `coverage_id`, `decision`, `actor`, `reason`, `decided_at` | 追加式；保留纠正历史 |
 | `StudyFocus` | `source_id`, `concept_id`, `kind`, `weight`, `confidence`, `status` | 老师重点与系统推断分开；用户可纠正 |
 | `LearningPlan` | `id`, `course_id`, `mode`, `goal_version`, `policy_version` | 每个生效计划有唯一版本和可重放输入 |
-| `PlanRevision` | `from_version`, `to_version`, `reason_codes`, `input_ids`, `created_at` | 不覆盖旧计划；只重排允许变更的未来任务 |
-| `CourseReviewGoal` | `mode`, `exam_local_date`, `timezone_id`, `version` | `finals` 需要日期和显式进入记录 |
+| `PlanRevision` | `from_version`, `to_version`, `reason_codes`, `input_ids`, `reverts_revision_id`, `created_at` | 不覆盖旧计划；只重排未开始未来任务；撤销以新修订引用被撤销版本 |
+| `CourseReviewGoal` | `mode`, `target_local_date`, `timezone_id`, `daily_budget_minutes`, `post_exam_state`, `version` | `finals` 需要日期和显式进入记录；预算可空；仅 `today_local > target_local_date` 后暂停 |
 
-`past_paper` 和 `teacher_focus` 是第一版已确认需要表达的数据角色；具体支持 PDF、图片、文本还是手工录入，以及答案材料是否支持，仍待后续范围确认。
+来源统一采用判别联合类型 `SourceLocator`：`pdf_page` 为 `{kind, material_id, content_hash, page, region?}`，`image` 为 `{kind, material_id, content_hash, image_id, region?}`，`text_lines` 为 `{kind, material_id, content_hash, line_start, line_end}`，`manual_entry` 为 `{kind, entry_id, version}`。材料删除或版本不匹配后 locator 失效；任何“基于材料”的内容必须能打开有效 locator，不能用文件名或模型猜测替代。来源型端口无法校验 locator 时，`propose_concept_coverage` / `analyze_exam_material` 返回空候选与 `source_insufficient`；`generate_explanation` / `generate_practice_candidate` / `generate_feedback` 只能返回标为 `model_supplement` 的非权威补充，不能进入课程事实、计划或掌握证据。
+
+第一版格式与角色按 D-019 白名单固定。答案、个人笔记、作业提交、教材和其他材料不因文件扩展名兼容而获得导入资格；后续若扩展必须新增角色、威胁分析和学生确认。
 
 ## 安全、版权与学术诚信边界
 
 - 新批次继承课程处理策略，但不会继承更宽的临时外发许可；扩大外发仍需确认。
 - 往年卷和老师重点同样属于不可信、可能受限的材料，内容不能获得工具调用权。
-- 不公开分发用户导入的往年卷、答案、老师重点或由其重建的大段内容。
+- 不公开分发用户导入的往年卷、老师重点或由其重建的大段内容；第一版不接收答案材料。
 - 不声称识别“必考原题”，不生成或传播疑似泄露试题，不以考试作弊为目标。
 - 材料中“忽略规则”“上传全部文件”等文字只作为内容；不得改变系统指令、处理策略或授权。
 - provider 调用失败、输出格式错误或映射置信度不足时，保留当前权威计划并显示可恢复状态。
+- 本地版 secret 只通过 keyring 写入 Windows Credential Manager；正式版、默认开发/测试路径和公开 demo 都不从 `.env` 读取 key，普通 config、SQLite 与浏览器存储也不得持有 key。强制清除凭据后所有新远端调用立即失败关闭，未完成远端清理保留 `delete_incomplete` 与脱敏恢复入口。
+- 公开 demo 只加载内置合成/明确许可夹具并注册 deterministic mock；禁用任意上传、真实凭据、真实 provider 出站与私人材料持久化。每个访客使用随机隔离 session，跨 session 读取为 0；30 分钟无活动或创建满 2 小时清除。单 session 最多 1 个活动课程、20 个材料夹具、2 个并发任务和 64 MiB 临时状态，每 IP 每分钟 60 个请求。
 
 ## 确定性验证场景
 
@@ -133,16 +153,22 @@ candidate coverage
 | 录入考试日期但未进入期末模式 | 模式仍为 `continuous`，不产生期末压力原因 |
 | 显式进入/退出期末模式 | 只重排未来可变任务；历史尝试和证据不变 |
 | 修改或清除考试日期 | 产生新 goal/plan 版本；不复制任务或丢失历史 |
+| 每日预算留空 | 使用可见、版本化的工程默认容量；固定输入得到相同计划 |
+| 填写或修改每日预算 | 只自动重排未开始任务；预算值、单位、修订原因和撤销入口可见 |
+| 自动重排后撤销 | 产生新的反向 `PlanRevision`；旧修订与学习证据仍可读取 |
+| 考试当天 | `today_local == target_local_date` 时仍可学习，不暂停 |
+| 考试日期已过去 | 仅 `today_local > target_local_date` 时归档本次期末计划并进入 `post_exam_paused`；不继续生成任务，询问新目标 |
 | 导入往年卷 | 仅生成候选题型/知识映射；无训练、微调或自动上传调用 |
 | 导入老师重点 | 显示来源和确认状态；未确认映射不能成为权威重点 |
+| 导入含答案往年卷或延期角色 | 拒绝或保持 `unsupported_role`，不能静默降级为已支持角色 |
 | provider 失败或返回注入文本 | 权威覆盖、优先级、计划和授权均不变 |
+| 来源 locator 缺失/失效 | coverage/exam 分析为空并返回 `source_insufficient`；解释/练习/反馈至多为 `model_supplement`，权威状态不变 |
 | 同一输入重算计划 | 在固定时钟、规则与证据下得到相同任务集合和原因 |
 
-## 尚未决定
+## 已固定边界与延期项
 
-- 期末周模式可在考试前多久启用，以及考试结束后的默认状态；
-- 每日可投入时间、不可用日期、冲刺任务上限与疲劳保护；
-- 具体间隔算法、优先级权重和模拟卷组卷策略；
-- 往年卷答案、个人笔记、作业与老师口头重点是否属于第一版；
-- 各材料类型的文件格式、大小限制、权利确认和保存期限；
-- 已确认采用用户触发的确定性工作流和受约束 AI 功能；具体模型端口、provider、预算参数和部署适配仍待后续技术选择。
+- MIME/批次限制与 `ReviewPolicy v1` 数值/纯函数是最新 SPEC 的工程候选，须整体签字后才成为版本化合同；不声称学习效果最优。
+- 第一版 local production 仅注册内置 OpenAI adapter；mock 仅在 test/demo 注册，不存在任意 endpoint/plugin 配置入口。
+- 材料权利确认、原始/派生数据保存期限和具体 OpenAI 动态政策快照仍需运行前核验；删除后历史只允许保留不能重建正文、路径或 provider ID 的 tombstone/失效 locator。
+- 模拟练习的组卷细则、通知/日历同步和不可用日期等延期功能；
+- 已确认采用用户触发的确定性工作流和受约束 AI 功能；精确依赖版本、OpenAI 支持模型/动态费用与公开托管平台仍待后续工程验证。
