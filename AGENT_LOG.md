@@ -637,5 +637,6 @@
 - **subagent 输出**：`/root/final_docs_sanity` 发现 G-03 候选 unit 经 T-01 反向依赖 G-03，形成冷启动自依赖；X2-01 提交遗漏 `provider_candidates.py`；T-03C/DEMO-01B/QA-01C 有模糊 stage 指令；X2-01/X2-02 红测示例有未定义标识符。该审查还确认当前过程文档对 Open Design、41/69/17、formal writing-plans 与 D-005/G-03 顺序没有当前时态冲突。
 - **主智能体修改**：把 G-03 明确为初始只含 `SPEC.md`/`PLAN.md` 的一次性 pre-implementation workspace，允许仅在实验中用最小临时 scaffold/test double，产物不合并，正式派发仍遵守依赖；补齐 X2-01/X2-02 自包含红测初始化与 X2-01 提交文件；禁止 T-03C 偷带 migration，DEMO-01B 只消费 T-07 公开注册接口，QA-01C 用精确 manifest/generator 路径；将 UI-03C 依赖改为 API-04A。同步把两份研究基线从“待注册 MCP”更新为“已注册、daemon 不可达、不得重复注册”。
 - **验证证据**：PLAN 仍为 17 个不可派发 group、69 个 dispatch heading/69 个台账行；命令路径不在 Files 声明中为 0；未知依赖为 0、拓扑环为 0；AC-01..AC-50 缺失为 0；Markdown 围栏奇数为 0；模糊 migration/provider/fixture stage 指令已移除；`git diff --check` 无 whitespace error。
+- **本地提交**：阶段 B 计划、审计与研究文档提交为 `83b32e7d7db16c1fcccbe23c3168a026629482b7`（`docs: finalize stage-b dispatch plan [agent: Codex GPT-5]`）；未 push、未创建 PR/MR。
 - **人工修改及原因**：只修订计划、研究和过程文档；未创建、合并或运行任何正式实现，未越过冷启动/实现批准门禁，未创建 `REFLECTION.md`。
 - **经验教训**：冷启动发生在正式依赖尚未实现之前，因此必须把“上下文依赖合同”和“已实现依赖”分开；否则课程要求本身会在计划图外形成语义死锁。
