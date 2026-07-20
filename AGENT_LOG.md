@@ -550,3 +550,10 @@
 - **subagent 输出**：`/root/consistency_audit_final` 的只读复核发现两项 attribution/语义风险：M3 边界把待签字候选写成已固定，以及领域模型把精确 ReviewPolicy 归因于 D-020；没有发现 D-017 至 D-024、分发候选或 locator/历史输入的其他 P1。主智能体按报告修订 `SPEC.md` 与 `docs/research/TUTORING_DOMAIN_MODEL_DRAFT.md`，未让 subagent 写入或提交。
 - **修订后复核**：再次得到 Markdown 27、local links 11/坏链接 0、围栏 0、用户故事 10、AC 50 且无缺失/重复、模块契约缺失 0、源码 0、`PLAN.md` 不存在、占位符 0、强特征凭据 0、`git diff --check` 无错误。针对“已固定/已确认隔离/本地原生包/无需选择”等 stale attribution 的搜索仅剩明确标注“待整体签字”的候选或历史说明。
 - **门禁结果**：阶段 A 静态一致性收口；仍未执行 Open Design 外部安装/MCP、Superpowers 新会话 `writing-plans`、学生本人反思、SPEC 整体签字、PLAN、冷启动、实现、测试、CI、分发和部署。下一步提交只包含文档证据，不跨越门禁。
+
+## 2026-07-20T17:24:04+08:00 — AUDIT-006 阶段 A 文档提交记录
+
+- **Task 编号**：AUDIT-006。
+- **提交 hash**：`11e1899afcf2355871e86ba6fa1a98658f767821`（`docs: finalize stage-a specification candidate [agent: Codex GPT-5]`）。
+- **提交内容**：20 个规约/研究/审计文档；未包含 Open Design 安装器（已被忽略）、`PLAN.md`、正式源码、凭据或远程操作。
+- **提交后动作**：本条记录将在下一次本地小提交中写入；不改变阶段门禁或产品边界。
