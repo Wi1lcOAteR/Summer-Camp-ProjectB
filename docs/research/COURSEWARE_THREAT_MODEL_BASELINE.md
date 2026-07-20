@@ -12,7 +12,7 @@
 
 本轮 brainstorming 又确认课程资料按批次增量到达；D-019 将第一版材料白名单固定为 `lecture`、无答案 `past_paper` 和 `teacher_focus`，支持 PDF/图片/文本及手工重点，答案、个人笔记和作业提交延期。D-020 将第一版调度固定为版本化简单规则、可选每日预算、自动但可撤销的未来任务重排，以及考试本地日期完整结束后的归档/暂停和新目标询问。上述材料沿用课件的最小外发、来源追踪和不可信输入边界，不获得额外工具权限，也不表示模型训练或原题预测。
 
-D-021/D-022 已确认 Windows x64 本地版通过 keyring 使用 Windows Credential Manager；公开 demo 仅使用合成/明确许可夹具和 deterministic mock。隔离、限时访客 session 以及具体 OCI/Hugging Face 部署是待整体签字的工程候选。以下项目将已确认边界转为可验证控制，不再把 provider、凭据后端或 demo 数据策略列为未决选择。
+D-021/D-022 已确认 Windows x64 本地版通过 keyring 使用 Windows Credential Manager；公开 demo 仅使用合成/明确许可夹具和 deterministic mock。隔离、限时访客 session 以及 OCI/Hugging Face 部署方向已随整体 SPEC 确认，仍须工程与官方条款验证。以下项目将已确认边界转为可验证控制，不再把 provider、凭据后端或 demo 数据策略列为未决选择。
 
 ## 保护目标
 
@@ -76,7 +76,7 @@ D-021/D-022 已确认 Windows x64 本地版通过 keyring 使用 Windows Credent
 | T-18 | 整份上传/索引部分失败、错误引用或删除失败造成孤儿对象 | 每文件对象/job 状态、每课程独占 Vector Store、幂等键与三层删除对账；OpenAI citation 必须映射并校验本地 `SourceLocator`，否则 `source_insufficient`；未知状态禁止检索并显示 `delete_incomplete` | 重启/取消/部分失败/离线恢复后对象仍可追踪；无有效 locator 时不产生材料事实/计划；删除未确认不显示成功 |
 | T-19 | 切换 OpenAI profile/config 后复用旧远端引用或授权 | profile/config 版本不可变；模型、受控参数、预算或政策指纹变化创建新快照和 consent；旧引用只由创建它的 profile 做对账/删除，不得迁移 | 切换模型/config 后旧引用不能进入新请求；配置未确认或能力不足时远端调用为 0 |
 | T-20 | 含答案往年卷、个人笔记或作业被伪装成首版允许角色 | 白名单只允许 `lecture`、无答案 `past_paper`、`teacher_focus`；明确延期角色返回 `unsupported_role`；本地解析后发现疑似答案/泄露进入 `needs_user_review`，远端/权威写入为 0，自动检测不声称完备 | 错误角色夹具不进入权威覆盖/计划；`needs_user_review` 只能经用户改正/移除/取消恢复；未知角色不产生远端调用 |
-| T-21 | 自动调度重排不可解释、不可撤销或过早暂停 | 最新 SPEC 提出待整体签字的 `ReviewPolicy v1` 纯函数、数值、稳定排序和 golden fixtures；自动修订只影响未开始任务并可撤销；考后条件严格 | 签字后以固定时钟/tzdata/策略/证据重放 fixtures；撤销保留历史；考试当天仍可学习 |
+| T-21 | 自动调度重排不可解释、不可撤销或过早暂停 | 整体确认的 `ReviewPolicy v1` 固定纯函数、数值、稳定排序和 golden fixtures；自动修订只影响未开始任务并可撤销；考后条件严格 | 以固定时钟/tzdata/策略/证据重放 fixtures；撤销保留历史；考试当天仍可学习 |
 | T-22 | 公开 demo 接收私人材料、真实 key、真实 provider 或串读访客状态 | 只加载内置合成/明确许可夹具和 deterministic mock；禁用上传、凭据入口、provider 出站和持久私人状态；随机隔离 session，30 分钟无活动/2 小时总寿命；每 session 1 课程/20 夹具/2 并发/64 MiB，每 IP 60 请求/分钟 | 构建/运行无真实 provider 网络权限或 credential store；跨 session 读取为 0；到期/重置清除；界面标明演示数据/模拟模型 |
 
 ## 三种正式模式的风险影响
@@ -108,7 +108,7 @@ D-021/D-022 已确认 Windows x64 本地版通过 keyring 使用 Windows Credent
 - 模式 F 必须通过文件级 consent、哈希幂等、上传/索引/删除状态和 provider 能力声明；不能用“模型接受 PDF”替代生命周期证据。
 - 第一版材料角色和输入形式实行白名单：`lecture`、无答案 `past_paper`、`teacher_focus`（PDF/图片/文本，重点可手工录入）；答案、个人笔记、作业提交和其他角色保持 `unsupported_role`。疑似答案/泄露进入 `needs_user_review` 且远端/权威写入为 0。
 - `SourceLocator.kind` 统一为：`pdf_page` = `{kind, material_id, content_hash, page, region?}`，`image` = `{kind, material_id, content_hash, image_id, region?}`，`text_lines` = `{kind, material_id, content_hash, line_start, line_end}`，`manual_entry` = `{kind, entry_id, version}`。无有效 locator 不得称为材料事实；coverage/exam 返回空结果 + `source_insufficient`，解释/练习/反馈只能返回 `model_supplement`。
-- `ReviewPolicy v1` 精确纯函数是待整体 SPEC 签字候选；签字后自动修订只影响未开始任务并可撤销，仅 `today_local > target_local_date` 后暂停。
+- `ReviewPolicy v1` 精确纯函数已随整体 SPEC 确认；自动修订只影响未开始任务并可撤销，仅 `today_local > target_local_date` 后暂停。
 - 删除后本地检索不能返回正文/单元；历史只保留不能重建正文、路径或 provider ID 的 tombstone 与失效 locator。强制清除凭据后新远端调用失败关闭，遗留对象显示 `delete_incomplete` 与恢复入口。
 - 公开 demo 只用许可夹具/mock、隔离限时 session，并禁用上传、真实凭据、真实 provider 出站和私人材料持久化。
 

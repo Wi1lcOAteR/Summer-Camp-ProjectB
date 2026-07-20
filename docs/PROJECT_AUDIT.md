@@ -124,13 +124,18 @@ Superpowers 插件、核心 skills 与 Open Design 仍均为 `none`。这是连�
 | 决策 | 已确认方向 | 当前证据边界 |
 | --- | --- | --- |
 | D-017/D-018 OpenAI 边界 | 首版唯一真实实现为内置 OpenAI adapter，并保留 deterministic mock/contract；不接受任意 endpoint/plugin | 只有合同与官方政策研究；OpenAI Python SDK 许可证/精确版本尚未核验，P/F 真实集成测试尚未执行 |
-| D-021 + 分发候选 | D-021 确认 Windows x64、Python/FastAPI + React/Vite、SQLite、Credential Manager；SPEC 另提单文件 `ProjectB.exe`，待整体签字 | 无依赖/源码/凭据测试/冻结构建/干净机/SmartScreen 证据；不得把 exe 候选归因成原 D-021 答案 |
-| D-022 + 部署候选 | D-022 确认许可夹具 + mock/无真实 key；SPEC 另提 OCI、HF Spaces、无上传/egress、隔离 session/限额，待整体签字 | 无镜像/build/run/URL/隔离证据；官方页面 502/curl 超时，签字前须重核；账号/部署需执行时授权 |
+| D-021 + 分发方向 | D-021 确认 Windows x64、Python/FastAPI + React/Vite、SQLite、Credential Manager；整体 SPEC 已确认单文件 `ProjectB.exe` 方向 | 无依赖/源码/凭据测试/冻结构建/干净机/SmartScreen 证据；不得把方向确认冒充实现完成 |
+| D-022 + 部署方向 | D-022 确认许可夹具 + mock/无真实 key；整体 SPEC 已确认 OCI、HF Spaces、无上传/egress、隔离 session/限额方向 | 无镜像/build/run/URL/隔离证据；官方页面 502/curl 超时，部署前须重核；账号/部署需执行时授权 |
 | D-023 远程仓库/CI | NJU Git/GitLab 主仓 + GitHub 镜像；GitLab `unit-test` + GitHub Actions 双 CI | 当前没有远程 push、PR/MR、镜像或 CI 运行；这些动作仍需执行当时的用户授权 |
-| D-024 Open Design | 安装并使用 Open Design | `od`、MCP 与 skill 仍不可用；当前环境禁止工作区外安装，正式 UI 仍被此外部门禁阻塞 |
+| D-024 Open Design | 0.15.0 桌面端已安装，MCP 已注册 | 当前工具已暴露，但 daemon/sidecar 不可达；`skillId=null`、`designSystemId=default`、项目位置为空，正式 UI 仍受 daemon 恢复和实际组合确认门禁阻塞 |
 
 OpenAI 的 Responses 能力/政策快照还须在每次 P/F 同意前刷新并记录，覆盖 application state、abuse monitoring、prompt cache、文件审查例外和 Files/Vector Stores 生命周期；`store:false` 不得表述为 ZDR。
 
 详细拓扑、分发完成标准、公开 demo 隔离/限额、依赖许可证门禁与远程操作边界见 [`research/TECH_STACK_DISTRIBUTION_BASELINE.md`](research/TECH_STACK_DISTRIBUTION_BASELINE.md)。这些选择解决了产品/交付方向问题，但不能充当实现或最终课程交付证据。
 
-当前进入阶段 B 前仍有以下门禁：恢复联网后重核 Hugging Face Spaces 当前官方条款；Open Design 安装/MCP 接入并记录实际 design system/skill；Superpowers `writing-plans` 在可调用的新会话中正式使用；学生本人补充 brainstorming 过程的优点、不足与关键取舍；学生明确整体签字确认 `SPEC.md`。之后仍须依次完成 PLAN、陌生智能体冷启动验证、规约修订复核和实现批准。
+### 阶段 B 更新（2026-07-20T18:45:26+08:00）
+
+- `PLAN.md` 已按缓存的上游 `writing-plans` v6.1.1 规则通过透明 fallback 生成：41 个 planning group 展开为 69 个 dispatch unit；宽 group 明确不可派发，unit 包含文件、依赖/并行关系、红测或失败门禁、验证命令、双评审、literal commit 和完成标准。当前会话未注册正式 `superpowers:writing-plans`，所以该调用证据仍明确缺失。
+- Open Design 桌面端 0.15.0 已安装，MCP 配置已写入且当前会话暴露工具；现在的根因是桌面 sidecar 未运行，动态端口发现失败后回退到不可达的 7456。`skillId=null`、实际 design system 和项目仍未确认；正式 UI 前须恢复 daemon、复验并记录学生确认的真实 skill/design system。候选审计见 [`research/OPEN_DESIGN_SKILL_OPTIONS.md`](research/OPEN_DESIGN_SKILL_OPTIONS.md)。
+- D-005 的不同类型冷启动智能体/账号可以先由学生选择，但阶段 B 的正式 `superpowers:writing-plans` 证据仍未闭合；恢复正式调用或取得课程明确接受 fallback 的证据前，不执行 G-03。之后全新 session 只能获得 `SPEC.md` 与 `PLAN.md`，且冷启动修订和再次批准前禁止正式实现。
+- Hugging Face 当前官方条款、依赖/SDK/冻结工具许可证等已放入 G-02 工程证据门禁；学生本人 brainstorming 反思仍是课程交付缺口且不得由 AI 代写。

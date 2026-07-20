@@ -1,8 +1,10 @@
-# ProjectB 规约（阶段 A 工作草案）
+# ProjectB 规约（v1 已确认）
 
-> 状态：**未签字确认**。本文只汇总已确认内容、可评审候选设计与明确未决项；它不触发 `writing-plans`、冷启动验证或正式实现。
+> 状态：**已由学生整体确认（2026-07-20）**。学生明确回复“已确认spec.md”；本文现为阶段 B 计划的权威规约。该确认不触发冷启动或实现，后续仍须遵守 Superpowers、Open Design、冷启动复核和实现批准门禁。
 >
 > 标记：`已确认` 表示学生已明确选择；`候选` 表示为下一轮评审准备；`未决` 表示课程规定必须由学生决定。
+>
+> 签字影响：本文签字前标为“待整体签字”的 `ReviewPolicy v1`、单文件 `ProjectB.exe`、OCI demo、隔离限额与 Hugging Face Spaces 首选方向已随整体确认成为 v1 工程合同；它们仍须通过许可证、官方条款、构建、运行与安全验证，证据不满足时只能走显式 SPEC 变更。
 
 ## 1. 问题陈述
 
@@ -25,7 +27,7 @@ ProjectB 是面向大学课程的连续学习工作台：它让学生分批导�
 
 D-010 已选择单用户、本地优先路线。三种候选路线及选择依据见 `docs/research/USER_DEPLOYMENT_BOUNDARY_OPTIONS.md`。
 
-## 2. 用户故事（待最终整体签字）
+## 2. 用户故事（已整体确认）
 
 1. **US-01 课程导入**：作为学生，我希望在导入课程时先看到文件规模与可读性检查，再明确选择处理方式，以便知道系统将如何使用我的材料。
 2. **US-02 原始来源核对**：作为学生，我希望任何基于材料的解释都能回到具体 PDF 页、图片、文本行或手工重点版本，以便发现解析失真或模型误读。
@@ -80,10 +82,10 @@ D-010 已选择单用户、本地优先路线。三种候选路线及选择依�
 | 输入 | 完整的追加式 `LearningEvidence` 历史、每个知识点的上一轮 `ConceptReviewState`、当前 `MasteryEstimate`、经用户确认的知识覆盖、知识点依赖、`ReviewPolicy` 版本、当前计划版本、可选考试本地日期/IANA 时区、可选每日预算、`post_exam_state`、已确认 `StudyFocus`、往年卷映射和历次复习尝试。 |
 | 行为 | 用版本化、确定性的简单间隔/证据规则推导可解释的掌握估计与 `LearningPlan`；在默认 `continuous` 模式中持续安排，不使用 FSRS/BKT，也不让模型计算权威到期时间。用户可选填每日投入预算；未填写时显示并使用版本化工程默认容量。新证据、目标日期、预算或确认覆盖变化会自动创建 `PlanRevision`，只替换未开始的未来任务，并展示 diff、原因和撤销入口。录入考试日期且用户显式进入 `finals` 后，才结合剩余时间、老师重点、往年卷模式、知识依赖与薄弱证据调整优先级。复习时优先主动提取，再依据结果显示解释并调整后续计划。考试本地日期完整结束后归档本次期末计划、暂停自动生成未来任务并询问新目标。 |
 | 输出 | `MasteryEstimate`、版本化 `LearningPlan` / `PlanRevision`、revision diff/`reverts_revision_id`、`ReviewTask`、安排/变更原因、归档/暂停结果和新的尝试证据。 |
-| 边界 | 无证据时保持“未知”；掌握度不是客观真值；不得删除历史证据或计划版本来改写结果。模型/provider 只能提出解释、练习或候选映射，不能直接写入权威知识覆盖、优先级、计划或掌握状态。下方的 v1 间隔、容量、证据转换、排序、预算单位/范围和任务时长是待整体签字的工程候选；整体签字后 PLAN 只能实现并验证，后续调整必须产生新的 ReviewPolicy/SPEC 版本。 |
+| 边界 | 无证据时保持“未知”；掌握度不是客观真值；不得删除历史证据或计划版本来改写结果。模型/provider 只能提出解释、练习或候选映射，不能直接写入权威知识覆盖、优先级、计划或掌握状态。下方的 v1 间隔、容量、证据转换、排序、预算单位/范围和任务时长已随整体签字成为 v1 工程合同；PLAN 只能实现并验证，后续调整必须产生新的 ReviewPolicy/SPEC 版本。 |
 | 错误处理 | 证据不完整、日期/时区/预算非法、规则版本不兼容或撤销目标冲突时不提升掌握状态、不覆盖当前计划；保留可重算标记、白名单错误原因和用户纠正入口。 |
 
-#### ReviewPolicy v1（工程候选，待整体 SPEC 签字确认）
+#### ReviewPolicy v1（已随整体 SPEC 确认，待实现验证）
 
 1. `daily_budget_minutes` 为 10–480 的整数、步长 5；空值时 `continuous` 使用 30 分钟/日，`finals` 使用 90 分钟/日。界面始终显示实际值、来源（用户/默认）和 policy version。
 2. 单个 `ReviewTask.estimated_minutes` 只取 5/10/15/20/30，默认 10；按稳定优先级依次装入每日预算，若当日第一项也超过剩余预算则不自动超额，提示用户修改预算或拆分任务。
@@ -101,7 +103,7 @@ D-010 已选择单用户、本地优先路线。三种候选路线及选择依�
 5. `due_local_date` 是装箱日；`due_at` 仅是显示/通知派生值，取该 IANA 时区当天最早有效 instant（午夜不存在时取首个有效 instant，歧义时取较早 instant）。领域排序只使用 local date，避免 DST 改变计划。
 6. 规范化输入使用 UTF-8 canonical JSON（对象 key 和实体 ID 升序）计算 SHA-256 `plan_input_hash`；canonical payload 必须包含完整相关 `LearningEvidence` 历史、`ConceptReviewState`、当前 `MasteryEstimate` 及其版本/纠正字段，而不是只包含最新一条证据。revision/task ID 使用固定 namespace UUIDv5，task name 为 `plan_input_hash|concept_id|due_local_date|task_type`。相同输入得到相同 ID/顺序；候选任务集合与当前未开始集合完全相同时不创建新 revision。
 
-签字前 golden fixtures（每项任务默认 10 分钟）：
+v1 golden fixtures（每项任务默认 10 分钟）：
 
 | Fixture | 输入摘要 | 必须输出 |
 | --- | --- | --- |
@@ -174,7 +176,7 @@ D-010 已选择单用户、本地优先路线。三种候选路线及选择依�
 - 主要结论通过字号、颜色、字重与字体建立一级强调；依据和限制作为二级信息，减少同时争夺注意力的正文。
 - 使用熟悉图标配合短句引导视线；颜色不能成为唯一状态信号。
 - “不会静默切换处理方式”和“课程设置 › 材料与隐私”必须高于普通说明文字的视觉权重。
-- 当前需求稿见 `docs/mockups/course-import-onboarding.html`。学生已选择安装并使用 Open Design；在 `od`/MCP/skill 接入并选择、记录实际 design system 前，该 HTML 只代表 brainstorming 需求稿，不是正式 UI 或 Open Design 证据。
+- 当前需求稿见 `docs/mockups/course-import-onboarding.html`。学生已选择安装并使用 Open Design；MCP 注册已写入且当前会话已暴露 Open Design 工具，但 daemon 尚不可达，实际 skill/design system 仍未由学生确认。在恢复可调用性并记录实际选择前，该 HTML 只代表 brainstorming 需求稿，不是正式 UI 或 Open Design 证据。
 
 ### 4.3 增量导入与计划修订（已确认）
 
@@ -291,7 +293,7 @@ Public HTTPS browser
   -> finals PlanRevision -> 同类练习/模拟 -> 新证据 -> 再规划
 ```
 
-`已确认`：第一版私有课件、索引和学习状态默认留在 Windows x64 本机，由浏览器访问 localhost WebUI；不包含账号或多租户服务。后端采用 Python/FastAPI，前端采用 React/Vite/TypeScript，权威状态存入 SQLite，secret 进入 Windows Credential Manager。远端能力经过统一适配器注册表；首版唯一真实实现是平台内置 OpenAI adapter，另有 test/demo mock/contract suite，未配置 profile 时不会静默启用。**待整体 SPEC 签字确认的工程候选**是单文件 `ProjectB.exe` 分发，以及 Hugging Face Spaces Docker SDK 上的 OCI demo（待官方连通性复核）。精确依赖/冻结/索引库不能改变上述已确认边界。
+`已确认`：第一版私有课件、索引和学习状态默认留在 Windows x64 本机，由浏览器访问 localhost WebUI；不包含账号或多租户服务。后端采用 Python/FastAPI，前端采用 React/Vite/TypeScript，权威状态存入 SQLite，secret 进入 Windows Credential Manager。远端能力经过统一适配器注册表；首版唯一真实实现是平台内置 OpenAI adapter，另有 test/demo mock/contract suite，未配置 profile 时不会静默启用。单文件 `ProjectB.exe` 分发与 Hugging Face Spaces Docker SDK 上的 OCI demo 已随整体 SPEC 确认为 v1 工程方向，后者仍待官方连通性/费用复核。精确依赖/冻结/索引库不能改变上述已确认边界。
 
 ## 7. 候选数据模型
 
@@ -343,10 +345,10 @@ Public HTTPS browser
 
 - `已确认`：最终必须提供可访问的 WebUI URL。
 - `已确认`：第一版真实使用形态是单用户、本地 WebUI；桌面窗口只能作为可选壳，不能替代 WebUI。多用户与分享不进入第一版。
-- `工程候选（由整体 SPEC 签字确认）`：课程分发类别采用 **Windows x64 单文件原生可执行二进制**。交付物 `ProjectB.exe` 内嵌前端与必要运行资源，用户不需安装 Python、Node 或 Docker；运行期数据写入文档化目录。具体冻结工具在 PLAN 中按许可证、冷启动、Credential Manager 和资源集成证据选择。若无代码签名，README/发布页如实说明 SmartScreen，不能伪称已签名。
-- `工程候选（由整体 SPEC 签字确认）`：公开实例使用同一 WebUI/领域合同的 **OCI container demo**，首选 **Hugging Face Spaces（Docker SDK）**，固定为许可夹具 + deterministic mock；无真实 key、任意上传/provider egress 或私人课件持久化。镜像须支持单条 build/run。2026-07-20 官方复核因 web 502、`curl` 超时未完成；签字/部署前须重核 Docker、HTTPS、休眠/临时存储、费用与账号条款。不满足无付费边界时须通过 SPEC 变更，不能静默产生费用。
+- `已随整体 SPEC 确认的 v1 工程方向`：课程分发类别采用 **Windows x64 单文件原生可执行二进制**。交付物 `ProjectB.exe` 内嵌前端与必要运行资源，用户不需安装 Python、Node 或 Docker；运行期数据写入文档化目录。具体冻结工具在 PLAN 中按许可证、冷启动、Credential Manager 和资源集成证据选择。若无代码签名，README/发布页如实说明 SmartScreen，不能伪称已签名。
+- `已随整体 SPEC 确认的 v1 工程方向`：公开实例使用同一 WebUI/领域合同的 **OCI container demo**，首选 **Hugging Face Spaces（Docker SDK）**，固定为许可夹具 + deterministic mock；无真实 key、任意上传/provider egress 或私人课件持久化。镜像须支持单条 build/run。2026-07-20 官方复核因 web 502、`curl` 超时未完成；部署前须重核 Docker、HTTPS、休眠/临时存储、费用与账号条款。不满足无付费边界时须通过 SPEC 变更，不能静默产生费用。
 - `已确认`：NJU Git/GitLab 为课程主仓，GitHub 为镜像；两套 CI 调用同一条一键测试命令。`.gitlab-ci.yml` 必须含名称严格为 `unit-test` 的 job，GitHub Actions 每次 push 运行测试；最终两边真实记录和课程提交对应 CI 必须通过。建仓、push、PR/MR、镜像和部署仍需执行时授权。
-- `已确认路线/外部门禁`：安装并使用 Open Design。官方 v0.15.0 安装器/校验已核验，但当前 `od`/MCP/skill 未接入；用户须在工作区外完成安装和 `od mcp install codex`，新会话验证后把实际 design system 与 skill 写入本文。安装完成前不得开始正式 UI 实现，现有 HTML 只作 brainstorming 证据。
+- `已确认路线/外部门禁`：Open Design 0.15.0 桌面端已安装，agent 已设为 Codex；学生已完成 MCP 注册，`~/.codex/config.toml` 出现 `open-design` 且当前会话暴露 MCP 方法。实际调用仍返回 daemon `127.0.0.1:7456` 不可达，配置仍为 `skillId=null`、`designSystemId=default`、项目位置为空。只读候选调查推荐 `frontend-design` + `default`（项目覆盖：卡片半径最多 8px、letter-spacing=0、紧凑工作台），`shadcn` 为 design-system 备选，`web-design-guidelines` 仅作实现后审查；这些尚未由学生确认。daemon 恢复且实际选择写入本文前不得开始正式 UI 实现，现有 HTML 只作 brainstorming 证据。
 
 详细工程基线与分发完成标准见 `docs/research/TECH_STACK_DISTRIBUTION_BASELINE.md`。
 
@@ -354,15 +356,15 @@ Public HTTPS browser
 
 | 选择 | 采用原因 | 第一版限制 |
 | --- | --- | --- |
-| Windows x64 单文件原生二进制（待整体签字） | 与真实本机课件、浏览器和 Credential Manager 边界一致；不要求开发环境 | macOS/Linux 延期；冻结工具须先核验许可证、单文件资源加载与干净机行为 |
+| Windows x64 单文件原生二进制（已确认方向） | 与真实本机课件、浏览器和 Credential Manager 边界一致；不要求开发环境 | macOS/Linux 延期；冻结工具须先核验许可证、单文件资源加载与干净机行为 |
 | Python + FastAPI | 文件处理生态、类型化 API 与可测试依赖注入适合 M1/X1/X2 | 精确 Python/FastAPI 版本须通过依赖矩阵；不对 LAN 监听 |
 | React + Vite + TypeScript | 满足响应式 WebUI、状态密集导入/学习流程和可访问性测试 | 构建后作为静态资源随本地二进制/OCI 镜像分发，不要求最终用户安装 Node |
 | SQLite | 单用户、本地事务、版本化证据和迁移可复现 | 单写者边界；不作为多用户服务数据库 |
 | keyring + Windows Credential Manager | secret 不进入 config/SQLite/浏览器，支持状态/更新/清除 | 只验证 Windows 后端；无 `.env` 正式兼容路径 |
 | 内置 OpenAI adapter + shared contract/mock | 一条真实 P/F 路径，同时保持领域状态可在无网络下确定性测试 | local production 只暴露 OpenAI；mock 仅 test/demo；无任意 endpoint/plugin |
-| Hugging Face Spaces Docker SDK 上的 OCI public demo（待整体签字和官方复核） | 便携部署相同 WebUI/领域合同并强制无密钥、临时状态 | 当前配额/费用/临时存储未现场复核；只用许可夹具/mock，与本地私有版隔离，不获授权不创建 Space |
+| Hugging Face Spaces Docker SDK 上的 OCI public demo（已确认方向，待官方复核） | 便携部署相同 WebUI/领域合同并强制无密钥、临时状态 | 当前配额/费用/临时存储未现场复核；只用许可夹具/mock，与本地私有版隔离，不获授权不创建 Space |
 
-精确 Python/Node 版本、框架/SDK/解析/索引/冻结依赖、SQLite schema 和构建集成仍需以兼容性、许可证、成本和可复现验证固化；Hugging Face Spaces Docker SDK 条款须重核。后续工程证据不得改变已确认的单用户本地优先、Windows x64、凭据后端、内置 adapter 与双 CI；单文件/OCI/HF 候选在整体签字后同样不得被 PLAN 静默改写。Python 3.13 只是兼容性候选，不是唯一版本。
+精确 Python/Node 版本、框架/SDK/解析/索引/冻结依赖、SQLite schema 和构建集成仍需以兼容性、许可证、成本和可复现验证固化；Hugging Face Spaces Docker SDK 条款须重核。后续工程证据不得改变已确认的单用户本地优先、Windows x64、凭据后端、内置 adapter、双 CI、单文件分发与 OCI/HF 方向；PLAN 不得静默改写。Python 3.13 只是兼容性候选，不是唯一版本。
 
 **已确认：第一版采用受约束 AI 功能，不包含课程定义的 agent。** 模型只能通过具名、结构化且有来源范围的端口生成候选知识映射、适配解释、练习、反馈和期末资料分析；应用状态机、版本化规则、确定性 oracle 与用户确认拥有权威写入权。若未来加入自主多轮决策、自主工具调用和反馈自修正，必须重新取得学生确认，并自行编码可用 mock/stub 确定性测试的主循环、工具分发和治理护栏。方案比较与延期理由见 `docs/research/AGENT_BOUNDARY_OPTIONS.md`，端口合同见 `docs/research/CONSTRAINED_AI_PORT_CONTRACT.md`。
 
@@ -427,16 +429,16 @@ Public HTTPS browser
 
 | 问题 | 状态/影响 |
 | --- | --- |
-| SPEC 整体尚未签字 | D-017 至 D-024 已确认并写入，但本文仍须学生明确整体确认；在此之前禁止 `writing-plans` |
+| SPEC 整体签字已完成 | 学生于 2026-07-20 明确回复“已确认spec.md”；阶段 B 可在正式调用 `writing-plans` 后开始 |
 | OpenAI File Search 页码/视觉保真不足 | 只有通过本地 `SourceLocator` 校验才能称为材料事实；失败时 coverage/exam-analysis 空内容关闭，解释/练习/反馈仅可标 `model_supplement`，不得伪造页码或进入计划 |
 | OpenAI 动态政策、模型、容量、费用和 SDK 许可证 | Provider 方向已确认；运行前 policy snapshot 必须覆盖 Responses/abuse monitoring/cache/文件安全审查/Files/Vector Stores；支持目录、SDK 许可证与兼容性仍需真实核验 |
 | 模式 F 重复对象、所有权与远端残留 | OpenAI 未提供已证明的上传 exactly-once；只能本地幂等、发现/对账/清理重复对象。每课程独占 store，File/association/store 分层删除，无法确认时保留 `delete_incomplete` |
-| ReviewPolicy v1 默认值尚无真实学习效果证据 | 纯函数/fixtures 已固定为签字候选；学生整体签字后才成为 v1 合同。实施后只能通过新 policy/SPEC 版本调整，不能宣传为科学最优 |
+| ReviewPolicy v1 默认值尚无真实学习效果证据 | 纯函数/fixtures 已随整体签字成为 v1 工程合同。实施后只能通过新 policy/SPEC 版本调整，不能宣传为科学最优 |
 | 公开 WebUI 尚无平台/URL | demo profile 已确认为合成/许可夹具 + mock；具体账号、托管平台和部署动作需要执行时授权，最终必须提供真实可访问 URL/CI-CD 证据 |
-| Hugging Face Spaces 官方复核受网络阻塞 | Docker SDK 是待整体签字的首选候选；2026-07-20 web 502/curl 超时，签字/部署前必须重核费用、Docker/HTTPS、休眠与临时存储 |
-| Windows x64 分发尚未验证 | 单文件 `ProjectB.exe` 是待整体签字的工程候选；签字后冻结工具仍须通过许可证、干净机、Credential Manager、SmartScreen 和数据边界验证 |
+| Hugging Face Spaces 官方复核受网络阻塞 | Docker SDK 已确认为首选方向；2026-07-20 web 502/curl 超时，部署前必须重核费用、Docker/HTTPS、休眠与临时存储 |
+| Windows x64 分发尚未验证 | 单文件 `ProjectB.exe` 已确认为分发方向；冻结工具仍须通过许可证、干净机、Credential Manager、SmartScreen 和数据边界验证 |
 | 双远程平台尚未执行 | NJU Git/GitLab 主仓 + GitHub 镜像及双 CI 已确认；建仓、push、PR/MR、镜像与部署需执行时授权，当前本地记录不能代替远程证据 |
-| Open Design 未接入 | 路线已确认但 `od`/MCP/skill 仍不可用；工作区外安装与新会话验证是正式 UI 前的外部门禁 |
+| Open Design daemon/skill/design system 未完成 | MCP 配置已写入且工具已暴露，但 daemon 当前不可达；`skillId`/实际 design system/项目位置均未确认。恢复 daemon、复验工具、由学生确认候选并记录选择是正式 UI 前的门禁 |
 | Superpowers 阶段 B skill 未注册 | v6.1.1 缓存已检测，但当前会话未暴露 `writing-plans`；SPEC 签字后须在已注册的新会话正式调用，不能以手工计划代替 |
 | 冷启动智能体类型 | D-005 尚待学生在阶段 C 前决定；不阻塞当前 SPEC 签字或阶段 B 计划编写 |
 | brainstorming 个人反思尚缺 | 课程审计要求学生本人评价过程优点、不足与关键取舍；AI 可提供问题框架但不得伪造学生观点或代写 `REFLECTION.md` |
@@ -446,11 +448,11 @@ Public HTTPS browser
 
 D-011 已采用互斥与竞态条件作为首个纵向切片。三套候选、选择依据和共同评分边界见 `docs/research/FIRST_LEARNING_LOOP_CANDIDATES.md`。
 
-D-012/D-019/D-020 已确认双模式、材料白名单和保守确定性方向；本文提出可唯一实现的 ReviewPolicy v1/fixtures，待整体 SPEC 签字。候选比较和时间测试见 `docs/research/REVIEW_SCHEDULING_OPTIONS.md`，增量流程见 `docs/research/INCREMENTAL_COURSE_WORKFLOW.md`。
+D-012/D-019/D-020 已确认双模式、材料白名单和保守确定性方向；ReviewPolicy v1/fixtures 已随整体 SPEC 签字成为 v1 工程合同。候选比较和时间测试见 `docs/research/REVIEW_SCHEDULING_OPTIONS.md`，增量流程见 `docs/research/INCREMENTAL_COURSE_WORKFLOW.md`。
 
 ## 13. 阶段门禁
 
-- 本文尚未由学生逐段确认；阶段 A 的 placeholder/矛盾/歧义/范围静态自审已完成并留有本次运行证据，仍须学生整体确认。
-- 在学生明确确认 `SPEC.md` 前不得调用 `writing-plans` 或创建 `PLAN.md`。
+- 学生已于 2026-07-20 对本文做整体确认；阶段 A 的 placeholder/矛盾/歧义/范围静态自审已有证据。该证据只证明整体签字，不虚构逐段口述审阅。
+- `SPEC.md` 签字门禁已解除；必须在正式应用 Superpowers `writing-plans` 后创建 `PLAN.md`，当前会话若未注册该 skill 不得把手工草稿冒充正式调用。
 - 在 `PLAN.md`、陌生智能体冷启动验证、缺陷修订与学生实现批准完成前，不得编写正式实现代码。
 - `REFLECTION.md` 只能由学生本人撰写；AI 仅可在学生初稿后按声明范围辅助。

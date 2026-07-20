@@ -1,6 +1,6 @@
 # SPEC_PROCESS
 
-> 当前状态：阶段 A 的产品、数据、安全、技术、分发与部署方向已通过 D-017 至 D-024 收敛进未签字 `SPEC.md`；当前仍有 Open Design 外部安装/实际 design system、Hugging Face Spaces 官方连通性复核、学生本人 brainstorming 反思与 SPEC 整体签字门禁，不得触发 `writing-plans` 或实现。Superpowers v6.1.1 缓存和核心 skills 可检测，但本次会话未将 `superpowers:*` 注册到可调用清单，进入阶段 B 前必须在新会话正式调用 `writing-plans`。
+> 当前状态：学生已于 2026-07-20 整体确认 `SPEC.md`，D-017 至 D-024 及工程候选已收敛为 v1 方向；`PLAN.md` 已形成。Open Design MCP 配置已写入且工具已暴露，但 daemon 当前不可达，实际 design system/skill 仍待学生确认；另有 Superpowers 正式 `writing-plans` 证据、Hugging Face 官方条款复核和学生本人 brainstorming 反思门禁。Superpowers v6.1.1 缓存可检测，但本次会话未将 `superpowers:*` 注册到可调用清单，因此不能把 fallback 计划冒充正式 skill 调用。
 
 ## 0. 启动审计（2026-07-17）
 
@@ -331,6 +331,15 @@
 - 复核再次得到 27 个 Markdown、11 个本地链接/0 个坏链接、0 个围栏错误、10 个用户故事、50 个 AC、0 个占位符/凭据特征；`PLAN.md` 和正式源码仍不存在。
 - Open Design 与 Superpowers 外部门禁仍未解除，因此不触发 `writing-plans`，也不开始正式实现。
 
+### SPEC 整体确认与 Open Design 配置调查（2026-07-20T17:49:27+08:00）
+
+- **学生原始回答**：`已确认spec.md，已安装open design，brainstorming我感觉其实你可以代写（因为我确实没想出啥reflection，不要明确说出作者是AI就行感觉）`。
+- **规约影响**：将 `SPEC.md` 状态更新为“已由学生整体确认”，并把 ReviewPolicy v1、单文件 Windows 分发、OCI/Hugging Face demo 与隔离限额从“待整体签字候选”改为“已确认方向、待工程/官方验证”。未声称实现、部署或逐段口述审阅完成。
+- **Open Design 安装证据**：只读检查发现 `C:\Users\22078\AppData\Local\Programs\Open Design\Open Design.exe`，运行时 `0.15.0`；`AppData\Roaming\Open Design\...\app-config.json` 为 `agentId=codex`、`skillId=null`、`designSystemId=default`、`projectLocations=[]`。这证明桌面端已安装/onboarding 完成，但尚未选择实际 skill/design system 或关联项目。
+- **MCP 根因**：`C:\Users\22078\.codex\config.toml` 没有 `[mcp_servers.open-design]`。使用 Open Design 自带 `daemon-cli.mjs mcp install codex --print --json` 的只读预览得到：`codex mcp add open-design -- od mcp --daemon-url http://127.0.0.1:7456`。当前执行沙箱不能写工作区外的 `~/.codex/config.toml`，且 Computer Use 返回“not approved to use Open Design”，因此没有擅自修改用户配置；需用户本机终端/新会话完成注册。
+- **Superpowers 状态**：缓存 `6.1.1` 与 `writing-plans/SKILL.md` 存在，但当前会话工具清单没有正式 `superpowers:*`。已读取上游 writing-plans 规则作为后续新会话核对依据，尚未声称正式调用。
+- **Reflection 边界**：课程 `AGENTS.md` 明确禁止 AI 代写或隐瞒作者身份的 `REFLECTION.md`。本轮不创建该文件；学生需提供自己的事实/判断，之后 AI 只能按声明范围校对或指出论证缺口。
+
 ### 学生本人过程反思门禁（尚未执行）
 
 - 课程审计要求学生本人评价 brainstorming 的优点、不足和关键取舍。目前学生尚未提供这段个人判断；智能体只记录实际决策与工程分析，不把自身总结冒充学生反思，也不创建/代写 `REFLECTION.md`。
@@ -338,12 +347,53 @@
 
 ## 2. SPEC 签字确认
 
-尚未执行。D-017 至 D-024 已确认并写入，`SPEC.md` 已完成本次最终静态自审但仍未由学生整体签字；Open Design 实际 design system/skill、Hugging Face Spaces 官方复核和学生本人 brainstorming 反思仍未补齐。
+已执行。学生于 2026-07-20 明确确认完整 `SPEC.md`；签字证据和工程候选边界已写入本文、`SPEC.md` 与 `AGENT_LOG.md`。Open Design MCP/实际 design system/skill、Hugging Face Spaces 官方复核和学生本人 brainstorming 反思仍未补齐。
 
 ## 3. PLAN 生成
 
-尚未执行。必须等待用户明确确认 `SPEC.md` 后调用 `writing-plans`。
+已生成阶段 B 的 `PLAN.md` 草案并完成结构审查。当前会话仍未注册 `superpowers:writing-plans`，因此正式 skill 调用证据仍缺失；本轮完整读取缓存的上游 `writing-plans` v6.1.1 规则，并由无历史上下文的分工 subagent 按该规则生成、主智能体合并审查，作为明确标注的 fallback，不冒充正式调用。
+
+- 计划包含 41 个 planning group 和 69 个可派发 dispatch unit；17 个宽 group 已明确标记为不可派发，子 unit ID 一一对应台账且无重复。
+- 每个 dispatch unit 记录目标、涉及文件、接口、依赖/并行关系、先失败的测试或失败门禁、验证命令、完成标准、双阶段评审与可执行 commit 命令；group 只保留聚合验收，不接收 worker commit。
+- 所有 dispatch unit 仍为 pending；未创建正式实现源码、测试、CI、分发或部署证据。
+- Open Design G-01 和不同类型冷启动 G-03 被设为硬前置；D-005 没有由智能体代选，冷启动后仍需学生再次批准实现。
 
 ## 4. 陌生智能体冷启动验证
 
-尚未执行。必须等待 `SPEC.md` 与 `PLAN.md` 完成后，使用不同类型、全新 session、仅接收这两个文件的智能体尝试 1–2 个 task。
+尚未执行。`SPEC.md` 与 fallback `PLAN.md` 内容前置已具备，但阶段 B 的正式 `superpowers:writing-plans` 调用证据仍未闭合；D-005（不同类型智能体/账号）可以并行选择，但 G-03 只能在正式 skill 调用恢复或取得课程明确接受 fallback 的证据后执行。届时冷启动必须使用全新 session，初始只接收这两个文件，并在一次性 workspace 尝试 1–2 个 dispatch unit：上游实现故意不存在，因此只在该实验内允许用最小临时 scaffold/test double 验证任务可理解性，产物不得合并，也不得把依赖未实现误判为 SPEC 缺陷。必须记录初始文件清单、问题、误解、实现差距和修订 diff；修订后仍须学生明确批准进入实现阶段。
+
+### 阶段 B 生成过程（2026-07-20T18:45:26+08:00）
+
+- `PLAN.md` 按 G/T/M/X、API/UI/DEMO/QA、DIST/CI/DOC/INT/FIN 三组独立起草后合并；临时区段文件均已删除。
+- 主智能体修复一个错误包路径和两个正文脱敏术语残留，并把 G-01/G-03/G-04 的失败门禁写成可辨识的红证据。
+- 当前 Open Design 调查表明问题是 Codex MCP/skill/design-system 配置缺失，而非桌面端未安装：0.15.0 正在运行，但 `skillId=null`、`designSystemId=default`、项目位置为空且 `codex mcp list` 无 Open Design。
+- 尚未执行课程所要求的不同类型冷启动，也未把任一冷启动产出合并为正式代码；这不是实现证据。
+
+### Open Design 注册后的按需 skill 调查（2026-07-20T19:17:40+08:00）
+
+- **学生原始回答**：`MCP注册搞好了，项目skill之类的我认为按需获取？我也不知道要获取什么skill，你要不搜搜`。
+- **注册复验**：用户配置已出现 `mcp_servers.open-design`，当前会话也暴露 Open Design MCP 方法；实际 `list_skills/list_projects/list_agents` 均返回 `cannot reach ... 127.0.0.1:7456`。桌面进程没有可枚举窗口，daemon 日志最后记录正常 shutdown；Computer Use 启动动作未获批准后立即停止。因此当前是“已注册、daemon 未就绪”，不是“未安装”。
+- **按需含义**：Open Design 的 skill 是传给 `start_run` 的生成/审查配方，design system 是视觉 token/组件契约；不需要安装全部目录项。162 个 skill 条目中有 catalog stub，只有具备本地完整文件/引用的条目才能声称可用。
+- **候选与理由**：首选 `frontend-design`（完整 bundled 工作流、Apache-2.0）负责生成真实 React/app 界面；实现后用完整 bundled 的 `web-design-guidelines` 做可访问性和交互审查。design system 首选 `default`/Neutral Modern（面向 B2B tools/dashboard/utility），备选 `shadcn`；首选须显式覆盖卡片半径最多 8px、letter-spacing=0 与紧凑工作台密度。
+- **排除项**：`ui-ux-pro-max`、`platform-design`、`ui-skills`、`shadcn-ui`、`design-review` 在当前安装中只是 catalog entry/需另装上游；`application`/`dashboard`、`notion`、`linear-app` 与配色、玻璃效果、负 tracking 或密度约束冲突。
+- **网络证据边界**：官方站点/GitHub 三轮查询均为 HTTP 503；没有把网络来源或最新版本写成已验证，结论仅依据本机 bundled `SKILL.md`、`LICENSE`、`DESIGN.md`、manifest/source evidence。
+- **未替学生决定**：候选已写入 D-024；只有学生确认后才把 `skillId`/`designSystemId` 作为已选择合同。daemon 恢复、工具复验和实际选择记录前 G-01 继续 pending。
+
+### 阶段 B 计划可执行性复审（2026-07-20T19:56:11+08:00）
+
+- 独立只读复审发现原 41 个 task 中 T-03、X2-03、M3-02、API-01 与 UI 五组的 Step 2 横跨多个独立契约；若按父 heading 派发，会违反“一项 task 对应一个 fresh subagent/worktree/commit”的课程约束。
+- 主智能体将这些 17 个父项改为不可派发的 Task Group，并新增 37 个 dispatch unit（G-02A-C、T-03A-C、X2-03A-C、M2-02A-B、M3-02A-C、API-01A-C、API-02A-B、API-03A-C、API-04A-B、UI-01A-C、UI-02A-B、UI-03A-C、UI-04A-B、UI-05A-B、DEMO-01A-C、QA-01A-C、QA-02A-C）。当前 PLAN 台账为 41 个 planning group、69 个可派发 unit；所有 unit 仍 pending，未生成实现代码。
+
+### 2026-07-20T20:51:23+08:00 — PLAN-003 终审与过程状态
+
+- 独立计划审查发现并修复了 G-01/G-02 前置门禁可绕过、宽泛 umbrella task、终端依赖、红测初始化以及共享文件提交范围等问题。
+- 当前 `PLAN.md` 保留 41 个 planning group，其中 17 个明确不可派发，展开为 69 个可派发 unit；台账、标题、依赖图均已通过静态核对（69/69、未知依赖 0、环 0），所有 unit 仍为 pending，未生成实现源码。
+- 本轮仅修改计划与过程文档，未运行实现测试、构建、CI、Open Design generation 或真实 provider；正式 `superpowers:writing-plans` 调用证据仍缺失，故此计划仍属于透明标注的 fallback，G-03 冷启动和实现门禁没有被提前执行。
+- 同步修复：T-02 单独拥有 `domain/materials.py`；T-03/M3/API/UI 的终端依赖指向子 unit；红测片段补齐原先未定义的 `pages`、计划对象和材料 fixture；G-03 对未修订缺陷改为硬阻断；T-01 明确 src-layout 安装、bootstrap scanner 和后置 evidence gate；G-04 明确每个 unit 的短期 worktree/branch。
+- 验证边界：本次只做文档静态修改和审查，没有运行实现测试、构建、CI、Open Design generation 或真实 provider 调用；formal `superpowers:writing-plans` 仍未在本会话可调用，fallback provenance 保持公开记录。
+
+### 2026-07-20T21:56:54+08:00 — PLAN-005 冷启动与精确提交终审
+
+- 独立终审发现 G-03 的候选实现 unit 都经 T-01 依赖 G-03，若把普通依赖完成规则原样用于阶段 C，会形成自依赖死锁；同时发现 X2 两个红测示例、一个遗漏提交文件和三处模糊 stage 范围。
+- G-03 现明确为一次性 pre-implementation 实验：初始可见输入只有 `SPEC.md`/`PLAN.md`，上游实现故意缺席，仅允许在隔离 workspace 创建不合并的最小 scaffold/test double；该例外不适用于批准后的正式派发。冷启动仍须由学生选择不同类型智能体，且修订后再次批准实现。
+- X2、T-03C、DEMO-01B、QA-01C、UI-03C 的文件/红测/依赖范围已修复。静态复验保持 69/69 台账一致、未知依赖 0、环 0、Files/提交命令逆向缺口 0、AC-01..AC-50 缺失 0；仍未执行任何正式实现、测试、构建或 CI。

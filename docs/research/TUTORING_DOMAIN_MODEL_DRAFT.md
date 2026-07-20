@@ -4,7 +4,7 @@
 
 ## 状态
 
-本文依据已确认的产品方向整理候选模块、接口与数据约束；最新 `SPEC.md` 是上位权威。D-013 已确认第一版使用受约束 AI 功能而不包含课程定义的 agent；D-017/D-018 已确认首版 local production 只注册平台内置 OpenAI adapter，不接受任意 endpoint 或第三方 plugin，deterministic mock 只注册于 test/demo；D-019 确认材料白名单，D-020 确认确定性调度方向，精确 `ReviewPolicy v1` 仍是待整体签字的工程候选；D-021/D-022 已确认 Windows x64 本地 WebUI、Credential Manager 与公开 demo 的合成/许可夹具 + mock 数据边界；隔离 session、限额和具体分发/托管仍是待整体签字的工程候选。
+本文依据已确认的产品方向整理候选模块、接口与数据约束；最新 `SPEC.md` 是上位权威。D-013 已确认第一版使用受约束 AI 功能而不包含课程定义的 agent；D-017/D-018 已确认首版 local production 只注册平台内置 OpenAI adapter，不接受任意 endpoint 或第三方 plugin，deterministic mock 只注册于 test/demo；D-019 确认材料白名单，D-020 确认确定性调度方向，精确 `ReviewPolicy v1` 已随整体 SPEC 确认；D-021/D-022 已确认 Windows x64 本地 WebUI、Credential Manager 与公开 demo 的合成/许可夹具 + mock 数据边界；隔离 session、限额和具体分发/托管也已纳入 v1 方向，仍待实现验证。
 
 ## 已确认的输入
 
@@ -18,7 +18,7 @@
 - 课程材料按学期进度增量导入；每批材料先形成候选知识覆盖，经用户确认后才修订未来学习计划，不能清空既有证据。
 - 学期中默认 `continuous` 持续模式；录入考试日期并由用户显式进入后才使用 `finals` 期末周模式。往年卷和老师重点是显式材料角色，不表示模型训练或原题预测。
 - 第一版材料角色仅为 `lecture`、无答案 `past_paper`、`teacher_focus`；三者支持 PDF/图片/文本，老师重点还可手工录入。答案、个人笔记、作业提交、教材和其他角色延期。
-- D-020 已确认确定性调度方向；`SPEC.md` 提出的 `ReviewPolicy v1` 数值/纯函数/fixtures 待整体签字。新证据自动修订/撤销与考后暂停语义已确认。
+- D-020 已确认确定性调度方向；`SPEC.md` 的 `ReviewPolicy v1` 数值/纯函数/fixtures 已随整体签字确认。新证据自动修订/撤销与考后暂停语义已确认。
 - Provider 差异仍由领域外 adapter port 隔离，但第一版不是开放插件平台：local production 只有内置 OpenAI adapter，用户只配置平台 schema 允许的模型、受控参数、预算和 `credential_ref`；`base_url`、任意 endpoint、动态 adapter/plugin 和未知字段在联网前拒绝。deterministic mock 只用于 test/demo。
 - 第一版目标为 Windows x64；Python/FastAPI 后端、React/Vite/TypeScript WebUI 与 SQLite 组成 localhost 应用，secret 通过成熟 keyring 写入 Windows Credential Manager。公开 demo 使用同一领域合同，但只加载合成/明确许可夹具和 deterministic mock。
 
@@ -245,7 +245,7 @@ choose goal
 
 ## 已固定边界与仍待工程验证
 
-- L/P/F、OpenAI、mock-only test/demo、许可夹具演示和 Credential Manager 已确认；M1 数值限制、隔离限额与 `ReviewPolicy v1` 是待整体 SPEC 签字工程候选。
+- L/P/F、OpenAI、mock-only test/demo、许可夹具演示和 Credential Manager 已确认；M1 数值限制、隔离限额与 `ReviewPolicy v1` 也已随整体 SPEC 确认，仍待实现验证。
 - 操作系统真实课件的远端处理/衍生练习权利、原始/派生数据保存期限仍待核验；不影响本地私有测试，但阻塞公开分发真实材料。
 - 互斥/竞态正式题目内容；
 - 模拟练习组卷细则、通知/日历同步和不可用日期等延期功能；

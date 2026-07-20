@@ -12,7 +12,7 @@ D-019 已确认第一版材料白名单为 `lecture`、无答案 `past_paper` �
 
 D-020 已确认第一版使用版本化简单间隔/证据规则、可选每日预算、自动但可撤销的未来任务重排，以及考试本地日期完整结束后的归档/暂停和新目标询问。本审计的页数、字节数和主题分布不能推导任何调度阈值或每日预算默认值。
 
-D-017/D-018 已确认首版 local production 仅注册平台内置 OpenAI adapter，普通配置不接受任意 endpoint/plugin；deterministic mock 仅用于 test/demo。D-021/D-022 已确认 Windows x64 本地版、Windows Credential Manager 和公开 demo 的合成/许可夹具 + mock 数据边界；隔离 session、限额与具体托管是待整体签字的工程候选。真实课件仍只用于本地私有验证，公开 demo 只能使用合成/明确许可夹具。
+D-017/D-018 已确认首版 local production 仅注册平台内置 OpenAI adapter，普通配置不接受任意 endpoint/plugin；deterministic mock 仅用于 test/demo。D-021/D-022 已确认 Windows x64 本地版、Windows Credential Manager 和公开 demo 的合成/许可夹具 + mock 数据边界；隔离 session、限额与具体托管已随整体 SPEC 确认为 v1 方向，仍待实现验证。真实课件仍只用于本地私有验证，公开 demo 只能使用合成/明确许可夹具。
 
 ## 材料概况
 
@@ -77,7 +77,7 @@ D-017/D-018 已确认首版 local production 仅注册平台内置 OpenAI adapte
 6. **期末材料角色**：第一版只允许无答案往年卷和老师给定重点作为后续批次；二者必须与课件区分角色、映射到已确认知识并保留来源/置信度。文件形式支持 PDF、图片和文本，重点还可手工录入；本审计尚未验证这些导入路径。相关分析只覆盖结构、题型、知识点与难度，不包含训练或原题预测。
 7. **版权与隐私**：默认不上传整套课件、不公开缓存、不随应用分发；云端处理范围必须由学生明确确认，新增批次不会继承更宽的临时许可。
 8. **容量基线**：真实样本约 195 MB、932 页，落在 M1 v1 的批次上限（50 文件、1 GiB、5,000 PDF 页）内；这只证明样本规模适配合同，不证明性能达标。v1 还限制 `.pdf` + `application/pdf`/PDF 魔数单文件 256 MiB/2,000 页，PNG/JPEG/WebP 对应标准扩展名/MIME 为 20 MiB/50 megapixels，UTF-8/UTF-8 BOM TXT/Markdown 对应 `text/plain`/`text/markdown` 为 2 MiB，手工重点 1-10,000 code points；任一变化都需新合同版本。
-9. **调度数值边界**：195 MB、932 页和 15 份课件不是调度参数依据。最新 SPEC 独立提出 `ReviewPolicy v1` 数值/纯函数候选，须整体签字；这些数值不宣称源于课件或科学最优。
+9. **调度数值边界**：195 MB、932 页和 15 份课件不是调度参数依据。`ReviewPolicy v1` 数值/纯函数已随整体 SPEC 确认，仍待实现与学习效果验证；这些数值不宣称源于课件或科学最优。
 10. **角色与人工复核**：明确答案/延期角色在正文处理前返回 `unsupported_role`；本地解析后发现疑似答案或泄露迹象进入 `needs_user_review`，远端调用和权威覆盖/计划写入为 0。自动检测不能声称识别全部泄露内容。
 11. **考后与删除**：考试当天仍可学习，仅 `today_local > target_local_date` 后进入 `post_exam_paused`。材料删除后本地正文/页面/抽取/可重建索引不可检索，历史只留不含正文、路径或 provider ID 的 tombstone/失效 locator。
 
@@ -88,7 +88,7 @@ D-011 选择后的首轮来源页只读映射与视觉抽样见 `docs/research/M
 - D-014 已允许 L/P/F 处理路径，但这批真实课件的远端处理权利仍未核验；实际外发继续需要逐文件授权和权利确认；
 - D-019 已确认无答案往年卷与老师重点进入第一版；答案、教材、作业提交、个人笔记和其他考试资料延期，不能借用 `lecture` 角色导入；
 - M1 v1 已固定 PDF/图片/文本/手工输入和批次限制；当前审计只验证 15 个 PDF 落在相关边界内，尚未验证边界夹具、图片/文本/手工重点或无答案往年卷的解析质量与失败语义；
-- `ReviewPolicy v1` 数值、纯函数和 fixtures 是待整体签字候选，尚无实现或学习效果证据；
+- `ReviewPolicy v1` 数值、纯函数和 fixtures 已随整体签字确认，但尚无实现或学习效果证据；
 - Windows Credential Manager、`.env` 禁用、强制清除恢复和公开 demo 隔离是已确认合同，尚未实现验证；真实课件不得进入公开 demo；
 - D-011 已选择互斥与竞态条件作为首个可验收知识点；正式来源页和题目内容仍需在本地选择；
 - 初次导入可以只处理一个批次或主题组；增量批次与知识覆盖确认流程见 `docs/research/INCREMENTAL_COURSE_WORKFLOW.md`，不要求整门课程一次导入。

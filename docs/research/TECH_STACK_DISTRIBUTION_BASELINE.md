@@ -4,9 +4,9 @@
 
 ## 状态
 
-本文记录学生对 D-017、D-018、D-021 至 D-024 选择方案 A 后的已确认边界，以及智能体为满足课程分发/部署硬项提出的工程候选。单文件 `ProjectB.exe`、OCI/Hugging Face 和精确 ReviewPolicy 只有在学生整体确认 `SPEC.md` 后才成为 v1 合同；本文不把它们误记为 D-021/D-022 原答案逐字确认，也不代表实现已完成。
+本文记录学生对 D-017、D-018、D-021 至 D-024 选择方案 A 后的已确认边界，以及智能体为满足课程分发/部署硬项提出的工程候选。学生已整体确认 `SPEC.md`，因此单文件 `ProjectB.exe`、OCI/Hugging Face 和精确 ReviewPolicy 已成为 v1 工程合同；本文不把它们误记为 D-021/D-022 原答案逐字确认，也不代表实现或工程验证已完成。
 
-## 已确认边界与待整体签字工程候选
+## 已确认边界与整体 SPEC 确认的工程方向
 
 | 主题 | 已确认方向 | 尚需证据 |
 | --- | --- | --- |
@@ -14,12 +14,12 @@
 | 本地形态 | 浏览器访问 loopback WebUI；SQLite 保存本地权威状态 | 端口冲突、Host/Origin、CORS、CSRF、路径与并发测试 |
 | 实现栈 | Python/FastAPI 后端 + React/Vite/TypeScript 前端 | 精确版本、许可证、构建集成、性能和单文件冻结验证后才能固化 |
 | 凭据 | 成熟 keyring 适配 Windows Credential Manager | 隐藏录入、仅状态回显、更新、清除、错误脱敏和失败关闭测试 |
-| 本地分发（待整体签字） | Windows x64 单文件原生二进制 `ProjectB.exe`；前端资源内嵌，最终用户无需 Python、Node 或 Docker | 学生整体签字；冻结工具许可证、单文件构建、干净机、Credential Manager、签名/SmartScreen |
-| 公开 WebUI（待整体签字） | 同一合同的 OCI demo；首选 Hugging Face Spaces Docker SDK；内置许可夹具与 HTTPS | 学生整体签字；官方 Docker/HTTPS/休眠/临时存储/费用重核及 build/run/隔离/CI-CD 实测 |
+| 本地分发（已确认方向） | Windows x64 单文件原生二进制 `ProjectB.exe`；前端资源内嵌，最终用户无需 Python、Node 或 Docker | 冻结工具许可证、单文件构建、干净机、Credential Manager、签名/SmartScreen |
+| 公开 WebUI（已确认方向） | 同一合同的 OCI demo；首选 Hugging Face Spaces Docker SDK；内置许可夹具与 HTTPS | 官方 Docker/HTTPS/休眠/临时存储/费用重核及 build/run/隔离/CI-CD 实测 |
 | 公开 provider | 只使用确定性 provider mock；不接受上传、真实 key 或真实 provider egress | mock 场景覆盖，以及上传、secret、provider 网络和私人材料持久化路径均关闭的测试 |
 | 远程仓库 | NJU Git/GitLab 主仓 + GitHub 镜像 | 用户当时授权后才可 push、建立 PR/MR 或配置镜像 |
 | CI | GitLab 精确 job 名 `unit-test` + GitHub Actions，每次 push 运行同一测试入口 | 两个平台的实际成功运行和最后提交对应记录 |
-| UI 工作流 | 安装并使用 Open Design | 当前 `od`、MCP、skill 不可用；须在外部用户环境安装并在新会话验证 |
+| UI 工作流 | 使用已安装的 Open Design 0.15.0；Codex MCP 配置已注册且当前会话暴露工具 | daemon/sidecar 当前不可达，`skillId` 为空且 design system 仍为未确认的 `default`；须重开桌面端、复验工具并由学生确认实际组合 |
 
 ## 本地运行拓扑
 
@@ -51,7 +51,7 @@ Public HTTPS URL
 
 ## 分发完成标准
 
-为满足课程“容器/单文件二进制/包”硬项，当前 SPEC 提议 **Windows x64 单文件原生二进制**；它随整体 SPEC 签字确认。具体冻结工具属于后续工程选择：
+为满足课程“容器/单文件二进制/包”硬项，当前 SPEC 已确认 **Windows x64 单文件原生二进制** 方向。具体冻结工具属于后续工程选择：
 
 - 课程分发产物为单个可直接启动的 `ProjectB.exe`，React/Vite 构建资源及运行所需应用代码均内嵌；运行时创建的 SQLite、缓存与用户材料属于用户数据，不冒充额外分发文件；
 - 一次获取后可在干净 Windows x64 环境启动 localhost WebUI，前后端资源、SQLite 初始化和浏览器打开流程均可复现；
@@ -70,7 +70,7 @@ OCI container 只用于公开 demo 和相应 CI/CD，不取代 Windows 单文件
 - 镜像只含合成或明确许可夹具与 deterministic provider mock，不提供任意上传、路径或 URL 输入；
 - 构建和运行环境均不含真实 key、credential store 或真实 provider 出站权限；
 - 隔离 session 的跨访客读取为零，到期清理和上述并发、存储、材料及速率限额可复现；
-- 首选托管平台为 Hugging Face Spaces Docker SDK。2026-07-20 现场官方复核因 web 上游返回 502、`curl` 连接超时未完成；在 SPEC 签字/部署前必须重新核验 Docker、HTTPS、休眠、临时存储、费用与账号条款，不能把历史印象当作当前证据。若不满足无付费资源边界，必须通过 SPEC 变更选择其他 OCI 平台；创建 Space、push 镜像和部署仍需执行时外部写入授权。
+- 首选托管平台为 Hugging Face Spaces Docker SDK。2026-07-20 现场官方复核因 web 上游返回 502、`curl` 连接超时未完成；在部署前必须重新核验 Docker、HTTPS、休眠、临时存储、费用与账号条款，不能把历史印象当作当前证据。若不满足无付费资源边界，必须通过 SPEC 变更选择其他 OCI 平台；创建 Space、push 镜像和部署仍需执行时外部写入授权。
 
 ## 依赖与许可证门禁
 
@@ -95,6 +95,6 @@ D-023 只批准了仓库与证据策略，不批准当前会话执行远程动�
 
 ## Open Design 外部门禁
 
-学生已选择安装并使用 Open Design，不存在默认绕过路径。当前 `od` 命令、MCP 与 skill 仍不可用，且托管环境不能写入工作区外的用户/系统目录，因此本轮只能记录门禁，不能完成安装。
+学生已选择并安装 Open Design 0.15.0，不存在默认绕过路径。用户配置已包含 `[mcp_servers.open-design]`，当前 Codex 会话也暴露 Open Design MCP 方法；但 `list_skills`、`list_projects` 和 `get_active_context` 均返回 daemon `127.0.0.1:7456` 不可达，现有 Open Design 进程没有 TCP listener，daemon 日志最后记录正常 shutdown。应用配置仍为 `skillId=null`、`designSystemId=default` 且项目位置为空。独立 PowerShell CLI 未加载同一配置的差异作为环境事实保留，不能据此重复注册。
 
-正式 UI 前必须在用户环境完成官方安装与 Codex MCP 接入，在新会话验证工具可用，然后把实际选择的 design system 与 skill 写入 `SPEC.md`。现有需求 mockup 仅是阶段 A 澄清材料，不能作为 Open Design 使用或正式 UI 验收证据。
+正式 UI 前须由用户正常关闭并重新打开 Open Design、保持桌面端运行，再在 Codex 会话复验 `list_skills`、`list_projects` 与 `get_active_context`；不得重复执行旧注册命令。工具真实可用后，由学生确认实际 design system 与 skill，并把选择写入 `SPEC.md`。现有需求 mockup 仅是阶段 A 澄清材料，不能作为 Open Design 使用或正式 UI 验收证据。

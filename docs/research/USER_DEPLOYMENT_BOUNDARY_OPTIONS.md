@@ -19,10 +19,10 @@
 - 课程硬性要求 WebUI，因此基线是浏览器访问 localhost 应用；桌面窗口可作为后续可选壳，但不能替代 WebUI；
 - 第一版不实现注册、登录、多租户、课件分享、资料协作、教师视角或跨设备同步；
 - 核心实体仍使用本地 actor/owner scope，目的是明确归属、支持测试和降低未来迁移风险，不代表实现多用户；
-- D-021 已确认 Windows x64、React/Vite/TypeScript + Python/FastAPI + SQLite 和 Windows Credential Manager；为满足课程分发硬项，SPEC 另提单文件 `ProjectB.exe` 候选，待整体签字；
-- D-022 已确认公开演示只用合成/许可材料与 provider mock、无真实 key；SPEC 另提 OCI、隔离到期 session/限额与 Hugging Face Spaces Docker SDK 候选，待整体签字且当前官方复核受 502/超时阻塞；
+- D-021 已确认 Windows x64、React/Vite/TypeScript + Python/FastAPI + SQLite 和 Windows Credential Manager；整体 SPEC 进一步确认单文件 `ProjectB.exe` 分发方向；
+- D-022 已确认公开演示只用合成/许可材料与 provider mock、无真实 key；整体 SPEC 进一步确认 OCI、隔离到期 session/限额与 Hugging Face Spaces Docker SDK 方向，当前官方复核仍受 502/超时阻塞；
 - D-023 已确认 NJU Git/GitLab 为主仓、GitHub 为镜像，并保留 GitLab `unit-test` 与 GitHub Actions 双 CI 证据；任何远程 push、PR/MR 或镜像操作仍需执行当时的用户授权；
-- D-024 已确认安装并使用 Open Design。当前 `od`、MCP 与 skill 仍不可用，且本执行环境禁止向工作区外安装，因此正式 UI 设计与实现仍受此外部环境门禁约束。
+- D-024 已确认安装并使用 Open Design。桌面端 0.15.0 已安装，Codex MCP 已注册且工具已暴露；当前缺口是 daemon 恢复/复验及实际 design system/skill 选择，正式 UI 设计与实现仍受该运行/选择门禁约束。
 
 ## 共同硬约束
 
@@ -87,7 +87,7 @@ Public HTTPS URL (preferred: Hugging Face Spaces Docker SDK)
 - 本地服务、浏览器打开、端口冲突、系统钥匙串和跨平台打包都要测试；
 - 公开 URL 需要单独的演示配置，必须证明它仍是可体验应用而非静态截图；
 - 公开演示与本地真实模式可能发生配置漂移，必须由同一核心测试套件约束；
-- 正式 UI 前必须在可写用户环境中安装并接入 Open Design，随后记录所选 design system 与 skill；当前需求 mockup 不能替代这项证据；
+- 正式 UI 前必须重开并保持 Open Design daemon 可用，在 Codex 会话复验 MCP 后记录实际所选 design system 与 skill；当前需求 mockup 不能替代这项证据；
 - 跨设备同步不是第一版能力，备份由用户承担或另行设计。
 
 ### 课程 URL 的保守处理
@@ -164,7 +164,7 @@ Browsers
 | `ProviderGateway` | 有界、可取消的页面/片段请求与脱敏结果 | 本地进程调用或服务端调用 |
 | `AuditSink` | 白名单事件元数据 | 本地审计或 tenant 分区审计 |
 
-这些合同边界不依赖精确依赖版本。D-021 已确认 Windows x64、Python/FastAPI + React/Vite/TypeScript、SQLite 和 Windows Credential Manager；单文件 `ProjectB.exe` 是待整体 SPEC 签字的分发候选。精确版本/冻结工具在 PLAN 前按许可证与验证要求固化。
+这些合同边界不依赖精确依赖版本。D-021 已确认 Windows x64、Python/FastAPI + React/Vite/TypeScript、SQLite 和 Windows Credential Manager；单文件 `ProjectB.exe` 已随整体 SPEC 确认为分发方向。精确版本/冻结工具在 PLAN 前按许可证与验证要求固化。
 
 ## 数据位置对比
 
@@ -229,16 +229,16 @@ Browsers
 
 当前证据只证明一个学生、一个真实课程和本地私有课件的需求，没有证明注册、多用户协作或教师端价值。学生据此采用方案 1，使第一版以最小的新信任边界满足真实自用，并把工程深度集中到项目独有难点。
 
-D-017/D-018/D-021 至 D-024 确认内置 OpenAI、Windows 本地栈、许可夹具/mock、双远程 CI 和 Open Design；单文件/OCI/HF/隔离限额是随后写入 SPEC 的待签字工程候选。详见 [`TECH_STACK_DISTRIBUTION_BASELINE.md`](TECH_STACK_DISTRIBUTION_BASELINE.md)。
+D-017/D-018/D-021 至 D-024 确认内置 OpenAI、Windows 本地栈、许可夹具/mock、双远程 CI 和 Open Design；单文件/OCI/HF/隔离限额随后写入 `SPEC.md`，并已随整体 SPEC 确认成为 v1 工程方向。它们仍须通过许可证、官方条款、构建、运行和安全验证。详见 [`TECH_STACK_DISTRIBUTION_BASELINE.md`](TECH_STACK_DISTRIBUTION_BASELINE.md)。
 
 选择方案 2 的充分理由应是“跨设备和统一公开实例是首版核心价值”，而不仅是部署看起来方便。选择方案 3 的充分理由应来自真实的第二类用户或多人隔离需求，而不是为了让项目显得更大。
 
 ## 已确认方向与后续验证
 
-1. `SPEC.md` 已同步目标用户、数据位置、owner 语义及 D-017 至 D-024；当前等待外部工具/平台复核、学生反思和整体签字；
+1. `SPEC.md` 已同步目标用户、数据位置、owner 语义及 D-017 至 D-024，并已由学生整体确认；当前等待外部工具/平台复核、学生本人反思和工程验证；
 2. 凭据后端已选 Windows Credential Manager + 成熟 keyring 适配，但首次录入、状态、更新、清除和失败关闭仍需 TDD 证明；
 3. 本地运行不引入登录；loopback、Host/Origin、CORS 与 CSRF 边界仍需实现和测试；
-4. 首版提议 Windows x64 单文件 `ProjectB.exe`，随整体 SPEC 签字确认；具体冻结工具按许可证与干净机证据选择；
-5. 公开 demo 提议 OCI + Hugging Face Spaces Docker SDK，随整体签字确认；官方条款复核、账号、URL、CI/CD 和可访问性尚未执行；
+4. 首版 Windows x64 单文件 `ProjectB.exe` 已随整体 SPEC 确认；具体冻结工具按许可证与干净机证据选择；
+5. 公开 demo 的 OCI + Hugging Face Spaces Docker SDK 方向已随整体 SPEC 确认；官方条款复核、账号、URL、CI/CD 和可访问性尚未执行；
 6. 双平台仓库/CI 策略已定，但远程 push、PR/MR、镜像与部署仍需执行当时授权；
-7. Open Design 使用方向已定，但必须先在工作区外完成安装/MCP 接入并在新会话验证，之后才能选择 design system/skill 和开始正式 UI。
+7. Open Design 0.15.0 与 Codex MCP 注册均已存在；必须先恢复 daemon、复验 MCP，并由学生选择 design system/skill 后才能开始正式 UI。

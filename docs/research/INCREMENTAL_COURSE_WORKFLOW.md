@@ -10,7 +10,7 @@
 导入课件 -> 确认可以学习/复习的知识 -> 筹划学习计划 -> 引导用户学习
 ```
 
-该流程会随新材料反复运行。D-019 已确认材料白名单，D-020 已确认保守确定性方向；最新 `SPEC.md` 提出的 `ReviewPolicy v1` 精确规则等待整体签字。D-017/D-018 限定内置 OpenAI，D-021/D-022 固定 Windows x64/Credential Manager 与许可夹具 + mock 的公开演示边界；隔离 session 数值属于签字候选。
+该流程会随新材料反复运行。D-019 已确认材料白名单，D-020 已确认保守确定性方向；最新 `SPEC.md` 的 `ReviewPolicy v1` 精确规则已随整体签字成为 v1 合同。D-017/D-018 限定内置 OpenAI，D-021/D-022 固定 Windows x64/Credential Manager 与许可夹具 + mock 的公开演示边界；隔离 session 数值也已纳入 v1 方向，仍须实现验证。
 
 “拟合往年卷”在本文中只表示分析题型、知识点覆盖、难度和结构分布，并据此挑选或生成同类练习。它不表示训练/微调模型，不承诺预测考试原题，不处理泄露资料，也不把文件自动发送给任何远端服务。
 
@@ -167,7 +167,7 @@ candidate coverage
 
 ## 已固定边界与延期项
 
-- MIME/批次限制与 `ReviewPolicy v1` 数值/纯函数是最新 SPEC 的工程候选，须整体签字后才成为版本化合同；不声称学习效果最优。
+- MIME/批次限制与 `ReviewPolicy v1` 数值/纯函数已随最新 SPEC 整体确认成为版本化合同；仍不声称学习效果最优。
 - 第一版 local production 仅注册内置 OpenAI adapter；mock 仅在 test/demo 注册，不存在任意 endpoint/plugin 配置入口。
 - 材料权利确认、原始/派生数据保存期限和具体 OpenAI 动态政策快照仍需运行前核验；删除后历史只允许保留不能重建正文、路径或 provider ID 的 tombstone/失效 locator。
 - 模拟练习的组卷细则、通知/日历同步和不可用日期等延期功能；

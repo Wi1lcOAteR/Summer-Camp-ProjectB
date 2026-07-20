@@ -2,11 +2,11 @@
 
 ## 当前真正开放的人工事项
 
-- **现在的课程门禁**：学生明确确认完整 `SPEC.md`。D-017 至 D-024 已全部确认，不应再次提问；签字前不得调用 `writing-plans`。
-- **随整体签字确认的工程候选**：D-020 的精确 `ReviewPolicy v1`、Windows x64 单文件 `ProjectB.exe`、OCI demo 与 Hugging Face Spaces Docker SDK 不是原 D-020/D-021/D-022 选项中逐字确认的细节；它们以清晰候选/风险写入 SPEC，只有学生确认完整 SPEC 后才成为 v1 合同。
+- **已解除的产品方向门禁**：学生于 2026-07-20 明确确认完整 `SPEC.md`；D-017 至 D-023 与 D-024 的“安装并使用 Open Design”方向已纳入 v1，不应重复提问。D-024 新增的具体 `frontend-design + default/shadcn` 组合仍需学生确认。`PLAN.md` 已按上游 `writing-plans` 规则通过透明 fallback 生成并审查，但当前会话仍缺少正式 `superpowers:writing-plans` 调用证据。
+- **已确认但仍需工程验证的合同**：D-020 的精确 `ReviewPolicy v1`、Windows x64 单文件 `ProjectB.exe`、OCI demo、隔离限额与 Hugging Face Spaces Docker SDK 已随整体 SPEC 确认；它们仍须通过许可证、官方条款、构建/运行和安全验证，不能把“已确认方向”写成“已实现”。
 - **学生本人过程证据**：课程审计要求学生用自己的话评价 brainstorming 的优点、不足与关键取舍；当前尚未提供，AI 不得代写或推断成学生观点。
-- **阶段 C 前的产品外决定**：D-005 冷启动智能体类型/账号，由学生在 `SPEC.md` 与 `PLAN.md` 完成后选择。
-- **外部环境门禁**：D-001 在阶段 B 新会话注册 Superpowers；D-024/D-003 在正式 UI 前安装 Open Design、执行 `od mcp install codex` 并验证 MCP/skill。它们不是仍待选择的产品方案。
+- **当前阻断信号**：阶段 B 的内容已形成，但正式 `writing-plans` 流程证据尚未闭合；D-005 类型可并行选择，但执行阶段 C/G-03 前必须先恢复正式 skill 调用，或取得课程明确接受 fallback 的证据。冷启动修订和学生再次批准前不能进入实现。
+- **外部环境门禁**：D-001 的正式 Superpowers skill 证据仍缺；D-024/D-003 的 MCP 注册已写入且工具已暴露，但 daemon 当前不可达，正式 UI 前还要恢复 daemon、复验并确认实际 design system/skill。Open Design 桌面端已经安装，当前是运行/选择问题，不是安装问题。
 - **执行时授权**：公开 demo 首选 Hugging Face Spaces Docker SDK，但官方页面复核受 502/超时阻塞；恢复联网后先核验当前 Docker/HTTPS/费用/临时存储，再由学生授权账号/部署。NJU Git/GitLab、GitHub 的建仓、push、PR/MR、镜像和远程 CI 配置也须当时授权。
 - **工程核验而非学生决策**：OpenAI SDK/依赖许可证、动态数据政策、模型/容量/费用、材料权利、打包兼容性和干净机/浏览器/CI 证据。它们必须真实验证，但不应伪装成新的产品选择题。
 
@@ -21,11 +21,11 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
 补充：无
 ```
 
-结果：OpenAI 参考 adapter；仅内置 adapter；基础期末材料范围；保守确定性调度；Windows x64/Python+React/SQLite/Credential Manager；合成或许可演示数据 + provider mock；NJU Git/GitLab 主仓 + GitHub 镜像和双 CI；安装并使用 Open Design。具体远程 push/PR/部署仍须执行时授权，Open Design 路线虽已选但安装环境尚未就绪。
+结果：OpenAI 参考 adapter；仅内置 adapter；基础期末材料范围；保守确定性调度；Windows x64/Python+React/SQLite/Credential Manager；合成或许可演示数据 + provider mock；NJU Git/GitLab 主仓 + GitHub 镜像和双 CI；安装并使用 Open Design。具体远程 push/PR/部署仍须执行时授权；Open Design 桌面端与 MCP 已安装/注册，但 daemon 和实际 skill/design system 仍未就绪。
 
 ## D-001 — Superpowers 安装与会话注册
 
-**状态：安装阻塞已解除。2026-07-19 复查确认官方插件缓存中存在 Superpowers v6.1.1 及完整核心 skills；此前会话已记录触发 `using-superpowers` 与 `brainstorming`。本次会话未将这些 skills 暴露到可调用清单，属于证据/注册限制，不再阻塞继续阶段 A 的逐项澄清，但在后续正式调用 `writing-plans` 前必须确认新会话能注册 Superpowers。**
+**状态：安装阻塞已解除。2026-07-19 复查确认官方插件缓存中存在 Superpowers v6.1.1 及完整核心 skills；此前会话已记录触发 `using-superpowers` 与 `brainstorming`。当前会话仍未把这些 skills 暴露到可调用清单。阶段 B 已完整读取上游 `writing-plans` 规则并用透明 fallback 生成 `PLAN.md`，但这不等于正式 skill 调用证据；后续新会话仍需修复注册并继续全流程留证。**
 
 - **问题**：插件已安装，但本次会话的可调用 skill 清单未注册 `superpowers:*`。
 - **为什么必须由你处理**：Codex 的插件启用与会话注册发生在应用层；当前项目工作区不能修改该状态。
@@ -34,11 +34,11 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
   2. 在 Codex App 的 Plugins 中确认 Superpowers 已启用后，再新建项目会话。
   3. 使用 Codex CLI `/plugins` 确认安装并重新进入项目会话。
 - **推荐方案及影响**：方案 1 不丢失当前 brainstorming 过程，同时确保 `writing-plans` 有正式调用证据。
-- **阻塞范围**：不阻塞阶段 A 的问题澄清；阻塞阶段 B 的 `writing-plans` 正式调用。
+- **阻塞范围**：不阻塞已有 `PLAN.md` fallback 草案的审查或 D-005 选择；但它阻塞阶段 B 正式闭合与 G-03 冷启动执行。恢复正式调用或取得课程明确接受 fallback 的证据前，不能把阶段 B 标为完成。
 
-## D-002 — AI 辅助场景的产品主线（已选择，待 SPEC 整体签字）
+## D-002 — AI 辅助场景的产品主线（已选择，SPEC 已整体确认）
 
-**状态：2026-07-19 学生回复“主线走 2 试试看”，选择学习辅导；后续 D-006 至 D-024 已把首版设计收敛为当前 `SPEC.md`。仍需整体签字，但本项不再开放重问。**
+**状态：2026-07-19 学生回复“主线走 2 试试看”，选择学习辅导；后续 D-006 至 D-024 已把首版设计收敛为当前 `SPEC.md`。2026-07-20 学生明确确认完整 `SPEC.md`，本项不再开放重问。**
 
 - **已知输入**：学生会反复使用模型帮助完成作业/项目、辅导学习和查找资料。
 - **问题**：三类需求目前过宽；需要选定一个首要场景，才能继续识别真实痛点、目标用户和可验收结果。
@@ -73,7 +73,7 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
   3. **对话彼此孤立，学习没有连续性** — 模型不追踪目标、进度、遗忘和复习计划，每次都从头开始。
 - **推荐方案及影响**：方案 1 最直接区别于“帮我答题”的普通聊天，也能自然引出诊断、引导练习和掌握度验证三个协作模块；但仍须由学生确认它是否真是最常遇到的问题。
 - **选择影响**：产品暂定围绕两个连续环节设计：先根据学生已有理解提供适配解释，再把知识点掌握状态转化为后续复习安排。必须避免把二者做成两个互不关联的聊天功能。
-- **阻塞范围**：已解除；课程、模块、行为与验收已在后续条目和 `SPEC.md` 收敛，当前只等待 SPEC 整体签字。
+- **阻塞范围**：已解除；课程、模块、行为、验收与整体规约均已确认，后续只受 Superpowers/Open Design 工具接入和实现顺序门禁约束。
 
 ## D-007 — 首个真实课程验证场景（已选择）
 
@@ -122,7 +122,7 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
 - **模型影响**：领域模型把材料状态设为 `awaiting_policy`，并把课程级 `ProcessingPolicy` 与每次扩大外发的追加式 `ConsentRecord` 分离；详见 `docs/research/TUTORING_DOMAIN_MODEL_DRAFT.md`。D-009 已确认这一步强制交互并按课程记住。
 - **选择结果**：采用方案 1。首次导入依次检查课程、选择处理方式、确认权限、进入课程；无选择时不开始正文解析或上传。设置按课程保存，低保真检测只提示，不静默升级模式。
 - **视觉方向**：桌面端与移动端均使用顶部 X 轴四阶段时间线；主要结论通过字号、颜色、字重与字体区分，次要信息降级；熟悉图标配合短句替代冗长说明；完成页高强调展示“课程设置 › 材料与隐私”。
-- **阻塞范围**：首次导入交互与视觉层级已经解除；D-024 已选使用 Open Design，但外部安装/MCP/skill 验证仍阻塞正式 design system 和 UI 实现；浏览器视觉验收尚未执行。
+- **阻塞范围**：首次导入交互与视觉层级已经解除；D-024 已选并安装 Open Design，MCP 也已注册，但 daemon 与实际 design system/skill 选择仍阻塞正式 UI 实现；浏览器视觉验收尚未执行。
 
 ## D-010 — 第一版用户与运行边界（已确认）
 
@@ -138,7 +138,7 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
 - **工程对比证据**：`docs/research/USER_DEPLOYMENT_BOUNDARY_OPTIONS.md` 逐项比较三种路线的拓扑、数据位置、凭据、公开 WebUI、测试、迁移和返工风险，并列出不随选择变化的核心合同。
 - **选择结果**：采用方案 1。第一版只有本地 actor，不实现注册、登录、账号找回或多租户隔离；核心实体仍保留明确 owner/actor scope 以便测试归属和未来迁移。私有课件、学习状态和索引默认保存在本机，只有按课程策略确认的页面/片段可调用远端 provider。
 - **延期范围**：多用户账号、课件分享、资料协作、教师视角和跨设备同步均不进入第一版；它们是未来方向，不应提前增加数据库或 UI 范围。
-- **阻塞范围**：D-010 已解除目标用户、认证和数据位置方向的阻塞；D-021/D-022 已确认 Windows x64、本地 WebUI、Windows Credential Manager 与公开 mock 数据边界。单文件分发、具体打包器、托管平台和部署动作仍按整体签字、证据与执行授权处理。
+- **阻塞范围**：D-010 已解除目标用户、认证和数据位置方向的阻塞；D-021/D-022 已确认 Windows x64、本地 WebUI、Windows Credential Manager、公开 mock 数据、单文件分发和 OCI/Hugging Face 方向。具体打包器、平台官方条件与部署动作仍按工程证据及执行授权处理。
 
 ## D-011 — “看懂 + 复习”的首个知识点（已确认）
 
@@ -280,7 +280,7 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
   2. 自适应算法 — 使用 FSRS/BKT 类间隔和自动重排，用户设置每日上限；学习效果潜力更高，但解释、参数和验证成本更大。
   3. 手动优先 — 每次计划重排都要求用户确认，系统只给建议；风险最低，但持续安排价值明显减弱。
 - **原阻塞范围**：M3 规则版本、任务粒度、虚拟时钟测试、期末 UI 和计划验收。
-- **确认后的范围**：已确认每日预算可选、确定性简单规则、无 FSRS/BKT、未来任务自动修订/撤销和考后暂停。**由工程分析新增、待整体 SPEC 签字**：预算 10–480、30/90 默认、`[1,3,7,14,30]` 间隔、纯函数/排序/fixtures 与严格 `today_local > target_local_date` 边界。
+- **确认后的范围**：已确认每日预算可选、确定性简单规则、无 FSRS/BKT、未来任务自动修订/撤销和考后暂停。**整体 SPEC 已确认的 v1 合同**：预算 10–480、30/90 默认、`[1,3,7,14,30]` 间隔、纯函数/排序/fixtures 与严格 `today_local > target_local_date` 边界；实现仍需验证。
 
 ## D-021 — 本地运行与技术/凭据预设（已确认：Windows x64 优先）
 
@@ -293,7 +293,7 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
   3. 容器优先 — Docker 运行本地/远端服务，凭据用受控 secret 注入或加密文件；跨平台获取容易，但与本地 OS 凭据和私有课件边界冲突更大。
 - **说明**：选择预设后，语言内的小型库、目录结构和 SQLite schema 仍由工程实现按许可证/测试证据选择；不会因此默认引入桌面壳或多用户服务。
 - **原阻塞范围**：SPEC 技术选型、凭据后端、分发脚本、CI 构建矩阵和 localhost 安全实现。
-- **确认后的范围**：后端使用 Python/FastAPI，前端使用 React/Vite/TypeScript，持久化 SQLite；secret 通过成熟 keyring 适配 Windows Credential Manager，普通 config 仅保存引用；macOS/Linux 延期。**由工程分析新增、待整体 SPEC 签字**：单文件 Windows x64 `ProjectB.exe`，最终用户无需 Python/Node/Docker。Python 3.13 只是兼容性候选；精确依赖/解释器/冻结工具在 PLAN 前按许可证与矩阵证据锁定。
+- **确认后的范围**：后端使用 Python/FastAPI，前端使用 React/Vite/TypeScript，持久化 SQLite；secret 通过成熟 keyring 适配 Windows Credential Manager，普通 config 仅保存引用；macOS/Linux 延期。**整体 SPEC 已确认的 v1 分发方向**：单文件 Windows x64 `ProjectB.exe`，最终用户无需 Python/Node/Docker。Python 3.13 只是兼容性候选；精确依赖/解释器/冻结工具在 PLAN 前按许可证与矩阵证据锁定。
 
 ## D-022 — 公开 WebUI 演示数据与 provider（已确认：合成/许可数据 + mock）
 
@@ -305,7 +305,7 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
   2. 合成/许可材料 + 可选用户自带 key — key 只在浏览器会话中使用且不落服务器；实现和安全说明更复杂。
   3. 公开实例使用项目持有的真实 provider key — 费用、滥用和凭据风险不可接受，不建议也不作为默认实现。
 - **原阻塞范围**：公开部署拓扑、README URL、演示夹具许可证、CI/CD 和凭据威胁模型。
-- **确认后的范围**：公开实例展示与本地版相同的核心 WebUI/状态机，但只用许可夹具与 mock；关闭真实凭据/provider egress。**由工程分析新增、待整体 SPEC 签字**：OCI container、隔离到期 session/限额和 Hugging Face Spaces Docker SDK；当前官方复核受 502/超时阻塞，无付费边界不满足时走 SPEC 变更。账号/部署仍需执行时授权。
+- **确认后的范围**：公开实例展示与本地版相同的核心 WebUI/状态机，但只用许可夹具与 mock；关闭真实凭据/provider egress。**整体 SPEC 已确认的 v1 demo 方向**：OCI container、隔离到期 session/限额和 Hugging Face Spaces Docker SDK；当前官方复核受 502/超时阻塞，无付费边界不满足时走 SPEC 变更。账号/部署仍需执行时授权。
 
 ## D-023 — 远程仓库与 CI 证据策略（已确认：双平台）
 
@@ -319,27 +319,30 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
 - **原阻塞范围**：CI 文件、worktree/PR 证据、最终提交链接与最后一次 pass 记录。
 - **确认后的范围**：NJU Git/GitLab 是课程提交权威；GitHub 镜像保留通用要求的 PR/Actions 证据。两套 CI 共享同一一键测试命令，GitLab job 名严格为 `unit-test`。当前授权不包含远程 push、建 PR 或创建仓库，这些操作仍需执行时确认。
 
-## D-024 — Open Design 环境门禁（路线已确认，安装仍阻塞）
+## D-024 — Open Design 环境门禁（MCP 已注册，daemon 与选择仍阻塞）
 
-**状态：2026-07-20 学生批量回复“全A”，选择安装并使用官方 Open Design。当前 `od`/MCP/skill 仍不可用，安装需要工作区外写入，托管环境不能合规执行。**
+**状态：2026-07-20 学生已完成 MCP 注册；用户配置和当前工具清单均出现 Open Design，但直接调用 `list_skills`、`list_projects`、`get_active_context` 都返回 daemon `127.0.0.1:7456` 不可达。Open Design 的 `skillId` 仍为空、design system 仍为未确认的 `default` 配置值，项目位置为空。阶段 B 计划目前为 41 个 planning group、69 个 dispatch unit。**
 
-- **问题**：当前 `od`、Open Design MCP/skill 仍不可用；正式 UI 前如何处理？
+- **问题**：MCP 配置已写入，但 daemon 未就绪，且实际 skill/design system 尚未选择；正式 UI 前采用哪一组？
+- **为什么必须由你决定**：skill/design system 会约束整个 WebUI 的视觉与交互合同；智能体可以比较适配度，但不能把候选静默写成学生确认。daemon 重启也需要你在桌面端完成，因为 Computer Use 对 Open Design 的启动未获批准。
 - **候选方案**：
-  1. **推荐：你安装官方 Windows x64 v0.15.0 并运行 `od mcp install codex`**，新会话验证后选择 design system/skill。
-  2. 明确批准偏离 Open Design — 在 `AGENT_LOG.md` 记录课程原文“强烈推荐”与仓库更严格规则的取舍，并承担 UI 过程证据缺口。
-  3. 暂缓安装 — 只允许继续文档/研究；正式 UI 和 PLAN task 仍不能开始。
+  1. **推荐：`frontend-design` + `default`（Neutral Modern）**；生成真实 React/app 工作台，并加入项目覆盖：卡片半径最多 8px、letter-spacing=0、紧凑信息密度。实现后另用 `web-design-guidelines` 审查。
+  2. `frontend-design` + `shadcn`；组件更紧凑、默认 8px radius，但视觉更单色，需要严格把 success/warn/error 只用于状态。
+  3. 先运行 `design-brief` 生成自定义 design system；自由度高但会新增一次重大视觉确认，并可能与已确认 UI 约束冲突。
+- **推荐方案及影响**：方案 1 的 skill 是完整 bundled Apache-2.0 工作流，design system 明确用于 B2B tools/dashboard/utility；无需安装 catalog-only 的上游包，最小化新增依赖。`ui-ux-pro-max` 等当前只是一页 stub，不选。完整比较见 [`docs/research/OPEN_DESIGN_SKILL_OPTIONS.md`](docs/research/OPEN_DESIGN_SKILL_OPTIONS.md)。
+- **恢复动作**：手动关闭并重新打开 Open Design，保持窗口打开；配置里的 `OD_SIDECAR_IPC_PATH` 会发现桌面 daemon 的动态端口，避免回退到默认 7456。在新 Codex task 验证 `list_skills`/`list_projects` 不再返回 daemon unreachable。若仍失败，保留 daemon 日志，不重复安装 MCP。
 - **原阻塞范围**：正式 WebUI 设计系统、UI 实现和视觉验收；不阻塞继续整理非 UI 的阶段 A 文档。
-- **确认后的动作**：学生在本机运行已核验的官方 v0.15.0 安装器，再执行 `od mcp install codex` 并新建会话验证；之后由 Open Design 选择/记录 design system 和 skill。安装完成前不得开始正式 UI 实现，现有 HTML 仍只是 brainstorming mockup。
+- **阻塞范围**：不阻塞计划审查或 D-005 选择；阻塞 G-01 完成、正式 UI task 和 Open Design/浏览器视觉证据。现有 HTML 仍只是 brainstorming mockup。
 
-## D-003 — 安装 Open Design（D-024 的历史别名；外部门禁）
+## D-003 — Open Design 接入（D-024 的历史别名；外部配置门禁）
 
-**状态更新：D-024 已确认安装并使用 Open Design，本项不再保留“不使用”的开放选择。项目根目录已有官方 v0.15.0 Windows x64 安装器及同名 `.sha256`；2026-07-19 复算 SHA-256 一致（`63fc2e...f6b5`），安装器未签名，与上游 Windows 发布说明一致。`od`、Open Design MCP 和 MCP resources/templates 仍不可用，说明尚未安装/接入。安装器已被精确加入 `.gitignore`，避免 309 MB 二进制误提交。**
+**历史快照（已被 D-024 更新）：此前曾记录配置未注册；当前应以 D-024 的“已注册但 daemon 不可达”事实为准。**
 
-**视觉 brainstorming 更新：学生要求查看首次导入界面。Superpowers visual companion 服务先因 Git Bash PATH 缺失失败，修正后又因本机拒绝绑定 `127.0.0.1:55535`（EACCES）失败；`od` 仍不存在。已降级为自包含 HTML + Playwright/Edge 截图，只用于需求澄清，不替代 Open Design 正式流程。**
+**历史视觉 brainstorming 快照：当时 Superpowers visual companion 先因 Git Bash PATH 缺失失败，修正后又因本机拒绝绑定 `127.0.0.1:55535`（EACCES）失败；当时 Open Design MCP 尚未注册。当前已由 D-024 更新为“已注册、daemon 不可达、实际组合待确认”。已有自包含 HTML + Playwright/Edge 截图只用于需求澄清，不替代 Open Design 正式流程。**
 
-- **问题**：课程最终要求 WebUI，而本项目约束规定含 UI 时使用 Open Design；当前 `od`、skill 与 MCP 均不可用。
-- **为什么必须由你处理**：安装会写入项目工作区之外的用户/系统目录并可能触发 SmartScreen；当前执行环境只允许写项目目录且不能申请提权，不能合规完成该动作。
-- **确认后的动作**：学生在本机安装官方 Windows x64 v0.15.0，运行 `od mcp install codex`，再新建 Codex 会话验证 MCP/skills；之后把实际 design system 与 skill 记录进 `SPEC.md`。
+- **历史问题**：课程最终要求 WebUI，而本项目约束规定含 UI 时使用 Open Design；当时桌面端已安装但 Codex MCP 尚未接入。
+- **历史处理**：MCP 注册发生在项目工作区之外，已由用户随后完成；不要再次执行旧注册命令。
+- **当前动作**：以 D-024 为准，恢复 daemon 后验证 MCP，并由学生确认实际 design system 与 skill，再记录进 `SPEC.md`。
 - **阻塞范围**：不再阻塞 UI 方向选择；仍阻塞正式 UI task、实现和 Open Design/浏览器视觉证据。
 
 ## D-004 — 远程平台策略（D-023 的历史别名；已确认）
@@ -357,10 +360,13 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
 
 ## D-005 — 冷启动智能体类型（后续门禁）
 
+**状态：`SPEC.md` 与 fallback `PLAN.md` 内容已具备，D-005 可先选择；但正式 `writing-plans` 过程证据未闭合，G-03 仍不得执行。**
+
 - **问题**：当前未检测到 `claude`，而冷启动必须使用不同类型智能体的新 session。
 - **为什么必须由你决定**：可能涉及安装并登录另一种智能体，且只能由学生控制账号与授权。
 - **候选方案**：
   1. **推荐：Claude Code + Superpowers**，与主开发 Codex 类型不同，课程材料也明确举例支持。
   2. 使用另一种课程允许的智能体（Cursor Agent、Gemini CLI、OpenCode 等），确保全新 session 且仅提供 SPEC/PLAN。
-- **推荐方案及影响**：方案 1 与现有准备文档一致；可在 PLAN 完成前再安装。
-- **阻塞范围**：不阻塞阶段 A/B；阻塞阶段 C 冷启动验证。
+- **推荐方案及影响**：方案 1 与现有准备文档一致；需要学生自行控制安装、登录和账号授权。若已有 Cursor/Gemini/OpenCode 等不同类型工具，方案 2 可减少安装工作，但仍必须全新 session 且只给 `SPEC.md` 与 `PLAN.md`。
+- **执行边界**：G-03 是正式实现前的一次性可理解性实验，初始只能看 `SPEC.md` 与 `PLAN.md`。其候选 unit 的正式依赖此时故意尚未实现，冷启动只能创建不合并的最小临时 scaffold/test double；普通依赖规则在后续正式派发时重新生效。
+- **阻塞范围**：阶段 A/B 已完成到可审查计划；本项阻塞阶段 C 冷启动验证，继而阻塞规约修订后的实现批准。
