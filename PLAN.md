@@ -92,9 +92,9 @@ There are 41 planning groups and 69 dispatch units (the 17 groups marked `Task G
 | ID | Deliverable | Dependencies | Parallel group | Status / commit |
 | --- | --- | --- | --- | --- |
 | G-01 | Open Design environment/MCP/selection gate | SPEC confirmed | G | [x] PASS；commit `b93c096db29f7b957950a0cfc74b80170a38d25a` |
-| G-02A | Toolchain/dependency/license baseline | SPEC confirmed | G | [ ] 尚未执行 |
-| G-02B | Provider policy/capability/cost evidence | G-02A | G | [ ] 尚未执行 |
-| G-02C | Distribution/hosting evidence | G-02A | G | [ ] 尚未执行 |
+| G-02A | Toolchain/dependency/license baseline | SPEC confirmed | G | [ ] PENDING; evidence ledger created, required dependency/license rows explicitly blocked |
+| G-02B | Provider policy/capability/cost evidence | G-02A | G | [ ] PENDING; official policy rows verified, pricing/F capability rows explicitly blocked |
+| G-02C | Distribution/hosting evidence | G-02A | G | [ ] PENDING; freezer, immutable OCI digest, and host rows explicitly blocked |
 | G-03 | Fresh-agent cold start and implementation approval | formal writing-plans evidence, G-01 PASS, G-02A/B/C PASS | G | [ ] 尚未执行 |
 | G-04 | Worktree/branch ownership map | G-03 approved | G | [ ] 尚未执行 |
 | T-01 | Reproducible project/test scaffold | G-01 PASS/G-02A PASS/G-03 approved/G-04 | F | [ ] 尚未执行 |
@@ -226,7 +226,7 @@ Evidence commit: `b93c096db29f7b957950a0cfc74b80170a38d25a` (`docs: correct Open
 
 **Dependencies / parallelism:** May run beside G-01. It must finish before T-01, X2-02, DIST-01, DIST-02, or any statement about provider fees/licenses. Never write “supported”, “free”, “licensed”, or “exactly once” without a cited current source and test evidence.
 
-- [ ] **Step 1: Add a failing evidence validator**
+- [x] **Step 1: Add a failing evidence validator**
 
 Create scripts/verify_evidence.ps1 that exits nonzero unless every required row has an exact version, source URL, license, verification date, and status verified or explicitly-blocked; it must reject rows containing a real secret or a blank source.
 
@@ -238,11 +238,15 @@ powershell -ExecutionPolicy Bypass -File scripts/verify_evidence.ps1
 
 Expected: FAIL because the evidence files and required rows do not yet exist.
 
-- [ ] **Step 2: Fill the evidence rows from authoritative sources**
+Observed red run on 2026-07-21: `EVIDENCE_VALIDATION_FAIL errors=3 rows=0`; the three evidence files were absent. A PowerShell interpolation error found in the first attempt was fixed before accepting this red evidence.
+
+- [x] **Step 2: Fill evidence rows or record explicit blockers**
 
 Record the selected compatible versions only after checking official release/compatibility pages and license texts. Record OpenAI policy snapshots for Responses, abuse monitoring, prompt cache, file safety review, Files, Vector Stores, deletion/expiry, region and pricing; distinguish “unknown/not verified” from a positive claim. Record Hugging Face Docker SDK terms, HTTPS/idle storage/quotas/cost, and the fallback SPEC-change procedure if the no-paid-resource boundary fails. Record the freezer's license and clean-machine constraints. Do not include private course PDFs.
 
-- [ ] **Step 3: Run the validator to green**
+Observed evidence ledgers: `docs/engineering/DEPENDENCY_BASELINE.md`, `PROVIDER_POLICY_EVIDENCE.md`, and `DISTRIBUTION_EVIDENCE.md`. OpenAI policy rows are current official-doc evidence; dependency, SDK, freezer, immutable OCI digest, and hosting rows remain explicitly blocked where first-party retrieval or project-lock evidence was unavailable.
+
+- [x] **Step 3: Run the validator to green**
 
 Run:
 
@@ -251,6 +255,8 @@ powershell -ExecutionPolicy Bypass -File scripts/verify_evidence.ps1
 ~~~
 
 Expected: PASS with a row count and no secret findings. If any provider, license, fee, or hosting fact remains unavailable, it stays explicitly blocked and the dependent task cannot claim completion.
+
+Observed green run on 2026-07-21: `EVIDENCE_VALIDATION_PASS rows=37 explicitly_blocked=28`. This is a schema/source/secret-scan pass only; G-02A, G-02B, and G-02C remain pending because 28 required rows are explicitly blocked.
 
 - [ ] **Step 4: Review and commit**
 
@@ -268,8 +274,8 @@ Group review checks AC-20, AC-39, AC-48, AC-49 and AC-50 after G-02A/B/C. Qualit
 
 **Dependencies / parallelism:** Requires confirmed SPEC. It owns the shared validator and completes before G-02B/G-02C or T-01.
 
-- [ ] **Red:** create the validator first and run `powershell -ExecutionPolicy Bypass -File scripts/verify_evidence.ps1`; expected FAIL because the dependency baseline rows are absent.
-- [ ] **Green/refactor:** verify exact versions/licenses from authoritative sources, populate dependency rows, then rerun the validator. A required incompatible/unverified item leaves the unit pending.
+- [x] **Red:** create the validator first and run `powershell -ExecutionPolicy Bypass -File scripts/verify_evidence.ps1`; expected FAIL because the dependency baseline rows are absent. Observed `EVIDENCE_VALIDATION_FAIL errors=3 rows=0`.
+- [ ] **Green/refactor:** verify exact versions/licenses from authoritative sources, populate dependency rows, then rerun the validator. A required incompatible/unverified item leaves the unit pending. Current ledger has explicitly-blocked dependency rows; no project lockfile was created.
 - [ ] **Reviews:** SPEC review AC-07, AC-10, AC-40, AC-43; quality review source authority, compatibility, transitive licenses, retrieval dates, and no credentials. Critical findings block T-01/G-02B/C.
 - [ ] **Commit:** `git add -- docs/engineering/DEPENDENCY_BASELINE.md scripts/verify_evidence.ps1`; run `git diff --cached --check`; commit with `git commit -m "docs(G-02A): lock toolchain and license baseline [agent: <fresh-agent-id>]"`.
 
@@ -285,8 +291,8 @@ Group review checks AC-20, AC-39, AC-48, AC-49 and AC-50 after G-02A/B/C. Qualit
 
 **Dependencies / parallelism:** Requires G-02A. It may run beside G-02C with serialized validator edits. X2-02/X2-03C/INT-01 depend on this unit.
 
-- [ ] **Red:** add provider-required-row assertions and run the validator; expected FAIL because provider rows are absent.
-- [ ] **Green/refactor:** populate rows only from current official sources, distinguish unknown from support, then rerun the validator. Any v1-required capability/policy/cost row blocked leaves G-02B pending.
+- [x] **Red:** add provider-required-row assertions and run the validator; expected FAIL because provider rows were absent in the initial red run.
+- [ ] **Green/refactor:** populate rows only from current official sources, distinguish unknown from support, then rerun the validator. Any v1-required capability/policy/cost row blocked leaves G-02B pending. Current OpenAI policy rows are verified, but pricing preflight and F capability proof remain blocked.
 - [ ] **Reviews:** SPEC review AC-20, AC-21, AC-27, AC-39, AC-48, AC-49, AC-50; quality review dated source authority, `store:false`/ZDR wording, retention/deletion distinctions, cost arithmetic, and no key/request body. Critical findings block provider implementation.
 - [ ] **Commit:** `git add -- docs/engineering/PROVIDER_POLICY_EVIDENCE.md scripts/verify_evidence.ps1`; run `git diff --cached --check`; commit with `git commit -m "docs(G-02B): verify provider policy and cost [agent: <fresh-agent-id>]"`.
 
@@ -302,8 +308,8 @@ Group review checks AC-20, AC-39, AC-48, AC-49 and AC-50 after G-02A/B/C. Qualit
 
 **Dependencies / parallelism:** Requires G-02A. It may run beside G-02B with serialized validator edits. DIST-01/DIST-02 depend on this unit.
 
-- [ ] **Red:** add distribution/hosting required-row assertions and run the validator; expected FAIL because those rows are absent.
-- [ ] **Green/refactor:** verify authoritative sources, record exact usable terms, then rerun the validator. A blocked selected freezer/base/host leaves G-02C pending and requires a SPEC change rather than substitution.
+- [x] **Red:** add distribution/hosting required-row assertions and run the validator; expected FAIL because those rows were absent in the initial red run.
+- [ ] **Green/refactor:** verify authoritative sources, record exact usable terms, then rerun the validator. A blocked selected freezer/base/host leaves G-02C pending and requires a SPEC change rather than substitution. Current ledger keeps freezer, immutable base digest, and all host rows explicitly blocked.
 - [ ] **Reviews:** SPEC review AC-10, AC-41, AC-43, AC-47; quality review source dates, license compatibility, architecture support, cost language, and clean-host reproducibility. Critical findings block packaging/deployment.
 - [ ] **Commit:** `git add -- docs/engineering/DISTRIBUTION_EVIDENCE.md scripts/verify_evidence.ps1`; run `git diff --cached --check`; commit with `git commit -m "docs(G-02C): verify distribution and hosting [agent: <fresh-agent-id>]"`.
 

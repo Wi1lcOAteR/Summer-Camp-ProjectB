@@ -663,3 +663,13 @@
 - **验证边界**：本轮未创建 Open Design project、未发送 prompt、未运行生成、未修改前端/生产源码、未运行测试/构建/CI，未创建或修改 `REFLECTION.md`。OD-003 的 stale-endpoint 历史记录保留。
 - **subagent 输出 / commit hash**：`/root/od_gate_scope_audit` 只读复核确认 G-01 应 PASS、无须长期开 daemon、UI-01A 后置 run；修订提交为 `b93c096db29f7b957950a0cfc74b80170a38d25a`（`docs: correct Open Design gate scope [agent: Codex GPT-5]`）。
 - **经验教训**：必须把“技能文件已安装”“MCP/daemon 可连接”“正式 Open Design run 已执行”建成三个独立证据层；否则会为了证明工具可用而制造空项目或让用户无意义地保持桌面应用运行。
+## 2026-07-21T22:25:00+08:00 - G-02 evidence baseline (pending)
+
+- **Task:** G-02 group; G-02A/G-02B/G-02C remain pending.
+- **Skills/tools used:** `openai-docs` was read and followed for current OpenAI policy evidence; official OpenAI Developer Docs MCP search/fetch was used. Formal `superpowers:*` skills are still not callable in this session, so the required red/green evidence validator was run directly and the limitation is not represented as a formal Superpowers invocation.
+- **Subagent evidence:** `g02a_dependency_audit` found no project manifests or lockfiles; host Python 3.14.3 and `pypdf 6.10.2` are environment-only; Codex-bundled `pypdfium2`/Playwright are not project dependencies; exact FastAPI, keyring, test, freezer, React/Vite, OpenAI SDK and transitive licenses remain unverified. `g02c_distribution_audit_retry` found Docker daemon unavailable and first-party freezer/registry/Hugging Face retrieval blocked by connection close/timeouts; no build, account, deployment, or paid action was performed.
+- **Red evidence:** after fixing two script-level PowerShell issues, `powershell -ExecutionPolicy Bypass -File scripts/verify_evidence.ps1` returned `EVIDENCE_VALIDATION_FAIL errors=3 rows=0` because all three evidence files were absent.
+- **Green evidence:** the same command returned `EVIDENCE_VALIDATION_PASS rows=37 explicitly_blocked=28` after adding the three ledgers. This validates table shape, URLs, dates, allowed status values, and secret-pattern absence only; it does not close G-02.
+- **Files changed by coordinator:** `docs/engineering/DEPENDENCY_BASELINE.md`, `PROVIDER_POLICY_EVIDENCE.md`, `DISTRIBUTION_EVIDENCE.md`, `scripts/verify_evidence.ps1`, `PLAN.md`. The ledgers intentionally mark unresolved rows `explicitly-blocked`; no production source, credentials, private course material, package install, or remote deployment was added.
+- **Commit:** not yet created; review and commit remain pending until the evidence rows are reviewed and the worktree is checked.
+- **Lesson:** a validator PASS can coexist with blocked evidence by design; downstream tasks must consume only `verified` rows and keep all blocked implementation gates closed.

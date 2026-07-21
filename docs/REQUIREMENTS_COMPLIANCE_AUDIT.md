@@ -61,3 +61,6 @@
 ## 当前最近门禁
 
 `SPEC.md` 已于 2026-07-20 整体确认，`PLAN.md` 已形成 41 个 planning group、69 个待执行 dispatch unit；单文件分发、OCI/Hugging Face demo、隔离限额和 `ReviewPolicy v1` 是 v1 工程方向。当前真实缺口是：重核 Hugging Face Spaces 和依赖许可证；恢复正式 Superpowers `writing-plans` 调用或取得课程明确接受 fallback 的证据；D-005 可先选择，但只在前述阶段 B 证据闭合后执行不同类型全新 session 的冷启动。Open Design 环境门禁已通过，真实 project/run/artifact 后置 UI-01A，并不允许在冷启动或实现批准前生成 UI。学生本人 brainstorming 反思仍是课程证据缺口，不得由 AI 代写。冷启动修订和再次批准前不开始正式实现。
+## 2026-07-21 evidence update
+
+The current compliance state is intentionally partial. OpenAI policy rows were retrieved from official Developer Docs without a key or paid call. Dependency/license, OpenAI SDK/cost preflight, freezer, immutable OCI digest, and Hugging Face hosting rows are explicitly blocked because the project has no lockfile and current first-party retrieval was unavailable. `verify_evidence.ps1` reports `PASS rows=37 explicitly_blocked=28`; this is not a claim that G-02 or any implementation requirement is complete. No README, REFLECTION, CI, build, deployment, or production source was created in this checkpoint.

@@ -413,3 +413,10 @@
 - **范围修正**：课程/仓库要求是含 UI 时使用 Open Design 工作流并记录 skill/design system，不要求把 bundled skill 复制到 Codex，也不要求 daemon 无任务长期运行或预先创建空 project。G-01 现定义为安装、MCP、bundled skill 和学生选择的 environment gate，按现有证据 PASS。
 - **后置工作流**：真实 Open Design project/run/artifact、截图和 review 证据移到获准实现后的 UI-01A；Open Design 只在该 task 的 MCP/run 期间开启。生成 artifact 的源代码不得绕过 UI-01A 的 TDD 红测直接复制到生产目录。
 - **过程边界**：本次只修订计划、规约说明、审计和过程文档；没有创建 Open Design 项目、发送 prompt、运行生成、修改前端/生产源码、测试、CI 或 `REFLECTION.md`。此前 OD-003 的 stale-endpoint 失败快照保留为历史证据。
+### G-02 evidence audit: 2026-07-21T22:25:00+08:00
+
+- The goal resumed after the Open Design documentation correction. G-01 remains an environment/selection PASS; no formal Open Design project/run/artifact was created.
+- A fresh read-only dependency audit found no project manifests or lockfiles. Host and bundled package versions were recorded as environment-only, not promoted to project dependencies. The distribution audit also confirmed that Docker, freezer, registry and Hugging Face checks could not be completed because the daemon/network was unavailable.
+- Official OpenAI Developer Docs MCP supplied current rows for Responses storage, abuse monitoring, prompt cache, file/image review, Files, Vector Stores, deletion/expiry and regional processing. No key, request body, private course material or paid request was used.
+- `scripts/verify_evidence.ps1` was created with a real red run (`EVIDENCE_VALIDATION_FAIL errors=3 rows=0`) and a green schema/secret-scan run (`EVIDENCE_VALIDATION_PASS rows=37 explicitly_blocked=28`). The green result intentionally does not close G-02: 28 rows remain explicitly blocked and downstream implementation is still prohibited.
+- Coordinator changes created the three engineering ledgers and synchronized `PLAN.md`; no production source, manifest, lockfile, deployment, or `REFLECTION.md` was created. No new product decision was inferred from the blocked rows; existing D-021/D-022 execution-time authorization and SPEC-change boundaries remain in force.

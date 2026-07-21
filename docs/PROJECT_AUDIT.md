@@ -145,3 +145,8 @@ OpenAI 的 Responses 能力/政策快照还须在每次 P/F 同意前刷新并�
 - 学生已在 Open Design 界面选择 `frontend-design` + `default`（Neutral Modern）并链接 `ProjectB`；该组合不再是待确认候选。
 - Open Design 0.15.1 daemon、完整 bundled skill、学生选择和 fresh MCP 只读结果均已记录；`projects=[]`、`active=false` 不构成环境缺口，G-01 已 PASS。
 - 正确后续动作不是保持窗口或创建空项目，而是在冷启动和实现批准后的 UI-01A 按需开启 Open Design，执行真实 project/run/artifact，记录截图与 review，并在 TDD 红测后再写生产 UI。本轮没有发送 prompt、生成 artifact 或修改正式 UI/源码。
+## 2026-07-21 G-02 evidence checkpoint
+
+- G-01 is now correctly scoped as an Open Design environment/selection gate and is recorded as PASS. A real project/run/artifact remains deferred to UI-01A after cold-start and implementation approval.
+- G-02 evidence ledgers and `scripts/verify_evidence.ps1` now exist. The validator has both observed red and green runs; green means 37 rows are structurally valid and no secret pattern was found, while 28 rows remain explicitly blocked.
+- No project dependency manifest/lockfile, production source, build, provider call, deployment, or public URL exists. G-02A/B/C, G-03 and all implementation units remain pending.

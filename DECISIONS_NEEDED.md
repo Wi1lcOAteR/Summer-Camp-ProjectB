@@ -370,3 +370,12 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
 - **推荐方案及影响**：方案 1 与现有准备文档一致；需要学生自行控制安装、登录和账号授权。若已有 Cursor/Gemini/OpenCode 等不同类型工具，方案 2 可减少安装工作，但仍必须全新 session 且只给 `SPEC.md` 与 `PLAN.md`。
 - **执行边界**：G-03 是正式实现前的一次性可理解性实验，初始只能看 `SPEC.md` 与 `PLAN.md`。其候选 unit 的正式依赖此时故意尚未实现，冷启动只能创建不合并的最小临时 scaffold/test double；普通依赖规则在后续正式派发时重新生效。
 - **阻塞范围**：阶段 A/B 已完成到可审查计划；本项阻塞阶段 C 冷启动验证，继而阻塞规约修订后的实现批准。
+## G-02 current external blockers (2026-07-21)
+
+No new product decision is requested in this checkpoint. The confirmed choices remain: Windows x64 local WebUI, one built-in OpenAI adapter plus deterministic mock, and an OCI/Hugging Face public demo direction. Engineering evidence is incomplete rather than ambiguous:
+
+- The repository has no project dependency manifest or lockfile. Exact FastAPI/React/Vite/keyring/test/freezer/OpenAI SDK versions and transitive licenses must be verified before implementation.
+- Current OpenAI policy facts are recorded, but the selected model/cost preflight and the F scope/lifecycle proof are not verified. Real P/F calls remain disabled.
+- Current freezer, OCI digest, and Hugging Face runtime/HTTPS/storage/sleep/quota/cost/account terms could not be retrieved. No account, deployment, paid resource, or host substitution was created. If the confirmed no-paid boundary fails after recheck, a SPEC change and student decision are required before choosing another host.
+
+These are recorded blockers for G-02A/B/C, not silently selected alternatives. The next safe action is a first-party recheck when network access is available; no user response is needed before that recheck.
