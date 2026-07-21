@@ -759,5 +759,5 @@
 - **结论**：旧的“插件已安装，只差会话注册”判断证据不足，现纠正为“cache-only / not callable”。用户须在 Codex App Plugins 安装/启用 Superpowers 并新建 task，或取得课程接受 fallback 的明确证据。
 - **两阶段复核**：先按 `AGENTS.md`/D-001/G-03 检查门禁合规，确认没有把 cache、fallback 或历史触发冒充正式 invocation；再核对官方 plugin loading/config 规则、CLI/desktop 证据隔离、bundle hash、skills 清单和历史/current 措辞。修复三处历史快照的“已安装”误导表述后，无 Critical/P1 残留。
 - **验证证据**：标准 evidence validator 为 `PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；distribution-strict 仍按预期只因两项 D-025 host blocker 失败。PLAN ledger 为 69 unique/3 PASS/66 pending；Markdown 为 35 文件、21 本地链接、0 坏链接、0 奇数围栏；当前 Superpowers 陈旧措辞扫描 0，focused credential scan 0，`git diff --check` 无 whitespace error。
-- **commit hash**：尚未创建；真实 hash 在最终 staged-diff 验证后回填。
+- **commit hash**：`1eb9a7da7a2814b89779861672f0e0f6e75c7d33`（`docs(D-001): correct Superpowers installation state [agent: Codex GPT-5]`）。该提交只记录环境诊断和门禁纠正，不是正式 Superpowers invocation。
 - **经验教训**：插件 payload、marketplace 可发现性、installed/enabled config 和新任务实际 skill catalog 是四层独立证据；任何一层缺失都不能用 cache 路径代替正式 invocation。

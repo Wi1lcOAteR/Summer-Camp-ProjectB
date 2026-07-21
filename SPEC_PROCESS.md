@@ -449,3 +449,4 @@
 - OpenAI's official plugin docs state that installation/enabled state is distinct from cache storage and that bundled skills become available to new chats/sessions after installation. The current official `openai/plugins` marketplace still lists Superpowers as available for Codex.
 - `docs/engineering/SUPERPOWERS_VALIDATION.md` records the exact bundle hash, detected skills, commands, official sources, non-actions and recovery gate. No user config, authentication, marketplace, cache or project dependency was changed.
 - D-001 is therefore open as an app-level installation/enablement gate, not a mere stale-session refresh. Formal `writing-plans` or explicit course acceptance of the fallback remains required before G-03.
+- The documentation-only correction is committed at `1eb9a7da7a2814b89779861672f0e0f6e75c7d33`; it does not close D-001.
