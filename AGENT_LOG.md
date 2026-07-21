@@ -649,6 +649,6 @@
 - **运行与选择证据**：Open Design 0.15.1 daemon 日志报告健康动态 loopback endpoint；直接只读 API 返回 `frontend-design`、`mode=prototype`、`designSystemRequired=true`、`default` 与 `Neutral Modern`，与学生截图一致。截图未复制入仓库，动态端口未写入仓库或 Codex 配置。
 - **MCP 诊断**：当前 Codex task 的 MCP 进程仍缓存启动时的 fallback `127.0.0.1:7456`；`list_skills`、`list_projects`、`get_active_context` 因而继续失败。已安装 `od mcp --help` 说明 MCP 进程会缓存 URL，daemon 重启后须重启 MCP client；恢复动作是保持 Open Design 开启并新建 Codex task，不重复注册 MCP。
 - **文档修改**：将 D-024 的实际选择写入 `SPEC.md`，新增 [`docs/engineering/OPEN_DESIGN_VALIDATION.md`](docs/engineering/OPEN_DESIGN_VALIDATION.md)，并同步 `PLAN.md` 与当前状态审计。G-01 仍为 partial；没有创建 Open Design project/run/artifact，没有修改正式 UI/源码、测试、CI 或 `REFLECTION.md`。
-- **subagent 输出 / commit hash**：`/root/od_docs_audit` 进行只读当前时态一致性复核；本条写入时本地提交尚未创建。
+- **subagent 输出 / commit hash**：`/root/od_docs_audit` 进行只读当前时态一致性复核，确认 G-01 未误标 PASS 且历史/当前状态无剩余冲突；本轮选择证据提交为 `39f278dee93fa61bc3fa70334b3f81e56ef04e3c`（`docs: record Open Design selection evidence [agent: Codex GPT-5]`）。
 - **人工修改及原因**：学生本人完成界面选择；智能体只记录已观察事实并解释下一步，以遵守 UI 设计选择和实现阶段人工门禁。
 - **经验教训**：桌面 daemon 健康、composer 选择和当前 task 的 MCP 可达性是三项独立证据；不能因前两项成功就把 G-01 写成 PASS，也不能把每次重启变化的端口固化进配置。
