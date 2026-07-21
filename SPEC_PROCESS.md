@@ -1,6 +1,6 @@
 # SPEC_PROCESS
 
-> 当前状态：学生已于 2026-07-20 整体确认 `SPEC.md`，D-017 至 D-024 及工程候选已收敛为 v1 方向；`PLAN.md` 已形成。Open Design MCP 配置已写入且工具已暴露，但 daemon 当前不可达，实际 design system/skill 仍待学生确认；另有 Superpowers 正式 `writing-plans` 证据、Hugging Face 官方条款复核和学生本人 brainstorming 反思门禁。Superpowers v6.1.1 缓存可检测，但本次会话未将 `superpowers:*` 注册到可调用清单，因此不能把 fallback 计划冒充正式 skill 调用。
+> 当前状态：学生已于 2026-07-20 整体确认 `SPEC.md`，D-017 至 D-024 及工程候选已收敛为 v1 方向；`PLAN.md` 已形成。2026-07-21 学生在 Open Design 中实际选择 `frontend-design` + `default`（Neutral Modern），0.15.1 daemon 的直接只读 API 已验证相同标识；当前 Codex task 的 MCP 仍缓存旧的 `127.0.0.1:7456`，须在保持 Open Design 开启的 fresh task 中复验。另有 Superpowers 正式 `writing-plans` 证据、Hugging Face 官方条款复核和学生本人 brainstorming 反思门禁。Superpowers v6.1.1 缓存可检测，但本次会话未将 `superpowers:*` 注册到可调用清单，因此不能把 fallback 计划冒充正式 skill 调用。
 
 ## 0. 启动审计（2026-07-17）
 
@@ -397,3 +397,11 @@
 - 独立终审发现 G-03 的候选实现 unit 都经 T-01 依赖 G-03，若把普通依赖完成规则原样用于阶段 C，会形成自依赖死锁；同时发现 X2 两个红测示例、一个遗漏提交文件和三处模糊 stage 范围。
 - G-03 现明确为一次性 pre-implementation 实验：初始可见输入只有 `SPEC.md`/`PLAN.md`，上游实现故意缺席，仅允许在隔离 workspace 创建不合并的最小 scaffold/test double；该例外不适用于批准后的正式派发。冷启动仍须由学生选择不同类型智能体，且修订后再次批准实现。
 - X2、T-03C、DEMO-01B、QA-01C、UI-03C 的文件/红测/依赖范围已修复。静态复验保持 69/69 台账一致、未知依赖 0、环 0、Files/提交命令逆向缺口 0、AC-01..AC-50 缺失 0；仍未执行任何正式实现、测试、构建或 CI。
+
+### 2026-07-21T18:58:23+08:00 — OD-003 实际选择与 daemon 恢复证据
+
+- **学生原始输入**：学生先在 Open Design 中选择 `frontend-design` 与 `Neutral Modern`，随后提供界面截图并询问“选了之后怎么办”。截图同时显示已链接目录 `ProjectB`。
+- **选择结果**：该界面操作构成学生对 D-024 具体组合的确认；正式记录为 `skillId=frontend-design`、`designSystemId=default`，显示名 `Neutral Modern`。此前的 `shadcn` 与 `design-brief` 只保留为历史比较，不再等待重复选择。
+- **运行证据**：Open Design 桌面端已更新为 0.15.1，daemon 日志报告健康的动态 loopback endpoint；对该 endpoint 的直接只读请求返回版本 0.15.1、`frontend-design`、`mode=prototype`、`designSystemRequired=true`、`default` 与 `Neutral Modern`。动态端口只用于本次观察，没有写入仓库或 Codex 配置。
+- **MCP 边界**：当前 Codex task 的 MCP 进程早于最新 daemon 启动并缓存了 fallback `127.0.0.1:7456`，所以本 task 的 `list_skills`、`list_projects`、`get_active_context` 仍失败。已安装 CLI 的帮助文本明确说明 MCP 会缓存启动时解析的 URL；正确恢复动作是保持 Open Design 开启并新建 Codex task，不是重复注册或持久化动态端口。
+- **产出边界**：没有点击 Open Design“发送”，没有创建 Open Design project/run/artifact，没有生成或修改正式 UI/源码。`docs/engineering/OPEN_DESIGN_VALIDATION.md` 只记录选择与 daemon 证据，G-01 保持 partial，直至 fresh MCP 三项调用成功并如实记录 project/context 状态。

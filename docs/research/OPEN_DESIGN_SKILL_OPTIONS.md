@@ -1,16 +1,23 @@
 # Open Design Skill and Design-System Options
 
-调查时间：2026-07-20T19:56:11+08:00（追加 daemon 复验与计划粒度复审）
-调查对象：本机 Open Design 0.15.0 bundled resources、当前 Codex MCP 暴露状态、ProjectB 已确认 UI 规约
-结论状态：候选建议，等待学生确认；不是正式 Open Design run 或 UI 实现证据
+调查时间：2026-07-20T19:56:11+08:00；运行更新：2026-07-21T18:58:23+08:00
+调查对象：本机 Open Design 0.15.1 runtime/bundled resources、当前 Codex MCP 暴露状态、ProjectB 已确认 UI 规约
+结论状态：学生已选择 `frontend-design` + `default`（Neutral Modern）；G-01 仍等待 fresh MCP 复验，不是正式 Open Design run 或 UI 实现证据
 
-## 1. 当前运行状态
+## 1. 2026-07-20 运行快照
 
 - `C:\Users\22078\.codex\config.toml` 已包含 `mcp_servers.open-design`，当前 Codex 会话也已暴露 `mcp__open_design__*` 工具。
 - 配置通过 `OD_SIDECAR_IPC_PATH` 发现桌面 daemon 的动态端口；当前桌面端没有可枚举窗口，daemon 日志最后记录 shutdown，因此发现失败并回退到 `http://127.0.0.1:7456`。
 - `list_skills`、`list_projects`、`list_agents`、`get_active_context` 的直接调用均返回 `cannot reach the Open Design daemon at http://127.0.0.1:7456`。无需重复注册 MCP；需正常重开并保持 Open Design 桌面端运行后复验。
 - 当前三个 `Open Design.exe` 进程没有任何 TCP listen socket；daemon 日志最后记录 `shutdown requested` 和正常退出。读取完整进程 command line 的只读 CIM 查询被系统拒绝，未请求提权或重复尝试。
 - Computer Use 对 Open Design 的启动动作未获批准，本轮立即停止 UI 输入，没有修改应用设置。
+
+### 2026-07-21 运行更新
+
+- 学生在 Open Design composer 中实际选择 `frontend-design` 与 `default`（显示名 `Neutral Modern`），界面同时显示链接目录 `ProjectB`。
+- Open Design 已更新为 0.15.1；daemon 健康运行在动态 loopback endpoint。直接只读 API 返回 `frontend-design`、`mode=prototype`、`designSystemRequired=true`、`default` 与 `Neutral Modern`，和界面选择一致。
+- 当前 Codex task 的 MCP 进程仍缓存 daemon 重启前的 fallback `127.0.0.1:7456`。CLI 帮助明确说明运行中的 MCP server 会缓存 URL，因此须保持 Open Design 开启并新建 Codex task 后再调用 `list_skills`、`list_projects`、`get_active_context`。
+- 动态端口没有写入配置；MCP 没有重复注册。尚未点击“发送”，也没有 Open Design project/run/artifact 或正式 UI 源码。
 
 ## 2. “按需获取”的准确含义
 
@@ -55,14 +62,14 @@ Open Design 的两类选择职责不同：
 4. 使用中性底色、一个克制主 accent 和 success/warn/danger 语义色，避免单一紫色、深蓝、米色或玻璃风主导。
 5. 首次导入和最终确认使用桌面/移动均可读的 X 轴四阶段时间线；主要结论用字号、字重和颜色形成二级层次，配置入口在“开始学习”前高强调。
 
-## 5. 推荐组合
+## 5. 已选择组合
 
 - 生成：`skillId=frontend-design`
 - 视觉合同：`designSystemId=default`
 - 实现后审查：`web-design-guidelines`
 - 备选视觉合同：`designSystemId=shadcn`
 
-该组合无需安装 catalog-only 的 upstream 包。正式记录前仍须学生确认，且必须先恢复 daemon，使用 MCP `list_skills`/`list_projects` 观察到真实结果。
+该组合无需安装 catalog-only 的 upstream 包，学生选择已写入 `SPEC.md`。G-01 仍须在 fresh Codex task 使用 MCP `list_skills`、`list_projects`、`get_active_context` 取得真实结果；在此之前不得把直接 daemon API 证据写成 MCP PASS。
 
 ## 6. 来源与证据限制
 

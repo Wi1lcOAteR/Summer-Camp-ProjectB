@@ -173,10 +173,10 @@ There are 41 planning groups and 69 dispatch units (the 17 groups marked `Task G
 - Do not modify: frontend source or production code
 
 **Interfaces:**
-- Consumes: the confirmed WebUI requirements in SPEC.md §4 and the installed Open Design 0.15.0 desktop application.
+- Consumes: the confirmed WebUI requirements in SPEC.md §4 and the installed Open Design 0.15.1 desktop application.
 - Produces: a recorded Open Design version, MCP endpoint/tool evidence, actual skill identifier, actual design-system identifier, selected rationale, rejected alternatives, and a verification date. UI tasks consume these exact identifiers through docs/engineering/OPEN_DESIGN_VALIDATION.md.
 
-**Dependencies / parallelism:** No code dependency. It may run beside G-02, but UI implementation is blocked until it passes. The student must execute external installation/MCP actions; the plan does not choose D-005 or the design system.
+**Dependencies / parallelism:** No code dependency. It may run beside G-02, but UI implementation is blocked until it passes. The student must execute external MCP/client-restart actions; the plan does not choose D-005 and must preserve the student's selected `frontend-design` + `default`/Neutral Modern combination.
 
 - [ ] **Step 1: Capture the current failing gate**
 
@@ -188,17 +188,17 @@ od --version
 rg -n "skillId|designSystemId|Open Design|MCP" SPEC.md docs/engineering 2>$null
 ~~~
 
-Expected: FAIL because the current session exposes the Open Design MCP methods but the daemon at `http://127.0.0.1:7456` is unreachable and no actual skill/design-system selection is recorded. This failure is evidence, not permission to bypass the gate.
+Expected current state: FAIL because this Codex task's MCP process cached the old `http://127.0.0.1:7456` fallback before the healthy ephemeral daemon started. The student-selected `frontend-design` + `default`/`Neutral Modern` combination and direct daemon catalog evidence are recorded, but live MCP tool/context evidence is still absent. This failure is evidence, not permission to bypass the gate.
 
 - [ ] **Step 2: Perform the user-authorized external setup and verification**
 
-After the student manually restarts/opens the installed Open Design desktop app and keeps its daemon running, use the installed preview/selection flow. The MCP registration is already present in the current user config; do not add a duplicate entry. In the fresh Codex session, call the exposed Open Design `list_skills`, `list_projects`, and `get_active_context` methods. If they still report the fallback `127.0.0.1:7456` connection error, preserve that exact error and the desktop daemon log rather than changing registration or bypassing the gate.
+The student has opened Open Design 0.15.1 and selected `frontend-design` + `default`/`Neutral Modern`; keep the desktop app running and do not send a broad generation prompt. The MCP registration is already present in the current user config; do not add a duplicate entry or persist an ephemeral port. Start a fresh Codex task so the MCP client process re-runs dynamic daemon discovery, then call `list_skills`, `list_projects`, and `get_active_context`. If they still report the fallback `127.0.0.1:7456` connection error, preserve that exact error and the desktop daemon log rather than changing registration or bypassing the gate.
 
-In a fresh session, invoke Open Design to read SPEC.md, propose a WebUI direction, and record the actual returned skill and design-system identifiers. Do not implement UI during this step.
+In the fresh task, use Open Design MCP only for read-only discovery: call `list_skills`, `list_projects`, and `get_active_context` when a real context exists. Do not call `start_run`, create a project merely to manufacture evidence, send a prompt, ask Open Design to generate a WebUI direction, or produce an artifact/source in this step. If the project list is empty or no active context exists, record that truthful result and keep G-01 partial; a controlled Open Design run belongs to a later explicitly scoped gate step.
 
 - [ ] **Step 3: Record only observed facts**
 
-Write docs/engineering/OPEN_DESIGN_VALIDATION.md with the exact tool output, selected IDs/names, version, date, rejected alternatives and reasons, and the statement that the HTML mockup is not formal evidence. Update SPEC.md and SPEC_PROCESS.md only with the student-confirmed choice; if the tool or terms differ, stop and request a SPEC decision.
+Complete docs/engineering/OPEN_DESIGN_VALIDATION.md with the fresh MCP tool output, selected IDs/names, version, date, rejected alternatives and reasons, and the statement that the HTML mockup is not formal evidence. The file currently contains partial selection/daemon evidence only. Update SPEC.md and SPEC_PROCESS.md only with observed facts; if the fresh MCP result differs, stop and request a SPEC decision.
 
 - [ ] **Step 4: Verify the gate**
 
@@ -214,7 +214,7 @@ Expected: the file contains an observed selected result, the tool is callable in
 - [ ] **Step 5: Review and commit**
 
 Spec review checks AC-44. Quality review checks that no UI code, unverified license, or invented design choice was added. Commit with process(G-01): record Open Design gate evidence; the coordinator records the hash in this plan and AGENT_LOG.md.
-**Commit command:** `git add -- docs/engineering/OPEN_DESIGN_VALIDATION.md; git diff --cached --check; git commit -m "process(G-01): record Open Design gate evidence [agent: <fresh-agent-id>]"; git rev-parse HEAD`
+**Commit command:** `git add -- docs/engineering/OPEN_DESIGN_VALIDATION.md SPEC.md SPEC_PROCESS.md AGENT_LOG.md; git diff --cached --check; git commit -m "process(G-01): record Open Design gate evidence [agent: <fresh-agent-id>]"; git rev-parse HEAD`
 
 **Completion standard:** Actual MCP/tool, skill, and design-system evidence is reproducible; UI tasks remain blocked if any part is unavailable or unrecorded.
 

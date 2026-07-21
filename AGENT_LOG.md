@@ -640,3 +640,15 @@
 - **本地提交**：阶段 B 计划、审计与研究文档提交为 `83b32e7d7db16c1fcccbe23c3168a026629482b7`（`docs: finalize stage-b dispatch plan [agent: Codex GPT-5]`）；未 push、未创建 PR/MR。
 - **人工修改及原因**：只修订计划、研究和过程文档；未创建、合并或运行任何正式实现，未越过冷启动/实现批准门禁，未创建 `REFLECTION.md`。
 - **经验教训**：冷启动发生在正式依赖尚未实现之前，因此必须把“上下文依赖合同”和“已实现依赖”分开；否则课程要求本身会在计划图外形成语义死锁。
+
+## 2026-07-21T18:58:23+08:00 — OD-003 Open Design 选择确认与连接诊断
+
+- **Task 编号**：OD-003（G-01 部分验证）。
+- **触发的 Superpowers skill**：无；本次是 Open Design 外部环境/证据检查，当前会话仍未暴露 `superpowers:*`。没有把本地读取或直接 API 请求冒充 Open Design MCP 成功调用。
+- **关键 prompt / context**：学生提供 Open Design 截图，界面已显示 `技能: frontend-design`、`Neutral Modern` 和链接目录 `ProjectB`，并询问“选了之后怎么办”。为避免在实现门禁前生成原型，明确要求暂不点击“发送”。
+- **运行与选择证据**：Open Design 0.15.1 daemon 日志报告健康动态 loopback endpoint；直接只读 API 返回 `frontend-design`、`mode=prototype`、`designSystemRequired=true`、`default` 与 `Neutral Modern`，与学生截图一致。截图未复制入仓库，动态端口未写入仓库或 Codex 配置。
+- **MCP 诊断**：当前 Codex task 的 MCP 进程仍缓存启动时的 fallback `127.0.0.1:7456`；`list_skills`、`list_projects`、`get_active_context` 因而继续失败。已安装 `od mcp --help` 说明 MCP 进程会缓存 URL，daemon 重启后须重启 MCP client；恢复动作是保持 Open Design 开启并新建 Codex task，不重复注册 MCP。
+- **文档修改**：将 D-024 的实际选择写入 `SPEC.md`，新增 [`docs/engineering/OPEN_DESIGN_VALIDATION.md`](docs/engineering/OPEN_DESIGN_VALIDATION.md)，并同步 `PLAN.md` 与当前状态审计。G-01 仍为 partial；没有创建 Open Design project/run/artifact，没有修改正式 UI/源码、测试、CI 或 `REFLECTION.md`。
+- **subagent 输出 / commit hash**：`/root/od_docs_audit` 进行只读当前时态一致性复核；本条写入时本地提交尚未创建。
+- **人工修改及原因**：学生本人完成界面选择；智能体只记录已观察事实并解释下一步，以遵守 UI 设计选择和实现阶段人工门禁。
+- **经验教训**：桌面 daemon 健康、composer 选择和当前 task 的 MCP 可达性是三项独立证据；不能因前两项成功就把 G-01 写成 PASS，也不能把每次重启变化的端口固化进配置。
