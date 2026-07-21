@@ -244,7 +244,7 @@ Observed red run on 2026-07-21: `EVIDENCE_VALIDATION_FAIL errors=3 rows=0`; the 
 
 Record the selected compatible versions only after checking official release/compatibility pages and license texts. Record OpenAI policy snapshots for Responses, abuse monitoring, prompt cache, file safety review, Files, Vector Stores, deletion/expiry, region and pricing; distinguish “unknown/not verified” from a positive claim. Record Hugging Face Docker SDK terms, HTTPS/idle storage/quotas/cost, and the fallback SPEC-change procedure if the no-paid-resource boundary fails. Record the freezer's license and clean-machine constraints. Do not include private course PDFs.
 
-Observed evidence ledgers: `docs/engineering/DEPENDENCY_BASELINE.md`, `PROVIDER_POLICY_EVIDENCE.md`, and `DISTRIBUTION_EVIDENCE.md`. OpenAI policy rows are current official-doc evidence; dependency, SDK, freezer, immutable OCI digest, and hosting rows remain explicitly blocked where first-party retrieval or project-lock evidence was unavailable.
+Observed evidence ledgers: `docs/engineering/DEPENDENCY_BASELINE.md`, `PROVIDER_POLICY_EVIDENCE.md`, and `DISTRIBUTION_EVIDENCE.md`. G-02A's exact dependency/license rows and G-02B's current official provider rows are verified. G-02C has verified freezer/base/runtime facts but keeps two hosting cost/account rows explicitly blocked by D-025.
 
 - [x] **Step 3: Run the validator to green**
 
@@ -256,13 +256,13 @@ powershell -ExecutionPolicy Bypass -File scripts/verify_evidence.ps1
 
 Expected: PASS with a row count and no secret findings. If any provider, license, fee, or hosting fact remains unavailable, it stays explicitly blocked and the dependent task cannot claim completion.
 
-Observed green run on 2026-07-21: `EVIDENCE_VALIDATION_PASS rows=37 explicitly_blocked=28`. This is a schema/source/secret-scan pass only; G-02A, G-02B, and G-02C remain pending because 28 required rows are explicitly blocked.
+Latest strict evidence run on 2026-07-22: `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`. G-02A is committed PASS. G-02B has no blocked row and is independently reviewable. The two remaining blocked rows belong to G-02C, so the G-02 group remains incomplete.
 
 - [ ] **Step 4: Review and commit**
 
 Group review checks AC-20, AC-39, AC-48, AC-49 and AC-50 after G-02A/B/C. Quality review checks source authority, dates, license compatibility, cost language, and absence of credentials. No worker commit is assigned to this heading; use the three unit commit commands below.
 
-**Completion standard:** Every selected v1 dependency has a cited, compatible, usable evidence row and no required row is blocked. A blocked row is valid diagnostic evidence but leaves G-02 pending and prevents G-03/T-01; no unverified provider/license/fee claim appears in PLAN.md, code, README, or CI.
+**Completion standard:** Every selected v1 dependency and required evidence fact has a cited, compatible, actionable row. Evidence status describes whether a fact is established, not whether the provider offers a positive guarantee. A current official negative or undocumented guarantee may be `verified` only when its documentation boundary is recorded precisely and SPEC defines a deterministic fail-closed behavior such as `source_disabled` or `delete_incomplete`. `explicitly-blocked` is reserved for missing authoritative evidence, unbounded cost, or a selected component with no safe v1 fallback; such a row prevents G-03/T-01.
 
 ### Task G-02A: Establish the Toolchain, Dependency, and License Baseline
 
@@ -285,18 +285,18 @@ Group review checks AC-20, AC-39, AC-48, AC-49 and AC-50 after G-02A/B/C. Qualit
 
 **Goal:** Verify current OpenAI P/F capabilities, retention/deletion/region facts, endpoint limitations, and bounded cost assumptions without making a live paid call.
 
-**Files:** Create `docs/engineering/PROVIDER_POLICY_EVIDENCE.md`; modify `scripts/verify_evidence.ps1` only through G-02A ownership.
+**Files:** Create or modify `docs/engineering/PROVIDER_POLICY_EVIDENCE.md`; modify the provider-required row set in `scripts/verify_evidence.ps1` through serialized G-02 coordinator ownership; modify the G-02B/G-03/X2-03 gate semantics in `PLAN.md` before staging.
 
 **Interfaces:** dated evidence rows cover Responses, abuse monitoring, prompt cache, file review, Files/Vector Stores, deletion/expiry, region, pricing, and explicit unsupported/unknown facts.
 
 **Dependencies / parallelism:** Requires G-02A. It may run beside G-02C with serialized validator edits. X2-02/X2-03C/INT-01 depend on this unit.
 
 - [x] **Red:** add provider-required-row assertions and run the validator; expected FAIL because provider rows were absent in the initial red run.
-- [ ] **Green/refactor:** populate rows only from current official sources, distinguish unknown from support, then rerun the validator. Any v1-required capability/policy/cost row blocked leaves G-02B pending. Current OpenAI policy rows are verified, but pricing preflight and F capability proof remain blocked.
+- [ ] **Green/refactor:** lock the exact model and bounded cost formula; verify documented P capabilities and F primitives from current official sources; record every undocumented guarantee as a verified negative/unknown boundary with its exact SPEC fail-closed consequence. G-02B must not wait for X2-02/X2-03/INT-01 implementation or live tests. A missing authoritative source, unbounded cost term, or unknown without a defined safe behavior leaves G-02B pending.
 - [ ] **Reviews:** SPEC review AC-20, AC-21, AC-27, AC-39, AC-48, AC-49, AC-50; quality review dated source authority, `store:false`/ZDR wording, retention/deletion distinctions, cost arithmetic, and no key/request body. Critical findings block provider implementation.
-- [ ] **Commit:** `git add -- docs/engineering/PROVIDER_POLICY_EVIDENCE.md scripts/verify_evidence.ps1`; run `git diff --cached --check`; commit with `git commit -m "docs(G-02B): verify provider policy and cost [agent: <fresh-agent-id>]"`.
+- [ ] **Commit:** `git add -- docs/engineering/PROVIDER_POLICY_EVIDENCE.md scripts/verify_evidence.ps1 PLAN.md`; run `git diff --cached --check`; commit with `git commit -m "docs(G-02B): verify provider policy and cost [agent: <fresh-agent-id>]"`.
 
-**Completion standard:** All provider facts needed by the selected P/F contract are current, compatible, and usable; an unresolved required fact keeps the unit pending.
+**Completion standard:** The evidence is sufficient to implement the provider boundary without guessing: P capability, F attributes/filter/result/delete primitives, retention/region facts, exact model/pricing, and all non-guarantees are current and mapped to deterministic fail-closed behavior. G-02B PASS does not claim a working live adapter, authorize a provider call, or enable F. Runtime F remains `source_disabled` until X2-03 proves the adapter contract; an actual selected profile/account lifecycle is claimed only by the explicitly authorized INT-01 evidence.
 
 ### Task G-02C: Establish Distribution and Hosting Evidence
 
@@ -331,7 +331,7 @@ Group review checks AC-20, AC-39, AC-48, AC-49 and AC-50 after G-02A/B/C. Qualit
 - Consumes: only SPEC.md and PLAN.md supplied to the fresh agent; the task prompt must not include this conversation history.
 - Produces: the student-selected D-005 agent type/version, session boundary, exact dispatch-unit IDs attempted (one or two), questions/pauses, misunderstood contract points, output gap, and before/after SPEC/PLAN diff. Task Group headings are forbidden cold-start choices. The implementation gate is a signed student decision after those revisions.
 
-**Dependencies / parallelism:** Requires this plan, a reproducible G-01 PASS, a G-02 baseline with no blocked row needed by any selected v1 dependency, and a real `superpowers:writing-plans` invocation record (or explicit course acceptance of the documented fallback). A documented but unresolved G-01/G-02 block is not a pass. This is a hard gate before T-01. D-005 is deliberately left to the student; this task must not select one.
+**Dependencies / parallelism:** Requires this plan, reproducible G-01 PASS, and a G-02 baseline with no missing or `explicitly-blocked` evidence fact needed to dispatch implementation. A source-backed provider non-guarantee mapped to an explicit SPEC fail-closed state is a verified boundary, not a blocked row. Also requires a real `superpowers:writing-plans` invocation record or explicit course acceptance of the documented fallback. This is a hard gate before T-01. D-005 is deliberately left to the student; this task must not select one.
 
 - [ ] **Step 1: Prepare the cold-start prompt**
 
@@ -1329,7 +1329,7 @@ Expected: PASS for partial failure, lost response, restart, cancellation, offlin
 
 Group review checks AC-26, AC-27, AC-28, AC-29, AC-37, AC-48, AC-50 and the remote lifecycle matrix after X2-03A/B/C. Quality review checks transaction ordering, bounded polling/retry, provider-ref redaction, duplicate isolation/cost language, store ownership, and deletion evidence. A Critical finding blocks M1-04. No worker commit is assigned to this group heading; use the three unit commit commands below.
 
-**Completion standard:** F remains disabled unless tracking/filter/result/deletion capabilities are proven; every object is recoverable and source-isolated, and every unknown cleanup state is visible and unusable.
+**Completion standard:** F defaults to `source_disabled`. X2-03 may clear the code-level gate only after deterministic tests prove capability-snapshot validation, scoped filters/results, locator checks, lifecycle reconciliation and fail-closed cleanup. These tests prove adapter behavior, not actual account/provider behavior; no live capability or AC-48 claim exists before explicitly authorized INT-01 evidence.
 
 ### Task X2-03A: Add F Enqueue, State, and Scope Contracts
 

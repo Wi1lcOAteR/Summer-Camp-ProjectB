@@ -107,8 +107,8 @@ $requiredRows = @{
     )
     "PROVIDER_POLICY_EVIDENCE.md" = @(
         "responses", "abuse-monitoring", "prompt-cache", "file-review",
-        "files", "vector-stores", "deletion-expiry", "region", "pricing",
-        "pf-unsupported"
+        "files", "vector-stores", "deletion-expiry", "region", "model-reference",
+        "p-input-file", "input-token-count", "f-filter-results", "pricing", "pf-unsupported"
     )
     "DISTRIBUTION_EVIDENCE.md" = @(
         "windows-freezer", "oci-base", "host-runtime", "host-https",
