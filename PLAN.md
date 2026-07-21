@@ -91,7 +91,7 @@ There are 41 planning groups and 69 dispatch units (the 17 groups marked `Task G
 
 | ID | Deliverable | Dependencies | Parallel group | Status / commit |
 | --- | --- | --- | --- | --- |
-| G-01 | Open Design environment/MCP/selection gate | SPEC confirmed | G | [x] PASS；证据提交待回填 |
+| G-01 | Open Design environment/MCP/selection gate | SPEC confirmed | G | [x] PASS；commit `b93c096db29f7b957950a0cfc74b80170a38d25a` |
 | G-02A | Toolchain/dependency/license baseline | SPEC confirmed | G | [ ] 尚未执行 |
 | G-02B | Provider policy/capability/cost evidence | G-02A | G | [ ] 尚未执行 |
 | G-02C | Distribution/hosting evidence | G-02A | G | [ ] 尚未执行 |
@@ -194,7 +194,7 @@ Observed in a fresh Codex task: `list_skills` returned built-in `frontend-design
 
 Spec review: AC-44 and SPEC §4.2 identifiers match. Quality review: an empty project/context is not manufactured into a failure; the daemon is not required to remain open without an MCP call or design run; the actual Open Design project/run/artifact is deferred to UI-01A after G-03 approval and may not bypass TDD.
 
-- [ ] **Step 5: Commit and record the evidence hash**
+- [x] **Step 5: Commit and record the evidence hash**
 
 Run during the evidence commit:
 
@@ -204,6 +204,8 @@ git diff --cached --check
 ~~~
 
 Expected: validation status is PASS, observed MCP results and selected identifiers are present, and the working changes contain no production source. Commit with `process(G-01): close Open Design environment gate [agent: <agent-id>]`; the coordinator records the hash in this ledger and AGENT_LOG.md.
+
+Evidence commit: `b93c096db29f7b957950a0cfc74b80170a38d25a` (`docs: correct Open Design gate scope [agent: Codex GPT-5]`).
 
 **Completion standard:** The installed complete skill, selected design system, and successful MCP discovery are reproducible and recorded. No project or active context is required before implementation approval. Actual Open Design run/artifact evidence remains a mandatory first step of UI-01A and is not implied by this PASS.
 
