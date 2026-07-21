@@ -53,7 +53,7 @@ Claude Code 与 Codex 属于不同类型的智能体，可用于课程要求的�
 
 `dispatching-parallel-agents` 仅在任务真正独立、没有共享写入和前置依赖时启用，不作为默认流程。
 
-## 三、有 UI 时安装：Open Design
+## 三、有 UI 时启用：Open Design
 
 - 上游：<https://github.com/nexu-io/open-design>
 - 许可证：Apache-2.0
@@ -66,6 +66,8 @@ Windows 上优先从上游 Releases 安装 Open Design 桌面版；它会自动�
 od mcp install codex
 ```
 
+ProjectB 当前无需重复执行上述安装：Open Design 0.15.1、Codex MCP、完整 bundled `frontend-design` 和 `default`/Neutral Modern 选择均已验证，G-01 已 PASS。以下说明用于区分已完成的环境接入和后续获准的真实 UI run。
+
 这里要区分三个层次：
 
 1. **Bundled skill/design system**：桌面版已经携带完整条目时（例如 `frontend-design` 与 `default`/Neutral Modern），界面选择只是把现有工作流附加到一次 Open Design run，不需要再把 `SKILL.md` 下载到 Codex。只有明确标为 catalog stub、正文要求另装 upstream 的条目才需要额外获取。
@@ -74,7 +76,7 @@ od mcp install codex
 
 若使用 WSL2，注意系统自带 `/usr/bin/od` 可能与 Open Design 命令重名，应按 Open Design 的 WSL2 指南配置，或从桌面应用 **Settings → MCP server** 复制使用绝对路径的配置。
 
-验证示例：
+新项目尚未选择 UI 方向时的提示示例（ProjectB 已完成此步，不要重复运行）：
 
 ```text
 Use open-design to produce a WebUI direction for this project. Read SPEC.md first,

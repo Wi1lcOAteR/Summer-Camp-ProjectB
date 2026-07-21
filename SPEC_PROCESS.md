@@ -11,12 +11,12 @@
 3. `docs/requirements/项目要求.md`
 4. `docs/requirements/AI4SE_Final_Project_B_应用类项目.md`
 
-### 当前阶段判定
+### 启动时阶段判定（历史）
 
 - 项目想法仍是模板占位文本，没有可确认的问题陈述、目标用户或功能边界。
 - 课程要求第一步必须由 Superpowers `brainstorming` 介入。
 - Superpowers v6.1.1 已安装，PRE-006 已记录此前会话触发 `brainstorming`；本次会话按同版本上游指令续接，但可调用 skill 清单未注册 `superpowers:*`。
-- 当前已进入阶段 A 的逐项需求澄清；在设计获得用户确认前不创建正式 `SPEC.md`，在用户明确确认 `SPEC.md` 前不进入计划或实现。
+- 启动时进入阶段 A 的逐项需求澄清；在设计获得用户确认前不创建正式 `SPEC.md`，在用户明确确认 `SPEC.md` 前不进入计划或实现。
 
 ### 已完成的非决策工作
 
@@ -347,7 +347,7 @@
 
 ## 2. SPEC 签字确认
 
-已执行。学生于 2026-07-20 明确确认完整 `SPEC.md`；签字证据和工程候选边界已写入本文、`SPEC.md` 与 `AGENT_LOG.md`。Open Design MCP/实际 design system/skill、Hugging Face Spaces 官方复核和学生本人 brainstorming 反思仍未补齐。
+已执行。学生于 2026-07-20 明确确认完整 `SPEC.md`；签字证据和工程候选边界已写入本文、`SPEC.md` 与 `AGENT_LOG.md`。Open Design MCP、完整 bundled skill 和实际 design system 选择已于 2026-07-21 完成验证，G-01 已 PASS；Hugging Face Spaces 官方复核和学生本人 brainstorming 反思仍未补齐。
 
 ## 3. PLAN 生成
 
@@ -355,8 +355,8 @@
 
 - 计划包含 41 个 planning group 和 69 个可派发 dispatch unit；17 个宽 group 已明确标记为不可派发，子 unit ID 一一对应台账且无重复。
 - 每个 dispatch unit 记录目标、涉及文件、接口、依赖/并行关系、先失败的测试或失败门禁、验证命令、完成标准、双阶段评审与可执行 commit 命令；group 只保留聚合验收，不接收 worker commit。
-- 所有 dispatch unit 仍为 pending；未创建正式实现源码、测试、CI、分发或部署证据。
-- Open Design G-01 和不同类型冷启动 G-03 被设为硬前置；D-005 没有由智能体代选，冷启动后仍需学生再次批准实现。
+- G-01 已 PASS，其余 68 个 dispatch unit 仍为 pending；未创建正式实现源码、测试、CI、分发或部署证据。
+- Open Design G-01 和不同类型冷启动 G-03 被设为硬前置；G-01 已于 2026-07-21 PASS，G-03 仍未执行。D-005 没有由智能体代选，冷启动后仍需学生再次批准实现。
 
 ## 4. 陌生智能体冷启动验证
 
@@ -366,18 +366,18 @@
 
 - `PLAN.md` 按 G/T/M/X、API/UI/DEMO/QA、DIST/CI/DOC/INT/FIN 三组独立起草后合并；临时区段文件均已删除。
 - 主智能体修复一个错误包路径和两个正文脱敏术语残留，并把 G-01/G-03/G-04 的失败门禁写成可辨识的红证据。
-- 当前 Open Design 调查表明问题是 Codex MCP/skill/design-system 配置缺失，而非桌面端未安装：0.15.0 正在运行，但 `skillId=null`、`designSystemId=default`、项目位置为空且 `codex mcp list` 无 Open Design。
+- 当时的 Open Design 调查表明问题是 Codex MCP/skill/design-system 配置缺失，而非桌面端未安装：0.15.0 正在运行，但 `skillId=null`、`designSystemId=default`、项目位置为空且 `codex mcp list` 无 Open Design。该历史状态已由后文 OD-004 的 G-01 PASS 结论取代。
 - 尚未执行课程所要求的不同类型冷启动，也未把任一冷启动产出合并为正式代码；这不是实现证据。
 
 ### Open Design 注册后的按需 skill 调查（2026-07-20T19:17:40+08:00）
 
 - **学生原始回答**：`MCP注册搞好了，项目skill之类的我认为按需获取？我也不知道要获取什么skill，你要不搜搜`。
-- **注册复验**：用户配置已出现 `mcp_servers.open-design`，当前会话也暴露 Open Design MCP 方法；实际 `list_skills/list_projects/list_agents` 均返回 `cannot reach ... 127.0.0.1:7456`。桌面进程没有可枚举窗口，daemon 日志最后记录正常 shutdown；Computer Use 启动动作未获批准后立即停止。因此当前是“已注册、daemon 未就绪”，不是“未安装”。
+- **注册复验（当时状态）**：用户配置已出现 `mcp_servers.open-design`，当时会话也暴露 Open Design MCP 方法；实际 `list_skills/list_projects/list_agents` 均返回 `cannot reach ... 127.0.0.1:7456`。桌面进程没有可枚举窗口，daemon 日志最后记录正常 shutdown；Computer Use 启动动作未获批准后立即停止。因此当时是“已注册、daemon 未就绪”，不是“未安装”。该故障随后已复验关闭。
 - **按需含义**：Open Design 的 skill 是传给 `start_run` 的生成/审查配方，design system 是视觉 token/组件契约；不需要安装全部目录项。162 个 skill 条目中有 catalog stub，只有具备本地完整文件/引用的条目才能声称可用。
 - **候选与理由**：首选 `frontend-design`（完整 bundled 工作流、Apache-2.0）负责生成真实 React/app 界面；实现后用完整 bundled 的 `web-design-guidelines` 做可访问性和交互审查。design system 首选 `default`/Neutral Modern（面向 B2B tools/dashboard/utility），备选 `shadcn`；首选须显式覆盖卡片半径最多 8px、letter-spacing=0 与紧凑工作台密度。
 - **排除项**：`ui-ux-pro-max`、`platform-design`、`ui-skills`、`shadcn-ui`、`design-review` 在当前安装中只是 catalog entry/需另装上游；`application`/`dashboard`、`notion`、`linear-app` 与配色、玻璃效果、负 tracking 或密度约束冲突。
 - **网络证据边界**：官方站点/GitHub 三轮查询均为 HTTP 503；没有把网络来源或最新版本写成已验证，结论仅依据本机 bundled `SKILL.md`、`LICENSE`、`DESIGN.md`、manifest/source evidence。
-- **未替学生决定**：候选已写入 D-024；只有学生确认后才把 `skillId`/`designSystemId` 作为已选择合同。daemon 恢复、工具复验和实际选择记录前 G-01 继续 pending。
+- **未替学生决定**：候选已写入 D-024；只有学生确认后才把 `skillId`/`designSystemId` 作为已选择合同。在该次调查时，daemon 恢复、工具复验和实际选择记录前 G-01 仍为 pending；后续学生选择及 fresh MCP 证据已使其 PASS。
 
 ### 阶段 B 计划可执行性复审（2026-07-20T19:56:11+08:00）
 
@@ -403,7 +403,7 @@
 - **学生原始输入**：学生先在 Open Design 中选择 `frontend-design` 与 `Neutral Modern`，随后提供界面截图并询问“选了之后怎么办”。截图同时显示已链接目录 `ProjectB`。
 - **选择结果**：该界面操作构成学生对 D-024 具体组合的确认；正式记录为 `skillId=frontend-design`、`designSystemId=default`，显示名 `Neutral Modern`。此前的 `shadcn` 与 `design-brief` 只保留为历史比较，不再等待重复选择。
 - **运行证据**：Open Design 桌面端已更新为 0.15.1，daemon 日志报告健康的动态 loopback endpoint；对该 endpoint 的直接只读请求返回版本 0.15.1、`frontend-design`、`mode=prototype`、`designSystemRequired=true`、`default` 与 `Neutral Modern`。动态端口只用于本次观察，没有写入仓库或 Codex 配置。
-- **MCP 边界**：当前 Codex task 的 MCP 进程早于最新 daemon 启动并缓存了 fallback `127.0.0.1:7456`，所以本 task 的 `list_skills`、`list_projects`、`get_active_context` 仍失败。已安装 CLI 的帮助文本明确说明 MCP 会缓存启动时解析的 URL；正确恢复动作是保持 Open Design 开启并新建 Codex task，不是重复注册或持久化动态端口。
+- **MCP 边界**：该 Codex task 的 MCP 进程早于最新 daemon 启动并缓存了 fallback `127.0.0.1:7456`，所以本 task 的 `list_skills`、`list_projects`、`get_active_context` 仍失败。已安装 CLI 的帮助文本明确说明 MCP 会缓存启动时解析的 URL；当时的一次性复验动作是在 MCP 调用期间开启 Open Design 并新建 Codex task，而不是重复注册或持久化动态端口。这不构成长期挂起 Open Design 的要求。
 - **产出边界**：没有点击 Open Design“发送”，没有创建 Open Design project/run/artifact，没有生成或修改正式 UI/源码。`docs/engineering/OPEN_DESIGN_VALIDATION.md` 只记录选择与 daemon 证据，G-01 保持 partial，直至 fresh MCP 三项调用成功并如实记录 project/context 状态。
 
 ### 2026-07-21T21:08:02+08:00 — OD-004 Open Design 门禁范围修正

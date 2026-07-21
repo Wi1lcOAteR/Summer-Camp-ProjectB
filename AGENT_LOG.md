@@ -688,3 +688,14 @@
 - PLAN dispatch ledger: `PLAN_DISPATCH_UNIQUE_PASS count=69`.
 - Focused credential scan: `CREDENTIAL_SCAN_PASS actual-token-patterns=0`; engineering evidence links: `ENGINEERING_LINKS_PASS`.
 - No backend/frontend implementation, README, CI file or student `REFLECTION.md` was created. G-02A/B/C remain pending, and G-03 remains blocked by formal Superpowers registration/fallback acceptance, cold-start validation and implementation approval.
+
+## 2026-07-21T23:03:34+08:00 - OD-005 current-state documentation cleanup
+
+- **Task:** Correct residual Open Design wording before the student restarts Goal mode; no implementation task was opened.
+- **Trigger/context:** The student correctly challenged the earlier implication that a bundled skill needed downloading or that Open Design had to remain open without active work. The authoritative state is G-01 PASS, with a real project/run/artifact deferred to UI-01A after cold-start validation and implementation approval.
+- **Changes:** Added a current authoritative snapshot to `docs/PROJECT_AUDIT.md`, relabeled its startup-only tool state as historical, corrected stale G-01/current-stage/count wording in `SPEC_PROCESS.md` and `docs/REQUIREMENTS_COMPLIANCE_AUDIT.md`, marked the stale-endpoint research section as superseded, fixed the remaining “Open Design 可用后” wording in `docs/research/MUTEX_RACE_SOURCE_MAP.md`, and updated `SKILLS_SETUP.md` to say ProjectB must not repeat installation or the preselection prompt.
+- **Evidence boundary:** Historical timestamped observations were retained rather than rewritten. No Open Design prompt, `start_run`, project, artifact, production source, test, build, CI, deployment, credential, or `REFLECTION.md` was created or modified.
+- **Skill/workflow:** No formal `superpowers:*` skill is callable in this task; this was a documentation consistency correction, not a substitute for the still-missing formal `writing-plans` evidence.
+- **Subagent reviews:** `/root/od_consistency_audit` found the remaining stale wording in `MUTEX_RACE_SOURCE_MAP.md` and then reported no findings on the final diff. `/root/process_status_audit` found the stale G-01/68-pending counts and startup-stage labels; all four current-state findings were corrected. Both reviews were read-only.
+- **Verification:** `git diff --check` passed (line-ending conversion warnings only); `scripts/verify_evidence.ps1` returned `EVIDENCE_VALIDATION_PASS rows=37 explicitly_blocked=28`; the PLAN ledger returned `rows=69 pass=1 pending=68`; current-contract and stale-wording assertions passed; focused credential scan found no matching token/private-key pattern.
+- **Lesson:** Status documents need an explicit current snapshot when historical diagnostics remain in the same file; otherwise a correct evidence trail can be mistaken for a live instruction.

@@ -4,11 +4,13 @@
 调查对象：本机 Open Design 0.15.1 runtime/bundled resources、当前 Codex MCP 暴露状态、ProjectB 已确认 UI 规约
 结论状态：学生已选择 `frontend-design` + `default`（Neutral Modern）；G-01 环境/选择门禁已 PASS，真实 Open Design run/artifact 后置 UI-01A，不是当前实现证据
 
-## 1. 2026-07-20 运行快照
+## 1. 2026-07-20 运行快照（历史，已被次日复验取代）
+
+本节保留 stale-endpoint 的原始失败证据。下方所述“开启后复验”是当时尚未完成的一次性诊断动作，不是让用户长期挂着 Open Design；当前结论以紧随其后的 2026-07-21 更新为准。
 
 - `C:\Users\22078\.codex\config.toml` 已包含 `mcp_servers.open-design`，当前 Codex 会话也已暴露 `mcp__open_design__*` 工具。
 - 配置通过 `OD_SIDECAR_IPC_PATH` 发现桌面 daemon 的动态端口；当前桌面端没有可枚举窗口，daemon 日志最后记录 shutdown，因此发现失败并回退到 `http://127.0.0.1:7456`。
-- `list_skills`、`list_projects`、`list_agents`、`get_active_context` 的直接调用均返回 `cannot reach the Open Design daemon at http://127.0.0.1:7456`。无需重复注册 MCP；需正常重开并保持 Open Design 桌面端运行后复验。
+- `list_skills`、`list_projects`、`list_agents`、`get_active_context` 的直接调用均返回 `cannot reach the Open Design daemon at http://127.0.0.1:7456`。无需重复注册 MCP；当时需要在一次性复验期间重开 Open Design。该复验现已完成，不再要求保持运行。
 - 当前三个 `Open Design.exe` 进程没有任何 TCP listen socket；daemon 日志最后记录 `shutdown requested` 和正常退出。读取完整进程 command line 的只读 CIM 查询被系统拒绝，未请求提权或重复尝试。
 - Computer Use 对 Open Design 的启动动作未获批准，本轮立即停止 UI 输入，没有修改应用设置。
 

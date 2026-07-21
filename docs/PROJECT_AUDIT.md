@@ -3,8 +3,17 @@
 初次审计时间：2026-07-17T18:14:41+08:00
 最近历史复查时间：2026-07-19T21:57:09+08:00
 最近外部门禁复查：2026-07-21T21:08:02+08:00（G-01 scope correction）
+最近文档一致性复查：2026-07-21T23:03:34+08:00
 
-> 当前（2026-07-20）要求符合性请以 [`REQUIREMENTS_COMPLIANCE_AUDIT.md`](REQUIREMENTS_COMPLIANCE_AUDIT.md) 为准。本文件前半部分保留启动阶段的历史快照，不能用其中“SPEC 不存在”等旧状态判断当前工作区。
+> 当前要求符合性请以 [`REQUIREMENTS_COMPLIANCE_AUDIT.md`](REQUIREMENTS_COMPLIANCE_AUDIT.md) 为准。本文件前半部分保留启动阶段的历史快照，不能用其中“SPEC 不存在”“Open Design 未安装”等旧状态判断当前工作区。
+
+## 当前权威状态（2026-07-21）
+
+- 项目处于阶段 B 的工程证据与计划门禁收口期，尚未进入正式实现。
+- `SPEC.md` 已由学生整体确认；`PLAN.md` 已形成，但正式 `superpowers:writing-plans` 调用证据仍缺，现有计划明确标记为 fallback。
+- Open Design 0.15.1、Codex MCP、完整内置 `frontend-design` 和学生选择的 `default`（Neutral Modern）均已验证，G-01 已 PASS。该 bundled skill 不需要另行下载到 Codex；Open Design 也不需要无任务时长期保持开启。
+- `list_projects=[]` 与 `get_active_context.active=false` 是实现前的正常状态。真实 project/run/artifact 只在冷启动完成且学生批准实现后的 UI-01A 中按需创建，不能提前生成 UI 来冒充环境验证。
+- 当前硬门禁是 G-02A/B/C 工程证据、正式 `writing-plans` 证据或课程明确接受 fallback、不同类型全新 session 的 G-03 冷启动，以及冷启动修订后的学生实现批准。
 
 ## 启动时结论（历史）
 
@@ -23,11 +32,11 @@
 | 冷启动验证 | 尚未执行 | SPEC/PLAN 均未完成 |
 | 实现 / 测试 / CI | 尚未执行 | 实现门禁未满足 |
 
-## Skill 与工具状态
+## 启动时 Skill 与工具状态（历史）
 
 ### Superpowers
 
-- 当前会话暴露的 skills 中没有 `superpowers:*`，但官方插件缓存存在 Superpowers v6.1.1（MIT）及完整核心 skill 目录。
+- 当时会话暴露的 skills 中没有 `superpowers:*`，但官方插件缓存存在 Superpowers v6.1.1（MIT）及完整核心 skill 目录。
 - 已检测：`brainstorming`、`writing-plans`、`using-git-worktrees`、`subagent-driven-development`、`executing-plans`、`test-driven-development`、`requesting-code-review`、`receiving-code-review`、`systematic-debugging`、`verification-before-completion`、`finishing-a-development-branch`，以及 `using-superpowers`、`dispatching-parallel-agents`、`writing-skills`。
 - 官方仓库在 2026-07-19 复核显示最新版本为 v6.1.1；本地插件 manifest 同样为 v6.1.1。
 - 官方 Codex 安装：App 侧栏 Plugins → Coding → Superpowers → `+`，或 CLI `/plugins` 搜索安装。
@@ -35,12 +44,12 @@
 
 ### Open Design
 
-- 当前未找到 `od` 命令、Open Design skill 或 MCP；MCP resources/templates 均为空。
+- 当时未找到 `od` 命令、Open Design skill 或 MCP；MCP resources/templates 均为空。该历史缺口已由上方“当前权威状态”取代。
 - D-024 已确认采用“安装并使用 Open Design”，因此该缺口不再是产品选择问题，而是正式 UI 前必须满足的外部环境门禁。
 - 官方 release：v0.15.0（2026-07-14，commit `79e257d`），Apache-2.0，提供 Windows x64 安装器。
 - 本地安装器大小 309,298,247 bytes；SHA-256 与同名 `.sha256` 一致，值为 `63fc2e609489474e99187cdf94d01d063c1dbee733aaf2464d835cdc1e96f6b5`；Authenticode 状态为 `NotSigned`，与上游 Windows 未签名发布说明一致。
 - 官方说明支持 Codex，接入命令为 `od mcp install codex`，也支持 `--print` 预览配置。
-- 安装器已下载但未运行。当前环境只允许写项目目录，无法合规完成会写入用户/系统目录且可能触发 SmartScreen 的安装；待用户按 `DECISIONS_NEEDED.md` 处理。
+- 安装器当时已下载但未运行。当时环境只允许写项目目录，无法合规完成会写入用户/系统目录且可能触发 SmartScreen 的安装；该历史缺口现已解除。
 
 ### 本地开发工具
 
@@ -110,7 +119,7 @@ Superpowers 插件、核心 skills 与 Open Design 仍均为 `none`。这是连�
 - 已完整读取 `using-superpowers` 与 `brainstorming` skill，并保持“用户批准设计前不得实现”的硬门禁。
 - Open Design 仍未安装。自动下载受 GitHub 网络连接与内置浏览器超时阻塞，用户改为手动下载官方 v0.15.0 安装器；安装后继续 MCP 接入验证。
 
-### 当前复查（2026-07-19T21:57:09+08:00）
+### 2026-07-19 复查（历史）
 
 - 完整复读根目录约束、课程通用要求、B 类要求、全部已有项目文档与 Git 历史；仓库仍无源码、`SPEC.md` 或 `PLAN.md`。
 - Superpowers v6.1.1 缓存和 14 个 skills 均存在；本次任务的可调用 skill 清单没有注册它们。已完整读取 `using-superpowers` 与 `brainstorming`，按其清单续接阶段 A，并在日志保留证据限制。
