@@ -92,9 +92,9 @@ There are 41 planning groups and 69 dispatch units (the 17 groups marked `Task G
 | ID | Deliverable | Dependencies | Parallel group | Status / commit |
 | --- | --- | --- | --- | --- |
 | G-01 | Open Design environment/MCP/selection gate | SPEC confirmed | G | [x] PASS；commit `b93c096db29f7b957950a0cfc74b80170a38d25a` |
-| G-02A | Toolchain/dependency/license baseline | SPEC confirmed | G | [ ] PENDING; evidence ledger created, required dependency/license rows explicitly blocked |
-| G-02B | Provider policy/capability/cost evidence | G-02A | G | [ ] PENDING; official policy rows verified, pricing/F capability rows explicitly blocked |
-| G-02C | Distribution/hosting evidence | G-02A | G | [ ] PENDING; freezer, immutable OCI digest, and host rows explicitly blocked |
+| G-02A | Toolchain/dependency/license baseline | SPEC confirmed | G | [ ] PENDING; evidence ledger created, required dependency/license rows explicitly blocked; checkpoint `24caa35` |
+| G-02B | Provider policy/capability/cost evidence | G-02A | G | [ ] PENDING; official policy rows verified, pricing/F capability rows explicitly blocked; checkpoint `24caa35` |
+| G-02C | Distribution/hosting evidence | G-02A | G | [ ] PENDING; freezer, immutable OCI digest, and host rows explicitly blocked; checkpoint `24caa35` |
 | G-03 | Fresh-agent cold start and implementation approval | formal writing-plans evidence, G-01 PASS, G-02A/B/C PASS | G | [ ] 尚未执行 |
 | G-04 | Worktree/branch ownership map | G-03 approved | G | [ ] 尚未执行 |
 | T-01 | Reproducible project/test scaffold | G-01 PASS/G-02A PASS/G-03 approved/G-04 | F | [ ] 尚未执行 |

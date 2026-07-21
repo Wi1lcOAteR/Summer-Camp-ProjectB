@@ -671,5 +671,5 @@
 - **Red evidence:** after fixing two script-level PowerShell issues, `powershell -ExecutionPolicy Bypass -File scripts/verify_evidence.ps1` returned `EVIDENCE_VALIDATION_FAIL errors=3 rows=0` because all three evidence files were absent.
 - **Green evidence:** the same command returned `EVIDENCE_VALIDATION_PASS rows=37 explicitly_blocked=28` after adding the three ledgers. This validates table shape, URLs, dates, allowed status values, and secret-pattern absence only; it does not close G-02.
 - **Files changed by coordinator:** `docs/engineering/DEPENDENCY_BASELINE.md`, `PROVIDER_POLICY_EVIDENCE.md`, `DISTRIBUTION_EVIDENCE.md`, `scripts/verify_evidence.ps1`, `PLAN.md`. The ledgers intentionally mark unresolved rows `explicitly-blocked`; no production source, credentials, private course material, package install, or remote deployment was added.
-- **Commit:** not yet created; review and commit remain pending until the evidence rows are reviewed and the worktree is checked.
+- **Commit:** checkpoint `24caa35` (`docs(G-02): record blocked evidence baseline [agent: Codex GPT-5]`). This is a partial evidence checkpoint; G-02A/B/C remain pending and no implementation gate was opened.
 - **Lesson:** a validator PASS can coexist with blocked evidence by design; downstream tasks must consume only `verified` rows and keep all blocked implementation gates closed.
