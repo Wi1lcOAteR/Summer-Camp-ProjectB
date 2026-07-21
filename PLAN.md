@@ -95,7 +95,7 @@ There are 41 planning groups and 69 dispatch units (the 17 groups marked `Task G
 | G-02A | Toolchain/dependency/license baseline | SPEC confirmed | G | [x] PASS; exact Python/npm locks, license closure, smoke evidence, and validator committed at `22b516af7b6f4896c6127e75b2585435e407a3c0` |
 | G-02B | Provider policy/capability/cost evidence | G-02A | G | [x] PASS; exact model/cost and P/F documentation boundaries committed at `5ac9d47ddda845ed78f1758326fb547610274f4c`; runtime F remains `source_disabled` until X2-03/INT-01 |
 | G-02C | Distribution/hosting evidence | G-02A | G | [ ] PENDING; freezer/base/HF runtime facts verified, but paid-plan/account rows await D-025; reviewed blocker checkpoint `be666537706b4c133673029d950e84f15ea3ae1b`; candidate comparison in `docs/research/PUBLIC_HOSTING_ALTERNATIVES.md` is not a host selection |
-| G-03 | Fresh-agent cold start and implementation approval | formal writing-plans evidence, G-01 PASS, G-02A/B/C PASS | G | [ ] 尚未执行 |
+| G-03 | Fresh-agent cold start and implementation approval | formal writing-plans evidence, G-01 PASS, G-02A/B/C PASS | G | [ ] 尚未执行；D-001 复核为 Superpowers cache-only，当前 task 无正式 `writing-plans` 调用能力 |
 | G-04 | Worktree/branch ownership map | G-03 approved | G | [ ] 尚未执行 |
 | T-01 | Reproducible project/test scaffold | G-01 PASS/G-02A PASS/G-03 approved/G-04 | F | [ ] 尚未执行 |
 | T-02 | Domain primitives and SourceLocator | T-01 | D | [ ] 尚未执行 |

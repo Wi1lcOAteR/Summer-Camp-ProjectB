@@ -9,6 +9,12 @@
 - 用途：课程要求的规约、计划、worktree、subagent、TDD、评审、调试与完成验证。
 - 选择理由：它不是“类似方案”，而是作业文档明确指定的框架；上游已经提供 Codex App、Codex CLI、Claude Code 等适配，不应手工复制或改写其中的 skill。
 
+### ProjectB 当前状态（2026-07-22）
+
+当前状态不是“已安装、只差重开会话”，而是 **cache-only**：Superpowers 6.1.1 的完整 bundle 与 14 个 skill 目录存在于 Codex cache，但 `config.toml` 没有 Superpowers plugin 启用项，当前 task 也没有暴露任何 `superpowers:*` skill。Codex CLI 0.144.4 的只读 marketplace/plugin 列表同样为空。精确证据见 [`docs/engineering/SUPERPOWERS_VALIDATION.md`](docs/engineering/SUPERPOWERS_VALIDATION.md)。
+
+因此应按下方 Codex App 步骤重新安装/启用，再**新建 task** 验证；不要把 cache 文件、手工读取 `SKILL.md` 或现有 fallback `PLAN.md` 当作正式 skill 调用。
+
 安装方式按你实际使用的编码智能体选择一种：
 
 ### Codex App（推荐作为主开发智能体）
@@ -16,7 +22,8 @@
 1. 打开 Codex App 左侧的 **Plugins**。
 2. 在 Coding 分类中找到 **Superpowers**。
 3. 点击 `+` 并完成安装。
-4. 新建会话，要求 Codex 列出可用的 Superpowers skills，确认下列核心项存在。
+4. 在 **Installed** 行确认 Superpowers 已启用。
+5. 新建会话，要求 Codex 列出可用的 Superpowers skills，确认下列核心项存在。
 
 ### Codex CLI
 
@@ -114,6 +121,8 @@ Do not write code.
 4. 不直接创建业务代码。
 
 若 Codex 直接开始搭框架，先检查 Superpowers 是否在当前 Codex 环境安装成功、是否重新开启了会话，以及项目根目录是否存在 `AGENTS.md`。
+
+仅看到 `~/.codex/plugins/cache/.../superpowers/<version>` 不代表安装成功。还应确认 `config.toml` 存在对应 enabled plugin 状态，并以新任务实际暴露/调用 skill 为最终证据。
 
 ## 六、版本与来源记录
 

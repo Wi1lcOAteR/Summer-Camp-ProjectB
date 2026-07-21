@@ -7,7 +7,7 @@
 - **新增部署决策 D-025**：2026-07-21 的当前官方文档已确认，新建 Gradio 或 Docker Space 需要付费方案；“CPU Basic 无小时费”不等于“可用免费账号创建”。2026-07-22 又完成替代路线的官方只读调查：已有 x64 Docker 主机可配现有 HTTPS 或 Tailscale Funnel，Azure for Students + Container Apps 是无需信用卡的托管候选；Cloudflare Quick Tunnel、Northflank Sandbox 与 Oracle Always Free 均有不适合作为当前最终路线的明确边界。调查不等于选择，G-02C 仍保持 pending。
 - **学生本人过程证据**：课程审计要求学生用自己的话评价 brainstorming 的优点、不足与关键取舍；当前尚未提供，AI 不得代写或推断成学生观点。
 - **当前阻断信号**：阶段 B 的内容已形成，但正式 `writing-plans` 流程证据尚未闭合；D-005 类型可并行选择，但执行阶段 C/G-03 前必须先恢复正式 skill 调用，或取得课程明确接受 fallback 的证据。冷启动修订和学生再次批准前不能进入实现。
-- **外部环境门禁**：D-001 的正式 Superpowers skill 证据仍缺。D-024/D-003 的 MCP 注册、Open Design 0.15.1 daemon、内置完整 `frontend-design` 与学生选择的 `default`/Neutral Modern 均已验证；fresh task 的 `list_skills` 也成功，空项目列表和无活动上下文是实现前的真实状态。G-01 环境门禁已通过；实际 project/run/artifact 只在获准实现后的 UI-01A 中执行，Open Design 不需要无任务长期挂起。
+- **外部环境门禁**：D-001 已复核为 Superpowers cache-only：当前 config 无 installed/enabled 状态、task 无 `superpowers:*`，正式 skill 证据仍缺；须在 Codex App 安装/启用并新建 task，或取得课程接受 fallback 的明确证据。D-024/D-003 的 MCP 注册、Open Design 0.15.1 daemon、内置完整 `frontend-design` 与学生选择的 `default`/Neutral Modern 均已验证；fresh task 的 `list_skills` 也成功，空项目列表和无活动上下文是实现前的真实状态。G-01 环境门禁已通过；实际 project/run/artifact 只在获准实现后的 UI-01A 中执行，Open Design 不需要无任务长期挂起。
 - **执行时授权**：公开 demo 的 OCI、同构 WebUI、许可夹具/mock、隔离与 HTTPS 合同保持不变；实际托管平台须先解决 D-025。NJU Git/GitLab、GitHub 的建仓、push、PR/MR、镜像和远程 CI 配置也须当时授权。
 - **工程核验而非学生决策**：OpenAI SDK/依赖许可证、动态数据政策、模型/容量/费用、材料权利、打包兼容性和干净机/浏览器/CI 证据。它们必须真实验证，但不应伪装成新的产品选择题。
 
@@ -40,15 +40,15 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
 
 ## D-001 — Superpowers 安装与会话注册
 
-**状态：安装阻塞已解除。2026-07-19 复查确认官方插件缓存中存在 Superpowers v6.1.1 及完整核心 skills；此前会话已记录触发 `using-superpowers` 与 `brainstorming`。当前会话仍未把这些 skills 暴露到可调用清单。阶段 B 已完整读取上游 `writing-plans` 规则并用透明 fallback 生成 `PLAN.md`，但这不等于正式 skill 调用证据；后续新会话仍需修复注册并继续全流程留证。**
+**状态：开放。2026-07-22 只读复核纠正了旧结论：Superpowers v6.1.1 完整 bundle 只存在于 cache；`config.toml` 没有 Superpowers enabled plugin 或对应 marketplace，Codex CLI 的 marketplace/plugin 列表为空，当前 task 也没有 `superpowers:*`。此前 brainstorming 过程与 fallback PLAN 证据保留，但不能证明当前已安装或正式调用。详见 `docs/engineering/SUPERPOWERS_VALIDATION.md`。**
 
-- **问题**：插件已安装，但本次会话的可调用 skill 清单未注册 `superpowers:*`。
+- **问题**：缓存 payload 存在，但 Superpowers 没有安装/启用到当前 Codex 环境，因此无法正式调用 `writing-plans`。
 - **为什么必须由你处理**：Codex 的插件启用与会话注册发生在应用层；当前项目工作区不能修改该状态。
 - **候选方案**：
-  1. **推荐：当前会话继续需求澄清，在进入阶段 B 前新建已加载插件的 Codex 会话**。
-  2. 在 Codex App 的 Plugins 中确认 Superpowers 已启用后，再新建项目会话。
-  3. 使用 Codex CLI `/plugins` 确认安装并重新进入项目会话。
-- **推荐方案及影响**：方案 1 不丢失当前 brainstorming 过程，同时确保 `writing-plans` 有正式调用证据。
+  1. **推荐：在 Codex App 的 Plugins 中安装/重新启用 Superpowers，并新建 ProjectB task 验证实际 skill 清单**。
+  2. 在已认证的 Codex CLI 中用 `/plugins` 安装，然后退出并开启新 CLI session；当前未认证 CLI 的空列表不能替代 App 安装。
+  3. 取得课程明确书面接受：现有完整 fallback `PLAN.md` 可替代本次正式 `writing-plans` 调用。
+- **推荐方案及影响**：方案 1 与官方插件加载规则和 Superpowers 自带 README 一致，不改写现有 brainstorming/PLAN 过程；新 task 只需正式运行 `writing-plans` 审核现有 SPEC/PLAN，并记录真实 diff。
 - **阻塞范围**：不阻塞已有 `PLAN.md` fallback 草案的审查或 D-005 选择；但它阻塞阶段 B 正式闭合与 G-03 冷启动执行。恢复正式调用或取得课程明确接受 fallback 的证据前，不能把阶段 B 标为完成。
 
 ## D-002 — AI 辅助场景的产品主线（已选择，SPEC 已整体确认）

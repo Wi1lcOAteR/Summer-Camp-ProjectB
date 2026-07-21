@@ -3,14 +3,14 @@
 初次审计时间：2026-07-17T18:14:41+08:00
 最近历史复查时间：2026-07-19T21:57:09+08:00
 最近外部门禁复查：2026-07-21T21:08:02+08:00（G-01 scope correction）
-最近文档一致性复查：2026-07-22T02:29:11+08:00（D-025 替代托管调查与初审修复）
+最近文档一致性复查：2026-07-22T02:55:19+08:00（Superpowers cache-only 状态纠正）
 
 > 当前要求符合性请以 [`REQUIREMENTS_COMPLIANCE_AUDIT.md`](REQUIREMENTS_COMPLIANCE_AUDIT.md) 为准。本文件前半部分保留启动阶段的历史快照，不能用其中“SPEC 不存在”“Open Design 未安装”等旧状态判断当前工作区。
 
 ## 当前权威状态（2026-07-22）
 
 - 项目处于阶段 B 的工程证据与计划门禁收口期，尚未进入正式实现。
-- `SPEC.md` 已由学生整体确认；`PLAN.md` 已形成，但正式 `superpowers:writing-plans` 调用证据仍缺，现有计划明确标记为 fallback。
+- `SPEC.md` 已由学生整体确认；`PLAN.md` 已形成，但正式 `superpowers:writing-plans` 调用证据仍缺，现有计划明确标记为 fallback。Superpowers 6.1.1 只是完整 cache payload，当前 config 无安装/启用项、task 无相应 skill；D-001 已重新开放。
 - Open Design 0.15.1、Codex MCP、完整内置 `frontend-design` 和学生选择的 `default`（Neutral Modern）均已验证，G-01 已 PASS。该 bundled skill 不需要另行下载到 Codex；Open Design 也不需要无任务时长期保持开启。
 - `list_projects=[]` 与 `get_active_context.active=false` 是实现前的正常状态。真实 project/run/artifact 只在冷启动完成且学生批准实现后的 UI-01A 中按需创建，不能提前生成 UI 来冒充环境验证。
 - G-02A 工具链/依赖/许可证与 G-02B provider 政策/费用证据已分别 PASS；G-02C 已验证 freezer、OCI base 与 HF runtime 条件，但当前官方付费方案要求触发 D-025，仍为 pending。2026-07-22 已补充现有主机/Tailscale 和 Azure Students/Container Apps 的官方候选比较；没有选择或创建托管资源。
@@ -18,7 +18,7 @@
 
 ## 启动时结论（历史）
 
-项目目前处于阶段 A 的需求澄清，不是实现阶段。仓库没有源码或项目规约；Superpowers v6.1.1 已安装且核心 skills 完整，但本次会话未将其注册到可调用清单。Open Design v0.15.0 安装器已下载并通过本地校验文件核对，尚未安装或接入。当前可继续 brainstorming 的逐项提问，但不得创建 `PLAN.md` 或编写实现。
+项目当时处于阶段 A 的需求澄清，不是实现阶段。仓库没有源码或项目规约；当时仅凭 Superpowers v6.1.1 cache 与核心 skill 文件存在而记为“已安装”，但本次会话未将其注册到可调用清单。该安装判断已由 2026-07-22 的四层证据复核纠正为 cache-only。Open Design v0.15.0 安装器当时已下载并通过本地校验文件核对，尚未安装或接入。
 
 ## 启动时仓库现状（历史）
 
@@ -72,7 +72,7 @@
 
 | 课程要求 | 当前状态 | 下一合规动作 |
 | --- | --- | --- |
-| Superpowers 全流程 | 插件已安装；本会话未注册 | 当前继续逐项澄清；阶段 B 前新建能正式调用 `writing-plans` 的会话 |
+| Superpowers 全流程 | **当时误判**为插件已安装；实际只有 cache，本会话未注册 | 该历史判断已由 `SUPERPOWERS_VALIDATION.md` 纠正；须 App 安装/启用并新建 task |
 | 真实、有用、至少 3 模块 | 未定义 | brainstorming 先确定真实用户与痛点，再验证模块边界 |
 | 5+ INVEST 用户故事 | 缺失 | 在用户确认问题方向后逐项形成 |
 | WebUI + Open Design | 安装器已验证，工具尚未安装 | 用户运行安装器后执行 `od mcp install codex`；在 SPEC 确认 design system/skill |
@@ -116,7 +116,7 @@ Superpowers 插件、核心 skills 与 Open Design 仍均为 `none`。这是连�
 
 ### 外部状态恢复（2026-07-17T22:05:24+08:00）
 
-- Superpowers v6.1.1 已安装到官方 Codex 插件缓存；核心 skills 完整，mandatory brainstorming 前置环境已恢复。
+- 当时把“Superpowers v6.1.1 已进入官方 Codex 插件缓存且核心 skills 完整”记录为安装/前置恢复；2026-07-22 复核证明 cache 不等于 installed/enabled，该历史结论已被纠正。
 - 已完整读取 `using-superpowers` 与 `brainstorming` skill，并保持“用户批准设计前不得实现”的硬门禁。
 - Open Design 仍未安装。自动下载受 GitHub 网络连接与内置浏览器超时阻塞，用户改为手动下载官方 v0.15.0 安装器；安装后继续 MCP 接入验证。
 

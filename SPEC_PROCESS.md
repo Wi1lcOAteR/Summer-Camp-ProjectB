@@ -1,6 +1,6 @@
 # SPEC_PROCESS
 
-> 当前状态：学生已于 2026-07-20 整体确认 `SPEC.md`，D-017 至 D-024 及工程候选已收敛为 v1 方向；`PLAN.md` 已形成。2026-07-21 学生在 Open Design 中实际选择 `frontend-design` + `default`（Neutral Modern），0.15.1 daemon、完整 bundled skill 和 fresh MCP 只读发现均已验证；`list_projects=[]` 与 `active=false` 是实现前的真实状态，G-01 环境/选择门禁已通过。Open Design daemon 仅在 MCP 调用或真实 project/run 期间按需运行，实际 project/run/artifact 延后至获准实现后的 UI-01A。G-02A/G-02B 已 PASS；Hugging Face 官方条款复核已完成，并因 Docker Space 付费方案要求触发 D-025/G-02C 门禁。2026-07-22 已完成现有主机/Tailscale 与 Azure Students/Container Apps 的官方候选调查，但没有替学生选择或创建资源。其余门禁是 Superpowers 正式 `writing-plans` 证据或课程接受 fallback、G-03 全新 session 冷启动、冷启动修订后的学生实现批准，以及学生本人 brainstorming 反思。Superpowers v6.1.1 缓存可检测，但本次会话未将 `superpowers:*` 注册到可调用清单，因此不能把 fallback 计划冒充正式 skill 调用。
+> 当前状态：学生已于 2026-07-20 整体确认 `SPEC.md`，D-017 至 D-024 及工程候选已收敛为 v1 方向；`PLAN.md` 已形成。2026-07-21 学生在 Open Design 中实际选择 `frontend-design` + `default`（Neutral Modern），0.15.1 daemon、完整 bundled skill 和 fresh MCP 只读发现均已验证；`list_projects=[]` 与 `active=false` 是实现前的真实状态，G-01 环境/选择门禁已通过。Open Design daemon 仅在 MCP 调用或真实 project/run 期间按需运行，实际 project/run/artifact 延后至获准实现后的 UI-01A。G-02A/G-02B 已 PASS；Hugging Face 官方条款复核已完成，并因 Docker Space 付费方案要求触发 D-025/G-02C 门禁。2026-07-22 已完成现有主机/Tailscale 与 Azure Students/Container Apps 的官方候选调查，但没有替学生选择或创建资源。其余门禁是 Superpowers 正式 `writing-plans` 证据或课程接受 fallback、G-03 全新 session 冷启动、冷启动修订后的学生实现批准，以及学生本人 brainstorming 反思。Superpowers v6.1.1 完整 bundle 只存在于 cache；当前配置无 installed/enabled 状态且 task 无 `superpowers:*`，因此不能把 fallback 计划冒充正式 skill 调用。
 
 ## 0. 启动审计（2026-07-17）
 
@@ -15,7 +15,7 @@
 
 - 项目想法仍是模板占位文本，没有可确认的问题陈述、目标用户或功能边界。
 - 课程要求第一步必须由 Superpowers `brainstorming` 介入。
-- Superpowers v6.1.1 已安装，PRE-006 已记录此前会话触发 `brainstorming`；本次会话按同版本上游指令续接，但可调用 skill 清单未注册 `superpowers:*`。
+- **启动时历史判断**：当时仅凭 Superpowers v6.1.1 cache 与 PRE-006 的先前触发记录写作“已安装”；本次会话按同版本上游指令续接，但可调用 skill 清单未注册 `superpowers:*`。2026-07-22 的安装状态复核已将该判断纠正为 cache-only。
 - 启动时进入阶段 A 的逐项需求澄清；在设计获得用户确认前不创建正式 `SPEC.md`，在用户明确确认 `SPEC.md` 前不进入计划或实现。
 
 ### 已完成的非决策工作
@@ -441,3 +441,11 @@
 - Standard evidence validation remained `PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`; distribution-strict validation failed only because the two hosting rows remain blocked. Local Markdown verification reported 34 files, 20 local links, 0 broken links and 0 odd fences. This is a researched decision gate, not G-02C completion.
 - The first independent SPEC/gate review found that this timestamped process entry and two audit update markers were missing. They were added without rewriting the earlier G-02C checkpoint; the follow-up review then approved the diff with no Critical or P1 finding. The review confirmed that D-025, formal `writing-plans`, fresh cold start and student implementation approval remain closed gates.
 - The research-only documentation checkpoint is `47f294c`; it records candidate evidence and review corrections, not a host choice or G-02C PASS.
+
+### Superpowers installation-state correction: 2026-07-22T02:55:19+08:00
+
+- A fresh task still exposed no `superpowers:*` skill. The complete 6.1.1 bundle and fourteen core skill directories remain in the `openai-curated-remote` cache, but `config.toml` has no Superpowers enabled-plugin entry or corresponding marketplace.
+- Codex CLI 0.144.4 reported empty configured marketplace, installed-plugin and available-plugin sets. The CLI is separately unauthenticated, so its auth/MCP diagnostics are not used as desktop-account claims; the decisive evidence is the current task catalog plus missing enabled state in config.
+- OpenAI's official plugin docs state that installation/enabled state is distinct from cache storage and that bundled skills become available to new chats/sessions after installation. The current official `openai/plugins` marketplace still lists Superpowers as available for Codex.
+- `docs/engineering/SUPERPOWERS_VALIDATION.md` records the exact bundle hash, detected skills, commands, official sources, non-actions and recovery gate. No user config, authentication, marketplace, cache or project dependency was changed.
+- D-001 is therefore open as an app-level installation/enablement gate, not a mere stale-session refresh. Formal `writing-plans` or explicit course acceptance of the fallback remains required before G-03.

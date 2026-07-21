@@ -747,3 +747,17 @@
 - **验证证据**：普通校验为 `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；`-RequireDistributionReady` 按预期只因两项托管 blocker 返回 exit 1。Markdown 校验为 34 文件、20 本地链接、0 坏链接、0 奇数围栏；当前时态陈旧措辞扫描为 0；`git diff --check` 无 whitespace error，仅有 Windows 行尾提示。
 - **commit hash**：`47f294ca994cc1fdafc82420a167f305716152ed`（`docs(G-02C-R1): research no-paid hosting alternatives [agent: Codex GPT-5]`）。该 hash 是只读研究/文档 checkpoint，不是 G-02C PASS。
 - **经验教训**：免费额度、无需信用卡、无需付款方式和不会自动产生账单是四个不同条件；候选调查可以让人工门禁更易回答，但在学生选择并确认 SPEC diff 前不能把候选事实写入 selected-host 证据行。
+
+## 2026-07-22T02:55:19+08:00 - D-001 Superpowers installation-state correction
+
+- **Task 编号**：D-001（只读环境诊断；阶段 B/G-03 仍阻断）。
+- **触发的 skill / 工具**：使用 `openai-docs` skill 的 Codex self-knowledge 路径。Codex manual helper 因 Windows Schannel `SEC_E_NO_CREDENTIALS` 失败；按 skill 规则改用官方 OpenAI Docs MCP，获取 `Plugins` 与 `Build plugins` 页面。没有关闭 TLS 校验、登录 CLI 或修改用户配置。
+- **关键 context**：Goal 自动续接后仍无 D-025 选择；唯一安全推进项是验证重开 task 是否已经让正式 Superpowers skills 可用。当前 task 的 skill catalog 仍无 `superpowers:*`。
+- **环境证据**：Codex CLI 0.144.4；Superpowers 6.1.1 manifest SHA-256 `42F44D5E17AFF909BD6F2A53795D516D8CA78CD9512C32C91F19CBBCCED68877`；14 个核心 skill 目录完整。`config.toml` 没有 Superpowers enabled-plugin 或对应 marketplace；CLI `marketplace list`、installed/available plugin JSON 均为空。CLI doctor 的未认证/网络结果只描述 CLI 环境，不冒充桌面账号状态。
+- **官方交叉核验**：OpenAI `openai/plugins` 当前 HEAD `11c74d6ba24d3a6d48f54a194cd00ef3beea18f9`，marketplace blob `dff3ad09da7efc35a6d3b905b1aa07795bc240b6` 将 Superpowers 标为 Codex 可安装。官方文档说明插件安装/启用状态与 cache 分离，bundled skills 在安装后的新 chat/session 才可用。
+- **修订与非动作**：新增 `docs/engineering/SUPERPOWERS_VALIDATION.md`，同步 `SKILLS_SETUP.md`、D-001、PLAN/G-03、过程和审计当前状态。没有复制/修改缓存、添加 marketplace、安装 plugin、修改 auth/config、正式调用 Superpowers、执行冷启动或开始实现。
+- **结论**：旧的“插件已安装，只差会话注册”判断证据不足，现纠正为“cache-only / not callable”。用户须在 Codex App Plugins 安装/启用 Superpowers 并新建 task，或取得课程接受 fallback 的明确证据。
+- **两阶段复核**：先按 `AGENTS.md`/D-001/G-03 检查门禁合规，确认没有把 cache、fallback 或历史触发冒充正式 invocation；再核对官方 plugin loading/config 规则、CLI/desktop 证据隔离、bundle hash、skills 清单和历史/current 措辞。修复三处历史快照的“已安装”误导表述后，无 Critical/P1 残留。
+- **验证证据**：标准 evidence validator 为 `PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；distribution-strict 仍按预期只因两项 D-025 host blocker 失败。PLAN ledger 为 69 unique/3 PASS/66 pending；Markdown 为 35 文件、21 本地链接、0 坏链接、0 奇数围栏；当前 Superpowers 陈旧措辞扫描 0，focused credential scan 0，`git diff --check` 无 whitespace error。
+- **commit hash**：尚未创建；真实 hash 在最终 staged-diff 验证后回填。
+- **经验教训**：插件 payload、marketplace 可发现性、installed/enabled config 和新任务实际 skill catalog 是四层独立证据；任何一层缺失都不能用 cache 路径代替正式 invocation。
