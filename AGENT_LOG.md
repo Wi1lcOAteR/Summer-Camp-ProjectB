@@ -680,3 +680,11 @@
 - **Observed local cache:** `C:\Users\22078\.codex\plugins\cache\openai-curated-remote\superpowers\6.1.1\skills` contains the expected `brainstorming`, `writing-plans`, worktree, TDD, review, debugging and verification directories.
 - **Decision:** cached files are not treated as a formal skill invocation. G-03 remains blocked until a fresh session exposes the registered skill or the course explicitly accepts the documented fallback, then the student selects D-005 and approves implementation after cold-start revisions.
 - **No changes:** no cached skill source was copied into the repository, no implementation was started, and no user-level Codex configuration was modified.
+
+## 2026-07-21T22:45:00+08:00 - Documentation checkpoint verification
+
+- `scripts/verify_evidence.ps1`: `EVIDENCE_VALIDATION_PASS rows=37 explicitly_blocked=28`.
+- `git diff --check`: pass; working tree clean after commit `96164fe`.
+- PLAN dispatch ledger: `PLAN_DISPATCH_UNIQUE_PASS count=69`.
+- Focused credential scan: `CREDENTIAL_SCAN_PASS actual-token-patterns=0`; engineering evidence links: `ENGINEERING_LINKS_PASS`.
+- No backend/frontend implementation, README, CI file or student `REFLECTION.md` was created. G-02A/B/C remain pending, and G-03 remains blocked by formal Superpowers registration/fallback acceptance, cold-start validation and implementation approval.
