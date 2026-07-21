@@ -42,7 +42,7 @@ Rows labelled **Task Group** are planning containers only. They are never dispat
 | API-02 | API-02A explanation/practice sessions; API-02B attempts/checks/evidence |
 | API-03 | API-03A plan/tasks/revisions; API-03B review-goal/finals; API-03C study-focus confirmation |
 | API-04 | API-04A profile/credential lifecycle; API-04B audit/security status |
-| UI-01 | UI-01A shell/tokens/accessibility; UI-01B timeline/navigation; UI-01C responsive/loading/error/empty states |
+| UI-01 | UI-01A controlled Open Design run + shell/tokens/accessibility; UI-01B timeline/navigation; UI-01C responsive/loading/error/empty states |
 | UI-02 | UI-02A metadata/import state; UI-02B policy/consent/start/recovery |
 | UI-03 | UI-03A source/coverage; UI-03B privacy; UI-03C credentials |
 | UI-04 | UI-04A explanation/citations; UI-04B deterministic checks/evidence |
