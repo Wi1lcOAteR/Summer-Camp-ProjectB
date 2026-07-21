@@ -4,7 +4,7 @@
 
 - **已解除的产品方向门禁**：学生于 2026-07-20 明确确认完整 `SPEC.md`；D-017 至 D-023 与 D-024 的“安装并使用 Open Design”方向已纳入 v1，不应重复提问。2026-07-21 学生又在 Open Design 界面实际选择 `frontend-design` + `default`（显示名 `Neutral Modern`），具体组合也已确认。`PLAN.md` 已按上游 `writing-plans` 规则通过透明 fallback 生成并审查，但当前会话仍缺少正式 `superpowers:writing-plans` 调用证据。
 - **已确认但仍需工程验证的合同**：D-020 的精确 `ReviewPolicy v1`、Windows x64 单文件 `ProjectB.exe`、OCI demo、隔离限额与 Hugging Face Spaces Docker SDK 已随整体 SPEC 确认；它们仍须通过许可证、官方条款、构建/运行和安全验证，不能把“已确认方向”写成“已实现”。
-- **新增部署决策 D-025**：2026-07-21 的当前官方文档已确认，新建 Gradio 或 Docker Space 需要付费方案；“CPU Basic 无小时费”不等于“可用免费账号创建”。这与当前“不产生付费云资源”的授权及已确认 SPEC 冲突。G-02C 保持 pending，不能静默换托管商、购买方案或创建 Space。
+- **新增部署决策 D-025**：2026-07-21 的当前官方文档已确认，新建 Gradio 或 Docker Space 需要付费方案；“CPU Basic 无小时费”不等于“可用免费账号创建”。2026-07-22 又完成替代路线的官方只读调查：已有 x64 Docker 主机可配现有 HTTPS 或 Tailscale Funnel，Azure for Students + Container Apps 是无需信用卡的托管候选；Cloudflare Quick Tunnel、Northflank Sandbox 与 Oracle Always Free 均有不适合作为当前最终路线的明确边界。调查不等于选择，G-02C 仍保持 pending。
 - **学生本人过程证据**：课程审计要求学生用自己的话评价 brainstorming 的优点、不足与关键取舍；当前尚未提供，AI 不得代写或推断成学生观点。
 - **当前阻断信号**：阶段 B 的内容已形成，但正式 `writing-plans` 流程证据尚未闭合；D-005 类型可并行选择，但执行阶段 C/G-03 前必须先恢复正式 skill 调用，或取得课程明确接受 fallback 的证据。冷启动修订和学生再次批准前不能进入实现。
 - **外部环境门禁**：D-001 的正式 Superpowers skill 证据仍缺。D-024/D-003 的 MCP 注册、Open Design 0.15.1 daemon、内置完整 `frontend-design` 与学生选择的 `default`/Neutral Modern 均已验证；fresh task 的 `list_skills` 也成功，空项目列表和无活动上下文是实现前的真实状态。G-01 环境门禁已通过；实际 project/run/artifact 只在获准实现后的 UI-01A 中执行，Open Design 不需要无任务长期挂起。
@@ -13,15 +13,16 @@
 
 ## D-025 — 公开 OCI demo 的托管与费用冲突（待学生决定）
 
-**状态：开放。2026-07-21 已从 Hugging Face 官方 `hub-docs` 当前提交核验：创建新的 Gradio 或 Docker Space 需要 PRO、Team 或 Enterprise 付费方案。CPU Basic 的硬件小时费为零不解除账号方案要求。未创建账号资源、未订阅、未部署。**
+**状态：开放。2026-07-21 已从 Hugging Face 官方 `hub-docs` 当前提交核验：创建新的 Gradio 或 Docker Space 需要 PRO、Team 或 Enterprise 付费方案。2026-07-22 已完成替代路线的官方只读比较，详见 `docs/research/PUBLIC_HOSTING_ALTERNATIVES.md`。未选择替代平台，未创建账号资源、未添加付款方式、未消耗 student credit、未订阅、未部署。**
 
 - **问题**：已确认的 Hugging Face Docker Space 首选方向无法在当前无付费授权下创建；必须确定课程所需公开 WebUI 的新托管路径。
 - **为什么必须由你决定**：这会改变部署平台、账号/费用责任或已确认 SPEC，属于重大交付与成本决策，不能由智能体静默替换。
 - **候选方案**：
-  1. **推荐（若你已有资源）：使用现有学生/NJU 控制的 OCI 主机**，要求可运行容器、提供 HTTPS 且不新增付费资源。保留同一 OCI、WebUI、mock、隔离和限额合同；你需要确认可用主机与域名/反向代理条件。
-  2. **继续 Hugging Face Docker Spaces**，由你明确授权并承担符合条件的付费方案及周期性费用上限。该选择超出当前 Goal 的无付费授权，未确认前不会执行。
-  3. **批准一次 SPEC 变更并重新研究其他公开托管商**。只采用可由官方当前文档证明费用、HTTPS、OCI、休眠/存储和账号条件的平台；会推迟 G-02C。当前浏览器安全策略明确禁止 Render/Koyeb 域名，本轮没有绕过，也没有把二者列为已验证候选。
-- **推荐方案及影响**：已有校园/学生主机时优先方案 1，改动最小且不产生新费用；若没有现成资源，方案 3 比未经预算约束地订阅更保守，但需要重新确认托管平台和 SPEC diff。
+  1. **推荐（若你已有资源）：使用现有学生/NJU 控制的 x64 Docker 主机**。已有域名/反向代理时沿用其 HTTPS；没有域名时可选择 Tailscale Funnel 提供 `ts.net` HTTPS URL。该方案保留同一 OCI/WebUI/mock/隔离合同且不新增云计算费用，但 Funnel 仍为 beta，主机、Docker 和隧道必须持续在线，并新增 tailnet policy 与公网暴露责任。
+  2. **推荐的托管式备选：Azure for Students + Azure Container Apps Consumption**。官方当前学生方案无需信用卡并含 `US$100`/12 个月 credit；Container Apps 支持 `linux/amd64` OCI、默认 HTTPS FQDN、scale-to-zero 和月度免费 grant。你必须确认学生资格、允许创建 Azure 账号/资源并消耗 credit，同时禁止升级按量付费；registry、日志、网络、临时存储和冷启动仍须工程验证。
+  3. **继续 Hugging Face Docker Spaces**，由你明确授权并承担符合条件的付费方案及周期性费用上限。该选择超出当前 Goal 的无付费授权，未确认前不会执行。
+- **已筛除的当前最终路线**：Cloudflare Quick Tunnel 仅供测试/开发且有 200 在途请求与无 SSE 限制；Northflank Sandbox 创建资源前强制付款方式且官方称免费层不应用于 production；Oracle Always Free 多数注册需信用卡、存在 idle 回收，A1 又与当前 `linux/amd64` 镜像架构不符。Render/Koyeb 域名此前被浏览器安全策略禁止，本轮未绕过。
+- **推荐方案及影响**：已有可持续在线主机时优先方案 1，改动最小；没有现成资源且符合学生资格时，方案 2 比无预算上限地订阅 HF 更保守，但仍会创建云账号/资源、消耗 student credit 并需要相应 SPEC diff。两者都必须由你选择，调查本身没有解除门禁。
 - **不决定会阻塞哪些 task**：G-02C、G-03、T-01、DIST-02、公开 WebUI URL 与最终部署验收。G-02A、G-02B、冷启动提示词准备和不依赖托管商的文档工作不受影响。
 
 以下 D-002 至 D-024 的已确认条目保留为 brainstorming 过程证据；其中候选/推荐均是**决策前历史比较**，不能覆盖后续确认结果。
@@ -319,7 +320,7 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
   2. 合成/许可材料 + 可选用户自带 key — key 只在浏览器会话中使用且不落服务器；实现和安全说明更复杂。
   3. 公开实例使用项目持有的真实 provider key — 费用、滥用和凭据风险不可接受，不建议也不作为默认实现。
 - **原阻塞范围**：公开部署拓扑、README URL、演示夹具许可证、CI/CD 和凭据威胁模型。
-- **确认后的范围**：公开实例展示与本地版相同的核心 WebUI/状态机，但只用许可夹具与 mock；关闭真实凭据/provider egress。**整体 SPEC 已确认的 v1 demo 方向**：OCI container、隔离到期 session/限额和 Hugging Face Spaces Docker SDK；当前官方复核受 502/超时阻塞，无付费边界不满足时走 SPEC 变更。账号/部署仍需执行时授权。
+- **确认后的范围**：公开实例展示与本地版相同的核心 WebUI/状态机，但只用许可夹具与 mock；关闭真实凭据/provider egress。**整体 SPEC 已确认的 v1 demo 合同**：OCI container、隔离到期 session/限额；Hugging Face Spaces Docker SDK 曾是首选，但当前官方证据已证明其付费账号冲突，实际托管商等待 D-025。替代路线证据见 `docs/research/PUBLIC_HOSTING_ALTERNATIVES.md`；账号、registry、镜像 push 和部署仍需执行时授权。
 
 ## D-023 — 远程仓库与 CI 证据策略（已确认：双平台）
 

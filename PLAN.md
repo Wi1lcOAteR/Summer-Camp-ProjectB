@@ -94,7 +94,7 @@ There are 41 planning groups and 69 dispatch units (the 17 groups marked `Task G
 | G-01 | Open Design environment/MCP/selection gate | SPEC confirmed | G | [x] PASS；commit `b93c096db29f7b957950a0cfc74b80170a38d25a` |
 | G-02A | Toolchain/dependency/license baseline | SPEC confirmed | G | [x] PASS; exact Python/npm locks, license closure, smoke evidence, and validator committed at `22b516af7b6f4896c6127e75b2585435e407a3c0` |
 | G-02B | Provider policy/capability/cost evidence | G-02A | G | [x] PASS; exact model/cost and P/F documentation boundaries committed at `5ac9d47ddda845ed78f1758326fb547610274f4c`; runtime F remains `source_disabled` until X2-03/INT-01 |
-| G-02C | Distribution/hosting evidence | G-02A | G | [ ] PENDING; freezer/base/HF runtime facts verified, but paid-plan/account rows await D-025; reviewed blocker checkpoint `be666537706b4c133673029d950e84f15ea3ae1b` |
+| G-02C | Distribution/hosting evidence | G-02A | G | [ ] PENDING; freezer/base/HF runtime facts verified, but paid-plan/account rows await D-025; reviewed blocker checkpoint `be666537706b4c133673029d950e84f15ea3ae1b`; candidate comparison in `docs/research/PUBLIC_HOSTING_ALTERNATIVES.md` is not a host selection |
 | G-03 | Fresh-agent cold start and implementation approval | formal writing-plans evidence, G-01 PASS, G-02A/B/C PASS | G | [ ] 尚未执行 |
 | G-04 | Worktree/branch ownership map | G-03 approved | G | [ ] 尚未执行 |
 | T-01 | Reproducible project/test scaffold | G-01 PASS/G-02A PASS/G-03 approved/G-04 | F | [ ] 尚未执行 |
@@ -314,6 +314,8 @@ Group review checks AC-20, AC-39, AC-48, AC-49 and AC-50 after G-02A/B/C. Qualit
 - [ ] **Commit:** after D-025 resolves the host, update all rows to verified, run `-RequireDistributionReady`, and commit the final PASS with `git commit -m "docs(G-02C): verify distribution and hosting [agent: <fresh-agent-id>]"`. Until then, commit only a clearly named blocked checkpoint and record its hash without checking this item.
 
 Reviewed blocker checkpoint: `be666537706b4c133673029d950e84f15ea3ae1b` (`docs(G-02C): record hosting cost conflict [agent: Codex GPT-5]`). `/root/g02c_blocker_review` found no Critical issue and approved it only as a pending checkpoint. Standard validation passed with 63 rows and two blockers; `-RequireDistributionReady` failed exactly on the two hosting rows. This is not G-02C completion.
+
+2026-07-22 safe follow-up: first-party read-only research compared an existing x64 Docker host with Tailscale Funnel, Azure for Students + Container Apps, and screened-out routes. It is recorded in `docs/research/PUBLIC_HOSTING_ALTERNATIVES.md` only to support D-025. No platform, account, payment method, registry, image or deployment was selected or created, so every G-02C checkbox remains open and the strict validator must still fail on exactly `host-cost` and `host-account`.
 
 **Completion standard:** The selected freezer, OCI base, and host each have a compatible verified row; no required distribution/hosting fact remains blocked.
 

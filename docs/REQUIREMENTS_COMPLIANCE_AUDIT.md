@@ -1,6 +1,6 @@
 # AI4SE Project B 要求符合性审计
 
-审计时间：2026-07-20；最近更新：2026-07-22（G-02A/B 证据闭合与 D-025 部署冲突）
+审计时间：2026-07-20；最近更新：2026-07-22T02:29:11+08:00（G-02A/B PASS、D-025 替代托管候选调查与门禁复核）
 审计范围：当前 Git 工作区、提交历史与以下权威来源：
 
 - [通用项目要求](requirements/项目要求.md)
@@ -47,7 +47,7 @@
 | 分发形态 | 整体 SPEC 已确认 Windows x64 单文件 `ProjectB.exe` 方向 | 文档覆盖，未验证 | 按[技术栈与分发基线](research/TECH_STACK_DISTRIBUTION_BASELINE.md)选冻结工具；验证单文件/干净机/SmartScreen/数据保留 |
 | README | 不存在 | 阶段门禁延后 | 随实现维护项目简介、安装、运行、分发、目录、安全、凭据、限制、第三方依赖与许可证 |
 | 第三方许可证 | G-02A 已锁定 54 个 Python、166 个 npm 条目及审查许可证集合；OpenAI SDK Apache-2.0、PyInstaller exception、Open Design Apache-2.0 等已有证据。课件许可证未知且未入仓 | 当前阶段满足；最终分发未验证 | T-01 从证据锁生成生产 manifest，CI-01 重新扫描，README/分发包保留完整 notices；公开夹具仍只用合成或明确许可材料 |
-| 公开 WebUI URL / CI/CD | OCI/mock/隔离合同已确认；G-02C 证实 HF Docker Space 创建需要付费方案，D-025 开放；未部署 | 明确缺口 | 学生先选现有无新增付费 OCI 主机、明确承担 HF 方案费用，或批准 SPEC 变更后研究其他平台；之后实测 build/run/HTTPS/隔离/CI |
+| 公开 WebUI URL / CI/CD | OCI/mock/隔离合同已确认；G-02C 证实 HF Docker Space 创建需要付费方案；2026-07-22 已完成现有主机/Tailscale 与 Azure Students/Container Apps 的候选调查，但 D-025 未选择、未部署 | 明确缺口 | 学生选择已有 x64 Docker 主机（既有 HTTPS 或 Tailscale Funnel）、Azure for Students + Container Apps，或明确承担 HF 费用；确认 SPEC diff 后实测 build/run/HTTPS/隔离/CI |
 | AGENT_LOG | 历史条目包含时间、task、skill、上下文、人工修改与教训；D-017 至 D-024 批量确认和当前审计均已记录 | 当前满足 | 后续每次真实决策/task 后即时追加，不回写或伪造历史证据 |
 | REFLECTION 1500–2500 字 | 文件不存在 | 阶段门禁延后 | 必须由学生本人撰写；AI 只能在有学生初稿后按声明范围润色或指出论证缺口 |
 
@@ -60,7 +60,7 @@
 
 ## 当前最近门禁
 
-`SPEC.md` 已于 2026-07-20 整体确认；G-01、G-02A、G-02B 已 PASS。G-02C 的唯一当前证据阻断是 D-025：HF Docker Space 的付费账号门槛与无付费授权冲突。除此之外仍须恢复正式 Superpowers `writing-plans` 调用或取得课程明确接受 fallback 的证据，再由不同类型全新 session 执行 G-03 冷启动；D-005 可先选择。Open Design 真实 project/run/artifact 后置 UI-01A，学生本人 brainstorming 反思不得由 AI 代写。D-025、正式 planning 证据、冷启动修订和再次批准前不开始正式实现。
+`SPEC.md` 已于 2026-07-20 整体确认；G-01、G-02A、G-02B 已 PASS。G-02C 的唯一当前证据阻断是 D-025：HF Docker Space 的付费账号门槛与无付费授权冲突。现有主机/Tailscale 与 Azure Students/Container Apps 已有官方候选证据，但调查不等于学生选择或 selected-host 验证。除此之外仍须恢复正式 Superpowers `writing-plans` 调用或取得课程明确接受 fallback 的证据，再由不同类型全新 session 执行 G-03 冷启动；D-005 可先选择。Open Design 真实 project/run/artifact 后置 UI-01A，学生本人 brainstorming 反思不得由 AI 代写。D-025、正式 planning 证据、冷启动修订和再次批准前不开始正式实现。
 ## 2026-07-21 evidence update
 
 This timestamped section is historical. Its 37-row/28-blocker result was true for the first ledger checkpoint and is superseded by the current update below; it must not be used as the current G-02 status.

@@ -70,7 +70,7 @@ OCI container 只用于公开 demo 和相应 CI/CD，不取代 Windows 单文件
 - 镜像只含合成或明确许可夹具与 deterministic provider mock，不提供任意上传、路径或 URL 输入；
 - 构建和运行环境均不含真实 key、credential store 或真实 provider 出站权限；
 - 隔离 session 的跨访客读取为零，到期清理和上述并发、存储、材料及速率限额可复现；
-- Hugging Face Spaces Docker SDK 曾是首选。2026-07-21 已用官方 `hub-docs` 当前提交核验：Docker SDK、HTTPS、临时磁盘、CPU Basic 配额和休眠语义均有文档，但创建新的 Docker/Gradio Space 需要 PRO、Team 或 Enterprise 付费方案；“CPU Basic 无小时费”不解除该账号门槛。它不满足当前无付费授权。D-025 决定使用已有学生/NJU OCI 主机、明确承担 HF 方案费用，或批准 SPEC 变更后研究其他平台；在决定前不创建 Space、不替换平台、不 push 镜像。精确证据见 `docs/engineering/DISTRIBUTION_EVIDENCE.md`。
+- Hugging Face Spaces Docker SDK 曾是首选。2026-07-21 已用官方 `hub-docs` 当前提交核验：Docker SDK、HTTPS、临时磁盘、CPU Basic 配额和休眠语义均有文档，但创建新的 Docker/Gradio Space 需要 PRO、Team 或 Enterprise 付费方案；“CPU Basic 无小时费”不解除该账号门槛。它不满足当前无付费授权。2026-07-22 已完成替代路线的官方只读比较：D-025 可选择已有 x64 Docker 主机（已有 HTTPS 或 Tailscale Funnel）、Azure for Students + Container Apps，或明确承担 HF 方案费用。在决定前不创建账号/资源、不添加付款方式、不消耗 student credit、不替换平台、不 push 镜像。精确证据见 `docs/engineering/DISTRIBUTION_EVIDENCE.md` 与 [`PUBLIC_HOSTING_ALTERNATIVES.md`](PUBLIC_HOSTING_ALTERNATIVES.md)。
 
 ## 依赖与许可证门禁
 

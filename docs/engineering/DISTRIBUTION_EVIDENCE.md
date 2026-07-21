@@ -2,7 +2,7 @@
 
 Status: **BLOCKED - G-02C found a confirmed paid-plan conflict requiring D-025**
 
-Verification date: `2026-07-21` (Asia/Shanghai). No deployment, account action, Docker build, registry push, or paid resource was created.
+Verification date: `2026-07-21` for the selected HF/freezer/base rows; alternative-host research refreshed `2026-07-22` (Asia/Shanghai). No deployment, account action, payment method, student credit use, Docker build, registry push, or paid resource was created.
 
 The freezer and OCI base can now be selected exactly. The previously selected Hugging Face Docker Space direction cannot satisfy the current no-paid-resource boundary: Hugging Face's current official docs explicitly require a paid plan to create a Gradio or Docker Space even though CPU Basic has no hourly hardware charge. No alternative host is selected silently.
 
@@ -17,7 +17,7 @@ The freezer and OCI base can now be selected exactly. The previously selected Hu
 | host-quota | CPU, memory, and ephemeral disk | CPU Basic 2 vCPU, 16 GB RAM, 50 GB disk; outbound network limited to standard HTTP/HTTPS ports plus 8080 | https://github.com/huggingface/hub-docs/blob/86be61b3d86b7df41ba4500e6b93de7a41f1d1fb/docs/hub/spaces-overview.md | Hugging Face official hub-docs; Apache-2.0 | 2026-07-21 | verified | Project limits must be lower and reproducible; no runtime benchmark has been performed. |
 | host-cost | Hosting cost boundary | CPU Basic hardware has no hourly charge, but creating a new Docker/Gradio compute Space requires a paid PRO, Team, or Enterprise plan | https://github.com/huggingface/hub-docs/blob/86be61b3d86b7df41ba4500e6b93de7a41f1d1fb/docs/hub/spaces-overview.md | Hugging Face official hub-docs at commit 86be61b3; paid-plan requirement | 2026-07-21 | explicitly-blocked | This contradicts the confirmed no-paid-resource boundary and current authorization. ZeroGPU's free exception is for Gradio, not the selected Docker SDK. |
 | host-account | Account and plan authorization | Docker Space creation requires an eligible paid personal or organization plan | https://github.com/huggingface/hub-docs/blob/86be61b3d86b7df41ba4500e6b93de7a41f1d1fb/docs/hub/spaces-overview.md | Hugging Face official account/plan requirement | 2026-07-21 | explicitly-blocked | No account, payment method, subscription, or terms acceptance is authorized. The student must choose D-025 before any platform action. |
-| fallback | No-silent-substitution boundary | selected host conflict requires explicit SPEC change; preserve OCI/same-contract/HTTPS/mock/isolation requirements | https://github.com/huggingface/hub-docs/blob/86be61b3d86b7df41ba4500e6b93de7a41f1d1fb/docs/hub/spaces-overview.md | ProjectB SPEC and current official host facts | 2026-07-21 | verified | Render and Koyeb could not be researched because the browser security policy forbids those domains; no workaround was attempted and neither is presented as a candidate. |
+| fallback | No-silent-substitution boundary | selected host conflict requires explicit student choice and SPEC diff; preserve OCI/same-contract/HTTPS/mock/isolation requirements | https://github.com/huggingface/hub-docs/blob/86be61b3d86b7df41ba4500e6b93de7a41f1d1fb/docs/hub/spaces-overview.md | ProjectB SPEC and current official host facts | 2026-07-22 | verified | First-party candidate research now exists in `docs/research/PUBLIC_HOSTING_ALTERNATIVES.md`, but no route is selected. Render and Koyeb remain excluded by the prior browser security decision. |
 
 ## Reproducible Source Snapshots
 
@@ -27,12 +27,21 @@ The freezer and OCI base can now be selected exactly. The previously selected Hu
 
 The Docker registry endpoint and Hugging Face rendered site timed out/reset in this environment. Exact first-party GitHub snapshots were used instead. Docker itself still reports no local daemon, so no image build/run evidence exists.
 
+## Alternative-Host Research Boundary
+
+`docs/research/PUBLIC_HOSTING_ALTERNATIVES.md` records current official evidence for two conditional alternatives without promoting either into the host evidence rows:
+
+- an existing student/NJU-controlled x64 Docker host, optionally exposed through Tailscale Funnel when no existing HTTPS domain is available;
+- Azure for Students with Azure Container Apps Consumption, subject to student eligibility, explicit account/resource approval and a no-pay-as-you-go boundary.
+
+It also records why Cloudflare Quick Tunnel, Northflank Developer Sandbox, Oracle Always Free and static hosting are not current final-host recommendations. These facts make D-025 answerable but do not verify `host-cost` or `host-account`: those rows preserve the previously selected HF route's incompatibility evidence while the actual host remains unset pending student choice and a confirmed SPEC diff.
+
 ## D-025 Gate
 
-The current selected host is proven incompatible with the no-paid-resource rule. Acceptable next directions require the student to choose one:
+The previously selected HF host is proven incompatible with the no-paid-resource rule, so the actual host is currently unset. Current first-party research supports three decision paths:
 
-1. provide an existing student/NJU-controlled OCI host with HTTPS and no new paid resource;
-2. explicitly authorize a paid Hugging Face plan and recurring-cost boundary, which is outside the current Goal authorization;
-3. approve a SPEC change and a new first-party research round for another public host.
+1. provide an existing student/NJU-controlled x64 Docker host; use its existing HTTPS entry point or explicitly accept Tailscale Funnel's beta/always-online boundary;
+2. approve the documented Azure for Students + Container Apps SPEC diff, account/resource creation and student-credit use while forbidding pay-as-you-go upgrade;
+3. explicitly authorize a paid Hugging Face plan and recurring-cost boundary, which is outside the current Goal authorization.
 
 Until D-025 is resolved, G-02C remains pending and blocks G-03, T-01, DIST-02, and any claim of a public WebUI URL. The verified PyInstaller and base-image rows remain usable after the host decision.

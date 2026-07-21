@@ -12,7 +12,7 @@
 
 本轮 brainstorming 又确认课程资料按批次增量到达；D-019 将第一版材料白名单固定为 `lecture`、无答案 `past_paper` 和 `teacher_focus`，支持 PDF/图片/文本及手工重点，答案、个人笔记和作业提交延期。D-020 将第一版调度固定为版本化简单规则、可选每日预算、自动但可撤销的未来任务重排，以及考试本地日期完整结束后的归档/暂停和新目标询问。上述材料沿用课件的最小外发、来源追踪和不可信输入边界，不获得额外工具权限，也不表示模型训练或原题预测。
 
-D-021/D-022 已确认 Windows x64 本地版通过 keyring 使用 Windows Credential Manager；公开 demo 仅使用合成/明确许可夹具和 deterministic mock。隔离、限时访客 session 以及 OCI/Hugging Face 部署方向已随整体 SPEC 确认，仍须工程与官方条款验证。以下项目将已确认边界转为可验证控制，不再把 provider、凭据后端或 demo 数据策略列为未决选择。
+D-021/D-022 已确认 Windows x64 本地版通过 keyring 使用 Windows Credential Manager；公开 demo 仅使用合成/明确许可夹具和 deterministic mock。隔离、限时访客 session 与 OCI 合同已随整体 SPEC 确认；Hugging Face 曾是首选，但当前付费方案冲突使托管商转入 D-025。以下项目将已确认边界转为可验证控制，不再把 provider、凭据后端或 demo 数据策略列为未决选择。
 
 ## 保护目标
 
@@ -122,4 +122,4 @@ D-021/D-022 已确认 Windows x64 本地版通过 keyring 使用 Windows Credent
 - 操作系统课件权利人对远端处理与衍生练习的许可边界；
 - 期末重点/往年卷的保存期限与展示粒度；公开 demo 已禁止导入真实材料，不依赖对私人材料做脱敏；
 - Windows keyring 后端、打包兼容性和依赖许可证，以及 OpenAI SDK 许可证仍须在引入依赖前验证；
-- 公开 OCI 首选 Hugging Face Spaces Docker SDK，但当前官方复核受 502/超时阻塞；网络恢复后须重核费用/Docker/HTTPS/临时存储，账号、URL 与隔离证据仍需部署阶段授权和真实验证。
+- 公开 OCI 的 Hugging Face 技术/费用条款已核验，但付费账号门槛与当前授权冲突；D-025 的现有主机/Tailscale、Azure Students/Container Apps 与付费 HF 候选证据见 [`PUBLIC_HOSTING_ALTERNATIVES.md`](PUBLIC_HOSTING_ALTERNATIVES.md)。所选平台的账号、URL、存储/休眠、费用、隔离与部署证据仍需授权和真实验证。

@@ -733,3 +733,17 @@
 - **人工修改及原因**：新增 D-025 三个候选方向并同步 SPEC、PLAN 和两份分发研究文档；保留 OCI/同构 WebUI/mock/HTTPS/隔离合同，不选择账号、主机或费用方案。没有 Docker build/run、账号动作、付费订阅、部署或公网 URL。
 - **checkpoint hash**：`be666537706b4c133673029d950e84f15ea3ae1b`（`docs(G-02C): record hosting cost conflict [agent: Codex GPT-5]`）。
 - **经验教训**：“免费硬件档位”与“免费账号可创建资源”是不同命题；外部平台事实与已确认成本边界冲突时，正确产出是可审查的 blocker 和人工决策，而不是替用户换平台。
+
+## 2026-07-22T02:29:11+08:00 - G-02C-R1 alternative-host research and documentation repair
+
+- **Task 编号**：G-02C-R1（D-025 只读研究；G-02C 仍未完成）。
+- **触发的 Superpowers skill / 工具**：当前可调用清单仍没有 `superpowers:*`，没有把本轮研究冒充 `writing-plans` 或任何正式 Superpowers 调用。使用各厂商官方网页/官方 Markdown 与 Microsoft Learn commit metadata 做只读核验；未登录、未接受条款、未创建账号或资源。
+- **关键 prompt / context**：Goal 在 Open Design 文档修正后续接；学生尚未选择托管平台。本轮只允许完成不依赖该选择的候选调查、当前状态同步和验证，必须保持 OCI/同构 WebUI/mock/HTTPS/隔离合同，不得越过 D-025、G-03 或实现批准门禁。
+- **网络失败与替代**：官方搜索接口返回 HTTP 503；`curl.exe` 返回 `schannel: AcquireCredentialsHandle failed: SEC_E_NO_CREDENTIALS`，`Invoke-WebRequest` 返回“基础连接已经关闭: 接收时发生错误”。没有重试提权、关闭 TLS 校验或访问已被浏览器安全策略禁止的 Render/Koyeb。Node.js 24.14.0 `fetch` 对相同官方 URL 成功，只读取公开内容。
+- **研究结论**：新增 `docs/research/PUBLIC_HOSTING_ALTERNATIVES.md`。条件候选是已有 x64 Docker 主机（既有 HTTPS 或 Tailscale Funnel）与 Azure for Students + Container Apps；付费 HF 保留为需明确成本授权的第三项。Cloudflare Quick Tunnel、Northflank Sandbox、Oracle Always Free 与静态 Pages 的当前不适用原因均有官方来源。没有把候选写成 selected host，也没有修改 `SPEC.md`。
+- **subagent / review**：`/root/hosting_tunnel_research` 的初始任务消息在传输中不可读，未产生可采信输出并被中止；其遗留只读子任务 `/root/hosting_tunnel_research/cloudflare_tailscale` 也在最终复验前中止，未使用其输出或文件。本轮事实均由主智能体从官方来源复核。`/root/d025_spec_review` 的第一次只读规约审查发现本条过程记录与两份审计更新时间缺失（P1/P2），并确认其余 D-025/G-03/实现门禁一致；缺口即时修复后，复审以无 Critical/P1 批准当前 diff，且未改写旧时间戳证据。
+- **第二阶段质量复核**：逐项回读官方当前页面，检查候选表中的 OCI 架构、HTTPS、免费/credit/付款方式、scale-to-zero、临时存储、beta/带宽、idle 回收和非 production 限制；把“HF 仍是 selected host”改为“实际 host 未定，HF 只保留冲突证据”，并移除静态托管段落中可能暗示应用已实现的措辞。未引入第三方代码或依赖，因此本轮没有新增 README 许可证条目。
+- **人工修改及原因**：同步 `DECISIONS_NEEDED.md`、`PLAN.md`、`SPEC_PROCESS.md`、两份审计、分发证据和四份研究基线；只把已完成调查写成候选证据，`host-cost`/`host-account` 保持 `explicitly-blocked`。没有 Open Design project/run/artifact、Docker build/run、registry、付款方式、student credit、部署、CI、生产源码或 `REFLECTION.md`。
+- **验证证据**：普通校验为 `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；`-RequireDistributionReady` 按预期只因两项托管 blocker 返回 exit 1。Markdown 校验为 34 文件、20 本地链接、0 坏链接、0 奇数围栏；当前时态陈旧措辞扫描为 0；`git diff --check` 无 whitespace error，仅有 Windows 行尾提示。
+- **commit hash**：主文档提交尚未创建；真实 hash 将在下一条本地过程 checkpoint 中记录，不提前填写。
+- **经验教训**：免费额度、无需信用卡、无需付款方式和不会自动产生账单是四个不同条件；候选调查可以让人工门禁更易回答，但在学生选择并确认 SPEC diff 前不能把候选事实写入 selected-host 证据行。

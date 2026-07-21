@@ -3,7 +3,7 @@
 初次审计时间：2026-07-17T18:14:41+08:00
 最近历史复查时间：2026-07-19T21:57:09+08:00
 最近外部门禁复查：2026-07-21T21:08:02+08:00（G-01 scope correction）
-最近文档一致性复查：2026-07-22T01:25:01+08:00
+最近文档一致性复查：2026-07-22T02:29:11+08:00（D-025 替代托管调查与初审修复）
 
 > 当前要求符合性请以 [`REQUIREMENTS_COMPLIANCE_AUDIT.md`](REQUIREMENTS_COMPLIANCE_AUDIT.md) 为准。本文件前半部分保留启动阶段的历史快照，不能用其中“SPEC 不存在”“Open Design 未安装”等旧状态判断当前工作区。
 
@@ -13,7 +13,7 @@
 - `SPEC.md` 已由学生整体确认；`PLAN.md` 已形成，但正式 `superpowers:writing-plans` 调用证据仍缺，现有计划明确标记为 fallback。
 - Open Design 0.15.1、Codex MCP、完整内置 `frontend-design` 和学生选择的 `default`（Neutral Modern）均已验证，G-01 已 PASS。该 bundled skill 不需要另行下载到 Codex；Open Design 也不需要无任务时长期保持开启。
 - `list_projects=[]` 与 `get_active_context.active=false` 是实现前的正常状态。真实 project/run/artifact 只在冷启动完成且学生批准实现后的 UI-01A 中按需创建，不能提前生成 UI 来冒充环境验证。
-- G-02A 工具链/依赖/许可证与 G-02B provider 政策/费用证据已分别 PASS；G-02C 已验证 freezer、OCI base 与 HF runtime 条件，但当前官方付费方案要求触发 D-025，仍为 pending。
+- G-02A 工具链/依赖/许可证与 G-02B provider 政策/费用证据已分别 PASS；G-02C 已验证 freezer、OCI base 与 HF runtime 条件，但当前官方付费方案要求触发 D-025，仍为 pending。2026-07-22 已补充现有主机/Tailscale 和 Azure Students/Container Apps 的官方候选比较；没有选择或创建托管资源。
 - 当前硬门禁是 D-025/G-02C、正式 `writing-plans` 证据或课程明确接受 fallback、不同类型全新 session 的 G-03 冷启动，以及冷启动修订后的学生实现批准。
 
 ## 启动时结论（历史）
@@ -165,5 +165,5 @@ OpenAI 的 Responses 能力/政策快照还须在每次 P/F 同意前刷新并�
 
 - G-02A PASS：exact evidence commit `22b516af7b6f4896c6127e75b2585435e407a3c0`；54 个 Python pins、166 个 npm entries、direct/license 双向校验和无网络 smoke 已复审。生产 manifest 与 clean-clone/full-app 仍属于 T-01/DIST-01。
 - G-02B PASS：exact evidence commit `5ac9d47ddda845ed78f1758326fb547610274f4c`；官方模型/价格/PDF/token count/File Search/留存与负能力边界已复审。F 仍为 `source_disabled`，未调用 provider。
-- G-02C PENDING：reviewed blocker checkpoint `be666537706b4c133673029d950e84f15ea3ae1b`。HF Docker Space 需要付费方案，`host-cost`/`host-account` 是仅余两个 blocker；D-025 由学生决定，未静默换平台或创建资源。
+- G-02C PENDING：reviewed blocker checkpoint `be666537706b4c133673029d950e84f15ea3ae1b`。HF Docker Space 需要付费方案，`host-cost`/`host-account` 是仅余两个 blocker；D-025 的候选证据见 `docs/research/PUBLIC_HOSTING_ALTERNATIVES.md`，仍由学生决定，未静默换平台或创建资源。
 - 当前 validator 为 `PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；distribution-strict 模式按预期失败。G-03 与所有正式实现继续关闭。

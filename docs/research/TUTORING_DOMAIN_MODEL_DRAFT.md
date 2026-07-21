@@ -250,4 +250,4 @@ choose goal
 - 互斥/竞态正式题目内容；
 - 模拟练习组卷细则、通知/日历同步和不可用日期等延期功能；
 - OpenAI 支持模型目录、动态能力/区域/费用/留存政策必须在实际调用前刷新并保存政策快照；OpenAI Python SDK 许可证和兼容性仍须在加入依赖前核验。
-- 精确依赖版本、Windows 单文件冻结工具、Hugging Face Spaces Docker SDK 当前官方条款/最终 URL 与远程 CI 证据仍待验证；平台复核受 502/超时阻塞，任何变化不得绕过 SPEC 或产生付费资源。
+- 精确依赖版本和 Windows 单文件冻结工具基线已由 G-02A PASS 与 G-02C blocker 证据固化，但完整应用打包、干净机、最终公开 URL 与远程 CI 仍待验证。Hugging Face 当前付费冲突及替代托管候选见 [`PUBLIC_HOSTING_ALTERNATIVES.md`](PUBLIC_HOSTING_ALTERNATIVES.md)；D-025 前任何变化不得绕过 SPEC、创建账号资源或产生付费责任。
