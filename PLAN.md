@@ -268,7 +268,7 @@ Group review checks AC-20, AC-39, AC-48, AC-49 and AC-50 after G-02A/B/C. Qualit
 
 **Goal:** Lock exact compatible Python/Node packages, parser/render stack, keyring backend, test tools, freezer candidates, and direct/transitive license evidence.
 
-**Files:** Create `docs/engineering/DEPENDENCY_BASELINE.md` and `scripts/verify_evidence.ps1`.
+**Files:** Create `docs/engineering/DEPENDENCY_BASELINE.md`, `docs/engineering/locks/python-3.14.6-windows-x64.lock`, `docs/engineering/locks/frontend-package-lock.json`, `scripts/evidence/g02a_python_smoke.py`, and `scripts/evidence/g02a_node_smoke.mjs`; create or modify `scripts/verify_evidence.ps1`; modify this G-02A file/commit contract in `PLAN.md` before staging the new evidence artifacts.
 
 **Interfaces:** the validator rejects missing version/source/license/date/status rows and real-secret patterns; later manifests consume only `verified` compatible rows.
 
@@ -277,7 +277,7 @@ Group review checks AC-20, AC-39, AC-48, AC-49 and AC-50 after G-02A/B/C. Qualit
 - [x] **Red:** create the validator first and run `powershell -ExecutionPolicy Bypass -File scripts/verify_evidence.ps1`; expected FAIL because the dependency baseline rows are absent. Observed `EVIDENCE_VALIDATION_FAIL errors=3 rows=0`.
 - [ ] **Green/refactor:** verify exact versions/licenses from authoritative sources, populate dependency rows, then rerun the validator. A required incompatible/unverified item leaves the unit pending. Current ledger has explicitly-blocked dependency rows; no project lockfile was created.
 - [ ] **Reviews:** SPEC review AC-07, AC-10, AC-40, AC-43; quality review source authority, compatibility, transitive licenses, retrieval dates, and no credentials. Critical findings block T-01/G-02B/C.
-- [ ] **Commit:** `git add -- docs/engineering/DEPENDENCY_BASELINE.md scripts/verify_evidence.ps1`; run `git diff --cached --check`; commit with `git commit -m "docs(G-02A): lock toolchain and license baseline [agent: <fresh-agent-id>]"`.
+- [ ] **Commit:** `git add -- docs/engineering/DEPENDENCY_BASELINE.md docs/engineering/locks/python-3.14.6-windows-x64.lock docs/engineering/locks/frontend-package-lock.json scripts/evidence/g02a_python_smoke.py scripts/evidence/g02a_node_smoke.mjs scripts/verify_evidence.ps1 PLAN.md`; run `git diff --cached --check`; commit with `git commit -m "docs(G-02A): lock toolchain and license baseline [agent: <fresh-agent-id>]"`.
 
 **Completion standard:** Every implementation/build dependency has one compatible locked row and verified license, and the validator passes without an unresolved required row.
 
