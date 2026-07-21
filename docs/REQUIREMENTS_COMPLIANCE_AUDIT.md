@@ -12,7 +12,7 @@
 
 项目仍符合 **Project B 非 harness 应用类项目**的选题边界：它有真实目标用户、可在 30 秒内说明的连续学习问题、M1/M2/M3 三个核心模块、WebUI 方向和明确的非 agent AI 边界。
 
-当前只能判定为 **SPEC 已整体确认、阶段 B 计划已形成但正式 skill 证据仍缺、最终交付尚不合规**。Open Design 0.15.1 daemon 与 `frontend-design` + `default`（Neutral Modern）实际选择已验证，但当前 Codex task 的 MCP 仍缓存旧 endpoint，fresh MCP 证据尚缺；Superpowers 的正式 `writing-plans` 调用证据与学生本人 brainstorming 反思也尚缺。`PLAN.md` 目前有 41 个 planning group、69 个可派发 dispatch unit；冷启动验证、正式源码、测试、CI、分发、README、PR/MR、公开 WebUI URL 和学生本人撰写的 `REFLECTION.md` 仍未产生。它们仍是后续硬缺口，不能写成“已满足”。
+当前只能判定为 **SPEC 已整体确认、阶段 B 计划已形成但正式 `superpowers:writing-plans` 调用证据仍缺、最终交付尚不合规**。Open Design 环境门禁已满足：0.15.1、MCP、完整内置 `frontend-design`、学生选择的 `default`/Neutral Modern 和 fresh 只读发现均有证据；`projects=[]`、`active=false` 是实现前状态。剩余 Open Design 证据是获准 UI-01A 的真实 project/run/artifact 和浏览器验收，不是安装或环境阻塞。学生本人 brainstorming 反思也尚缺。`PLAN.md` 目前有 41 个 planning group、69 个可派发 dispatch unit；冷启动验证、正式源码、测试、CI、分发、README、PR/MR、公开 WebUI URL 和学生本人撰写的 `REFLECTION.md` 仍未产生。它们仍是后续硬缺口，不能写成“已满足”。
 
 状态含义：
 
@@ -34,7 +34,7 @@
 | API key 安全存储与生命周期 | `SPEC.md` 安全/凭据章节、provider profile/`credential_ref`、[威胁模型](research/COURSEWARE_THREAT_MODEL_BASELINE.md)；D-021 已选成熟 keyring 适配 Windows Credential Manager | 文档覆盖，未验证 | TDD 验证隐藏录入、状态、更新、清除、错误脱敏和失败关闭；普通 config、SQLite、日志和前端状态禁止 secret |
 | OpenAI Responses 政策快照 | `SPEC.md` 8.2、AC-39/49 已约束 `store:false`、application state、abuse monitoring、cache、文件审查例外与 Files/Vector Stores 生命周期 | 文档覆盖，未验证 | 实现时从官方政策刷新并绑定 consent/profile 指纹；测试不得把 `store:false` 或“默认不训练”误报为 ZDR |
 | WebUI | localhost WebUI、首次导入流程和响应式 AC 已写；已有需求 mockup | 文档覆盖，未验证 | mockup 不算正式源码；最终必须提供可访问 URL 并做真实双端 UI 验证 |
-| Open Design | 0.15.1 daemon 健康；学生已在 composer 选择 `frontend-design` + `default`（Neutral Modern）并链接 `ProjectB`，直接只读 API 返回相同标识；当前 task MCP 仍缓存旧 7456 | 明确缺口（仅 fresh MCP 证据） | 保持 Open Design 开启，在新 Codex task 复验 `list_skills/list_projects/get_active_context`；不得重复注册、固化动态端口或把直接 API 写成 MCP PASS |
+| Open Design | 0.15.1 daemon、MCP、完整内置 `frontend-design`、学生选择的 `default`/Neutral Modern 和 fresh `list_skills/list_projects/get_active_context` 结果均有记录；空项目/无活动上下文是实现前状态 | 当前满足（环境门禁）；正式工作流阶段门禁延后 | UI-01A 在冷启动和实现批准后按需开启 Open Design，创建真实 project/run/artifact、做截图与 review；生成源代码不得绕过 TDD 红测进入生产目录 |
 | Superpowers | v6.1.1 缓存与核心 skills 已核验；`brainstorming` 过程有日志；阶段 B 完整读取上游 `writing-plans` 规则并透明记录 fallback | 明确缺口 | 当前会话未注册 `superpowers:*`；不得把 fallback 冒充正式调用，后续新会话需修复注册并继续全流程留证 |
 | SPEC_PROCESS 至少 3 轮迭代与反思 | [SPEC_PROCESS](../SPEC_PROCESS.md) 已记录多轮原始回答、采纳、修正与未执行边界，但尚无独立的 brainstorming 优点/不足反思段 | 明确缺口 | 学生本人补充优点、不满和关键取舍；不得由 AI 代替个人判断或隐瞒代写 |
 | PLAN 细粒度任务 | `PLAN.md` 有 41 个 planning group、69 个 dispatch unit；宽 group 明确不可派发，unit ID 无重复；每个 unit 含目标、文件、接口、依赖/并行、预期红测或失败门禁、命令、双评审、literal commit 和完成标准 | 当前满足（生成方式证据受限） | 保持所有 unit pending；正式 `writing-plans` 未注册的限制继续在日志披露，冷启动发现的问题须反向修订计划 |
@@ -60,4 +60,4 @@
 
 ## 当前最近门禁
 
-`SPEC.md` 已于 2026-07-20 整体确认，`PLAN.md` 已形成 41 个 planning group、69 个待执行 dispatch unit；单文件分发、OCI/Hugging Face demo、隔离限额和 `ReviewPolicy v1` 是 v1 工程方向。当前真实缺口是：重核 Hugging Face Spaces 和依赖许可证；在 fresh Codex task 完成 Open Design MCP 复验；恢复正式 Superpowers `writing-plans` 调用或取得课程明确接受 fallback 的证据；D-005 可先选择，但只在前述阶段 B 证据闭合后执行不同类型全新 session 的冷启动。学生本人 brainstorming 反思仍是课程证据缺口，不得由 AI 代写。冷启动修订和再次批准前不开始正式实现。
+`SPEC.md` 已于 2026-07-20 整体确认，`PLAN.md` 已形成 41 个 planning group、69 个待执行 dispatch unit；单文件分发、OCI/Hugging Face demo、隔离限额和 `ReviewPolicy v1` 是 v1 工程方向。当前真实缺口是：重核 Hugging Face Spaces 和依赖许可证；恢复正式 Superpowers `writing-plans` 调用或取得课程明确接受 fallback 的证据；D-005 可先选择，但只在前述阶段 B 证据闭合后执行不同类型全新 session 的冷启动。Open Design 环境门禁已通过，真实 project/run/artifact 后置 UI-01A，并不允许在冷启动或实现批准前生成 UI。学生本人 brainstorming 反思仍是课程证据缺口，不得由 AI 代写。冷启动修订和再次批准前不开始正式实现。

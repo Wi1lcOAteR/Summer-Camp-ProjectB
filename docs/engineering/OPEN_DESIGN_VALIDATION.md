@@ -1,7 +1,9 @@
 # Open Design Validation
 
-Status: **PARTIAL - G-01 remains pending**
-Observation time: `2026-07-21T18:58:23+08:00`
+Status: **PASS - G-01 environment and selection gate complete**
+Initial daemon observation time: `2026-07-21T18:58:23+08:00`
+Fresh MCP observation time: `2026-07-21T19:51:57+08:00`
+Gate-scope correction time: `2026-07-21T21:08:02+08:00`
 
 ## Confirmed Selection
 
@@ -11,6 +13,12 @@ Observation time: `2026-07-21T18:58:23+08:00`
 - A student-provided screenshot in the conversation shows all three selections. The screenshot was not copied into the repository.
 
 This is the actual v1 UI workflow choice, not an agent-selected default. ProjectB adds these overrides to Neutral Modern: card radius at most 8 px, `letter-spacing: 0`, compact workbench density, no marketing hero, a top horizontal four-stage timeline on desktop and mobile, and semantic status colors that are not the only state signal.
+
+## Bundled Skill and Runtime Boundary
+
+`frontend-design` did not need a separate download. Open Design 0.15.1 already ships the complete built-in workflow at `resources/open-design/skills/frontend-design/SKILL.md` with its Apache-2.0 `LICENSE.txt`; the selected `default` design system likewise ships `DESIGN.md`, tokens, components, manifests, and previews. Selecting the skill in the composer attaches that installed workflow to an Open Design turn. It does not install a new Codex skill.
+
+The Open Design desktop daemon serves a different purpose: its MCP server proxies project and artifact operations to a running local Open Design instance, while an actual Open Design run injects the selected skill, design system, and craft references. The desktop application only needs to be running while MCP calls or an Open Design project/run are actively being used. Keeping it open without a project or run creates no additional evidence or project progress.
 
 ## Local Runtime Evidence
 
@@ -35,20 +43,45 @@ The endpoint used for this check was an observed ephemeral port, not a value to 
 
 The desktop app config still stores global `skillId: null` and `designSystemId: "default"`. This does not contradict the screenshot: Open Design attaches skills to an individual composer turn, while the design system can also be the global/default selection. The config's recent linked directories includes ProjectB, but no Open Design project or artifact has yet been created for this gate.
 
-## MCP Evidence Still Missing
+## Fresh Read-only MCP Evidence
 
-The Open Design MCP process for the current Codex task started before the latest desktop daemon and cached the fallback `http://127.0.0.1:7456`. Its `list_skills`, `list_projects`, and `get_active_context` calls therefore still fail even though the new daemon is healthy on an ephemeral port.
+In a fresh Codex task, the Open Design MCP dynamic daemon discovery succeeded. Only the three read-only discovery tools allowed by G-01 were called. Their observed results were:
 
-The installed `od mcp --help` states that daemon resolution happens when the MCP process starts and that a running MCP server caches the URL; after a daemon restart, the MCP client must restart to discover the new port. The existing MCP registration must not be duplicated or replaced with an ephemeral port.
+```json
+{
+  "list_skills": {
+    "skill_count": 162,
+    "frontend-design": {
+      "id": "frontend-design",
+      "name": "frontend-design",
+      "mode": "prototype",
+      "surface": "web",
+      "source": "built-in",
+      "designSystemRequired": true,
+      "hasBody": true
+    }
+  },
+  "list_projects": {
+    "projects": []
+  },
+  "get_active_context": {
+    "active": false
+  }
+}
+```
 
-To close G-01, keep Open Design running, start a fresh Codex task so its MCP process restarts, and capture successful results from:
+This closes the earlier stale-endpoint question and confirms that the installed MCP catalog exposes the selected `frontend-design` skill. The empty project list and inactive context are the truthful pre-implementation state, not an environment failure. The selected `default` / `Neutral Modern` contract is supported by the student-provided composer screenshot, the installed design-system package, and the direct local runtime evidence above.
 
-1. `list_skills` containing `frontend-design`;
-2. `list_projects` or a truthful empty project list before project creation;
-3. `get_active_context` for the actual Open Design project/context once created;
-4. the Open Design version and selected `frontend-design` / `default` identifiers.
+## Deferred Open Design Workflow Evidence
 
-Until those MCP calls succeed, this file is selection and daemon evidence only. It is not a formal Open Design run, generated artifact, UI implementation, or G-01 PASS.
+An actual Open Design project/run is still required by the repository's UI workflow rule, but it is not part of the pre-implementation environment gate. After cold-start validation and explicit implementation approval, UI-01A must:
+
+1. open Open Design for that task and create/use the real ProjectB design project;
+2. run the approved UI brief with `frontend-design` and `default` / `Neutral Modern`;
+3. record the project/context, selected identifiers, artifact, screenshots, and review findings in `docs/engineering/OPEN_DESIGN_RUN.md`;
+4. treat generated artifact code as design evidence only until the UI task has produced and run its required failing test; do not copy generated code into production before the TDD red step.
+
+G-01 passes because installation, MCP reachability, the complete bundled skill, and the student-selected design-system contract are all recorded. This PASS is not a formal Open Design run, generated artifact, UI implementation, or visual acceptance result.
 
 ## Alternatives Not Selected
 
@@ -57,4 +90,4 @@ Until those MCP calls succeed, this file is selection and daemon evidence only. 
 - Catalog-only stubs such as `ui-ux-pro-max`: not selected because the local entry is not a complete bundled workflow.
 - `web-design-guidelines`: reserved for post-implementation UI review, not used as the generation skill.
 
-No Open Design prompt was sent, no artifact was generated, and no frontend or production file was created or modified during this validation step.
+No Open Design prompt was sent, `start_run` was not called, no project or artifact was created, and no frontend or production file was created or modified during this validation step.

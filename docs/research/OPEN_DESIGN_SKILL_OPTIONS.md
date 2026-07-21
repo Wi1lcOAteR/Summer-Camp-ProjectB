@@ -1,8 +1,8 @@
 # Open Design Skill and Design-System Options
 
-调查时间：2026-07-20T19:56:11+08:00；运行更新：2026-07-21T18:58:23+08:00
+调查时间：2026-07-20T19:56:11+08:00；运行更新：2026-07-21T21:08:02+08:00
 调查对象：本机 Open Design 0.15.1 runtime/bundled resources、当前 Codex MCP 暴露状态、ProjectB 已确认 UI 规约
-结论状态：学生已选择 `frontend-design` + `default`（Neutral Modern）；G-01 仍等待 fresh MCP 复验，不是正式 Open Design run 或 UI 实现证据
+结论状态：学生已选择 `frontend-design` + `default`（Neutral Modern）；G-01 环境/选择门禁已 PASS，真实 Open Design run/artifact 后置 UI-01A，不是当前实现证据
 
 ## 1. 2026-07-20 运行快照
 
@@ -16,8 +16,8 @@
 
 - 学生在 Open Design composer 中实际选择 `frontend-design` 与 `default`（显示名 `Neutral Modern`），界面同时显示链接目录 `ProjectB`。
 - Open Design 已更新为 0.15.1；daemon 健康运行在动态 loopback endpoint。直接只读 API 返回 `frontend-design`、`mode=prototype`、`designSystemRequired=true`、`default` 与 `Neutral Modern`，和界面选择一致。
-- 当前 Codex task 的 MCP 进程仍缓存 daemon 重启前的 fallback `127.0.0.1:7456`。CLI 帮助明确说明运行中的 MCP server 会缓存 URL，因此须保持 Open Design 开启并新建 Codex task 后再调用 `list_skills`、`list_projects`、`get_active_context`。
-- 动态端口没有写入配置；MCP 没有重复注册。尚未点击“发送”，也没有 Open Design project/run/artifact 或正式 UI 源码。
+- 新 Codex task 已通过动态 daemon discovery；`list_skills` 返回 built-in `frontend-design`，`list_projects` 返回 `[]`，`get_active_context` 返回 `active=false`。动态端口没有写入配置，MCP 没有重复注册。
+- 空 project/context 是实现前的真实状态；尚未点击“发送”，也没有 Open Design project/run/artifact 或正式 UI 源码。Open Design 只需在 MCP 调用或真实设计 run 期间运行。
 
 ## 2. “按需获取”的准确含义
 
@@ -29,6 +29,8 @@ Open Design 的两类选择职责不同：
 | Design system | 颜色、字体、间距、组件和交互状态合同 | 一个项目固定一个首选系统，并记录项目级覆盖，不按页面随意切换 |
 
 本机 bundled 目录当前有 162 个 skill 条目和 152 个 design-system 条目。条目存在不等于完整工作流已安装：只有一个 `SKILL.md` 且正文要求另装 upstream bundle 的条目只是 catalog stub。
+
+本项目选择的 `frontend-design` 不是 catalog stub：本机条目包含完整 `SKILL.md` 和 `LICENSE.txt`；`default` / Neutral Modern 同样包含 `DESIGN.md`、tokens、components、manifest 和 preview。因此不需要把 skill 文件另行下载到 Codex。MCP/daemon 是运行时代理，不是 skill 安装器。
 
 ## 3. Skill 比较
 
@@ -69,7 +71,7 @@ Open Design 的两类选择职责不同：
 - 实现后审查：`web-design-guidelines`
 - 备选视觉合同：`designSystemId=shadcn`
 
-该组合无需安装 catalog-only 的 upstream 包，学生选择已写入 `SPEC.md`。G-01 仍须在 fresh Codex task 使用 MCP `list_skills`、`list_projects`、`get_active_context` 取得真实结果；在此之前不得把直接 daemon API 证据写成 MCP PASS。
+该组合无需安装 catalog-only 的 upstream 包，学生选择已写入 `SPEC.md`，fresh MCP 只读证据已记录，G-01 环境/选择门禁 PASS。真实 project/context/run/artifact 不是环境验证前置，而是冷启动和实现批准后的 UI-01A 工作流证据；生成 artifact 的源代码仍须经过 TDD 红测后才能进入生产目录。
 
 ## 6. 来源与证据限制
 

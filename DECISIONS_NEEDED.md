@@ -6,7 +6,7 @@
 - **已确认但仍需工程验证的合同**：D-020 的精确 `ReviewPolicy v1`、Windows x64 单文件 `ProjectB.exe`、OCI demo、隔离限额与 Hugging Face Spaces Docker SDK 已随整体 SPEC 确认；它们仍须通过许可证、官方条款、构建/运行和安全验证，不能把“已确认方向”写成“已实现”。
 - **学生本人过程证据**：课程审计要求学生用自己的话评价 brainstorming 的优点、不足与关键取舍；当前尚未提供，AI 不得代写或推断成学生观点。
 - **当前阻断信号**：阶段 B 的内容已形成，但正式 `writing-plans` 流程证据尚未闭合；D-005 类型可并行选择，但执行阶段 C/G-03 前必须先恢复正式 skill 调用，或取得课程明确接受 fallback 的证据。冷启动修订和学生再次批准前不能进入实现。
-- **外部环境门禁**：D-001 的正式 Superpowers skill 证据仍缺。D-024/D-003 的 MCP 注册已写入，Open Design 0.15.1 daemon 已恢复且直接只读 API 与界面选择一致；但当前 Codex task 的 MCP 进程仍缓存旧的 `127.0.0.1:7456`，须保持 Open Design 开启并在新 Codex task 复验。当前只剩 MCP 进程重载/证据问题，不再是安装、daemon 或选择问题。
+- **外部环境门禁**：D-001 的正式 Superpowers skill 证据仍缺。D-024/D-003 的 MCP 注册、Open Design 0.15.1 daemon、内置完整 `frontend-design` 与学生选择的 `default`/Neutral Modern 均已验证；fresh task 的 `list_skills` 也成功，空项目列表和无活动上下文是实现前的真实状态。G-01 环境门禁已通过；实际 project/run/artifact 只在获准实现后的 UI-01A 中执行，Open Design 不需要无任务长期挂起。
 - **执行时授权**：公开 demo 首选 Hugging Face Spaces Docker SDK，但官方页面复核受 502/超时阻塞；恢复联网后先核验当前 Docker/HTTPS/费用/临时存储，再由学生授权账号/部署。NJU Git/GitLab、GitHub 的建仓、push、PR/MR、镜像和远程 CI 配置也须当时授权。
 - **工程核验而非学生决策**：OpenAI SDK/依赖许可证、动态数据政策、模型/容量/费用、材料权利、打包兼容性和干净机/浏览器/CI 证据。它们必须真实验证，但不应伪装成新的产品选择题。
 
@@ -21,7 +21,7 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
 补充：无
 ```
 
-结果：OpenAI 参考 adapter；仅内置 adapter；基础期末材料范围；保守确定性调度；Windows x64/Python+React/SQLite/Credential Manager；合成或许可演示数据 + provider mock；NJU Git/GitLab 主仓 + GitHub 镜像和双 CI；安装并使用 Open Design。具体远程 push/PR/部署仍须执行时授权；Open Design 桌面端与 MCP 已安装/注册，2026-07-21 又实际选择 `frontend-design` + `default`（Neutral Modern），但 G-01 仍等待新 Codex task 的 MCP 复验。
+结果：OpenAI 参考 adapter；仅内置 adapter；基础期末材料范围；保守确定性调度；Windows x64/Python+React/SQLite/Credential Manager；合成或许可演示数据 + provider mock；NJU Git/GitLab 主仓 + GitHub 镜像和双 CI；安装并使用 Open Design。具体远程 push/PR/部署仍须执行时授权；Open Design 桌面端与 MCP 已安装/注册，2026-07-21 又实际选择完整内置 `frontend-design` + `default`（Neutral Modern），fresh MCP 只读发现成功，G-01 环境/选择门禁已 PASS；正式 project/run/artifact 后置 UI-01A。
 
 ## D-001 — Superpowers 安装与会话注册
 
@@ -122,7 +122,7 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
 - **模型影响**：领域模型把材料状态设为 `awaiting_policy`，并把课程级 `ProcessingPolicy` 与每次扩大外发的追加式 `ConsentRecord` 分离；详见 `docs/research/TUTORING_DOMAIN_MODEL_DRAFT.md`。D-009 已确认这一步强制交互并按课程记住。
 - **选择结果**：采用方案 1。首次导入依次检查课程、选择处理方式、确认权限、进入课程；无选择时不开始正文解析或上传。设置按课程保存，低保真检测只提示，不静默升级模式。
 - **视觉方向**：桌面端与移动端均使用顶部 X 轴四阶段时间线；主要结论通过字号、颜色、字重与字体区分，次要信息降级；熟悉图标配合短句替代冗长说明；完成页高强调展示“课程设置 › 材料与隐私”。
-- **阻塞范围**：首次导入交互与视觉层级已经解除；D-024 已安装 Open Design，MCP 已注册，`frontend-design` + `default`（Neutral Modern）也已由学生实际选择。正式 UI 仍等待新 Codex task 完成 MCP 复验及后续阶段门禁；浏览器视觉验收尚未执行。
+- **阻塞范围**：首次导入交互与视觉层级、Open Design 环境/选择门禁均已解除。正式 UI 仍等待正式 `writing-plans`、冷启动修订和实现批准；获准后 UI-01A 还必须执行真实 Open Design project/run/artifact 和浏览器视觉验收。
 
 ## D-010 — 第一版用户与运行边界（已确认）
 
@@ -319,31 +319,31 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
 - **原阻塞范围**：CI 文件、worktree/PR 证据、最终提交链接与最后一次 pass 记录。
 - **确认后的范围**：NJU Git/GitLab 是课程提交权威；GitHub 镜像保留通用要求的 PR/Actions 证据。两套 CI 共享同一一键测试命令，GitLab job 名严格为 `unit-test`。当前授权不包含远程 push、建 PR 或创建仓库，这些操作仍需执行时确认。
 
-## D-024 — Open Design 环境门禁（选择已确认，fresh MCP 复验仍阻塞）
+## D-024 — Open Design 环境门禁（环境/选择已通过，正式 run 后置）
 
-**状态：2026-07-21 学生在 Open Design composer 实际选择 `frontend-design` + `default`（显示名 `Neutral Modern`）并链接 `ProjectB`。Open Design 0.15.1 daemon 已健康运行，直接只读 API 返回相同 skill/design-system 标识；但当前 Codex task 的 MCP 进程在 daemon 重启前启动，仍缓存回退地址 `127.0.0.1:7456`。尚未发送 Open Design prompt、创建项目或生成 artifact，G-01 继续为 partial。阶段 B 计划目前为 41 个 planning group、69 个 dispatch unit。**
+**状态：2026-07-21 学生在 Open Design composer 实际选择 `frontend-design` + `default`（显示名 `Neutral Modern`）并链接 `ProjectB`。Open Design 0.15.1 daemon 健康，fresh Codex task 的 `list_skills` 成功返回 built-in `frontend-design`；`list_projects=[]`、`get_active_context.active=false` 如实表示尚未创建 project/run。G-01 的环境与选择门禁已 PASS，阶段 B 计划仍为 41 个 planning group、69 个 dispatch unit。**
 
-- **问题**：实际组合与 daemon 已就绪，但当前 task 的 MCP 客户端仍使用启动时缓存的旧 endpoint；怎样取得不伪造的 MCP 复验证据？
-- **为什么曾必须由你决定**：skill/design system 会约束整个 WebUI 的视觉与交互合同；智能体只能比较适配度，不能把候选静默写成学生确认。该决策已经通过学生的界面选择解除。
+- **问题**：如何在不把 Open Design 运行时、skill 安装和正式 UI run 混成一个门禁的情况下，留下可复现证据？
+- **为什么曾必须由你决定**：skill/design system 会约束整个 WebUI 的视觉与交互合同；智能体只能比较适配度，不能把候选静默写成学生确认。该决策已经通过学生的界面选择解除；后续真实 run 只消费已确认合同，不新增产品方向选择。
 - **候选方案**：
   1. **推荐：`frontend-design` + `default`（Neutral Modern）**；生成真实 React/app 工作台，并加入项目覆盖：卡片半径最多 8px、letter-spacing=0、紧凑信息密度。实现后另用 `web-design-guidelines` 审查。
   2. `frontend-design` + `shadcn`；组件更紧凑、默认 8px radius，但视觉更单色，需要严格把 success/warn/error 只用于状态。
   3. 先运行 `design-brief` 生成自定义 design system；自由度高但会新增一次重大视觉确认，并可能与已确认 UI 约束冲突。
 - **选择结果及影响**：学生采用方案 1。`frontend-design` 是完整 bundled Apache-2.0 工作流，`default`/Neutral Modern 明确用于 B2B tools/dashboard/utility；ProjectB 覆盖卡片半径、字距、密度与状态色。无需安装 catalog-only 的上游包，`web-design-guidelines` 留作实现后审查。完整比较见 [`docs/research/OPEN_DESIGN_SKILL_OPTIONS.md`](docs/research/OPEN_DESIGN_SKILL_OPTIONS.md)。
-- **恢复动作**：保持 Open Design 窗口和 daemon 开启，新建同一 ProjectB workspace 的 Codex task，使 MCP 进程重新通过 `OD_SIDECAR_IPC_PATH` 发现动态端口；随后验证 `list_skills`、`list_projects`、`get_active_context`。不得重复注册 MCP，也不得把短生命周期端口写入配置。若新 task 仍回退到 7456，保留错误与 daemon 日志，重启 Codex 客户端后只复验一次。
-- **原阻塞范围**：正式 WebUI 设计系统、UI 实现和视觉验收；不阻塞继续整理非 UI 的阶段 A 文档。
-- **阻塞范围**：不阻塞计划审查或 D-005 选择；只阻塞 G-01 完成、正式 UI task 和 Open Design/浏览器视觉证据。现有 HTML 仍只是 brainstorming mockup。
+- **恢复动作**：无需保持 Open Design 长期开启或创建空项目。实际 UI-01A 获准后，临时开启 Open Design，创建/打开真实 ProjectB project，执行受控 run，记录 project/context/artifact 和审查证据；运行结束即可关闭。
+- **原阻塞范围**：正式 WebUI 设计系统、UI 实现和视觉验收；环境验证后，前两项不再阻塞阶段 C 冷启动，实际设计 run 后置到 UI-01A。
+- **阻塞范围**：G-01 已解除；正式 UI task 仍受正式 `writing-plans`、冷启动、实现批准和 UI-01A 的真实 Open Design run/TDD/浏览器证据约束。现有 HTML 仍只是 brainstorming mockup。
 
 ## D-003 — Open Design 接入（D-024 的历史别名；外部配置门禁）
 
-**历史快照（已被 D-024 更新）：此前曾记录配置未注册或 daemon 不可达；当前应以 D-024 的“选择已确认、daemon 健康、fresh MCP 复验待完成”事实为准。**
+**历史快照（已被 D-024 更新）：此前曾记录配置未注册或 daemon 不可达；当前应以 D-024 的“环境/选择门禁已通过、正式 project/run 后置”事实为准。**
 
-**历史视觉 brainstorming 快照：当时 Superpowers visual companion 先因 Git Bash PATH 缺失失败，修正后又因本机拒绝绑定 `127.0.0.1:55535`（EACCES）失败；当时 Open Design MCP 尚未注册。当前已由 D-024 更新为“已注册、组合已确认、daemon 健康、fresh MCP 复验待完成”。已有自包含 HTML + Playwright/Edge 截图只用于需求澄清，不替代 Open Design 正式流程。**
+**历史视觉 brainstorming 快照：当时 Superpowers visual companion 先因 Git Bash PATH 缺失失败，修正后又因本机拒绝绑定 `127.0.0.1:55535`（EACCES）失败；当时 Open Design MCP 尚未注册。当前已由 D-024 更新为“已注册、组合已确认、环境门禁通过、正式 project/run 后置”。已有自包含 HTML + Playwright/Edge 截图只用于需求澄清，不替代 Open Design 正式流程。**
 
 - **历史问题**：课程最终要求 WebUI，而本项目约束规定含 UI 时使用 Open Design；当时桌面端已安装但 Codex MCP 尚未接入。
 - **历史处理**：MCP 注册发生在项目工作区之外，已由用户随后完成；不要再次执行旧注册命令。
-- **当前动作**：以 D-024 为准，保持 daemon 开启并在新 Codex task 验证 MCP；实际 design system 与 skill 已由学生确认并记录进 `SPEC.md`。
-- **阻塞范围**：不再阻塞 UI 方向选择；仍阻塞正式 UI task、实现和 Open Design/浏览器视觉证据。
+- **当前动作**：以 D-024 为准，环境门禁已经完成；实际 design system 与 skill 已由学生确认并记录进 `SPEC.md`。在获准实现后的 UI-01A 临时开启 daemon，执行真实 Open Design run 并记录 artifact/context，不提前生成或修改正式 UI。
+- **阻塞范围**：不再阻塞 UI 方向选择或阶段 C 冷启动；仍约束正式 UI task 必须在 UI-01A 完成真实 Open Design run、TDD 和浏览器视觉证据。
 
 ## D-004 — 远程平台策略（D-023 的历史别名；已确认）
 

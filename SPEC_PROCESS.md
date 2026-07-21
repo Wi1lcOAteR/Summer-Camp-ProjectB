@@ -1,6 +1,6 @@
 # SPEC_PROCESS
 
-> 当前状态：学生已于 2026-07-20 整体确认 `SPEC.md`，D-017 至 D-024 及工程候选已收敛为 v1 方向；`PLAN.md` 已形成。2026-07-21 学生在 Open Design 中实际选择 `frontend-design` + `default`（Neutral Modern），0.15.1 daemon 的直接只读 API 已验证相同标识；当前 Codex task 的 MCP 仍缓存旧的 `127.0.0.1:7456`，须在保持 Open Design 开启的 fresh task 中复验。另有 Superpowers 正式 `writing-plans` 证据、Hugging Face 官方条款复核和学生本人 brainstorming 反思门禁。Superpowers v6.1.1 缓存可检测，但本次会话未将 `superpowers:*` 注册到可调用清单，因此不能把 fallback 计划冒充正式 skill 调用。
+> 当前状态：学生已于 2026-07-20 整体确认 `SPEC.md`，D-017 至 D-024 及工程候选已收敛为 v1 方向；`PLAN.md` 已形成。2026-07-21 学生在 Open Design 中实际选择 `frontend-design` + `default`（Neutral Modern），0.15.1 daemon、完整 bundled skill 和 fresh MCP 只读发现均已验证；`list_projects=[]` 与 `active=false` 是实现前的真实状态，G-01 环境/选择门禁已通过。Open Design daemon 仅在 MCP 调用或真实 project/run 期间按需运行，实际 project/run/artifact 延后至获准实现后的 UI-01A。另有 Superpowers 正式 `writing-plans` 证据、Hugging Face 官方条款复核和学生本人 brainstorming 反思门禁。Superpowers v6.1.1 缓存可检测，但本次会话未将 `superpowers:*` 注册到可调用清单，因此不能把 fallback 计划冒充正式 skill 调用。
 
 ## 0. 启动审计（2026-07-17）
 
@@ -405,3 +405,11 @@
 - **运行证据**：Open Design 桌面端已更新为 0.15.1，daemon 日志报告健康的动态 loopback endpoint；对该 endpoint 的直接只读请求返回版本 0.15.1、`frontend-design`、`mode=prototype`、`designSystemRequired=true`、`default` 与 `Neutral Modern`。动态端口只用于本次观察，没有写入仓库或 Codex 配置。
 - **MCP 边界**：当前 Codex task 的 MCP 进程早于最新 daemon 启动并缓存了 fallback `127.0.0.1:7456`，所以本 task 的 `list_skills`、`list_projects`、`get_active_context` 仍失败。已安装 CLI 的帮助文本明确说明 MCP 会缓存启动时解析的 URL；正确恢复动作是保持 Open Design 开启并新建 Codex task，不是重复注册或持久化动态端口。
 - **产出边界**：没有点击 Open Design“发送”，没有创建 Open Design project/run/artifact，没有生成或修改正式 UI/源码。`docs/engineering/OPEN_DESIGN_VALIDATION.md` 只记录选择与 daemon 证据，G-01 保持 partial，直至 fresh MCP 三项调用成功并如实记录 project/context 状态。
+
+### 2026-07-21T21:08:02+08:00 — OD-004 Open Design 门禁范围修正
+
+- **触发输入**：学生质疑“按理来说不应该是下载 skill 文件吗，为什么要让我把 Open Design 打开挂着”，指出环境验证、skill 获取和正式设计 run 可能被混为一谈。
+- **事实复核**：本机 Open Design 0.15.1 已携带完整 `resources/open-design/skills/frontend-design/SKILL.md` 与 Apache-2.0 `LICENSE.txt`；`default` / Neutral Modern 也携带 `DESIGN.md`、tokens、components、manifest 和 preview。fresh Codex task 的 MCP 只读结果为 built-in `frontend-design`（`mode=prototype`、`designSystemRequired=true`）、`list_projects=[]`、`get_active_context.active=false`。
+- **范围修正**：课程/仓库要求是含 UI 时使用 Open Design 工作流并记录 skill/design system，不要求把 bundled skill 复制到 Codex，也不要求 daemon 无任务长期运行或预先创建空 project。G-01 现定义为安装、MCP、bundled skill 和学生选择的 environment gate，按现有证据 PASS。
+- **后置工作流**：真实 Open Design project/run/artifact、截图和 review 证据移到获准实现后的 UI-01A；Open Design 只在该 task 的 MCP/run 期间开启。生成 artifact 的源代码不得绕过 UI-01A 的 TDD 红测直接复制到生产目录。
+- **过程边界**：本次只修订计划、规约说明、审计和过程文档；没有创建 Open Design 项目、发送 prompt、运行生成、修改前端/生产源码、测试、CI 或 `REFLECTION.md`。此前 OD-003 的 stale-endpoint 失败快照保留为历史证据。

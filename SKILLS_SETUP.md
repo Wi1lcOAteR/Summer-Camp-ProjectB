@@ -66,6 +66,12 @@ Windows 上优先从上游 Releases 安装 Open Design 桌面版；它会自动�
 od mcp install codex
 ```
 
+这里要区分三个层次：
+
+1. **Bundled skill/design system**：桌面版已经携带完整条目时（例如 `frontend-design` 与 `default`/Neutral Modern），界面选择只是把现有工作流附加到一次 Open Design run，不需要再把 `SKILL.md` 下载到 Codex。只有明确标为 catalog stub、正文要求另装 upstream 的条目才需要额外获取。
+2. **MCP/daemon**：MCP 把编码智能体连接到一个正在运行的本地 Open Design 实例，用于读取项目、上下文和 artifact；它不是 skill 安装器。Open Design 只需在 MCP 调用或实际 project/run 期间开启，不要求无任务时长期挂起。
+3. **实际 Open Design run**：环境验证只证明工具可用和选择已记录；课程所需的真实 UI 工作流证据必须在获准的 UI task 中创建 project/run/artifact，并与 TDD 顺序、评审和截图证据一起保存。不得为制造环境门禁 PASS 而创建空项目。
+
 若使用 WSL2，注意系统自带 `/usr/bin/od` 可能与 Open Design 命令重名，应按 Open Design 的 WSL2 指南配置，或从桌面应用 **Settings → MCP server** 复制使用绝对路径的配置。
 
 验证示例：

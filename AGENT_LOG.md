@@ -652,3 +652,14 @@
 - **subagent 输出 / commit hash**：`/root/od_docs_audit` 进行只读当前时态一致性复核，确认 G-01 未误标 PASS 且历史/当前状态无剩余冲突；本轮选择证据提交为 `39f278dee93fa61bc3fa70334b3f81e56ef04e3c`（`docs: record Open Design selection evidence [agent: Codex GPT-5]`）。
 - **人工修改及原因**：学生本人完成界面选择；智能体只记录已观察事实并解释下一步，以遵守 UI 设计选择和实现阶段人工门禁。
 - **经验教训**：桌面 daemon 健康、composer 选择和当前 task 的 MCP 可达性是三项独立证据；不能因前两项成功就把 G-01 写成 PASS，也不能把每次重启变化的端口固化进配置。
+
+## 2026-07-21T21:08:02+08:00 — OD-004 Open Design 门禁范围修正
+
+- **Task 编号**：OD-004（G-01 scope correction）。
+- **触发的 Superpowers skill / 工具**：无正式 Superpowers skill；依据仓库 `AGENTS.md`、`SKILLS_SETUP.md`、已安装 Open Design 0.15.1 本地文档、`frontend-design/SKILL.md`、default/Neutral Modern package 和新任务提供的 MCP 只读结果做证据复核。
+- **学生原始问题**：学生指出“按理来说不应该是下载 skill 文件吗，为什么要让我把 Open Design 打开挂着”，要求解释并修正文档。
+- **事实证据**：Open Design 桌面包已携带完整 `frontend-design/SKILL.md`、Apache-2.0 `LICENSE.txt` 和 default design-system 文件；fresh MCP task 返回 built-in `frontend-design`（`mode=prototype`、`designSystemRequired=true`）、`projects=[]`、`active=false`。空 project/context 是实现前状态，不是 MCP 失败。
+- **主智能体修改**：将 G-01 改为 environment/MCP/bundled-skill/selection gate 并标记 PASS；明确 daemon 只在 MCP 调用或实际 design run 时按需运行，不要求长期挂起或创建空 project；将真实 project/run/artifact、截图和 review 证据后置到 UI-01A，并规定生成源代码不得绕过 TDD 红测进入生产目录。同步修订 `SPEC.md`、`PLAN.md`、`SPEC_PROCESS.md`、`DECISIONS_NEEDED.md`、`SKILLS_SETUP.md`、审计和研究基线。
+- **验证边界**：本轮未创建 Open Design project、未发送 prompt、未运行生成、未修改前端/生产源码、未运行测试/构建/CI，未创建或修改 `REFLECTION.md`。OD-003 的 stale-endpoint 历史记录保留。
+- **subagent 输出 / commit hash**：`/root/od_gate_scope_audit` 只读复核确认 G-01 应 PASS、无须长期开 daemon、UI-01A 后置 run；本条写入时修订提交尚未创建。
+- **经验教训**：必须把“技能文件已安装”“MCP/daemon 可连接”“正式 Open Design run 已执行”建成三个独立证据层；否则会为了证明工具可用而制造空项目或让用户无意义地保持桌面应用运行。

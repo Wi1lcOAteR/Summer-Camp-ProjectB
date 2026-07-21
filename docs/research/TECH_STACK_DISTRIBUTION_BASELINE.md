@@ -19,7 +19,7 @@
 | 公开 provider | 只使用确定性 provider mock；不接受上传、真实 key 或真实 provider egress | mock 场景覆盖，以及上传、secret、provider 网络和私人材料持久化路径均关闭的测试 |
 | 远程仓库 | NJU Git/GitLab 主仓 + GitHub 镜像 | 用户当时授权后才可 push、建立 PR/MR 或配置镜像 |
 | CI | GitLab 精确 job 名 `unit-test` + GitHub Actions，每次 push 运行同一测试入口 | 两个平台的实际成功运行和最后提交对应记录 |
-| UI 工作流 | Open Design 0.15.1 daemon 健康；学生已选择 `frontend-design` + `default`（Neutral Modern）；Codex MCP 已注册 | 当前 task 的 MCP 仍缓存旧 7456；须保持桌面端开启并在 fresh task 复验三项 MCP，尚无 project/run/artifact 或正式 UI 证据 |
+| UI 工作流 | Open Design 0.15.1 daemon、Codex MCP、完整内置 `frontend-design` 和学生选择的 `default`/Neutral Modern 均已验证 | G-01 环境门禁已 PASS；`projects=[]`、`active=false` 是实现前状态。UI-01A 获准后按需执行真实 project/run/artifact、截图、review 和浏览器验收 |
 
 ## 本地运行拓扑
 
@@ -97,4 +97,4 @@ D-023 只批准了仓库与证据策略，不批准当前会话执行远程动�
 
 学生已选择并安装 Open Design；2026-07-21 桌面端版本为 0.15.1，composer 已实际选择 `frontend-design` + `default`（Neutral Modern）并链接 `ProjectB`。daemon 的直接只读 API 健康且返回相同标识。全局配置中的 `skillId=null` 不与该事实冲突，因为 skill 绑定在单次 composer turn；MCP 注册也无需重复。
 
-当前 Codex task 的 MCP 进程在最新 daemon 前启动并缓存了 fallback `127.0.0.1:7456`。正式 UI 前须保持 Open Design 运行，在 fresh Codex task 复验 `list_skills`、`list_projects` 与 `get_active_context`；不得重复注册或把动态端口写入配置。选择已写入 `SPEC.md`，但现有需求 mockup 与直接 daemon API 都不能替代 Open Design MCP run/artifact 或正式 UI 验收证据。
+fresh Codex task 已成功发现动态 daemon，并记录 `list_skills`、`list_projects=[]` 与 `get_active_context.active=false`；不得重复注册或把动态端口写入配置。G-01 环境门禁已 PASS。正式 UI 前不要求长期保持 Open Design 运行；UI-01A 在实现批准后按需创建 project/run/artifact，记录截图与 review，且现有需求 mockup/直接 daemon API 不能替代那一阶段的真实 workflow 证据。

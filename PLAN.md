@@ -91,7 +91,7 @@ There are 41 planning groups and 69 dispatch units (the 17 groups marked `Task G
 
 | ID | Deliverable | Dependencies | Parallel group | Status / commit |
 | --- | --- | --- | --- | --- |
-| G-01 | Open Design MCP/design-system gate | SPEC confirmed | G | [ ] 尚未执行 |
+| G-01 | Open Design environment/MCP/selection gate | SPEC confirmed | G | [x] PASS；证据提交待回填 |
 | G-02A | Toolchain/dependency/license baseline | SPEC confirmed | G | [ ] 尚未执行 |
 | G-02B | Provider policy/capability/cost evidence | G-02A | G | [ ] 尚未执行 |
 | G-02C | Distribution/hosting evidence | G-02A | G | [ ] 尚未执行 |
@@ -133,7 +133,7 @@ There are 41 planning groups and 69 dispatch units (the 17 groups marked `Task G
 | API-03C | Study-focus confirmation routes | M3-03/API-03B | API | [ ] 尚未执行 |
 | API-04A | Profile/credential lifecycle routes | T-04/T-05/T-06/API-01C | API | [ ] 尚未执行 |
 | API-04B | Audit/security status routes | API-04A/T-03C | API | [ ] 尚未执行 |
-| UI-01A | Shell/tokens/accessibility base | G-01/API-01C | UI | [ ] 尚未执行 |
+| UI-01A | Controlled Open Design run + shell/tokens/accessibility base | G-01/API-01C | UI | [ ] 尚未执行 |
 | UI-01B | Four-stage timeline/navigation | UI-01A | UI | [ ] 尚未执行 |
 | UI-01C | Responsive/loading/error/empty shell states | UI-01B/API-01C | UI | [ ] 尚未执行 |
 | UI-02A | Metadata/import state | UI-01C/API-01C | UI | [ ] 尚未执行 |
@@ -163,9 +163,9 @@ There are 41 planning groups and 69 dispatch units (the 17 groups marked `Task G
 
 ---
 
-### Task G-01: Verify Open Design MCP, Skill, and Actual Design System
+### Task G-01: Verify Open Design Environment, MCP, Bundled Skill, and Selected Design System
 
-**Goal:** Satisfy the mandatory UI prerequisite without inventing a design system or skill choice.
+**Goal:** Prove that the mandatory Open Design workflow is ready for later authorized UI work without requiring an empty project, permanent daemon process, or premature design generation.
 
 **Files:**
 - Create: docs/engineering/OPEN_DESIGN_VALIDATION.md
@@ -173,50 +173,39 @@ There are 41 planning groups and 69 dispatch units (the 17 groups marked `Task G
 - Do not modify: frontend source or production code
 
 **Interfaces:**
-- Consumes: the confirmed WebUI requirements in SPEC.md §4 and the installed Open Design 0.15.1 desktop application.
-- Produces: a recorded Open Design version, MCP endpoint/tool evidence, actual skill identifier, actual design-system identifier, selected rationale, rejected alternatives, and a verification date. UI tasks consume these exact identifiers through docs/engineering/OPEN_DESIGN_VALIDATION.md.
+- Consumes: the confirmed WebUI requirements in SPEC.md §4, the installed Open Design 0.15.1 package, and the student's composer selection.
+- Produces: a recorded Open Design version, successful MCP discovery evidence, complete bundled skill evidence, selected design-system identifier, rationale, rejected alternatives, and verification dates. UI-01A consumes these exact identifiers through docs/engineering/OPEN_DESIGN_VALIDATION.md and performs the first actual project/run only after implementation approval.
 
-**Dependencies / parallelism:** No code dependency. It may run beside G-02, but UI implementation is blocked until it passes. The student must execute external MCP/client-restart actions; the plan does not choose D-005 and must preserve the student's selected `frontend-design` + `default`/Neutral Modern combination.
+**Dependencies / parallelism:** No code dependency. It may run beside G-02. The plan does not choose D-005 and must preserve the student's selected `frontend-design` + `default`/Neutral Modern combination. Open Design only needs to run while MCP or an actual design task is in use; an empty project list or inactive context does not fail this environment gate.
 
-- [ ] **Step 1: Capture the current failing gate**
+- [x] **Step 1: Verify the bundled workflow and design-system files**
 
-Run:
+Observed: the installed package contains the complete `frontend-design/SKILL.md` and Apache-2.0 `LICENSE.txt`, plus the `default` design system's `DESIGN.md`, tokens, components, manifests, and previews. No separate skill download is required.
 
-~~~powershell
-codex mcp list
-od --version
-rg -n "skillId|designSystemId|Open Design|MCP" SPEC.md docs/engineering 2>$null
-~~~
+- [x] **Step 2: Record the student-selected contract and runtime evidence**
 
-Expected current state: FAIL because this Codex task's MCP process cached the old `http://127.0.0.1:7456` fallback before the healthy ephemeral daemon started. The student-selected `frontend-design` + `default`/`Neutral Modern` combination and direct daemon catalog evidence are recorded, but live MCP tool/context evidence is still absent. This failure is evidence, not permission to bypass the gate.
+Observed: the student selected `frontend-design` + `default` (`Neutral Modern`) in the Open Design composer; the 0.15.1 daemon's read-only API returned matching skill/design-system metadata. No prompt, project, artifact, or production file was created.
 
-- [ ] **Step 2: Perform the user-authorized external setup and verification**
+- [x] **Step 3: Verify fresh MCP discovery**
 
-The student has opened Open Design 0.15.1 and selected `frontend-design` + `default`/`Neutral Modern`; keep the desktop app running and do not send a broad generation prompt. The MCP registration is already present in the current user config; do not add a duplicate entry or persist an ephemeral port. Start a fresh Codex task so the MCP client process re-runs dynamic daemon discovery, then call `list_skills`, `list_projects`, and `get_active_context`. If they still report the fallback `127.0.0.1:7456` connection error, preserve that exact error and the desktop daemon log rather than changing registration or bypassing the gate.
+Observed in a fresh Codex task: `list_skills` returned built-in `frontend-design` with `mode=prototype`, `designSystemRequired=true`, and a complete body; `list_projects` truthfully returned `[]`; `get_active_context` truthfully returned `active=false`. These results prove MCP reachability and the pre-implementation state.
 
-In the fresh task, use Open Design MCP only for read-only discovery: call `list_skills`, `list_projects`, and `get_active_context` when a real context exists. Do not call `start_run`, create a project merely to manufacture evidence, send a prompt, ask Open Design to generate a WebUI direction, or produce an artifact/source in this step. If the project list is empty or no active context exists, record that truthful result and keep G-01 partial; a controlled Open Design run belongs to a later explicitly scoped gate step.
+- [x] **Step 4: Review the gate scope**
 
-- [ ] **Step 3: Record only observed facts**
+Spec review: AC-44 and SPEC §4.2 identifiers match. Quality review: an empty project/context is not manufactured into a failure; the daemon is not required to remain open without an MCP call or design run; the actual Open Design project/run/artifact is deferred to UI-01A after G-03 approval and may not bypass TDD.
 
-Complete docs/engineering/OPEN_DESIGN_VALIDATION.md with the fresh MCP tool output, selected IDs/names, version, date, rejected alternatives and reasons, and the statement that the HTML mockup is not formal evidence. The file currently contains partial selection/daemon evidence only. Update SPEC.md and SPEC_PROCESS.md only with observed facts; if the fresh MCP result differs, stop and request a SPEC decision.
+- [ ] **Step 5: Commit and record the evidence hash**
 
-- [ ] **Step 4: Verify the gate**
-
-Run:
+Run during the evidence commit:
 
 ~~~powershell
-rg -n "actual|skill|design system|MCP|version|selected|rejected" docs/engineering/OPEN_DESIGN_VALIDATION.md
-codex mcp list
+rg -n "PASS|frontend-design|Neutral Modern|list_skills|projects|active" docs/engineering/OPEN_DESIGN_VALIDATION.md
+git diff --cached --check
 ~~~
 
-Expected: the file contains an observed selected result, the tool is callable in a fresh session, and the selected IDs match the recorded evidence.
+Expected: validation status is PASS, observed MCP results and selected identifiers are present, and the working changes contain no production source. Commit with `process(G-01): close Open Design environment gate [agent: <agent-id>]`; the coordinator records the hash in this ledger and AGENT_LOG.md.
 
-- [ ] **Step 5: Review and commit**
-
-Spec review checks AC-44. Quality review checks that no UI code, unverified license, or invented design choice was added. Commit with process(G-01): record Open Design gate evidence; the coordinator records the hash in this plan and AGENT_LOG.md.
-**Commit command:** `git add -- docs/engineering/OPEN_DESIGN_VALIDATION.md SPEC.md SPEC_PROCESS.md AGENT_LOG.md; git diff --cached --check; git commit -m "process(G-01): record Open Design gate evidence [agent: <fresh-agent-id>]"; git rev-parse HEAD`
-
-**Completion standard:** Actual MCP/tool, skill, and design-system evidence is reproducible; UI tasks remain blocked if any part is unavailable or unrecorded.
+**Completion standard:** The installed complete skill, selected design system, and successful MCP discovery are reproducible and recorded. No project or active context is required before implementation approval. Actual Open Design run/artifact evidence remains a mandatory first step of UI-01A and is not implied by this PASS.
 
 ### Task Group G-02 (not dispatchable): Toolchain, Provider, License, Cost, and Hosting Evidence
 
@@ -2605,7 +2594,7 @@ Planning group ID: API-04 (not dispatchable; use API-04A/API-04B)
 
 Planning group ID: UI-01 (not dispatchable; use UI-01A/UI-01B/UI-01C)
 
-**Goal:** Establish the formal responsive WebUI shell using the actual Open Design MCP/skill/design-system identifiers recorded by G-01. The shell must preserve the four-stage X-axis timeline at mobile and desktop widths, provide accessible landmarks/focus states, and expose a stable route/API boundary for later feature screens.
+**Goal:** Run the first controlled Open Design design task after implementation approval, then establish the formal responsive WebUI shell using its reviewed artifact and the identifiers recorded by G-01. The shell must preserve the four-stage X-axis timeline at mobile and desktop widths, provide accessible landmarks/focus states, and expose a stable route/API boundary for later feature screens.
 
 **Files:**
 - Modify: `frontend/src/app/App.tsx`
@@ -2618,14 +2607,16 @@ Planning group ID: UI-01 (not dispatchable; use UI-01A/UI-01B/UI-01C)
 - Create: `frontend/src/app/AppShell.test.tsx`
 - Create: `frontend/src/components/PhaseTimeline.test.tsx`
 - Create: `frontend/src/test/setup.ts`
+- Create: `docs/engineering/OPEN_DESIGN_RUN.md`
 
 **Interfaces:**
 - `AppShell({profile, children})` renders semantic `header`, `nav`, `main`, and live status regions and consumes the selected Open Design tokens/components from `docs/engineering/OPEN_DESIGN_VALIDATION.md`; it must not invent a replacement system.
 - `PhaseTimeline({activePhase, phases})` exposes exactly four phases (`import`, `understand`, `practice`, `review`) on one X axis at widths 320 px, 390 px, and 1440 px, with `aria-current`, visible labels/icon names, keyboard focus, and no page-level horizontal overflow.
 - `routes.tsx` defines stable paths for import, materials/privacy, learning, review/finals, and settings and exposes a profile/health loading state; `StatusBanner` displays recoverable errors and demo/local profile without color-only meaning. The terminal shell unit is UI-01C.
 - `tokens.css`/`global.css` contain the recorded design-system variables, responsive constraints, focus styles, typography/color contrast, and icon sizing. No feature state or secret is written to localStorage/sessionStorage.
+- `OPEN_DESIGN_RUN.md` records the real Open Design project/context, `frontend-design` + `default` identifiers, prompt scope, artifact reference/screenshots, review findings, and the boundary that generated artifact source was not copied into production before the red test.
 
-**Dependencies / parallelism:** Group summary only. UI-01A requires G-01/API-01C; UI-01B requires UI-01A; UI-01C requires UI-01B/API-01C. No formal UI implementation may begin while Open Design evidence is missing. UI-02A through UI-05A may branch only after UI-01C; shared token/global files remain UI-01A-owned.
+**Dependencies / parallelism:** Group summary only. UI-01A requires G-01/API-01C and therefore occurs only after G-03 implementation approval and G-04/T-01 foundations. UI-01B requires UI-01A; UI-01C requires UI-01B/API-01C. UI-01A must finish its controlled Open Design run record before writing the failing production-code test. UI-02A through UI-05A may branch only after UI-01C; shared token/global files remain UI-01A-owned.
 
 - [ ] **Step 1: Write the minimum failing test**
 
@@ -2639,7 +2630,7 @@ Planning group ID: UI-01 (not dispatchable; use UI-01A/UI-01B/UI-01C)
 
 - [ ] **Step 2: Implement the smallest shell**
 
-  Wire the verified Open Design primitives/tokens, semantic layout, route outlet, profile health state, and keyboard/focus behavior. Keep the timeline horizontal at mobile by sizing its four stable tracks responsively; do not introduce a horizontal page scroller, decorative blobs, or an unverified icon/font library.
+  Wire the reviewed Open Design run primitives/tokens, semantic layout, route outlet, profile health state, and keyboard/focus behavior. Do not copy generated artifact source before the red test; implement only the smallest protected shell. Keep the timeline horizontal at mobile by sizing its four stable tracks responsively; do not introduce a horizontal page scroller, decorative blobs, or an unverified icon/font library.
 
 - [ ] **Step 3: Focused and full regression**
 
@@ -2660,24 +2651,25 @@ Planning group ID: UI-01 (not dispatchable; use UI-01A/UI-01B/UI-01C)
 
   **Group record:** no worker commit is assigned to the group heading. The coordinator records UI-01A/B/C hashes and reviews separately.
 
-**Completion standard:** A production build renders the verified design system, four-phase horizontal timeline, accessible navigation, and profile/error status without page overflow or unrecorded design choices; later UI tasks have stable routes and tokens to consume.
+**Completion standard:** `OPEN_DESIGN_RUN.md` contains a real approved project/run/artifact record, and a production build renders the reviewed design system, four-phase horizontal timeline, accessible navigation, and profile/error status without page overflow or unrecorded design choices; later UI tasks have stable routes and tokens to consume.
 
 ### Task UI-01A: Build the Shell, Tokens, and Accessibility Base
 
-**Goal:** Create the semantic application shell, verified design tokens, focus/contrast primitives, and route outlet using the G-01 evidence.
+**Goal:** Produce the first controlled Open Design run after implementation approval, then create the semantic application shell, verified design tokens, focus/contrast primitives, and route outlet using G-01 and the reviewed artifact.
 
-**Files:** Modify `frontend/src/app/App.tsx`; create `frontend/src/app/AppShell.tsx`, `frontend/src/app/routes.tsx`, `frontend/src/styles/tokens.css`, `frontend/src/styles/global.css`, `frontend/src/test/setup.ts`, and `frontend/src/app/AppShell.test.tsx`.
+**Files:** Modify `frontend/src/app/App.tsx`; create `frontend/src/app/AppShell.tsx`, `frontend/src/app/routes.tsx`, `frontend/src/styles/tokens.css`, `frontend/src/styles/global.css`, `frontend/src/test/setup.ts`, `frontend/src/app/AppShell.test.tsx`, and `docs/engineering/OPEN_DESIGN_RUN.md`.
 
-**Interfaces:** semantic header/nav/main/live status, profile/health state, stable route placeholders, no browser persistence of secrets, and only recorded Open Design tokens/components.
+**Interfaces:** a real Open Design project/run/artifact evidence record; semantic header/nav/main/live status, profile/health state, stable route placeholders, no browser persistence of secrets, and only reviewed Open Design tokens/components.
 
-**Dependencies / parallelism:** Requires G-01 and API-01C. It owns global shell/token files and completes before UI-01B.
+**Dependencies / parallelism:** Requires G-01 and API-01C, which places it after G-03 approval and the shared foundations. It owns the Open Design run record and global shell/token files and completes before UI-01B. Open Design need only remain running for the project/run and evidence capture.
 
+- [ ] **Open Design evidence before production code:** open/create the real ProjectB Open Design project, apply the approved brief with `frontend-design` + `default`/Neutral Modern, capture project/context/artifact/screenshots and review findings in `docs/engineering/OPEN_DESIGN_RUN.md`, then stop. Do not copy generated artifact source into `frontend/` before the red step.
 - [ ] **Red:** render landmark/focus/profile tests; run `npm --prefix frontend run test -- --run src/app/AppShell.test.tsx`. Expected: FAIL because the shell is absent.
-- [ ] **Green/refactor:** implement shell/tokens/accessibility only; run the focused test, full frontend tests/build, and `python scripts/test_all.py`.
-- [ ] **Reviews:** SPEC review AC-08, AC-09, AC-44; quality review actual G-01 evidence, contrast/focus, CSP/API base, dependency licenses, and no secret state. Critical findings block UI-01B.
-- [ ] **Commit:** scan secrets; `git add -- frontend/src/app/App.tsx frontend/src/app/AppShell.tsx frontend/src/app/routes.tsx frontend/src/styles/tokens.css frontend/src/styles/global.css frontend/src/test/setup.ts frontend/src/app/AppShell.test.tsx`; run `git diff --cached --check`; commit with `git commit -m "feat(UI-01A): add shell tokens and accessibility base [agent: <fresh-agent-id>]"`.
+- [ ] **Green/refactor:** implement shell/tokens/accessibility only from the reviewed direction; run the focused test, full frontend tests/build, and `python scripts/test_all.py`.
+- [ ] **Reviews:** SPEC review AC-08, AC-09, AC-44; quality review the actual Open Design run/artifact, TDD ordering, contrast/focus, CSP/API base, dependency licenses, and no secret state. Critical findings block UI-01B.
+- [ ] **Commit:** scan secrets; `git add -- docs/engineering/OPEN_DESIGN_RUN.md frontend/src/app/App.tsx frontend/src/app/AppShell.tsx frontend/src/app/routes.tsx frontend/src/styles/tokens.css frontend/src/styles/global.css frontend/src/test/setup.ts frontend/src/app/AppShell.test.tsx`; run `git diff --cached --check`; commit with `git commit -m "feat(UI-01A): add reviewed shell tokens and accessibility base [agent: <fresh-agent-id>]"`.
 
-**Completion standard:** A clean frontend build has accessible shell landmarks and recorded tokens with no unverified design choice.
+**Completion standard:** A real Open Design project/run/artifact is recorded, and a clean frontend build has accessible shell landmarks and reviewed tokens with no unverified design choice or TDD bypass.
 
 ### Task UI-01B: Add the Four-stage Timeline and Navigation
 

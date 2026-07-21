@@ -22,7 +22,7 @@
 - D-021 已确认 Windows x64、React/Vite/TypeScript + Python/FastAPI + SQLite 和 Windows Credential Manager；整体 SPEC 进一步确认单文件 `ProjectB.exe` 分发方向；
 - D-022 已确认公开演示只用合成/许可材料与 provider mock、无真实 key；整体 SPEC 进一步确认 OCI、隔离到期 session/限额与 Hugging Face Spaces Docker SDK 方向，当前官方复核仍受 502/超时阻塞；
 - D-023 已确认 NJU Git/GitLab 为主仓、GitHub 为镜像，并保留 GitLab `unit-test` 与 GitHub Actions 双 CI 证据；任何远程 push、PR/MR 或镜像操作仍需执行当时的用户授权；
-- D-024 已确认安装并使用 Open Design。桌面端 0.15.1 daemon 健康，学生已实际选择 `frontend-design` + `default`（Neutral Modern），Codex MCP 已注册；当前缺口仅是 fresh Codex task 的 MCP 复验，正式 UI 设计与实现仍受 G-01 及后续阶段门禁约束。
+- D-024 已确认安装并使用 Open Design。桌面端 0.15.1 daemon、Codex MCP、完整内置 `frontend-design` 与学生选择的 `default`（Neutral Modern）均已验证；G-01 环境门禁通过。正式 UI 设计与实现仍受冷启动、实现批准和 UI-01A 真实 project/run/artifact 证据约束，不要求 daemon 长期运行。
 
 ## 共同硬约束
 
@@ -87,7 +87,7 @@ Public HTTPS URL (preferred: Hugging Face Spaces Docker SDK)
 - 本地服务、浏览器打开、端口冲突、系统钥匙串和跨平台打包都要测试；
 - 公开 URL 需要单独的演示配置，必须证明它仍是可体验应用而非静态截图；
 - 公开演示与本地真实模式可能发生配置漂移，必须由同一核心测试套件约束；
-- 正式 UI 前必须保持 Open Design daemon 可用，并在 fresh Codex task 复验 MCP；实际 `frontend-design` + `default`（Neutral Modern）组合已记录，但当前需求 mockup 和直接 daemon API 都不能替代正式 MCP/run/UI 证据；
+- 正式 UI 的 UI-01A task 必须按需开启 Open Design，使用已记录的 `frontend-design` + `default`（Neutral Modern）执行真实 project/run，并记录 MCP context、artifact、截图和 review；环境门禁已完成，当前需求 mockup 和直接 daemon API 不能替代该正式 workflow 证据；
 - 跨设备同步不是第一版能力，备份由用户承担或另行设计。
 
 ### 课程 URL 的保守处理
@@ -241,4 +241,4 @@ D-017/D-018/D-021 至 D-024 确认内置 OpenAI、Windows 本地栈、许可夹�
 4. 首版 Windows x64 单文件 `ProjectB.exe` 已随整体 SPEC 确认；具体冻结工具按许可证与干净机证据选择；
 5. 公开 demo 的 OCI + Hugging Face Spaces Docker SDK 方向已随整体 SPEC 确认；官方条款复核、账号、URL、CI/CD 和可访问性尚未执行；
 6. 双平台仓库/CI 策略已定，但远程 push、PR/MR、镜像与部署仍需执行当时授权；
-7. Open Design 0.15.1 daemon、Codex MCP 注册和 `frontend-design` + `default`（Neutral Modern）选择均已存在；必须先在 fresh Codex task 复验 MCP，再按后续阶段门禁开始正式 UI。
+7. Open Design 0.15.1 daemon、Codex MCP 注册、完整内置 `frontend-design` 和 `default`（Neutral Modern）选择均已存在；无需长期运行或创建空项目，UI-01A 获准后按需执行正式 project/run/artifact，再开始受 TDD 保护的 UI 实现。

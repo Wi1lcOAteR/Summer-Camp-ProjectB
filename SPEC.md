@@ -176,7 +176,7 @@ v1 golden fixtures（每项任务默认 10 分钟）：
 - 主要结论通过字号、颜色、字重与字体建立一级强调；依据和限制作为二级信息，减少同时争夺注意力的正文。
 - 使用熟悉图标配合短句引导视线；颜色不能成为唯一状态信号。
 - “不会静默切换处理方式”和“课程设置 › 材料与隐私”必须高于普通说明文字的视觉权重。
-- 当前需求稿见 `docs/mockups/course-import-onboarding.html`。学生于 2026-07-21 在 Open Design 0.15.1 界面实际附加 `frontend-design` 并选择 `default`（显示名 `Neutral Modern`），同时关联 ProjectB 本地目录；该组合现为已确认的 v1 UI 工作流。项目覆盖为卡片半径最多 8px、`letter-spacing: 0`、紧凑工作台密度、桌面/移动端顶部四阶段时间线和非纯颜色状态表达。当前 Codex task 的 MCP 进程仍缓存旧的 7456 fallback，须在保持 Open Design 运行时由新 Codex task 复验动态 daemon；复验前现有 HTML 仍只代表 brainstorming 需求稿，不是正式 UI 或 G-01 PASS。
+- 当前需求稿见 `docs/mockups/course-import-onboarding.html`。学生于 2026-07-21 在 Open Design 0.15.1 界面实际附加 `frontend-design` 并选择 `default`（显示名 `Neutral Modern`），同时关联 ProjectB 本地目录；该组合现为已确认的 v1 UI 工作流。`frontend-design` 与 Neutral Modern 的完整 skill/design-system 文件已经随桌面版内置，无需另行下载。fresh Codex task 已通过 MCP 观察到 built-in `frontend-design`；空项目列表和无活动上下文是实现前的真实状态，不是门禁失败。G-01 环境/选择门禁已通过；冷启动修订和实现批准后，UI-01A 才创建真实 Open Design 项目/run/artifact，并在 TDD 红测前只把它作为设计证据。现有 HTML 仍只代表 brainstorming 需求稿，不是正式 Open Design run 或 UI 验收。
 
 ### 4.3 增量导入与计划修订（已确认）
 
@@ -348,7 +348,7 @@ Public HTTPS browser
 - `已随整体 SPEC 确认的 v1 工程方向`：课程分发类别采用 **Windows x64 单文件原生可执行二进制**。交付物 `ProjectB.exe` 内嵌前端与必要运行资源，用户不需安装 Python、Node 或 Docker；运行期数据写入文档化目录。具体冻结工具在 PLAN 中按许可证、冷启动、Credential Manager 和资源集成证据选择。若无代码签名，README/发布页如实说明 SmartScreen，不能伪称已签名。
 - `已随整体 SPEC 确认的 v1 工程方向`：公开实例使用同一 WebUI/领域合同的 **OCI container demo**，首选 **Hugging Face Spaces（Docker SDK）**，固定为许可夹具 + deterministic mock；无真实 key、任意上传/provider egress 或私人课件持久化。镜像须支持单条 build/run。2026-07-20 官方复核因 web 502、`curl` 超时未完成；部署前须重核 Docker、HTTPS、休眠/临时存储、费用与账号条款。不满足无付费边界时须通过 SPEC 变更，不能静默产生费用。
 - `已确认`：NJU Git/GitLab 为课程主仓，GitHub 为镜像；两套 CI 调用同一条一键测试命令。`.gitlab-ci.yml` 必须含名称严格为 `unit-test` 的 job，GitHub Actions 每次 push 运行测试；最终两边真实记录和课程提交对应 CI 必须通过。建仓、push、PR/MR、镜像和部署仍需执行时授权。
-- `已确认路线/外部门禁`：Open Design 已更新并运行 0.15.1，agent 为 Codex，MCP 注册已存在。学生于 2026-07-21 实际选择 `skillId=frontend-design` 与 `designSystemId=default`（`Neutral Modern`）；`web-design-guidelines` 作为实现后审查 skill，`shadcn` 仅保留为显式 SPEC 变更时的备选。健康 daemon 的只读 API 已验证版本、skill 存在且 `designSystemRequired=true`、design-system ID/标题匹配；但当前 Codex task 的 MCP 进程仍缓存旧 7456，尚未成功返回 `list_skills/list_projects/get_active_context`。新 task 的 MCP 复验与实际 Open Design project/context 证据完成前不得开始正式 UI 实现，现有 HTML 只作 brainstorming 证据。
+- `已确认路线/环境门禁通过`：Open Design 0.15.1、Codex MCP 注册、内置完整 `skillId=frontend-design` 和 `designSystemId=default`（`Neutral Modern`）均已验证；fresh task 的 `list_skills` 成功，`list_projects=[]` 与 `active=false` 如实表示尚未进入实现。Open Design 桌面端只需在 MCP 调用或真实 design run 期间运行，不要求长期挂起，也不需要再次下载该内置 skill。`web-design-guidelines` 作为实现后审查 skill，`shadcn` 仅保留为显式 SPEC 变更时的备选。实际 project/run/artifact 证据由获准实现后的 UI-01A 创建并记录；在此之前现有 HTML 只作 brainstorming 证据，不能冒充 Open Design run 或正式 UI。
 
 详细工程基线与分发完成标准见 `docs/research/TECH_STACK_DISTRIBUTION_BASELINE.md`。
 
@@ -438,7 +438,7 @@ Public HTTPS browser
 | Hugging Face Spaces 官方复核受网络阻塞 | Docker SDK 已确认为首选方向；2026-07-20 web 502/curl 超时，部署前必须重核费用、Docker/HTTPS、休眠与临时存储 |
 | Windows x64 分发尚未验证 | 单文件 `ProjectB.exe` 已确认为分发方向；冻结工具仍须通过许可证、干净机、Credential Manager、SmartScreen 和数据边界验证 |
 | 双远程平台尚未执行 | NJU Git/GitLab 主仓 + GitHub 镜像及双 CI 已确认；建仓、push、PR/MR、镜像与部署需执行时授权，当前本地记录不能代替远程证据 |
-| Open Design MCP 复验未完成 | 0.15.1 daemon 与 `frontend-design` + `default`/`Neutral Modern` 选择已有直接证据；当前 task 的 MCP 仍缓存旧 7456，尚未返回 live tool/context。保持桌面端运行并在新 Codex task 复验 MCP 是正式 UI 前剩余门禁 |
+| Open Design 正式 run 尚未执行 | G-01 环境门禁已通过：0.15.1、MCP、完整内置 `frontend-design` 与 `default`/Neutral Modern 选择均有证据；空 project/context 不构成失败。UI-01A 在实现批准后创建真实 project/run/artifact，并保证生成物不绕过 TDD 红测 |
 | Superpowers 阶段 B skill 未注册 | v6.1.1 缓存已检测，但当前会话未暴露 `writing-plans`；SPEC 签字后须在已注册的新会话正式调用，不能以手工计划代替 |
 | 冷启动智能体类型 | D-005 尚待学生在阶段 C 前决定；不阻塞当前 SPEC 签字或阶段 B 计划编写 |
 | brainstorming 个人反思尚缺 | 课程审计要求学生本人评价过程优点、不足与关键取舍；AI 可提供问题框架但不得伪造学生观点或代写 `REFLECTION.md` |
