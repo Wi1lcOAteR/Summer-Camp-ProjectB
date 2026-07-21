@@ -700,3 +700,14 @@
 - **Verification:** `git diff --check` passed (line-ending conversion warnings only); `scripts/verify_evidence.ps1` returned `EVIDENCE_VALIDATION_PASS rows=37 explicitly_blocked=28`; the PLAN ledger returned `rows=69 pass=1 pending=68`; current-contract and stale-wording assertions passed; focused credential scan found no matching token/private-key pattern.
 - **Commit:** `3d0100d` (`docs(OD-005): clarify Open Design workflow state [agent: Codex GPT-5]`).
 - **Lesson:** Status documents need an explicit current snapshot when historical diagnostics remain in the same file; otherwise a correct evidence trail can be mistaken for a live instruction.
+
+## 2026-07-22T00:53:17+08:00 - G-02A exact dependency and license baseline
+
+- **Task 编号**：G-02A。
+- **触发的 Superpowers skill / 工具**：当前会话仍未暴露正式 `superpowers:*`；按 TDD/verification 和课程双评审纪律使用证据校验器、精确临时 CPython/Node 运行时及 fresh read-only reviewer。未把这些动作冒充 `superpowers:writing-plans` 或正式实现。
+- **关键 prompt / context**：在任何生产 manifest 前锁定 Windows x64 工具链、直接/传递依赖、许可证和组件兼容性；不得使用真实 key、provider 请求、私人课件或系统级安装。
+- **Red / Green 证据**：扩展校验器后，文档/锁缺失产生 `EVIDENCE_VALIDATION_FAIL errors=29 rows=37`；修复后严格运行得到 `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`。CRLF 锁副本仍 PASS；React direct 漂移和 `UNKNOWN` Python 许可证 fixture 均按预期 FAIL。Python 3.14.6 smoke 输出 `PYTHON_SMOKE_PASS packages=16 ... provider_network=0`；Node 24.18.0 smoke 输出 `NODE_SMOKE_PASS modules=13 ...`；Uvicorn、PDFium 和收集 keyring completion 资源后的单文件组件均重新运行成功。
+- **subagent 输出 / review**：`g02a_exact_audit` 与其 npm closure 子审计给出 54/166 精确闭包；`g02a_staged_review` 先发现 CRLF 摘要、PLAN 文件合同、direct/license 校验和 smoke 证据问题，修复后又发现错误的 Python 包计数。最终复审确认无 P0/P1 或证据真实性阻断，并保留 clean-clone bootstrap 与完整应用/干净机验证给 T-01/DIST-01。
+- **人工修改及原因**：使用规范化 LF 摘要；增加 18 个 Python direct 和 npm root 3+13 direct 的双向/版本/许可证校验、PyPI 精确来源、npm tarball/SRI 与许可证 allowlist；新增无网络 Python/Node smoke harness。没有创建生产源码、manifest、CI、部署或 `REFLECTION.md`。
+- **commit hash**：`22b516af7b6f4896c6127e75b2585435e407a3c0`（`docs(G-02A): lock toolchain and license baseline [agent: Codex GPT-5]`）。
+- **经验教训**：锁文件的字节摘要必须定义跨平台换行语义；“依赖表存在”不等于 direct 集合、许可证或 smoke 已被机器互证；人类可读计数也必须由测试数据派生，不能手填后长期漂移。

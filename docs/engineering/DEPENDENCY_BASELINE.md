@@ -1,6 +1,6 @@
 # Dependency Baseline
 
-Status: **READY FOR COMMIT - G-02A exact dependency and license evidence verified**
+Status: **PASS - G-02A exact dependency and license evidence committed**
 
 Verification date: `2026-07-21` (Asia/Shanghai)
 
@@ -154,4 +154,4 @@ Validator regression fixtures also passed: converting both committed lock copies
 
 ## Gate
 
-G-02A evidence is ready for the reviewed task commit. The coordinator marks the task PASS only after recording that commit in `PLAN.md` and `AGENT_LOG.md`. T-01 must consume these exact selections, create production manifests/locks, rerun compatibility and license checks, and record any required change as a reviewed evidence update rather than silently drifting versions.
+G-02A passed in commit `22b516af7b6f4896c6127e75b2585435e407a3c0`. T-01 must consume these exact selections, create production manifests/locks, rerun compatibility and license checks, and record any required change as a reviewed evidence update rather than silently drifting versions.

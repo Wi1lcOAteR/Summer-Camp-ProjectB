@@ -92,7 +92,7 @@ There are 41 planning groups and 69 dispatch units (the 17 groups marked `Task G
 | ID | Deliverable | Dependencies | Parallel group | Status / commit |
 | --- | --- | --- | --- | --- |
 | G-01 | Open Design environment/MCP/selection gate | SPEC confirmed | G | [x] PASS；commit `b93c096db29f7b957950a0cfc74b80170a38d25a` |
-| G-02A | Toolchain/dependency/license baseline | SPEC confirmed | G | [ ] PENDING; evidence ledger created, required dependency/license rows explicitly blocked; checkpoint `24caa35` |
+| G-02A | Toolchain/dependency/license baseline | SPEC confirmed | G | [x] PASS; exact Python/npm locks, license closure, smoke evidence, and validator committed at `22b516af7b6f4896c6127e75b2585435e407a3c0` |
 | G-02B | Provider policy/capability/cost evidence | G-02A | G | [ ] PENDING; official policy rows verified, pricing/F capability rows explicitly blocked; checkpoint `24caa35` |
 | G-02C | Distribution/hosting evidence | G-02A | G | [ ] PENDING; freezer, immutable OCI digest, and host rows explicitly blocked; checkpoint `24caa35` |
 | G-03 | Fresh-agent cold start and implementation approval | formal writing-plans evidence, G-01 PASS, G-02A/B/C PASS | G | [ ] 尚未执行 |
@@ -275,9 +275,9 @@ Group review checks AC-20, AC-39, AC-48, AC-49 and AC-50 after G-02A/B/C. Qualit
 **Dependencies / parallelism:** Requires confirmed SPEC. It owns the shared validator and completes before G-02B/G-02C or T-01.
 
 - [x] **Red:** create the validator first and run `powershell -ExecutionPolicy Bypass -File scripts/verify_evidence.ps1`; expected FAIL because the dependency baseline rows are absent. Observed `EVIDENCE_VALIDATION_FAIL errors=3 rows=0`.
-- [ ] **Green/refactor:** verify exact versions/licenses from authoritative sources, populate dependency rows, then rerun the validator. A required incompatible/unverified item leaves the unit pending. Current ledger has explicitly-blocked dependency rows; no project lockfile was created.
-- [ ] **Reviews:** SPEC review AC-07, AC-10, AC-40, AC-43; quality review source authority, compatibility, transitive licenses, retrieval dates, and no credentials. Critical findings block T-01/G-02B/C.
-- [ ] **Commit:** `git add -- docs/engineering/DEPENDENCY_BASELINE.md docs/engineering/locks/python-3.14.6-windows-x64.lock docs/engineering/locks/frontend-package-lock.json scripts/evidence/g02a_python_smoke.py scripts/evidence/g02a_node_smoke.mjs scripts/verify_evidence.ps1 PLAN.md`; run `git diff --cached --check`; commit with `git commit -m "docs(G-02A): lock toolchain and license baseline [agent: <fresh-agent-id>]"`.
+- [x] **Green/refactor:** exact CPython 3.14.6/Node 24.18.0 selections, 54 Python pins, 166 npm package entries, 18 Python and 16 npm direct dependencies, reviewed license sets, and component smoke harnesses are recorded. Strict validation returned `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`; the two blocked rows belong only to G-02C hosting.
+- [x] **Reviews:** `/root/g02a_staged_review` performed the SPEC/acceptance review and quality/security/license review. It found CRLF hash instability, incomplete PLAN scope, weak direct/license validation, and a false Python package count; all blockers were fixed and the final review reported no P0/P1 or evidence-truthfulness issue. Credential Manager write lifecycle, Playwright browser binaries, full app freezer, and clean-machine distribution remain later tasks.
+- [x] **Commit:** `22b516af7b6f4896c6127e75b2585435e407a3c0` (`docs(G-02A): lock toolchain and license baseline [agent: Codex GPT-5]`).
 
 **Completion standard:** Every implementation/build dependency has one compatible locked row and verified license, and the validator passes without an unresolved required row.
 
