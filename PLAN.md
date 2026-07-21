@@ -317,6 +317,8 @@ Reviewed blocker checkpoint: `be666537706b4c133673029d950e84f15ea3ae1b` (`docs(G
 
 2026-07-22 safe follow-up: first-party read-only research compared an existing x64 Docker host with Tailscale Funnel, Azure for Students + Container Apps, and screened-out routes. It is recorded in `docs/research/PUBLIC_HOSTING_ALTERNATIVES.md` only to support D-025. No platform, account, payment method, registry, image or deployment was selected or created, so every G-02C checkbox remains open and the strict validator must still fail on exactly `host-cost` and `host-account`.
 
+Research-only checkpoint: `47f294c` (`docs(G-02C-R1): research no-paid hosting alternatives [agent: Codex GPT-5]`). The independent SPEC/gate review approved the corrected diff with no Critical/P1. This hash is not G-02C Green/Reviews/Commit completion evidence.
+
 **Completion standard:** The selected freezer, OCI base, and host each have a compatible verified row; no required distribution/hosting fact remains blocked.
 
 ### Task G-03: Run the Required Fresh-Agent Cold Start and Obtain Implementation Approval

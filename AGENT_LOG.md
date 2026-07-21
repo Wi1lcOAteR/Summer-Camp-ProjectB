@@ -745,5 +745,5 @@
 - **第二阶段质量复核**：逐项回读官方当前页面，检查候选表中的 OCI 架构、HTTPS、免费/credit/付款方式、scale-to-zero、临时存储、beta/带宽、idle 回收和非 production 限制；把“HF 仍是 selected host”改为“实际 host 未定，HF 只保留冲突证据”，并移除静态托管段落中可能暗示应用已实现的措辞。未引入第三方代码或依赖，因此本轮没有新增 README 许可证条目。
 - **人工修改及原因**：同步 `DECISIONS_NEEDED.md`、`PLAN.md`、`SPEC_PROCESS.md`、两份审计、分发证据和四份研究基线；只把已完成调查写成候选证据，`host-cost`/`host-account` 保持 `explicitly-blocked`。没有 Open Design project/run/artifact、Docker build/run、registry、付款方式、student credit、部署、CI、生产源码或 `REFLECTION.md`。
 - **验证证据**：普通校验为 `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；`-RequireDistributionReady` 按预期只因两项托管 blocker 返回 exit 1。Markdown 校验为 34 文件、20 本地链接、0 坏链接、0 奇数围栏；当前时态陈旧措辞扫描为 0；`git diff --check` 无 whitespace error，仅有 Windows 行尾提示。
-- **commit hash**：主文档提交尚未创建；真实 hash 将在下一条本地过程 checkpoint 中记录，不提前填写。
+- **commit hash**：`47f294ca994cc1fdafc82420a167f305716152ed`（`docs(G-02C-R1): research no-paid hosting alternatives [agent: Codex GPT-5]`）。该 hash 是只读研究/文档 checkpoint，不是 G-02C PASS。
 - **经验教训**：免费额度、无需信用卡、无需付款方式和不会自动产生账单是四个不同条件；候选调查可以让人工门禁更易回答，但在学生选择并确认 SPEC diff 前不能把候选事实写入 selected-host 证据行。
