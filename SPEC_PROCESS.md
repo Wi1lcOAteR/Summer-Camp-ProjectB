@@ -420,3 +420,8 @@
 - Official OpenAI Developer Docs MCP supplied current rows for Responses storage, abuse monitoring, prompt cache, file/image review, Files, Vector Stores, deletion/expiry and regional processing. No key, request body, private course material or paid request was used.
 - `scripts/verify_evidence.ps1` was created with a real red run (`EVIDENCE_VALIDATION_FAIL errors=3 rows=0`) and a green schema/secret-scan run (`EVIDENCE_VALIDATION_PASS rows=37 explicitly_blocked=28`). The green result intentionally does not close G-02: 28 rows remain explicitly blocked and downstream implementation is still prohibited.
 - Coordinator changes created the three engineering ledgers and synchronized `PLAN.md`; no production source, manifest, lockfile, deployment, or `REFLECTION.md` was created. No new product decision was inferred from the blocked rows; existing D-021/D-022 execution-time authorization and SPEC-change boundaries remain in force.
+
+### G-03 availability recheck: 2026-07-21T22:40:00+08:00
+
+- The current callable tool catalog still exposes no `superpowers:*` skill. The installed 6.1.1 cache is present on disk with the expected core directories, but that is not a formal invocation record.
+- No user-level configuration was changed. G-03 remains a hard gate: formal `writing-plans` evidence or course acceptance of the transparent fallback, then a different-type fresh session with only `SPEC.md` and `PLAN.md`, then student approval before implementation.

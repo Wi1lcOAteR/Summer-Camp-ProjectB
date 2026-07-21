@@ -673,3 +673,10 @@
 - **Files changed by coordinator:** `docs/engineering/DEPENDENCY_BASELINE.md`, `PROVIDER_POLICY_EVIDENCE.md`, `DISTRIBUTION_EVIDENCE.md`, `scripts/verify_evidence.ps1`, `PLAN.md`. The ledgers intentionally mark unresolved rows `explicitly-blocked`; no production source, credentials, private course material, package install, or remote deployment was added.
 - **Commit:** checkpoint `24caa35` (`docs(G-02): record blocked evidence baseline [agent: Codex GPT-5]`). This is a partial evidence checkpoint; G-02A/B/C remain pending and no implementation gate was opened.
 - **Lesson:** a validator PASS can coexist with blocked evidence by design; downstream tasks must consume only `verified` rows and keep all blocked implementation gates closed.
+
+## 2026-07-21T22:40:00+08:00 - G-03 Superpowers availability recheck
+
+- **Observed callable tools:** the current session tool catalog contains no `superpowers:*` entries.
+- **Observed local cache:** `C:\Users\22078\.codex\plugins\cache\openai-curated-remote\superpowers\6.1.1\skills` contains the expected `brainstorming`, `writing-plans`, worktree, TDD, review, debugging and verification directories.
+- **Decision:** cached files are not treated as a formal skill invocation. G-03 remains blocked until a fresh session exposes the registered skill or the course explicitly accepts the documented fallback, then the student selects D-005 and approves implementation after cold-start revisions.
+- **No changes:** no cached skill source was copied into the repository, no implementation was started, and no user-level Codex configuration was modified.
