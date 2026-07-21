@@ -1,6 +1,6 @@
 # Provider Policy Evidence
 
-Status: **READY FOR COMMIT - G-02B pre-implementation evidence verified; live F remains disabled**
+Status: **PASS - G-02B pre-implementation evidence committed; live F remains disabled**
 
 Verification date: `2026-07-21` (Asia/Shanghai). Every row was fetched through the official OpenAI Developer Docs MCP. No API key, request body, course material, or paid API call was used.
 
@@ -54,4 +54,4 @@ The implementation stores the dated model/price/service-tier/region snapshot and
 
 ## Gate
 
-G-02B evidence is ready for the reviewed task commit. The evidence is sufficient to implement without guessing because positive primitives and negative guarantees both map to deterministic behavior. The coordinator marks G-02B PASS only after recording that commit. This readiness does not enable F, authorize a provider call, or claim AC-48 live evidence.
+G-02B passed in commit `5ac9d47ddda845ed78f1758326fb547610274f4c`. The evidence is sufficient to implement without guessing because positive primitives and negative guarantees both map to deterministic behavior. This PASS does not enable F, authorize a provider call, or claim AC-48 live evidence.

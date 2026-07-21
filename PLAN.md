@@ -93,7 +93,7 @@ There are 41 planning groups and 69 dispatch units (the 17 groups marked `Task G
 | --- | --- | --- | --- | --- |
 | G-01 | Open Design environment/MCP/selection gate | SPEC confirmed | G | [x] PASS；commit `b93c096db29f7b957950a0cfc74b80170a38d25a` |
 | G-02A | Toolchain/dependency/license baseline | SPEC confirmed | G | [x] PASS; exact Python/npm locks, license closure, smoke evidence, and validator committed at `22b516af7b6f4896c6127e75b2585435e407a3c0` |
-| G-02B | Provider policy/capability/cost evidence | G-02A | G | [ ] PENDING; official policy rows verified, pricing/F capability rows explicitly blocked; checkpoint `24caa35` |
+| G-02B | Provider policy/capability/cost evidence | G-02A | G | [x] PASS; exact model/cost and P/F documentation boundaries committed at `5ac9d47ddda845ed78f1758326fb547610274f4c`; runtime F remains `source_disabled` until X2-03/INT-01 |
 | G-02C | Distribution/hosting evidence | G-02A | G | [ ] PENDING; freezer, immutable OCI digest, and host rows explicitly blocked; checkpoint `24caa35` |
 | G-03 | Fresh-agent cold start and implementation approval | formal writing-plans evidence, G-01 PASS, G-02A/B/C PASS | G | [ ] 尚未执行 |
 | G-04 | Worktree/branch ownership map | G-03 approved | G | [ ] 尚未执行 |
@@ -292,9 +292,9 @@ Group review checks AC-20, AC-39, AC-48, AC-49 and AC-50 after G-02A/B/C. Qualit
 **Dependencies / parallelism:** Requires G-02A. It may run beside G-02C with serialized validator edits. X2-02/X2-03C/INT-01 depend on this unit.
 
 - [x] **Red:** add provider-required-row assertions and run the validator; expected FAIL because provider rows were absent in the initial red run.
-- [ ] **Green/refactor:** lock the exact model and bounded cost formula; verify documented P capabilities and F primitives from current official sources; record every undocumented guarantee as a verified negative/unknown boundary with its exact SPEC fail-closed consequence. G-02B must not wait for X2-02/X2-03/INT-01 implementation or live tests. A missing authoritative source, unbounded cost term, or unknown without a defined safe behavior leaves G-02B pending.
-- [ ] **Reviews:** SPEC review AC-20, AC-21, AC-27, AC-39, AC-48, AC-49, AC-50; quality review dated source authority, `store:false`/ZDR wording, retention/deletion distinctions, cost arithmetic, and no key/request body. Critical findings block provider implementation.
-- [ ] **Commit:** `git add -- docs/engineering/PROVIDER_POLICY_EVIDENCE.md scripts/verify_evidence.ps1 PLAN.md`; run `git diff --cached --check`; commit with `git commit -m "docs(G-02B): verify provider policy and cost [agent: <fresh-agent-id>]"`.
+- [x] **Green/refactor:** exact `gpt-5.4-mini-2026-03-17` reference arithmetic, P direct PDF/token-count capability, F attributes/filter/results/File-ID primitives, current retention/region facts, and unsupported guarantees are mapped to deterministic fail-closed behavior. Strict validation returned `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`; both blocked rows belong only to G-02C.
+- [x] **Reviews:** `/root/g02b_staged_review` performed the SPEC/acceptance and quality/security/cost reviews. It verified the US$0.15035 ceiling and no G-02B/X2-03 cycle, then found the missing Vector Store post-delete server-removal window. The final diff distinguishes local revocation, delete acceptance, and the documented maximum 30-day server-removal period; final review found no blocker.
+- [x] **Commit:** `5ac9d47ddda845ed78f1758326fb547610274f4c` (`docs(G-02B): verify provider policy and cost [agent: Codex GPT-5]`).
 
 **Completion standard:** The evidence is sufficient to implement the provider boundary without guessing: P capability, F attributes/filter/result/delete primitives, retention/region facts, exact model/pricing, and all non-guarantees are current and mapped to deterministic fail-closed behavior. G-02B PASS does not claim a working live adapter, authorize a provider call, or enable F. Runtime F remains `source_disabled` until X2-03 proves the adapter contract; an actual selected profile/account lifecycle is claimed only by the explicitly authorized INT-01 evidence.
 

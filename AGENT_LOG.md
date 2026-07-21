@@ -711,3 +711,14 @@
 - **人工修改及原因**：使用规范化 LF 摘要；增加 18 个 Python direct 和 npm root 3+13 direct 的双向/版本/许可证校验、PyPI 精确来源、npm tarball/SRI 与许可证 allowlist；新增无网络 Python/Node smoke harness。没有创建生产源码、manifest、CI、部署或 `REFLECTION.md`。
 - **commit hash**：`22b516af7b6f4896c6127e75b2585435e407a3c0`（`docs(G-02A): lock toolchain and license baseline [agent: Codex GPT-5]`）。
 - **经验教训**：锁文件的字节摘要必须定义跨平台换行语义；“依赖表存在”不等于 direct 集合、许可证或 smoke 已被机器互证；人类可读计数也必须由测试数据派生，不能手填后长期漂移。
+
+## 2026-07-22T01:16:37+08:00 - G-02B provider policy, capability, and cost evidence
+
+- **Task 编号**：G-02B。
+- **触发的 skill / 工具**：完整遵循已读取的 `openai-docs` skill，通过官方 OpenAI Developer Docs MCP 获取模型、定价、数据控制、PDF input、token counting、File Search 与 API reference；没有 key、请求正文、付费调用或私人材料。正式 `superpowers:writing-plans` 仍不可调用，该缺口不被本任务冒充关闭。
+- **关键 prompt / context**：验证 P/F 实现所需的当前能力、留存/删除/区域/费用事实，同时解决“G-02B 等待 X2-03 live test、X2-03 又依赖 G-02B”的计划循环；官方未保证事项只能映射为显式 fail-closed，不能解释成供应商支持。
+- **验证证据**：`-RequireProviderReady` 返回 `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；两项 blocker 均属于 G-02C。离线手算为 `0.01650 + 0.03135 + 0.00250 + 0.10000 = US$0.15035`，低于 AC-48 的 US$1 上限；这不是实际账单或调用成功证据。
+- **subagent 输出 / review**：`g02b_official_audit` 建议把有官方来源且有确定性 fail-closed 的负能力边界标为 verified，以消除计划循环。`g02b_staged_review` 核对 AC-20/21/27/39/48/49/50、价格和 P/F 原语，发现 Vector Store 删除受理后最长 30 天服务端移除窗口遗漏；修复后批准提交。
+- **人工修改及原因**：新增精确模型、PDF input、token count、F filter/result rows 与保守费用公式；明确 `store:false` 不是 ZDR，F 默认 `source_disabled`，未知清理为 `delete_incomplete`，delete accepted 不等于即时物理清除。没有启用 adapter、创建 provider 对象或修改生产源码。
+- **commit hash**：`5ac9d47ddda845ed78f1758326fb547610274f4c`（`docs(G-02B): verify provider policy and cost [agent: Codex GPT-5]`）。
+- **经验教训**：证据门禁判断的是“实现是否无需猜测”，不要求供应商提供正向保证；但删除 API 成功、数据不可再用和服务端物理清除必须分开建模与展示。
