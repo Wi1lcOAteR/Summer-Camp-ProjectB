@@ -254,9 +254,9 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
 - **为什么必须由你决定**：具体 provider 会决定 SDK/许可证、PDF/图像与文件接口、结构化输出、引用定位、上传/索引/删除语义、凭据字段、区域/留存/训练政策、费用和真实端到端测试。即使 adapter-neutral，也不能由智能体把一家服务悄悄写成首版唯一真实实现。
 - **候选方向**：OpenAI API、Google Gemini API、Anthropic Claude API。逐项比较见 `docs/research/REFERENCE_PROVIDER_OPTIONS.md`：OpenAI 与当前 F 生命周期最接近但原生页码/视觉引用有缺口；Gemini 的 P 很强但文件政策层级和 F 引用/过期组合更复杂；Claude 的 P/页码 citations 较强但没有与当前合同直接对应的托管索引生命周期。若某家不能满足模式 F 的对象追踪和删除合同，将从候选中降级或排除。
 - **决策前推荐与结果**：OpenAI 当时因 Files/Vector Stores 生命周期最接近现有 F 合同而被推荐，学生已明确选择。页码/视觉保真缺口仍必须通过本地映射或失败关闭，不能把选择写成无条件兼容。
-- **当前安全边界**：不读取真实 key、不调用付费 API、不上传真实课件；研究只使用官方开发文档。OpenAI Python SDK 许可证本轮未现场核验，加入依赖前必须核实并记录。
+- **当前安全边界**：不读取真实 key、不调用付费 API、不上传真实课件；研究只使用官方开发文档。G-02A 已核验 OpenAI Python SDK 2.46.0 为 Apache-2.0 并写入精确闭包；生产 manifest、CI 许可证重扫和最终分发 notices 仍由 T-01/CI-01 复核。
 - **原阻塞范围**：真实 adapter 名称、SDK/许可证、模型/文件端点、凭据配置、政策快照、费用上限和 P/F 联网验收；不阻塞继续完善 provider-neutral 规约。
-- **确认后的范围**：真实 adapter 使用 OpenAI Responses、Files、Vector Stores/File Search 与 Structured Outputs 的已核验能力；不默认固定模型版本，模型由受支持 profile 配置。原生 File Search 页码/视觉引用不足必须本地映射或失败关闭；文件/向量库对象与政策快照、删除/过期对账不可省略。SDK 许可证在加入依赖前重新核验。
+- **确认后的范围**：真实 adapter 使用 OpenAI Responses、Files、Vector Stores/File Search 与 Structured Outputs 的已核验能力；不默认固定模型版本，模型由受支持 profile 配置。原生 File Search 页码/视觉引用不足必须本地映射或失败关闭；文件/向量库对象与政策快照、删除/过期对账不可省略。SDK 许可证的证据基线已由 G-02A 核验；生产 manifest、CI notices 和最终兼容性仍由 T-01/CI-01/INT-01 复核。
 
 ## D-018 — Provider 配置是否允许自定义 endpoint（已确认：仅内置 adapter）
 
@@ -384,12 +384,12 @@ D017=A, D018=A, D019=A, D020=A, D021=A, D022=A, D023=A, D024=A
 - **推荐方案及影响**：方案 1 与现有准备文档一致；需要学生自行控制安装、登录和账号授权。若已有 Cursor/Gemini/OpenCode 等不同类型工具，方案 2 可减少安装工作，但仍必须全新 session 且只给 `SPEC.md` 与 `PLAN.md`。
 - **执行边界**：G-03 是正式实现前的一次性可理解性实验，初始只能看 `SPEC.md` 与 `PLAN.md`。其候选 unit 的正式依赖此时故意尚未实现，冷启动只能创建不合并的最小临时 scaffold/test double；普通依赖规则在后续正式派发时重新生效。
 - **阻塞范围**：阶段 A/B 已完成到可审查计划；本项阻塞阶段 C 冷启动验证，继而阻塞规约修订后的实现批准。
-## G-02 current external blockers (2026-07-21)
+## G-02 historical external blockers (2026-07-21; superseded)
 
-No new product decision is requested in this checkpoint. The confirmed choices remain: Windows x64 local WebUI, one built-in OpenAI adapter plus deterministic mock, and an OCI/Hugging Face public demo direction. Engineering evidence is incomplete rather than ambiguous:
+This section preserves the truthful pre-evidence checkpoint and is not the current status. It has been superseded by the 2026-07-22 G-02A/G-02B PASS records, the G-02C blocked checkpoint, and D-025 above. No new product decision was requested at the time. The confirmed choices then remained: Windows x64 local WebUI, one built-in OpenAI adapter plus deterministic mock, and an OCI/Hugging Face public demo direction.
 
-- The repository has no project dependency manifest or lockfile. Exact FastAPI/React/Vite/keyring/test/freezer/OpenAI SDK versions and transitive licenses must be verified before implementation.
-- Current OpenAI policy facts are recorded, but the selected model/cost preflight and the F scope/lifecycle proof are not verified. Real P/F calls remain disabled.
-- Current freezer, OCI digest, and Hugging Face runtime/HTTPS/storage/sleep/quota/cost/account terms could not be retrieved. No account, deployment, paid resource, or host substitution was created. If the confirmed no-paid boundary fails after recheck, a SPEC change and student decision are required before choosing another host.
+- At that checkpoint the repository had no project dependency manifest or lockfile, so exact versions and transitive licenses were still pending.
+- At that checkpoint OpenAI policy facts were recorded but the selected model/cost preflight and F scope/lifecycle proof were not verified; real P/F calls remained disabled.
+- At that checkpoint freezer, OCI digest and Hugging Face terms could not be retrieved. No account, deployment, paid resource or host substitution was created.
 
-These are recorded blockers for G-02A/B/C, not silently selected alternatives. The next safe action is a first-party recheck when network access is available; no user response is needed before that recheck.
+The current safe action is no longer a generic recheck: G-02A and G-02B are closed with cited evidence, while D-025 is the remaining student decision for G-02C. Historical wording is retained to preserve process evidence and must not be used as the current blocker list.

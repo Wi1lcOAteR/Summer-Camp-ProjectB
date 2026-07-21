@@ -94,7 +94,7 @@ There are 41 planning groups and 69 dispatch units (the 17 groups marked `Task G
 | G-01 | Open Design environment/MCP/selection gate | SPEC confirmed | G | [x] PASS；commit `b93c096db29f7b957950a0cfc74b80170a38d25a` |
 | G-02A | Toolchain/dependency/license baseline | SPEC confirmed | G | [x] PASS; exact Python/npm locks, license closure, smoke evidence, and validator committed at `22b516af7b6f4896c6127e75b2585435e407a3c0` |
 | G-02B | Provider policy/capability/cost evidence | G-02A | G | [x] PASS; exact model/cost and P/F documentation boundaries committed at `5ac9d47ddda845ed78f1758326fb547610274f4c`; runtime F remains `source_disabled` until X2-03/INT-01 |
-| G-02C | Distribution/hosting evidence | G-02A | G | [ ] PENDING; freezer, immutable OCI digest, and host rows explicitly blocked; checkpoint `24caa35` |
+| G-02C | Distribution/hosting evidence | G-02A | G | [ ] PENDING; freezer/base/HF runtime facts verified, but paid-plan/account rows await D-025; reviewed blocker checkpoint `be666537706b4c133673029d950e84f15ea3ae1b` |
 | G-03 | Fresh-agent cold start and implementation approval | formal writing-plans evidence, G-01 PASS, G-02A/B/C PASS | G | [ ] 尚未执行 |
 | G-04 | Worktree/branch ownership map | G-03 approved | G | [ ] 尚未执行 |
 | T-01 | Reproducible project/test scaffold | G-01 PASS/G-02A PASS/G-03 approved/G-04 | F | [ ] 尚未执行 |
@@ -256,7 +256,7 @@ powershell -ExecutionPolicy Bypass -File scripts/verify_evidence.ps1
 
 Expected: PASS with a row count and no secret findings. If any provider, license, fee, or hosting fact remains unavailable, it stays explicitly blocked and the dependent task cannot claim completion.
 
-Latest strict evidence run on 2026-07-22: `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`. G-02A is committed PASS. G-02B has no blocked row and is independently reviewable. The two remaining blocked rows belong to G-02C, so the G-02 group remains incomplete.
+Latest strict evidence run on 2026-07-22: `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`. G-02A and G-02B are committed PASS. The two remaining blocked rows belong to G-02C, so the G-02 group remains incomplete.
 
 - [ ] **Step 4: Review and commit**
 
@@ -312,6 +312,8 @@ Group review checks AC-20, AC-39, AC-48, AC-49 and AC-50 after G-02A/B/C. Qualit
 - [ ] **Green/refactor:** verify authoritative sources, record exact usable terms, then rerun the validator. PyInstaller 6.21.0, the immutable linux/amd64 Python base, and Hugging Face runtime/HTTPS/storage/sleep/quota terms are now verified. Current official terms require a paid plan to create the selected Docker Space, so `host-cost` and `host-account` remain explicitly blocked by D-025; no host is substituted silently.
 - [ ] **Reviews:** SPEC review AC-10, AC-41, AC-43, AC-47; quality review source dates, license compatibility, architecture support, cost language, and clean-host reproducibility. A reviewed blocker checkpoint may be committed without marking G-02C complete. Critical findings block packaging/deployment.
 - [ ] **Commit:** after D-025 resolves the host, update all rows to verified, run `-RequireDistributionReady`, and commit the final PASS with `git commit -m "docs(G-02C): verify distribution and hosting [agent: <fresh-agent-id>]"`. Until then, commit only a clearly named blocked checkpoint and record its hash without checking this item.
+
+Reviewed blocker checkpoint: `be666537706b4c133673029d950e84f15ea3ae1b` (`docs(G-02C): record hosting cost conflict [agent: Codex GPT-5]`). `/root/g02c_blocker_review` found no Critical issue and approved it only as a pending checkpoint. Standard validation passed with 63 rows and two blockers; `-RequireDistributionReady` failed exactly on the two hosting rows. This is not G-02C completion.
 
 **Completion standard:** The selected freezer, OCI base, and host each have a compatible verified row; no required distribution/hosting fact remains blocked.
 

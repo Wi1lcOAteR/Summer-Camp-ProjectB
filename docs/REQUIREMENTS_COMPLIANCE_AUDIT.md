@@ -1,6 +1,6 @@
 # AI4SE Project B 要求符合性审计
 
-审计时间：2026-07-20；最近更新：2026-07-21（Open Design 当前状态与任务计数一致性复核）
+审计时间：2026-07-20；最近更新：2026-07-22（G-02A/B 证据闭合与 D-025 部署冲突）
 审计范围：当前 Git 工作区、提交历史与以下权威来源：
 
 - [通用项目要求](requirements/项目要求.md)
@@ -12,7 +12,7 @@
 
 项目仍符合 **Project B 非 harness 应用类项目**的选题边界：它有真实目标用户、可在 30 秒内说明的连续学习问题、M1/M2/M3 三个核心模块、WebUI 方向和明确的非 agent AI 边界。
 
-当前只能判定为 **SPEC 已整体确认、阶段 B 计划已形成但正式 `superpowers:writing-plans` 调用证据仍缺、最终交付尚不合规**。Open Design 环境门禁已满足：0.15.1、MCP、完整内置 `frontend-design`、学生选择的 `default`/Neutral Modern 和 fresh 只读发现均有证据；`projects=[]`、`active=false` 是实现前状态。剩余 Open Design 证据是获准 UI-01A 的真实 project/run/artifact 和浏览器验收，不是安装或环境阻塞。学生本人 brainstorming 反思也尚缺。`PLAN.md` 目前有 41 个 planning group、69 个可派发 dispatch unit；冷启动验证、正式源码、测试、CI、分发、README、PR/MR、公开 WebUI URL 和学生本人撰写的 `REFLECTION.md` 仍未产生。它们仍是后续硬缺口，不能写成“已满足”。
+当前只能判定为 **SPEC 已整体确认、G-02A/B 工程证据已 PASS、G-02C 等待 D-025、正式 `superpowers:writing-plans` 调用证据仍缺、最终交付尚不合规**。Open Design 环境门禁已满足：0.15.1、MCP、完整内置 `frontend-design`、学生选择的 `default`/Neutral Modern 和 fresh 只读发现均有证据；`projects=[]`、`active=false` 是实现前状态。剩余 Open Design 证据是获准 UI-01A 的真实 project/run/artifact 和浏览器验收，不是安装或环境阻塞。学生本人 brainstorming 反思也尚缺。`PLAN.md` 目前有 41 个 planning group、69 个可派发 dispatch unit；其中 G-01/G-02A/G-02B 已 PASS，G-02C 与其余 65 个 unit pending。冷启动验证、正式源码、产品测试、CI、分发、README、PR/MR、公开 WebUI URL 和学生本人撰写的 `REFLECTION.md` 仍未产生。
 
 状态含义：
 
@@ -37,7 +37,7 @@
 | Open Design | 0.15.1 daemon、MCP、完整内置 `frontend-design`、学生选择的 `default`/Neutral Modern 和 fresh `list_skills/list_projects/get_active_context` 结果均有记录；空项目/无活动上下文是实现前状态 | 当前满足（环境门禁）；正式工作流阶段门禁延后 | UI-01A 在冷启动和实现批准后按需开启 Open Design，创建真实 project/run/artifact、做截图与 review；生成源代码不得绕过 TDD 红测进入生产目录 |
 | Superpowers | v6.1.1 缓存与核心 skills 已核验；`brainstorming` 过程有日志；阶段 B 完整读取上游 `writing-plans` 规则并透明记录 fallback | 明确缺口 | 当前会话未注册 `superpowers:*`；不得把 fallback 冒充正式调用，后续新会话需修复注册并继续全流程留证 |
 | SPEC_PROCESS 至少 3 轮迭代与反思 | [SPEC_PROCESS](../SPEC_PROCESS.md) 已记录多轮原始回答、采纳、修正与未执行边界，但尚无独立的 brainstorming 优点/不足反思段 | 明确缺口 | 学生本人补充优点、不满和关键取舍；不得由 AI 代替个人判断或隐瞒代写 |
-| PLAN 细粒度任务 | `PLAN.md` 有 41 个 planning group、69 个 dispatch unit；宽 group 明确不可派发，unit ID 无重复；每个 unit 含目标、文件、接口、依赖/并行、预期红测或失败门禁、命令、双评审、literal commit 和完成标准 | 当前满足（生成方式证据受限） | G-01 已 PASS，其余 68 个 unit 保持 pending；正式 `writing-plans` 未注册的限制继续在日志披露，冷启动发现的问题须反向修订计划 |
+| PLAN 细粒度任务 | `PLAN.md` 有 41 个 planning group、69 个 dispatch unit；宽 group 明确不可派发，unit ID 无重复；每个 unit 含目标、文件、接口、依赖/并行、预期红测或失败门禁、命令、双评审、literal commit 和完成标准 | 当前满足（生成方式证据受限） | G-01/G-02A/G-02B 已 PASS；G-02C 与其余 65 个 unit pending。正式 `writing-plans` 未注册的限制继续披露，冷启动发现的问题须反向修订计划 |
 | 陌生智能体冷启动 | 尚未执行 | 阶段门禁延后 | SPEC+PLAN 后由不同类型全新 session，仅提供两文件并记录提问、误解、差距与修订 diff |
 | worktree/subagent/TDD/两阶段评审 | 尚无正式实现 | 阶段门禁延后 | 获准实现后每 task 新鲜 subagent、先红后绿再重构、先规约合规评审再质量评审 |
 | 一键测试 | 无测试命令、测试代码或本次运行证据 | 阶段门禁延后 | PLAN 选择统一命令并覆盖 M1/M2/M3、安全策略、adapter contract 和端到端关键流 |
@@ -46,8 +46,8 @@
 | GitHub/NJU Git 与 PR/MR 历史 | D-023 已确认 NJU Git/GitLab 主仓 + GitHub 镜像；当前只有本地小步文档提交，无远程/PR/MR | 文档覆盖，未验证 | 未经执行当时授权不 push、建 PR/MR 或启用镜像；实现阶段每 worktree 对应可审查 PR/MR |
 | 分发形态 | 整体 SPEC 已确认 Windows x64 单文件 `ProjectB.exe` 方向 | 文档覆盖，未验证 | 按[技术栈与分发基线](research/TECH_STACK_DISTRIBUTION_BASELINE.md)选冻结工具；验证单文件/干净机/SmartScreen/数据保留 |
 | README | 不存在 | 阶段门禁延后 | 随实现维护项目简介、安装、运行、分发、目录、安全、凭据、限制、第三方依赖与许可证 |
-| 第三方许可证 | Superpowers MIT、Open Design Apache-2.0 已记录；课件许可证未知且未入仓；公开夹具仅可使用合成或明确许可材料；OpenAI Python SDK 许可证尚未现场核验 | 文档覆盖，未验证 | SDK、冻结/安装工具、传递依赖与资产接入前逐项核验，最终汇总到 README 并生成分发内容许可证清单 |
-| 公开 WebUI URL / CI/CD | 整体 SPEC 已确认 OCI/HF Spaces、许可夹具 + mock/无真实 key和隔离限额方向；官方页面复核受 502/超时且未部署 | 明确缺口 | 重核官方 Docker/HTTPS/费用/临时存储后，再实测 build/run/隔离/CI；账号/部署需执行时授权，不得付费 |
+| 第三方许可证 | G-02A 已锁定 54 个 Python、166 个 npm 条目及审查许可证集合；OpenAI SDK Apache-2.0、PyInstaller exception、Open Design Apache-2.0 等已有证据。课件许可证未知且未入仓 | 当前阶段满足；最终分发未验证 | T-01 从证据锁生成生产 manifest，CI-01 重新扫描，README/分发包保留完整 notices；公开夹具仍只用合成或明确许可材料 |
+| 公开 WebUI URL / CI/CD | OCI/mock/隔离合同已确认；G-02C 证实 HF Docker Space 创建需要付费方案，D-025 开放；未部署 | 明确缺口 | 学生先选现有无新增付费 OCI 主机、明确承担 HF 方案费用，或批准 SPEC 变更后研究其他平台；之后实测 build/run/HTTPS/隔离/CI |
 | AGENT_LOG | 历史条目包含时间、task、skill、上下文、人工修改与教训；D-017 至 D-024 批量确认和当前审计均已记录 | 当前满足 | 后续每次真实决策/task 后即时追加，不回写或伪造历史证据 |
 | REFLECTION 1500–2500 字 | 文件不存在 | 阶段门禁延后 | 必须由学生本人撰写；AI 只能在有学生初稿后按声明范围润色或指出论证缺口 |
 
@@ -60,7 +60,11 @@
 
 ## 当前最近门禁
 
-`SPEC.md` 已于 2026-07-20 整体确认，`PLAN.md` 已形成 41 个 planning group、69 个 dispatch unit；其中 G-01 已 PASS，其余 68 个待执行。单文件分发、OCI/Hugging Face demo、隔离限额和 `ReviewPolicy v1` 是 v1 工程方向。当前真实缺口是：重核 Hugging Face Spaces 和依赖许可证；恢复正式 Superpowers `writing-plans` 调用或取得课程明确接受 fallback 的证据；D-005 可先选择，但只在前述阶段 B 证据闭合后执行不同类型全新 session 的冷启动。Open Design 环境门禁已通过，真实 project/run/artifact 后置 UI-01A，并不允许在冷启动或实现批准前生成 UI。学生本人 brainstorming 反思仍是课程证据缺口，不得由 AI 代写。冷启动修订和再次批准前不开始正式实现。
+`SPEC.md` 已于 2026-07-20 整体确认；G-01、G-02A、G-02B 已 PASS。G-02C 的唯一当前证据阻断是 D-025：HF Docker Space 的付费账号门槛与无付费授权冲突。除此之外仍须恢复正式 Superpowers `writing-plans` 调用或取得课程明确接受 fallback 的证据，再由不同类型全新 session 执行 G-03 冷启动；D-005 可先选择。Open Design 真实 project/run/artifact 后置 UI-01A，学生本人 brainstorming 反思不得由 AI 代写。D-025、正式 planning 证据、冷启动修订和再次批准前不开始正式实现。
 ## 2026-07-21 evidence update
 
-The current compliance state is intentionally partial. OpenAI policy rows were retrieved from official Developer Docs without a key or paid call. Dependency/license, OpenAI SDK/cost preflight, freezer, immutable OCI digest, and Hugging Face hosting rows are explicitly blocked because the project has no lockfile and current first-party retrieval was unavailable. `verify_evidence.ps1` reports `PASS rows=37 explicitly_blocked=28`; this is not a claim that G-02 or any implementation requirement is complete. No README, REFLECTION, CI, build, deployment, or production source was created in this checkpoint.
+This timestamped section is historical. Its 37-row/28-blocker result was true for the first ledger checkpoint and is superseded by the current update below; it must not be used as the current G-02 status.
+
+## 2026-07-22 evidence update
+
+G-02A passed at `22b516af7b6f4896c6127e75b2585435e407a3c0`; G-02B passed at `5ac9d47ddda845ed78f1758326fb547610274f4c`. G-02C has reviewed blocker checkpoint `be666537706b4c133673029d950e84f15ea3ae1b` and remains pending D-025. Standard evidence validation reports `PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`; distribution-strict validation fails exactly on `host-cost` and `host-account`. No production source, provider call, account resource, paid plan, build, deployment, CI, README or REFLECTION was created.

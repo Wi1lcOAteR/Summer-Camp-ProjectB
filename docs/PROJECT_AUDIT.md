@@ -3,17 +3,18 @@
 初次审计时间：2026-07-17T18:14:41+08:00
 最近历史复查时间：2026-07-19T21:57:09+08:00
 最近外部门禁复查：2026-07-21T21:08:02+08:00（G-01 scope correction）
-最近文档一致性复查：2026-07-21T23:03:34+08:00
+最近文档一致性复查：2026-07-22T01:25:01+08:00
 
 > 当前要求符合性请以 [`REQUIREMENTS_COMPLIANCE_AUDIT.md`](REQUIREMENTS_COMPLIANCE_AUDIT.md) 为准。本文件前半部分保留启动阶段的历史快照，不能用其中“SPEC 不存在”“Open Design 未安装”等旧状态判断当前工作区。
 
-## 当前权威状态（2026-07-21）
+## 当前权威状态（2026-07-22）
 
 - 项目处于阶段 B 的工程证据与计划门禁收口期，尚未进入正式实现。
 - `SPEC.md` 已由学生整体确认；`PLAN.md` 已形成，但正式 `superpowers:writing-plans` 调用证据仍缺，现有计划明确标记为 fallback。
 - Open Design 0.15.1、Codex MCP、完整内置 `frontend-design` 和学生选择的 `default`（Neutral Modern）均已验证，G-01 已 PASS。该 bundled skill 不需要另行下载到 Codex；Open Design 也不需要无任务时长期保持开启。
 - `list_projects=[]` 与 `get_active_context.active=false` 是实现前的正常状态。真实 project/run/artifact 只在冷启动完成且学生批准实现后的 UI-01A 中按需创建，不能提前生成 UI 来冒充环境验证。
-- 当前硬门禁是 G-02A/B/C 工程证据、正式 `writing-plans` 证据或课程明确接受 fallback、不同类型全新 session 的 G-03 冷启动，以及冷启动修订后的学生实现批准。
+- G-02A 工具链/依赖/许可证与 G-02B provider 政策/费用证据已分别 PASS；G-02C 已验证 freezer、OCI base 与 HF runtime 条件，但当前官方付费方案要求触发 D-025，仍为 pending。
+- 当前硬门禁是 D-025/G-02C、正式 `writing-plans` 证据或课程明确接受 fallback、不同类型全新 session 的 G-03 冷启动，以及冷启动修订后的学生实现批准。
 
 ## 启动时结论（历史）
 
@@ -126,15 +127,15 @@ Superpowers 插件、核心 skills 与 Open Design 仍均为 `none`。这是连�
 - Open Design v0.15.0 官方 release、Windows x64 资产、本地哈希一致性与未签名状态已核对；`od`/MCP 均不存在。安装因工作区外写入限制交由用户处理，不重复尝试提权。
 - Git 工作区原本只有两份 Open Design 下载文件未跟踪；已精确加入 `.gitignore`，防止大文件误提交。
 
-### 阶段 A 交付边界更新（2026-07-20）
+### 阶段 A 交付边界更新（2026-07-20；历史快照）
 
 学生对 D-017 至 D-024 全部选择方案 A，最新 `SPEC.md` 已把这些选择收敛为规约。下表区分“文档已覆盖”与“已有实现/运行证据”；后者当前仍为空。
 
-| 决策 | 已确认方向 | 当前证据边界 |
+| 决策 | 已确认方向 | 截至当时的证据边界 |
 | --- | --- | --- |
-| D-017/D-018 OpenAI 边界 | 首版唯一真实实现为内置 OpenAI adapter，并保留 deterministic mock/contract；不接受任意 endpoint/plugin | 只有合同与官方政策研究；OpenAI Python SDK 许可证/精确版本尚未核验，P/F 真实集成测试尚未执行 |
+| D-017/D-018 OpenAI 边界 | 首版唯一真实实现为内置 OpenAI adapter，并保留 deterministic mock/contract；不接受任意 endpoint/plugin | **截至 2026-07-20 的历史快照**：只有合同与官方政策研究；OpenAI Python SDK 许可证/精确版本尚未核验，P/F 真实集成测试尚未执行。当前 G-02A 已核验精确包/许可证；P/F 集成仍未执行 |
 | D-021 + 分发方向 | D-021 确认 Windows x64、Python/FastAPI + React/Vite、SQLite、Credential Manager；整体 SPEC 已确认单文件 `ProjectB.exe` 方向 | 无依赖/源码/凭据测试/冻结构建/干净机/SmartScreen 证据；不得把方向确认冒充实现完成 |
-| D-022 + 部署方向 | D-022 确认许可夹具 + mock/无真实 key；整体 SPEC 已确认 OCI、HF Spaces、无上传/egress、隔离 session/限额方向 | 无镜像/build/run/URL/隔离证据；官方页面 502/curl 超时，部署前须重核；账号/部署需执行时授权 |
+| D-022 + 部署方向 | D-022 确认许可夹具 + mock/无真实 key；整体 SPEC 已确认 OCI、HF Spaces、无上传/egress、隔离 session/限额方向 | **截至 2026-07-20 的历史快照**：无镜像/build/run/URL/隔离证据；官方页面 502/curl 超时。该网络阻塞后来关闭，当前 HF 付费方案冲突与 D-025/G-02C 状态以当前证据为准 |
 | D-023 远程仓库/CI | NJU Git/GitLab 主仓 + GitHub 镜像；GitLab `unit-test` + GitHub Actions 双 CI | 当前没有远程 push、PR/MR、镜像或 CI 运行；这些动作仍需执行当时的用户授权 |
 | D-024 Open Design | 0.15.1 桌面端与 MCP 已注册；学生已选择完整内置 `frontend-design` + `default`（Neutral Modern） | fresh MCP `list_skills` 成功；`projects=[]`、`active=false` 是实现前正常状态。G-01 环境门禁已 PASS；真实 project/run/artifact 和正式 UI 证据后置 UI-01A |
 
@@ -154,8 +155,15 @@ OpenAI 的 Responses 能力/政策快照还须在每次 P/F 同意前刷新并�
 - 学生已在 Open Design 界面选择 `frontend-design` + `default`（Neutral Modern）并链接 `ProjectB`；该组合不再是待确认候选。
 - Open Design 0.15.1 daemon、完整 bundled skill、学生选择和 fresh MCP 只读结果均已记录；`projects=[]`、`active=false` 不构成环境缺口，G-01 已 PASS。
 - 正确后续动作不是保持窗口或创建空项目，而是在冷启动和实现批准后的 UI-01A 按需开启 Open Design，执行真实 project/run/artifact，记录截图与 review，并在 TDD 红测后再写生产 UI。本轮没有发送 prompt、生成 artifact 或修改正式 UI/源码。
-## 2026-07-21 G-02 evidence checkpoint
+## 2026-07-21 G-02 evidence checkpoint（历史）
 
 - G-01 is now correctly scoped as an Open Design environment/selection gate and is recorded as PASS. A real project/run/artifact remains deferred to UI-01A after cold-start and implementation approval.
 - G-02 evidence ledgers and `scripts/verify_evidence.ps1` now exist. The validator has both observed red and green runs; green means 37 rows are structurally valid and no secret pattern was found, while 28 rows remain explicitly blocked.
 - No project dependency manifest/lockfile, production source, build, provider call, deployment, or public URL exists. G-02A/B/C, G-03 and all implementation units remain pending.
+
+## 2026-07-22 G-02 current evidence state
+
+- G-02A PASS：exact evidence commit `22b516af7b6f4896c6127e75b2585435e407a3c0`；54 个 Python pins、166 个 npm entries、direct/license 双向校验和无网络 smoke 已复审。生产 manifest 与 clean-clone/full-app 仍属于 T-01/DIST-01。
+- G-02B PASS：exact evidence commit `5ac9d47ddda845ed78f1758326fb547610274f4c`；官方模型/价格/PDF/token count/File Search/留存与负能力边界已复审。F 仍为 `source_disabled`，未调用 provider。
+- G-02C PENDING：reviewed blocker checkpoint `be666537706b4c133673029d950e84f15ea3ae1b`。HF Docker Space 需要付费方案，`host-cost`/`host-account` 是仅余两个 blocker；D-025 由学生决定，未静默换平台或创建资源。
+- 当前 validator 为 `PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；distribution-strict 模式按预期失败。G-03 与所有正式实现继续关闭。

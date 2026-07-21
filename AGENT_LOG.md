@@ -722,3 +722,14 @@
 - **人工修改及原因**：新增精确模型、PDF input、token count、F filter/result rows 与保守费用公式；明确 `store:false` 不是 ZDR，F 默认 `source_disabled`，未知清理为 `delete_incomplete`，delete accepted 不等于即时物理清除。没有启用 adapter、创建 provider 对象或修改生产源码。
 - **commit hash**：`5ac9d47ddda845ed78f1758326fb547610274f4c`（`docs(G-02B): verify provider policy and cost [agent: Codex GPT-5]`）。
 - **经验教训**：证据门禁判断的是“实现是否无需猜测”，不要求供应商提供正向保证；但删除 API 成功、数据不可再用和服务端物理清除必须分开建模与展示。
+
+## 2026-07-22T01:25:01+08:00 - G-02C hosting cost conflict checkpoint
+
+- **Task 编号**：G-02C（blocked checkpoint，未完成）。
+- **触发的 skill / 工具**：读取并遵循 `browser:control-in-app-browser` 的安全边界做官方页面调查；浏览器明确拒绝 Render/Koyeb 域名后没有绕过或改用其他表面访问。其余精确事实来自 PyPI/PyInstaller 官方资料、Docker Official Images `repo-info` 固定提交和 Hugging Face 官方 `hub-docs` 固定提交。未调用正式 Superpowers skill。
+- **关键 prompt / context**：验证已确认的 Windows 单文件、OCI/HF demo 是否满足许可证、架构、HTTPS、存储、休眠、配额和无付费授权；证据冲突时必须提出 SPEC 决策而非静默替换。
+- **事实与验证**：PyInstaller 6.21.0、`python:3.14.6-slim-bookworm` index/amd64 digest、HF Docker runtime/HTTPS/50GB 临时盘/CPU Basic/48 小时休眠均有固定官方快照。当前 HF 文档同时要求付费方案才能创建新的 Docker/Gradio Space；`host-cost`、`host-account` 因此是仅余两个 blocker。标准 validator PASS（63/2/54/166），`-RequireDistributionReady` 按预期 FAIL `explicitly-blocked rows=2`。
+- **subagent 输出 / review**：`g02c_blocker_review` 对 AC-10/41/43/47 与证据质量做两阶段只读审查，未发现 Critical，批准提交 blocked checkpoint，但明确禁止勾选 G-02C Green/Reviews/Commit。
+- **人工修改及原因**：新增 D-025 三个候选方向并同步 SPEC、PLAN 和两份分发研究文档；保留 OCI/同构 WebUI/mock/HTTPS/隔离合同，不选择账号、主机或费用方案。没有 Docker build/run、账号动作、付费订阅、部署或公网 URL。
+- **checkpoint hash**：`be666537706b4c133673029d950e84f15ea3ae1b`（`docs(G-02C): record hosting cost conflict [agent: Codex GPT-5]`）。
+- **经验教训**：“免费硬件档位”与“免费账号可创建资源”是不同命题；外部平台事实与已确认成本边界冲突时，正确产出是可审查的 blocker 和人工决策，而不是替用户换平台。

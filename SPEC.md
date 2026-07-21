@@ -339,7 +339,7 @@ Public HTTPS browser
 - 第一版目标平台为 Windows x64，secret 通过成熟 keyring 适配 Windows Credential Manager；前端只能提交隐藏录入值给后端凭据服务，状态接口只返回“已配置/未配置”、更新时间和白名单错误码。keyring 包、版本、许可证、Windows 后端行为及打包兼容性在加入依赖前核验。
 - Provider-neutral 架构保留；local production profile 只注册内置 OpenAI reference adapter，deterministic mock 只在 test/demo profile 注册。普通 config 不允许 `base_url`、任意 endpoint、模块路径或第三方 plugin；具体 OpenAI 模型由受支持 profile 显式配置，不设静默固定模型。
 - 每次 P/F 外发前必须展示并绑定 OpenAI capability/policy snapshot。当前官方快照说明 API 数据默认不用于训练（除非组织显式选择分享）；Responses 默认 application state、最长 30 天 abuse monitoring、最长 24 小时 prompt cache、图像/文件安全审查例外，以及 Files/Vector Stores 非 ZDR且保留到删除必须分别呈现。首版 Responses 固定 `store:false` 并禁用非必要后台/托管工具，但不得把它解释为 ZDR。动态政策、区域资格、费用与容量在运行前刷新/展示并受预算限制。
-- 模式 F 只有在 adapter 通过上传、异步 ready、本地 `SourceLocator` 映射、每课程独占 Vector Store 对账、删除/过期和恢复 contract test 后才能启用。OpenAI Python SDK 许可证本轮未现场核验；在选包/锁版本前必须验证并记录，不能把候选 SDK 当作已获许可依赖。
+- 模式 F 只有在 adapter 通过上传、异步 ready、本地 `SourceLocator` 映射、每课程独占 Vector Store 对账、删除/过期和恢复 contract test 后才能启用。G-02A 已核验 OpenAI Python SDK 2.46.0 为 Apache-2.0 并记录在精确闭包；生产 manifest、CI 重扫和最终分发 notices 仍须由 T-01/CI-01 复核，不能把证据基线当作已完成实现。
 
 ## 9. 分发、部署、CI 与设计系统
 
@@ -431,7 +431,7 @@ Public HTTPS browser
 | --- | --- |
 | SPEC 整体签字已完成 | 学生于 2026-07-20 明确回复“已确认spec.md”；阶段 B 可在正式调用 `writing-plans` 后开始 |
 | OpenAI File Search 页码/视觉保真不足 | 只有通过本地 `SourceLocator` 校验才能称为材料事实；失败时 coverage/exam-analysis 空内容关闭，解释/练习/反馈仅可标 `model_supplement`，不得伪造页码或进入计划 |
-| OpenAI 动态政策、模型、容量、费用和 SDK 许可证 | Provider 方向已确认；运行前 policy snapshot 必须覆盖 Responses/abuse monitoring/cache/文件安全审查/Files/Vector Stores；支持目录、SDK 许可证与兼容性仍需真实核验 |
+| OpenAI 动态政策、模型、容量、费用和 SDK 许可证 | G-02B 已核验当前参考模型/费用公式/政策与负能力边界，G-02A 已核验 SDK 许可证；运行前仍需刷新 policy snapshot，生产兼容性、账户资格、容量和最终 manifest 由 T-01/CI-01/INT-01 继续验证 |
 | 模式 F 重复对象、所有权与远端残留 | OpenAI 未提供已证明的上传 exactly-once；只能本地幂等、发现/对账/清理重复对象。每课程独占 store，File/association/store 分层删除，无法确认时保留 `delete_incomplete` |
 | ReviewPolicy v1 默认值尚无真实学习效果证据 | 纯函数/fixtures 已随整体签字成为 v1 工程合同。实施后只能通过新 policy/SPEC 版本调整，不能宣传为科学最优 |
 | 公开 WebUI 尚无可用托管平台/URL | demo profile 已确认为合成/许可夹具 + mock；D-025 必须先解决托管与费用冲突，具体账号和部署动作还需执行时授权，最终必须提供真实可访问 URL/CI-CD 证据 |

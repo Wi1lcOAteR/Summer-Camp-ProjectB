@@ -1,6 +1,6 @@
 # SPEC_PROCESS
 
-> 当前状态：学生已于 2026-07-20 整体确认 `SPEC.md`，D-017 至 D-024 及工程候选已收敛为 v1 方向；`PLAN.md` 已形成。2026-07-21 学生在 Open Design 中实际选择 `frontend-design` + `default`（Neutral Modern），0.15.1 daemon、完整 bundled skill 和 fresh MCP 只读发现均已验证；`list_projects=[]` 与 `active=false` 是实现前的真实状态，G-01 环境/选择门禁已通过。Open Design daemon 仅在 MCP 调用或真实 project/run 期间按需运行，实际 project/run/artifact 延后至获准实现后的 UI-01A。另有 Superpowers 正式 `writing-plans` 证据、Hugging Face 官方条款复核和学生本人 brainstorming 反思门禁。Superpowers v6.1.1 缓存可检测，但本次会话未将 `superpowers:*` 注册到可调用清单，因此不能把 fallback 计划冒充正式 skill 调用。
+> 当前状态：学生已于 2026-07-20 整体确认 `SPEC.md`，D-017 至 D-024 及工程候选已收敛为 v1 方向；`PLAN.md` 已形成。2026-07-21 学生在 Open Design 中实际选择 `frontend-design` + `default`（Neutral Modern），0.15.1 daemon、完整 bundled skill 和 fresh MCP 只读发现均已验证；`list_projects=[]` 与 `active=false` 是实现前的真实状态，G-01 环境/选择门禁已通过。Open Design daemon 仅在 MCP 调用或真实 project/run 期间按需运行，实际 project/run/artifact 延后至获准实现后的 UI-01A。G-02A/G-02B 已 PASS；Hugging Face 官方条款复核已完成，并因 Docker Space 付费方案要求触发 D-025/G-02C 门禁。其余门禁是 Superpowers 正式 `writing-plans` 证据或课程接受 fallback、G-03 全新 session 冷启动、冷启动修订后的学生实现批准，以及学生本人 brainstorming 反思。Superpowers v6.1.1 缓存可检测，但本次会话未将 `superpowers:*` 注册到可调用清单，因此不能把 fallback 计划冒充正式 skill 调用。
 
 ## 0. 启动审计（2026-07-17）
 
@@ -291,12 +291,12 @@
 - **先审后合并**：主智能体没有直接提交断网前产出，而是分别审查 provider、调度/材料、分发/审计 diff；另派三个只读审计检查 SPEC 缺口、决策台账过期状态和研究合同事实/授权边界。
 - **只读审计暴露的关键差距**：Responses 留存面遗漏、远端 exactly-once 过度承诺、共享 Vector Store 删除所有权不清、非 PDF 来源没有 locator、考后暂停提前到考试日零点、调度默认仍留给 PLAN 猜、原生包未明确满足课程“单文件二进制”、公开 demo session 可能串状态。以上均在本轮即时修订，不作为事后测试证据。
 
-### OpenAI 官方资料复核与策略修订（2026-07-20T15:39:25+08:00 前完成）
+### OpenAI 官方资料复核与策略修订（2026-07-20T15:39:25+08:00 前完成；历史快照）
 
 - **使用的 skill/来源**：续用已完整读取的 `openai-docs` skill，并通过 OpenAI Developer Docs MCP 重新读取 [Your Data](https://developers.openai.com/api/docs/guides/your-data#data-retention-controls-for-abuse-monitoring)、[`/v1/responses`](https://developers.openai.com/api/docs/guides/your-data#v1responses) 与 Files OpenAPI；没有调用真实 API、读取 key 或上传材料。
 - **新增官方事实**：Responses 默认（或 `store:true`）有至少 30 天 application-state 保留；首版因此显式 `store:false` 并禁用 background/Conversations/远程 MCP/执行型 hosted tools。但这不消除默认最长 30 天、可能含 prompt/response 的 abuse-monitoring 日志，非 ZDR 组织支持模型还有最长 24 小时 prompt cache；图像/文件存在特殊安全审查例外。Files/Vector Stores 仍非 ZDR、应用状态保留到删除。
 - **幂等证据边界**：Files `POST /v1/files` 的当前 OpenAPI 没有文档化的 idempotency header；不能承诺真实上传 exactly-once 或绝不重复计费。合同改为本地幂等 + at-least-once、重复对象发现/隔离/对账/清理；deterministic mock 才可保证按键重放。
-- **SDK 许可证**：OpenAI Python SDK LICENSE 仍未现场取得；OpenAPI 自身的许可元数据不能替代 SDK 包许可证。选包/锁版本前继续作为依赖门禁。
+- **SDK 许可证（截至当时）**：OpenAI Python SDK LICENSE 尚未现场取得；OpenAPI 自身的许可元数据不能替代 SDK 包许可证。该历史门禁后来由 G-02A 的精确包/许可证证据关闭。
 
 ### 可验证工程候选的收敛（2026-07-20，待整体 SPEC 签字）
 
@@ -304,7 +304,7 @@
 - **统一来源**：新增 `SourceLocator` 判别联合类型，覆盖 PDF 页/区域、图片、文本行范围和手工 entry；缺 locator 时 coverage/exam-analysis 空内容失败关闭，其他端口最多显示 `model_supplement`，不能写材料事实或计划。
 - **ReviewPolicy v1**：提出每日预算范围与 30/90 分钟默认、任务时长、`[1,3,7,14,30]` 日间隔、纯函数/fixtures、证据转换与稳定排序；`today_local > target_local_date` 才暂停。它不是 D-020 原答案逐字数值，须学生整体签字后才成为合同，不声称科学最优。
 - **远端所有权**：每课程/profile/config 独占 Vector Store；删单文件只删 association + File，课程/F 删除且无剩余关联才删 store。强制清凭据后遗留对象保持 `delete_incomplete`，只能同 profile 显式恢复或人工清理。
-- **分发/演示**：为满足课程硬项提出 Windows x64 单文件 `ProjectB.exe`、OCI demo、临时隔离 session 和 Hugging Face Spaces Docker SDK。D-021/D-022 未逐字确认这些细节，须整体 SPEC 签字。2026-07-20 web 返回 502、三个官方页面 `curl` 均 20 秒超时，故没有声称当前配额/可用性，签字前还须恢复联网复核。
+- **分发/演示（截至当时的历史快照）**：为满足课程硬项提出 Windows x64 单文件 `ProjectB.exe`、OCI demo、临时隔离 session 和 Hugging Face Spaces Docker SDK。D-021/D-022 未逐字确认这些细节，须整体 SPEC 签字。2026-07-20 web 返回 502、三个官方页面 `curl` 均 20 秒超时，故当时没有声称当前配额/可用性；该网络阻塞后来关闭，当前付费方案冲突见 G-02C/D-025。
 
 ### 断网恢复后的阶段 A P1 跟进（2026-07-20T17:07:19+08:00）
 
@@ -347,7 +347,7 @@
 
 ## 2. SPEC 签字确认
 
-已执行。学生于 2026-07-20 明确确认完整 `SPEC.md`；签字证据和工程候选边界已写入本文、`SPEC.md` 与 `AGENT_LOG.md`。Open Design MCP、完整 bundled skill 和实际 design system 选择已于 2026-07-21 完成验证，G-01 已 PASS；Hugging Face Spaces 官方复核和学生本人 brainstorming 反思仍未补齐。
+已执行。学生于 2026-07-20 明确确认完整 `SPEC.md`；签字证据和工程候选边界已写入本文、`SPEC.md` 与 `AGENT_LOG.md`。Open Design MCP、完整 bundled skill 和实际 design system 选择已于 2026-07-21 完成验证，G-01 已 PASS。2026-07-21 的 Hugging Face 官方复核已完成，并证明新建 Docker Space 需要付费方案；该事实触发 D-025，而不是由智能体静默改写托管商。学生本人 brainstorming 反思仍未补齐。
 
 ## 3. PLAN 生成
 
@@ -355,12 +355,12 @@
 
 - 计划包含 41 个 planning group 和 69 个可派发 dispatch unit；17 个宽 group 已明确标记为不可派发，子 unit ID 一一对应台账且无重复。
 - 每个 dispatch unit 记录目标、涉及文件、接口、依赖/并行关系、先失败的测试或失败门禁、验证命令、完成标准、双阶段评审与可执行 commit 命令；group 只保留聚合验收，不接收 worker commit。
-- G-01 已 PASS，其余 68 个 dispatch unit 仍为 pending；未创建正式实现源码、测试、CI、分发或部署证据。
+- G-01、G-02A、G-02B 已 PASS；G-02C 仍因 D-025 pending，其余实现/交付 unit 均未开始，共 66 个 dispatch unit pending。未创建正式实现源码、产品测试、CI、分发或部署证据。
 - Open Design G-01 和不同类型冷启动 G-03 被设为硬前置；G-01 已于 2026-07-21 PASS，G-03 仍未执行。D-005 没有由智能体代选，冷启动后仍需学生再次批准实现。
 
 ## 4. 陌生智能体冷启动验证
 
-尚未执行。`SPEC.md` 与 fallback `PLAN.md` 内容前置已具备，但阶段 B 的正式 `superpowers:writing-plans` 调用证据仍未闭合；D-005（不同类型智能体/账号）可以并行选择，但 G-03 只能在正式 skill 调用恢复或取得课程明确接受 fallback 的证据后执行。届时冷启动必须使用全新 session，初始只接收这两个文件，并在一次性 workspace 尝试 1–2 个 dispatch unit：上游实现故意不存在，因此只在该实验内允许用最小临时 scaffold/test double 验证任务可理解性，产物不得合并，也不得把依赖未实现误判为 SPEC 缺陷。必须记录初始文件清单、问题、误解、实现差距和修订 diff；修订后仍须学生明确批准进入实现阶段。
+尚未执行。`SPEC.md` 与 fallback `PLAN.md` 内容前置已具备，但阶段 B 的正式 `superpowers:writing-plans` 调用证据仍未闭合，且 G-02C 仍等待 D-025；D-005（不同类型智能体/账号）可以并行选择，但 G-03 只能在正式 skill 调用恢复或取得课程明确接受 fallback 的证据、且 G-02C PASS 后执行。届时冷启动必须使用全新 session，初始只接收这两个文件，并在一次性 workspace 尝试 1–2 个 dispatch unit：上游实现故意不存在，因此只在该实验内允许用最小临时 scaffold/test double 验证任务可理解性，产物不得合并，也不得把依赖未实现误判为 SPEC 缺陷。必须记录初始文件清单、问题、误解、实现差距和修订 diff；修订后仍须学生明确批准进入实现阶段。
 
 ### 阶段 B 生成过程（2026-07-20T18:45:26+08:00）
 
@@ -425,3 +425,10 @@
 
 - The current callable tool catalog still exposes no `superpowers:*` skill. The installed 6.1.1 cache is present on disk with the expected core directories, but that is not a formal invocation record.
 - No user-level configuration was changed. G-03 remains a hard gate: formal `writing-plans` evidence or course acceptance of the transparent fallback, then a different-type fresh session with only `SPEC.md` and `PLAN.md`, then student approval before implementation.
+
+### G-02 evidence closure and deployment conflict: 2026-07-22T01:25:01+08:00
+
+- G-02A passed at `22b516af7b6f4896c6127e75b2585435e407a3c0`; its reviewed baseline contains exact CPython 3.14.6/Node 24.18.0 selections, 54 Python pins, 166 npm entries, direct/closure/license checks, and no-network component smoke evidence. Review-found CRLF, PLAN-scope, direct/license, and count defects were fixed before PASS.
+- G-02B passed at `5ac9d47ddda845ed78f1758326fb547610274f4c`; official OpenAI evidence covers the exact reference model/cost formula, P PDF/token count, F filter/result primitives, retention/region and verified negative guarantees. F remains `source_disabled`; no key, live request, provider object or AC-48 claim exists. Review added the Vector Store deletion-acceptance versus up-to-30-day server-removal distinction.
+- G-02C remains pending. The reviewed blocker checkpoint `be666537706b4c133673029d950e84f15ea3ae1b` verifies PyInstaller, the immutable linux/amd64 Python base and HF runtime terms, while `host-cost` and `host-account` remain the only two `explicitly-blocked` rows because creating a Docker Space requires a paid plan. D-025 is a real student deployment/cost decision; no host was substituted and no account/deployment action occurred.
+- Standard validation now reports `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`; distribution-strict validation fails exactly on those two rows. This evidence closes G-02A/B only and does not open G-03 or implementation.
