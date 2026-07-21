@@ -1,28 +1,38 @@
 # Distribution and Hosting Evidence
 
-Status: **BLOCKED - current host terms, immutable base digest, and clean-machine packaging are not verified**
+Status: **BLOCKED - G-02C found a confirmed paid-plan conflict requiring D-025**
 
-Verification date: `2026-07-21` (Asia/Shanghai). This audit performed no deployment, account action, Docker build, or paid resource creation.
+Verification date: `2026-07-21` (Asia/Shanghai). No deployment, account action, Docker build, registry push, or paid resource was created.
+
+The freezer and OCI base can now be selected exactly. The previously selected Hugging Face Docker Space direction cannot satisfy the current no-paid-resource boundary: Hugging Face's current official docs explicitly require a paid plan to create a Gradio or Docker Space even though CPU Basic has no hourly hardware charge. No alternative host is selected silently.
 
 | ID | Item | Version/term | Source URL | License/authority | Verified | Status | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| windows-freezer | Windows x64 single-file freezer | PyInstaller candidate; exact version and target smoke not verified | https://pyinstaller.org/en/stable/license.html | PyInstaller official license/usage pages; clean-machine behavior unverified | 2026-07-21 | explicitly-blocked | Recheck the official license and usage/one-file constraints at https://pyinstaller.org/en/stable/usage.html. Nuitka is an unselected alternative; do not substitute it silently. |
-| oci-base | OCI base image | `python:3.13-slim-bookworm` candidate; immutable digest and amd64 manifest not verified | https://hub.docker.com/_/python | Docker Official Image metadata; Debian/Python notices not collected | 2026-07-21 | explicitly-blocked | A mutable tag is not a reproducible image lock. |
-| host-runtime | Public host runtime | Hugging Face Spaces Docker SDK candidate; current runtime requirements not retrieved | https://huggingface.co/docs/hub/spaces-sdks-docker | Hugging Face official docs; terms/current limits unavailable in this audit | 2026-07-21 | explicitly-blocked | No Space was created. |
-| host-https | Public HTTPS access | generated HTTPS URL and ingress behavior not verified | https://huggingface.co/docs/hub/spaces-overview | Hugging Face official docs; current deployment behavior unavailable | 2026-07-21 | explicitly-blocked | AC-47 requires an externally reachable URL and evidence. |
-| host-storage | Host storage and persistence | ephemeral/persistent storage behavior and quotas not verified | https://huggingface.co/docs/hub/spaces-overview | Hugging Face official docs; current storage terms unavailable | 2026-07-21 | explicitly-blocked | Demo state must remain disposable even if host storage exists. |
-| host-sleep | Idle sleep and restart | idle sleep/restart policy not verified | https://huggingface.co/docs/hub/spaces-overview | Hugging Face official docs; current lifecycle terms unavailable | 2026-07-21 | explicitly-blocked | Project session TTL is not a substitute for host lifecycle evidence. |
-| host-quota | CPU, memory, request and storage quota | current free-tier/hardware quota not verified | https://huggingface.co/docs/hub/spaces-gpus | Hugging Face official docs; current quota table unavailable | 2026-07-21 | explicitly-blocked | Do not infer historical free-tier values. |
-| host-cost | Hosting cost boundary | current price/free allowance not verified | https://huggingface.co/pricing#spaces | Hugging Face pricing page; current cost not retrieved | 2026-07-21 | explicitly-blocked | No paid resource may be created without a separate execution-time authorization. |
-| host-account | Account and terms | account/payment/acceptable-use terms not verified | https://huggingface.co/terms-of-service | Hugging Face official terms; current page unavailable | 2026-07-21 | explicitly-blocked | Student account ownership and external deployment remain execution-time decisions. |
-| fallback | No-paid-resource fallback | if selected host violates no-paid/HTTPS/limits, require explicit SPEC change before substitution | https://huggingface.co/docs/hub/spaces-sdks-docker | ProjectB SPEC/PLAN boundary; host facts still unverified | 2026-07-21 | verified | No alternative host is selected and no deployment is authorized by this row. |
+| windows-freezer | Windows x64 single-file freezer | PyInstaller 6.21.0; Python >=3.8 and <3.16; win_amd64 wheel SHA-256 7fae06c494ce0ebfe6bd3055c0e409def884f63af2e3705d06bd431ad9237fc7 | https://pyinstaller.org/en/stable/license.html | GPL-2.0-or-later WITH Bootloader-exception; runtime hooks Apache-2.0 | 2026-07-21 | verified | One-file Uvicorn and PDFium smoke passed on CPython 3.14.6. keyring requires explicit collection of backend_complete.bash and backend_complete.zsh; corrected smoke exposed WinVaultKeyring priority 5. Full app/clean-machine proof remains DIST-01. |
+| oci-base | OCI base image for linux/amd64 | python:3.14.6-slim-bookworm index sha256:86f975aca15cf04a40b399eebede9aea7c82eae084d1f1a0a6ef6bcaae871a30; amd64 manifest sha256:f70215e5dbe2a47dee6d23f9c6d358bf3c148f59cce2fd165b61118e9d80f2bb | https://github.com/docker-library/repo-info/blob/99919ada7d519a93bfafcd36ddab30df211ecdb9/repos/python/remote/3.14.6-slim-bookworm.md | Docker Official Images metadata; PSF Python plus Debian package-specific licenses | 2026-07-21 | verified | Exact amd64 image is 44,765,139 compressed bytes and uses Python 3.14.6. DIST-02 must generate an SBOM and retain Debian/Python notices; a digest does not prove project image behavior. |
+| host-runtime | Hugging Face Docker Spaces runtime | Docker SDK supports a Dockerfile, sdk: docker, default app_port 7860, and containers running as UID 1000 | https://github.com/huggingface/hub-docs/blob/86be61b3d86b7df41ba4500e6b93de7a41f1d1fb/docs/hub/spaces-sdks-docker.md | Hugging Face official hub-docs; Apache-2.0 | 2026-07-21 | verified | Technical runtime is compatible with FastAPI/React, but creation is commercially incompatible with the current no-paid boundary. |
+| host-https | Public HTTPS access | public/protected running app uses https://<space-subdomain>.hf.space; public source and app are visible | https://github.com/huggingface/hub-docs/blob/86be61b3d86b7df41ba4500e6b93de7a41f1d1fb/docs/hub/spaces-overview.md | Hugging Face official hub-docs; Apache-2.0 | 2026-07-21 | verified | This is documentation evidence only; no URL or external browser acceptance evidence exists. |
+| host-storage | Host storage and persistence | default 50 GB disk is not persistent; Space disk is ephemeral and lost on restart/stop | https://github.com/huggingface/hub-docs/blob/86be61b3d86b7df41ba4500e6b93de7a41f1d1fb/docs/hub/spaces-storage.md | Hugging Face official hub-docs; Apache-2.0 | 2026-07-21 | verified | The demo already requires disposable state and must not attach a storage bucket or persist private/user material. |
+| host-sleep | Idle sleep and restart | CPU Basic sleeps after 48 hours inactive; a visitor restarts it; indefinite/custom sleep requires paid hardware | https://github.com/huggingface/hub-docs/blob/86be61b3d86b7df41ba4500e6b93de7a41f1d1fb/docs/hub/spaces-gpus.md | Hugging Face official hub-docs; Apache-2.0 | 2026-07-21 | verified | Project session TTL remains separate from host sleep/wake behavior. |
+| host-quota | CPU, memory, and ephemeral disk | CPU Basic 2 vCPU, 16 GB RAM, 50 GB disk; outbound network limited to standard HTTP/HTTPS ports plus 8080 | https://github.com/huggingface/hub-docs/blob/86be61b3d86b7df41ba4500e6b93de7a41f1d1fb/docs/hub/spaces-overview.md | Hugging Face official hub-docs; Apache-2.0 | 2026-07-21 | verified | Project limits must be lower and reproducible; no runtime benchmark has been performed. |
+| host-cost | Hosting cost boundary | CPU Basic hardware has no hourly charge, but creating a new Docker/Gradio compute Space requires a paid PRO, Team, or Enterprise plan | https://github.com/huggingface/hub-docs/blob/86be61b3d86b7df41ba4500e6b93de7a41f1d1fb/docs/hub/spaces-overview.md | Hugging Face official hub-docs at commit 86be61b3; paid-plan requirement | 2026-07-21 | explicitly-blocked | This contradicts the confirmed no-paid-resource boundary and current authorization. ZeroGPU's free exception is for Gradio, not the selected Docker SDK. |
+| host-account | Account and plan authorization | Docker Space creation requires an eligible paid personal or organization plan | https://github.com/huggingface/hub-docs/blob/86be61b3d86b7df41ba4500e6b93de7a41f1d1fb/docs/hub/spaces-overview.md | Hugging Face official account/plan requirement | 2026-07-21 | explicitly-blocked | No account, payment method, subscription, or terms acceptance is authorized. The student must choose D-025 before any platform action. |
+| fallback | No-silent-substitution boundary | selected host conflict requires explicit SPEC change; preserve OCI/same-contract/HTTPS/mock/isolation requirements | https://github.com/huggingface/hub-docs/blob/86be61b3d86b7df41ba4500e6b93de7a41f1d1fb/docs/hub/spaces-overview.md | ProjectB SPEC and current official host facts | 2026-07-21 | verified | Render and Koyeb could not be researched because the browser security policy forbids those domains; no workaround was attempted and neither is presented as a candidate. |
 
-## Local observations
+## Reproducible Source Snapshots
 
-- Docker CLI `29.1.2` was present, but the Docker daemon was unavailable (`docker_engine` named pipe missing), so no image build/run evidence exists.
-- PyInstaller, Nuitka, and cx_Freeze were not installed or cached in the project environment.
-- Network probes to the official freezer, registry, Docker Hub, and Hugging Face pages failed with connection close/timeouts during this audit. The failure is recorded rather than replaced with historical limits.
+- Hugging Face hub-docs commit: `86be61b3d86b7df41ba4500e6b93de7a41f1d1fb`, committed `2026-07-21T12:37:28Z`; repository license Apache-2.0.
+- Docker Library repo-info commit: `99919ada7d519a93bfafcd36ddab30df211ecdb9`, committed `2026-07-21T15:12:16Z`.
+- PyInstaller exact PyPI release: 6.21.0, official documentation title also reports 6.21.0.
 
-## Gate
+The Docker registry endpoint and Hugging Face rendered site timed out/reset in this environment. Exact first-party GitHub snapshots were used instead. Docker itself still reports no local daemon, so no image build/run evidence exists.
 
-G-02C remains pending. Recheck the first-party pages, lock an immutable OCI digest and architecture, select one freezer, and run clean-machine build/smoke tests before DIST-01/DIST-02 or a public URL claim.
+## D-025 Gate
+
+The current selected host is proven incompatible with the no-paid-resource rule. Acceptable next directions require the student to choose one:
+
+1. provide an existing student/NJU-controlled OCI host with HTTPS and no new paid resource;
+2. explicitly authorize a paid Hugging Face plan and recurring-cost boundary, which is outside the current Goal authorization;
+3. approve a SPEC change and a new first-party research round for another public host.
+
+Until D-025 is resolved, G-02C remains pending and blocks G-03, T-01, DIST-02, and any claim of a public WebUI URL. The verified PyInstaller and base-image rows remain usable after the host decision.

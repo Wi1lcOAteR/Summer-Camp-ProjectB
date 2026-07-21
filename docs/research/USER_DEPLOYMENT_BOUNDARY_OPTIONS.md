@@ -20,7 +20,7 @@
 - 第一版不实现注册、登录、多租户、课件分享、资料协作、教师视角或跨设备同步；
 - 核心实体仍使用本地 actor/owner scope，目的是明确归属、支持测试和降低未来迁移风险，不代表实现多用户；
 - D-021 已确认 Windows x64、React/Vite/TypeScript + Python/FastAPI + SQLite 和 Windows Credential Manager；整体 SPEC 进一步确认单文件 `ProjectB.exe` 分发方向；
-- D-022 已确认公开演示只用合成/许可材料与 provider mock、无真实 key；整体 SPEC 进一步确认 OCI、隔离到期 session/限额与 Hugging Face Spaces Docker SDK 方向，当前官方复核仍受 502/超时阻塞；
+- D-022 已确认公开演示只用合成/许可材料与 provider mock、无真实 key；整体 SPEC 进一步确认 OCI、隔离到期 session/限额，并曾首选 Hugging Face Spaces Docker SDK。2026-07-21 当前官方证据已证明新建 Docker Space 需要付费方案，托管商现由 D-025 阻塞；
 - D-023 已确认 NJU Git/GitLab 为主仓、GitHub 为镜像，并保留 GitLab `unit-test` 与 GitHub Actions 双 CI 证据；任何远程 push、PR/MR 或镜像操作仍需执行当时的用户授权；
 - D-024 已确认安装并使用 Open Design。桌面端 0.15.1 daemon、Codex MCP、完整内置 `frontend-design` 与学生选择的 `default`（Neutral Modern）均已验证；G-01 环境门禁通过。正式 UI 设计与实现仍受冷启动、实现批准和 UI-01A 真实 project/run/artifact 证据约束，不要求 daemon 长期运行。
 
@@ -67,7 +67,7 @@ Windows x64 browser
             -> parser and renderer
             -> built-in OpenAI adapter for confirmed scope
 
-Public HTTPS URL (preferred: Hugging Face Spaces Docker SDK)
+Public HTTPS URL (host pending D-025)
   -> OCI container / same WebUI and domain contracts
        -> licensed/synthetic fixtures only
        -> isolated expiring sessions + provider mock only
@@ -92,7 +92,7 @@ Public HTTPS URL (preferred: Hugging Face Spaces Docker SDK)
 
 ### 课程 URL 的保守处理
 
-公开部署必须使用同一 WebUI、领域合同与业务状态机，并在许可夹具范围内完整体验导入、覆盖确认、学习检查、计划修订/撤销和考后暂停。模型路径固定 mock；任意上传、真实凭据/provider egress 和私人材料持久化均关闭。每浏览器随机隔离 session，30 分钟无活动/2 小时总寿命后清除，并执行 `SPEC.md` 中的资源/速率上限。首选 Hugging Face Spaces Docker SDK；官方 Docker/HTTPS/费用/临时存储条款在网络恢复后重核，不满足无付费边界时必须走 SPEC 变更。
+公开部署必须使用同一 WebUI、领域合同与业务状态机，并在许可夹具范围内完整体验导入、覆盖确认、学习检查、计划修订/撤销和考后暂停。模型路径固定 mock；任意上传、真实凭据/provider egress 和私人材料持久化均关闭。每浏览器随机隔离 session，30 分钟无活动/2 小时总寿命后清除，并执行 `SPEC.md` 中的资源/速率上限。Hugging Face Docker SDK 的技术条款已核验，但创建需要付费方案，违反当前无付费边界。D-025 解决前不得创建资源或把未验证平台写成新首选。
 
 ## 路线 2：单用户、云端个人实例
 
@@ -229,7 +229,7 @@ Browsers
 
 当前证据只证明一个学生、一个真实课程和本地私有课件的需求，没有证明注册、多用户协作或教师端价值。学生据此采用方案 1，使第一版以最小的新信任边界满足真实自用，并把工程深度集中到项目独有难点。
 
-D-017/D-018/D-021 至 D-024 确认内置 OpenAI、Windows 本地栈、许可夹具/mock、双远程 CI 和 Open Design；单文件/OCI/HF/隔离限额随后写入 `SPEC.md`，并已随整体 SPEC 确认成为 v1 工程方向。它们仍须通过许可证、官方条款、构建、运行和安全验证。详见 [`TECH_STACK_DISTRIBUTION_BASELINE.md`](TECH_STACK_DISTRIBUTION_BASELINE.md)。
+D-017/D-018/D-021 至 D-024 确认内置 OpenAI、Windows 本地栈、许可夹具/mock、双远程 CI 和 Open Design；单文件/OCI/隔离限额及当时的 HF 首选随后写入 `SPEC.md`。当前官方证据已否定 HF 在无付费边界内可创建的假设，因此 OCI 合同保持，托管商进入 D-025。其余方向仍须通过许可证、构建、运行和安全验证。详见 [`TECH_STACK_DISTRIBUTION_BASELINE.md`](TECH_STACK_DISTRIBUTION_BASELINE.md)。
 
 选择方案 2 的充分理由应是“跨设备和统一公开实例是首版核心价值”，而不仅是部署看起来方便。选择方案 3 的充分理由应来自真实的第二类用户或多人隔离需求，而不是为了让项目显得更大。
 
@@ -239,6 +239,6 @@ D-017/D-018/D-021 至 D-024 确认内置 OpenAI、Windows 本地栈、许可夹�
 2. 凭据后端已选 Windows Credential Manager + 成熟 keyring 适配，但首次录入、状态、更新、清除和失败关闭仍需 TDD 证明；
 3. 本地运行不引入登录；loopback、Host/Origin、CORS 与 CSRF 边界仍需实现和测试；
 4. 首版 Windows x64 单文件 `ProjectB.exe` 已随整体 SPEC 确认；具体冻结工具按许可证与干净机证据选择；
-5. 公开 demo 的 OCI + Hugging Face Spaces Docker SDK 方向已随整体 SPEC 确认；官方条款复核、账号、URL、CI/CD 和可访问性尚未执行；
+5. 公开 demo 的 OCI 合同已随整体 SPEC 确认；HF Docker Space 已证实需要付费方案，D-025 决定实际托管商。账号、URL、CI/CD 和可访问性均尚未执行；
 6. 双平台仓库/CI 策略已定，但远程 push、PR/MR、镜像与部署仍需执行当时授权；
 7. Open Design 0.15.1 daemon、Codex MCP 注册、完整内置 `frontend-design` 和 `default`（Neutral Modern）选择均已存在；无需长期运行或创建空项目，UI-01A 获准后按需执行正式 project/run/artifact，再开始受 TDD 保护的 UI 实现。

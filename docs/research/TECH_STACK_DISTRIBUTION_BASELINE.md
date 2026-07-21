@@ -4,7 +4,7 @@
 
 ## 状态
 
-本文记录学生对 D-017、D-018、D-021 至 D-024 选择方案 A 后的已确认边界，以及智能体为满足课程分发/部署硬项提出的工程候选。学生已整体确认 `SPEC.md`，因此单文件 `ProjectB.exe`、OCI/Hugging Face 和精确 ReviewPolicy 已成为 v1 工程合同；本文不把它们误记为 D-021/D-022 原答案逐字确认，也不代表实现或工程验证已完成。
+本文记录学生对 D-017、D-018、D-021 至 D-024 选择方案 A 后的已确认边界，以及智能体为满足课程分发/部署硬项提出的工程候选。学生已整体确认 `SPEC.md`，因此单文件 `ProjectB.exe`、OCI demo 和精确 ReviewPolicy 已成为 v1 工程合同。Hugging Face Docker Spaces 曾是已确认首选，但 2026-07-21 的当前官方证据证明创建它需要付费方案；托管商因此转入 D-025，而不是由本文静默替换。本文不把工程扩展误记为 D-021/D-022 原答案逐字确认，也不代表实现或工程验证已完成。
 
 ## 已确认边界与整体 SPEC 确认的工程方向
 
@@ -15,7 +15,7 @@
 | 实现栈 | Python/FastAPI 后端 + React/Vite/TypeScript 前端 | 精确版本、许可证、构建集成、性能和单文件冻结验证后才能固化 |
 | 凭据 | 成熟 keyring 适配 Windows Credential Manager | 隐藏录入、仅状态回显、更新、清除、错误脱敏和失败关闭测试 |
 | 本地分发（已确认方向） | Windows x64 单文件原生二进制 `ProjectB.exe`；前端资源内嵌，最终用户无需 Python、Node 或 Docker | 冻结工具许可证、单文件构建、干净机、Credential Manager、签名/SmartScreen |
-| 公开 WebUI（已确认方向） | 同一合同的 OCI demo；首选 Hugging Face Spaces Docker SDK；内置许可夹具与 HTTPS | 官方 Docker/HTTPS/休眠/临时存储/费用重核及 build/run/隔离/CI-CD 实测 |
+| 公开 WebUI（OCI 合同已确认；托管商待 D-025） | 同一合同的 OCI demo，内置许可夹具并要求 HTTPS；不得创建付费资源 | HF Docker Space 付费冲突的学生决策，以及后续所选主机的 Docker/HTTPS/休眠/临时存储/费用、build/run/隔离/CI-CD 实测 |
 | 公开 provider | 只使用确定性 provider mock；不接受上传、真实 key 或真实 provider egress | mock 场景覆盖，以及上传、secret、provider 网络和私人材料持久化路径均关闭的测试 |
 | 远程仓库 | NJU Git/GitLab 主仓 + GitHub 镜像 | 用户当时授权后才可 push、建立 PR/MR 或配置镜像 |
 | CI | GitLab 精确 job 名 `unit-test` + GitHub Actions，每次 push 运行同一测试入口 | 两个平台的实际成功运行和最后提交对应记录 |
@@ -70,7 +70,7 @@ OCI container 只用于公开 demo 和相应 CI/CD，不取代 Windows 单文件
 - 镜像只含合成或明确许可夹具与 deterministic provider mock，不提供任意上传、路径或 URL 输入；
 - 构建和运行环境均不含真实 key、credential store 或真实 provider 出站权限；
 - 隔离 session 的跨访客读取为零，到期清理和上述并发、存储、材料及速率限额可复现；
-- 首选托管平台为 Hugging Face Spaces Docker SDK。2026-07-20 现场官方复核因 web 上游返回 502、`curl` 连接超时未完成；在部署前必须重新核验 Docker、HTTPS、休眠、临时存储、费用与账号条款，不能把历史印象当作当前证据。若不满足无付费资源边界，必须通过 SPEC 变更选择其他 OCI 平台；创建 Space、push 镜像和部署仍需执行时外部写入授权。
+- Hugging Face Spaces Docker SDK 曾是首选。2026-07-21 已用官方 `hub-docs` 当前提交核验：Docker SDK、HTTPS、临时磁盘、CPU Basic 配额和休眠语义均有文档，但创建新的 Docker/Gradio Space 需要 PRO、Team 或 Enterprise 付费方案；“CPU Basic 无小时费”不解除该账号门槛。它不满足当前无付费授权。D-025 决定使用已有学生/NJU OCI 主机、明确承担 HF 方案费用，或批准 SPEC 变更后研究其他平台；在决定前不创建 Space、不替换平台、不 push 镜像。精确证据见 `docs/engineering/DISTRIBUTION_EVIDENCE.md`。
 
 ## 依赖与许可证门禁
 

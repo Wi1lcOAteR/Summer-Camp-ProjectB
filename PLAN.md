@@ -302,16 +302,16 @@ Group review checks AC-20, AC-39, AC-48, AC-49 and AC-50 after G-02A/B/C. Qualit
 
 **Goal:** Verify the Windows freezer, OCI base image, selected public host terms, HTTPS/storage/sleep/quota/cost limits, and fallback boundaries.
 
-**Files:** Create `docs/engineering/DISTRIBUTION_EVIDENCE.md`; modify `scripts/verify_evidence.ps1` only through G-02A ownership.
+**Files:** Create or modify `docs/engineering/DISTRIBUTION_EVIDENCE.md`; modify `SPEC.md`, `DECISIONS_NEEDED.md`, `docs/research/TECH_STACK_DISTRIBUTION_BASELINE.md`, `docs/research/USER_DEPLOYMENT_BOUNDARY_OPTIONS.md`, and this G-02C checkpoint contract in `PLAN.md` when current host evidence forces a student deployment decision. The required validator row set remains under the completed G-02A ownership unless its schema must change.
 
 **Interfaces:** dated rows cover freezer license/clean-machine constraints, Docker image digest/license, hosting runtime/HTTPS/storage/idle/quota/account/cost, and no-paid-resource fallback.
 
 **Dependencies / parallelism:** Requires G-02A. It may run beside G-02B with serialized validator edits. DIST-01/DIST-02 depend on this unit.
 
 - [x] **Red:** add distribution/hosting required-row assertions and run the validator; expected FAIL because those rows were absent in the initial red run.
-- [ ] **Green/refactor:** verify authoritative sources, record exact usable terms, then rerun the validator. A blocked selected freezer/base/host leaves G-02C pending and requires a SPEC change rather than substitution. Current ledger keeps freezer, immutable base digest, and all host rows explicitly blocked.
-- [ ] **Reviews:** SPEC review AC-10, AC-41, AC-43, AC-47; quality review source dates, license compatibility, architecture support, cost language, and clean-host reproducibility. Critical findings block packaging/deployment.
-- [ ] **Commit:** `git add -- docs/engineering/DISTRIBUTION_EVIDENCE.md scripts/verify_evidence.ps1`; run `git diff --cached --check`; commit with `git commit -m "docs(G-02C): verify distribution and hosting [agent: <fresh-agent-id>]"`.
+- [ ] **Green/refactor:** verify authoritative sources, record exact usable terms, then rerun the validator. PyInstaller 6.21.0, the immutable linux/amd64 Python base, and Hugging Face runtime/HTTPS/storage/sleep/quota terms are now verified. Current official terms require a paid plan to create the selected Docker Space, so `host-cost` and `host-account` remain explicitly blocked by D-025; no host is substituted silently.
+- [ ] **Reviews:** SPEC review AC-10, AC-41, AC-43, AC-47; quality review source dates, license compatibility, architecture support, cost language, and clean-host reproducibility. A reviewed blocker checkpoint may be committed without marking G-02C complete. Critical findings block packaging/deployment.
+- [ ] **Commit:** after D-025 resolves the host, update all rows to verified, run `-RequireDistributionReady`, and commit the final PASS with `git commit -m "docs(G-02C): verify distribution and hosting [agent: <fresh-agent-id>]"`. Until then, commit only a clearly named blocked checkpoint and record its hash without checking this item.
 
 **Completion standard:** The selected freezer, OCI base, and host each have a compatible verified row; no required distribution/hosting fact remains blocked.
 

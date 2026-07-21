@@ -4,7 +4,7 @@
 >
 > 标记：`已确认` 表示学生已明确选择；`候选` 表示为下一轮评审准备；`未决` 表示课程规定必须由学生决定。
 >
-> 签字影响：本文签字前标为“待整体签字”的 `ReviewPolicy v1`、单文件 `ProjectB.exe`、OCI demo、隔离限额与 Hugging Face Spaces 首选方向已随整体确认成为 v1 工程合同；它们仍须通过许可证、官方条款、构建、运行与安全验证，证据不满足时只能走显式 SPEC 变更。
+> 签字影响：本文签字前标为“待整体签字”的 `ReviewPolicy v1`、单文件 `ProjectB.exe`、OCI demo、隔离限额与 Hugging Face Spaces 首选方向已随整体确认成为 v1 工程合同；它们仍须通过许可证、官方条款、构建、运行与安全验证，证据不满足时只能走显式 SPEC 变更。2026-07-21 的当前官方证据已证明新建 Docker Space 需要付费方案，与本项目无付费边界冲突；该事实不自动选择替代平台，须由学生通过 D-025 决定并确认相应 SPEC 修订。
 
 ## 1. 问题陈述
 
@@ -293,7 +293,7 @@ Public HTTPS browser
   -> finals PlanRevision -> 同类练习/模拟 -> 新证据 -> 再规划
 ```
 
-`已确认`：第一版私有课件、索引和学习状态默认留在 Windows x64 本机，由浏览器访问 localhost WebUI；不包含账号或多租户服务。后端采用 Python/FastAPI，前端采用 React/Vite/TypeScript，权威状态存入 SQLite，secret 进入 Windows Credential Manager。远端能力经过统一适配器注册表；首版唯一真实实现是平台内置 OpenAI adapter，另有 test/demo mock/contract suite，未配置 profile 时不会静默启用。单文件 `ProjectB.exe` 分发与 Hugging Face Spaces Docker SDK 上的 OCI demo 已随整体 SPEC 确认为 v1 工程方向，后者仍待官方连通性/费用复核。精确依赖/冻结/索引库不能改变上述已确认边界。
+`已确认`：第一版私有课件、索引和学习状态默认留在 Windows x64 本机，由浏览器访问 localhost WebUI；不包含账号或多租户服务。后端采用 Python/FastAPI，前端采用 React/Vite/TypeScript，权威状态存入 SQLite，secret 进入 Windows Credential Manager。远端能力经过统一适配器注册表；首版唯一真实实现是平台内置 OpenAI adapter，另有 test/demo mock/contract suite，未配置 profile 时不会静默启用。单文件 `ProjectB.exe` 分发与 OCI demo 已随整体 SPEC 确认为 v1 工程方向。原首选 Hugging Face Spaces Docker SDK 已在 2026-07-21 证实需要付费方案，因此托管商现由 D-025 阻塞；在学生决定前不得静默替换或付费。精确依赖/冻结/索引库不能改变上述已确认边界。
 
 ## 7. 候选数据模型
 
@@ -346,7 +346,7 @@ Public HTTPS browser
 - `已确认`：最终必须提供可访问的 WebUI URL。
 - `已确认`：第一版真实使用形态是单用户、本地 WebUI；桌面窗口只能作为可选壳，不能替代 WebUI。多用户与分享不进入第一版。
 - `已随整体 SPEC 确认的 v1 工程方向`：课程分发类别采用 **Windows x64 单文件原生可执行二进制**。交付物 `ProjectB.exe` 内嵌前端与必要运行资源，用户不需安装 Python、Node 或 Docker；运行期数据写入文档化目录。具体冻结工具在 PLAN 中按许可证、冷启动、Credential Manager 和资源集成证据选择。若无代码签名，README/发布页如实说明 SmartScreen，不能伪称已签名。
-- `已随整体 SPEC 确认的 v1 工程方向`：公开实例使用同一 WebUI/领域合同的 **OCI container demo**，首选 **Hugging Face Spaces（Docker SDK）**，固定为许可夹具 + deterministic mock；无真实 key、任意上传/provider egress 或私人课件持久化。镜像须支持单条 build/run。2026-07-20 官方复核因 web 502、`curl` 超时未完成；部署前须重核 Docker、HTTPS、休眠/临时存储、费用与账号条款。不满足无付费边界时须通过 SPEC 变更，不能静默产生费用。
+- `已随整体 SPEC 确认的 v1 工程方向`：公开实例使用同一 WebUI/领域合同的 **OCI container demo**，固定为许可夹具 + deterministic mock；无真实 key、任意上传/provider egress 或私人课件持久化，镜像须支持单条 build/run。Hugging Face Spaces（Docker SDK）曾是已确认首选，但 2026-07-21 当前官方文档证明新建 Docker/Gradio Space 需要付费方案，即使 CPU Basic 无小时费；这与当前无付费授权冲突。D-025 解决前不创建 Space、不订阅、不静默替换托管商；所选新路径须继续满足 HTTPS、休眠/临时存储、费用、账号和隔离合同，并经学生确认 SPEC diff。
 - `已确认`：NJU Git/GitLab 为课程主仓，GitHub 为镜像；两套 CI 调用同一条一键测试命令。`.gitlab-ci.yml` 必须含名称严格为 `unit-test` 的 job，GitHub Actions 每次 push 运行测试；最终两边真实记录和课程提交对应 CI 必须通过。建仓、push、PR/MR、镜像和部署仍需执行时授权。
 - `已确认路线/环境门禁通过`：Open Design 0.15.1、Codex MCP 注册、内置完整 `skillId=frontend-design` 和 `designSystemId=default`（`Neutral Modern`）均已验证；fresh task 的 `list_skills` 成功，`list_projects=[]` 与 `active=false` 如实表示尚未进入实现。Open Design 桌面端只需在 MCP 调用或真实 design run 期间运行，不要求长期挂起，也不需要再次下载该内置 skill。`web-design-guidelines` 作为实现后审查 skill，`shadcn` 仅保留为显式 SPEC 变更时的备选。实际 project/run/artifact 证据由获准实现后的 UI-01A 创建并记录；在此之前现有 HTML 只作 brainstorming 证据，不能冒充 Open Design run 或正式 UI。
 
@@ -362,9 +362,9 @@ Public HTTPS browser
 | SQLite | 单用户、本地事务、版本化证据和迁移可复现 | 单写者边界；不作为多用户服务数据库 |
 | keyring + Windows Credential Manager | secret 不进入 config/SQLite/浏览器，支持状态/更新/清除 | 只验证 Windows 后端；无 `.env` 正式兼容路径 |
 | 内置 OpenAI adapter + shared contract/mock | 一条真实 P/F 路径，同时保持领域状态可在无网络下确定性测试 | local production 只暴露 OpenAI；mock 仅 test/demo；无任意 endpoint/plugin |
-| Hugging Face Spaces Docker SDK 上的 OCI public demo（已确认方向，待官方复核） | 便携部署相同 WebUI/领域合同并强制无密钥、临时状态 | 当前配额/费用/临时存储未现场复核；只用许可夹具/mock，与本地私有版隔离，不获授权不创建 Space |
+| OCI public demo；托管商由 D-025 待定 | 便携部署相同 WebUI/领域合同并强制无密钥、临时状态 | Hugging Face Docker Space 已证实需要付费方案而不符合当前授权；只用许可夹具/mock，与本地私有版隔离，未经新决策不创建任何托管资源 |
 
-精确 Python/Node 版本、框架/SDK/解析/索引/冻结依赖、SQLite schema 和构建集成仍需以兼容性、许可证、成本和可复现验证固化；Hugging Face Spaces Docker SDK 条款须重核。后续工程证据不得改变已确认的单用户本地优先、Windows x64、凭据后端、内置 adapter、双 CI、单文件分发与 OCI/HF 方向；PLAN 不得静默改写。Python 3.13 只是兼容性候选，不是唯一版本。
+精确 Python/Node 版本、框架/SDK/解析/索引/冻结依赖、SQLite schema 和构建集成仍需以兼容性、许可证、成本和可复现验证固化。后续工程证据不得改变已确认的单用户本地优先、Windows x64、凭据后端、内置 adapter、双 CI、单文件分发与 OCI demo 合同；托管商只能通过 D-025 和相应 SPEC 修订选择，PLAN 不得静默改写。Python 3.13 只是历史候选；G-02A 已核验的精确工具链以依赖证据表为准。
 
 **已确认：第一版采用受约束 AI 功能，不包含课程定义的 agent。** 模型只能通过具名、结构化且有来源范围的端口生成候选知识映射、适配解释、练习、反馈和期末资料分析；应用状态机、版本化规则、确定性 oracle 与用户确认拥有权威写入权。若未来加入自主多轮决策、自主工具调用和反馈自修正，必须重新取得学生确认，并自行编码可用 mock/stub 确定性测试的主循环、工具分发和治理护栏。方案比较与延期理由见 `docs/research/AGENT_BOUNDARY_OPTIONS.md`，端口合同见 `docs/research/CONSTRAINED_AI_PORT_CONTRACT.md`。
 
@@ -434,8 +434,8 @@ Public HTTPS browser
 | OpenAI 动态政策、模型、容量、费用和 SDK 许可证 | Provider 方向已确认；运行前 policy snapshot 必须覆盖 Responses/abuse monitoring/cache/文件安全审查/Files/Vector Stores；支持目录、SDK 许可证与兼容性仍需真实核验 |
 | 模式 F 重复对象、所有权与远端残留 | OpenAI 未提供已证明的上传 exactly-once；只能本地幂等、发现/对账/清理重复对象。每课程独占 store，File/association/store 分层删除，无法确认时保留 `delete_incomplete` |
 | ReviewPolicy v1 默认值尚无真实学习效果证据 | 纯函数/fixtures 已随整体签字成为 v1 工程合同。实施后只能通过新 policy/SPEC 版本调整，不能宣传为科学最优 |
-| 公开 WebUI 尚无平台/URL | demo profile 已确认为合成/许可夹具 + mock；具体账号、托管平台和部署动作需要执行时授权，最终必须提供真实可访问 URL/CI-CD 证据 |
-| Hugging Face Spaces 官方复核受网络阻塞 | Docker SDK 已确认为首选方向；2026-07-20 web 502/curl 超时，部署前必须重核费用、Docker/HTTPS、休眠与临时存储 |
+| 公开 WebUI 尚无可用托管平台/URL | demo profile 已确认为合成/许可夹具 + mock；D-025 必须先解决托管与费用冲突，具体账号和部署动作还需执行时授权，最终必须提供真实可访问 URL/CI-CD 证据 |
+| Hugging Face Docker Space 付费冲突 | 2026-07-21 当前官方文档已证明创建 Docker/Gradio Space 需要付费方案；CPU Basic 无小时费不等于免费账号可创建。当前无付费授权下不可用，G-02C 保持 pending，禁止静默换平台或订阅 |
 | Windows x64 分发尚未验证 | 单文件 `ProjectB.exe` 已确认为分发方向；冻结工具仍须通过许可证、干净机、Credential Manager、SmartScreen 和数据边界验证 |
 | 双远程平台尚未执行 | NJU Git/GitLab 主仓 + GitHub 镜像及双 CI 已确认；建仓、push、PR/MR、镜像与部署需执行时授权，当前本地记录不能代替远程证据 |
 | Open Design 正式 run 尚未执行 | G-01 环境门禁已通过：0.15.1、MCP、完整内置 `frontend-design` 与 `default`/Neutral Modern 选择均有证据；空 project/context 不构成失败。UI-01A 在实现批准后创建真实 project/run/artifact，并保证生成物不绕过 TDD 红测 |
