@@ -439,7 +439,7 @@ Public HTTPS browser
 | Windows x64 分发尚未验证 | 单文件 `ProjectB.exe` 已确认为分发方向；冻结工具仍须通过许可证、干净机、Credential Manager、SmartScreen 和数据边界验证 |
 | 双远程平台尚未执行 | NJU Git/GitLab 主仓 + GitHub 镜像及双 CI 已确认；建仓、push、PR/MR、镜像与部署需执行时授权，当前本地记录不能代替远程证据 |
 | Open Design 正式 run 尚未执行 | G-01 环境门禁已通过：0.15.1、MCP、完整内置 `frontend-design` 与 `default`/Neutral Modern 选择均有证据；空 project/context 不构成失败。UI-01A 在实现批准后创建真实 project/run/artifact，并保证生成物不绕过 TDD 红测 |
-| Superpowers 阶段 B skill 未注册 | v6.1.1 缓存已检测，但当前会话未暴露 `writing-plans`；SPEC 签字后须在已注册的新会话正式调用，不能以手工计划代替 |
+| Superpowers 阶段 B skill 未注册 | 官方 curated plugin 的安装/启用层已通过，所选 5.1.3/`11c74d6b` 快照含 14 个完整 skill；但当前安装前 task 未暴露 `writing-plans`，须在新 task 正式调用，不能以手工计划代替 |
 | 冷启动智能体类型 | D-005 尚待学生在阶段 C 前决定；不阻塞当前 SPEC 签字或阶段 B 计划编写 |
 | brainstorming 个人反思尚缺 | 课程审计要求学生本人评价过程优点、不足与关键取舍；AI 可提供问题框架但不得伪造学生观点或代写 `REFLECTION.md` |
 | 操作系统课件许可证未知 | 私人本地学习可继续核验；阻塞把真实课件放入 Git、CI、分发包或公开 demo，也要求每次远端整份处理由用户确认其权利与风险 |

@@ -1,6 +1,6 @@
 # AI4SE Project B 要求符合性审计
 
-审计时间：2026-07-20；最近更新：2026-07-22T02:55:19+08:00（Superpowers cache-only 状态纠正）
+审计时间：2026-07-20；最近更新：2026-07-22T20:16:26+08:00（Superpowers 已安装启用；当前 task 未重载）
 审计范围：当前 Git 工作区、提交历史与以下权威来源：
 
 - [通用项目要求](requirements/项目要求.md)
@@ -35,7 +35,7 @@
 | OpenAI Responses 政策快照 | `SPEC.md` 8.2、AC-39/49 已约束 `store:false`、application state、abuse monitoring、cache、文件审查例外与 Files/Vector Stores 生命周期 | 文档覆盖，未验证 | 实现时从官方政策刷新并绑定 consent/profile 指纹；测试不得把 `store:false` 或“默认不训练”误报为 ZDR |
 | WebUI | localhost WebUI、首次导入流程和响应式 AC 已写；已有需求 mockup | 文档覆盖，未验证 | mockup 不算正式源码；最终必须提供可访问 URL 并做真实双端 UI 验证 |
 | Open Design | 0.15.1 daemon、MCP、完整内置 `frontend-design`、学生选择的 `default`/Neutral Modern 和 fresh `list_skills/list_projects/get_active_context` 结果均有记录；空项目/无活动上下文是实现前状态 | 当前满足（环境门禁）；正式工作流阶段门禁延后 | UI-01A 在冷启动和实现批准后按需开启 Open Design，创建真实 project/run/artifact、做截图与 review；生成源代码不得绕过 TDD 红测进入生产目录 |
-| Superpowers | v6.1.1 完整 cache bundle 与 14 个核心 skill 文件已核验；`brainstorming` 过程有历史日志；阶段 B 完整读取上游 `writing-plans` 规则并透明记录 fallback | 明确缺口 | cache 不等于安装。当前 config 无 Superpowers enabled plugin/marketplace，task 无 `superpowers:*`；在 App Plugins 安装/启用并新建 task，或取得课程明确接受 fallback 的证据 |
+| Superpowers | 官方 curated 快照已在 config 中启用，所选 bundle manifest 版本 5.1.3、14 个核心 skill 文件完整；`brainstorming` 过程有历史日志；阶段 B 完整读取上游 `writing-plans` 规则并透明记录 fallback | 安装层满足；会话/调用证据仍缺 | 当前安装前 task 无 `superpowers:*`；新建 ProjectB task 后验证 catalog 并正式调用 `writing-plans`，或取得课程明确接受 fallback 的证据 |
 | SPEC_PROCESS 至少 3 轮迭代与反思 | [SPEC_PROCESS](../SPEC_PROCESS.md) 已记录多轮原始回答、采纳、修正与未执行边界，但尚无独立的 brainstorming 优点/不足反思段 | 明确缺口 | 学生本人补充优点、不满和关键取舍；不得由 AI 代替个人判断或隐瞒代写 |
 | PLAN 细粒度任务 | `PLAN.md` 有 41 个 planning group、69 个 dispatch unit；宽 group 明确不可派发，unit ID 无重复；每个 unit 含目标、文件、接口、依赖/并行、预期红测或失败门禁、命令、双评审、literal commit 和完成标准 | 当前满足（生成方式证据受限） | G-01/G-02A/G-02B 已 PASS；G-02C 与其余 65 个 unit pending。正式 `writing-plans` 未注册的限制继续披露，冷启动发现的问题须反向修订计划 |
 | 陌生智能体冷启动 | 尚未执行 | 阶段门禁延后 | SPEC+PLAN 后由不同类型全新 session，仅提供两文件并记录提问、误解、差距与修订 diff |

@@ -11,9 +11,9 @@
 
 ### ProjectB 当前状态（2026-07-22）
 
-当前状态不是“已安装、只差重开会话”，而是 **cache-only**：Superpowers 6.1.1 的完整 bundle 与 14 个 skill 目录存在于 Codex cache，但 `config.toml` 没有 Superpowers plugin 启用项，当前 task 也没有暴露任何 `superpowers:*` skill。Codex CLI 0.144.4 的只读 marketplace/plugin 列表同样为空。精确证据见 [`docs/engineering/SUPERPOWERS_VALIDATION.md`](docs/engineering/SUPERPOWERS_VALIDATION.md)。
+当前状态已变为 **已安装并启用，但本任务未重新加载**：`config.toml` 已有 `[plugins."superpowers@openai-api-curated"]` 与 `enabled = true`；所选安装快照 `11c74d6b` 的 manifest 版本为 `5.1.3`，14 个 skill 目录及其 `SKILL.md` 均完整。此前 `openai-curated-remote` 下的 6.1.1 仅作为旧 cache 保留，不再用于判断当前安装状态。当前 task 仍未暴露任何 `superpowers:*` skill；Codex CLI 0.144.4 的空 marketplace/plugin 列表属于独立 CLI 环境，不能推翻桌面端 config/cache 直接证据。精确证据见 [`docs/engineering/SUPERPOWERS_VALIDATION.md`](docs/engineering/SUPERPOWERS_VALIDATION.md)。
 
-因此应按下方 Codex App 步骤重新安装/启用，再**新建 task** 验证；不要把 cache 文件、手工读取 `SKILL.md` 或现有 fallback `PLAN.md` 当作正式 skill 调用。
+因此现在不需要重新下载 skill 或重复安装；只需在安装完成后**新建 ProjectB task** 验证。不要把本任务的旧 skill 快照、手工读取 `SKILL.md` 或现有 fallback `PLAN.md` 当作正式 skill 调用。
 
 安装方式按你实际使用的编码智能体选择一种：
 

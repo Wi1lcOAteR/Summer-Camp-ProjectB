@@ -761,3 +761,17 @@
 - **验证证据**：标准 evidence validator 为 `PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；distribution-strict 仍按预期只因两项 D-025 host blocker 失败。PLAN ledger 为 69 unique/3 PASS/66 pending；Markdown 为 35 文件、21 本地链接、0 坏链接、0 奇数围栏；当前 Superpowers 陈旧措辞扫描 0，focused credential scan 0，`git diff --check` 无 whitespace error。
 - **commit hash**：`1eb9a7da7a2814b89779861672f0e0f6e75c7d33`（`docs(D-001): correct Superpowers installation state [agent: Codex GPT-5]`）。该提交只记录环境诊断和门禁纠正，不是正式 Superpowers invocation。
 - **经验教训**：插件 payload、marketplace 可发现性、installed/enabled config 和新任务实际 skill catalog 是四层独立证据；任何一层缺失都不能用 cache 路径代替正式 invocation。
+
+## 2026-07-22T20:16:26+08:00 - D-001 Superpowers installation recovery and stale-task diagnosis
+
+- **Task 编号**：D-001（安装层恢复；新 task 注册/正式调用仍阻断）。
+- **触发的 skill / 工具**：使用 `openai-docs` skill 的 Codex self-knowledge 路径。Codex manual helper 再次因 Windows Schannel `SEC_E_NO_CREDENTIALS` 失败；按 skill 规则改用官方 OpenAI Docs MCP 获取 `Plugins` 与 `Build plugins`。没有关闭 TLS 校验或修改用户配置。
+- **关键 prompt / context**：学生指出已添加 Superpowers 并询问为何仍不可用。当前 task 的 supplied skill catalog 仍无 `superpowers:*`，因此需要区分安装状态与旧 task 的加载快照。
+- **环境证据**：`config.toml` 现含 `[plugins."superpowers@openai-api-curated"]` 与 `enabled = true`，最后写入时间 `2026-07-22T20:11:10+08:00`。所选 `11c74d6b` 安装快照 manifest 版本 5.1.3、MIT、SHA-256 `CE06DE063CABC2C41FFCE239AEB5CB941FCAB0C98DDDEDE927AA06E854D40AED`；14 个 skill 目录全部含 `SKILL.md`。旧的 6.1.1 remote cache 不再用于判断当前安装。
+- **诊断**：安装与启用层 PASS；当前任务加载层 FAIL。官方文档明确说明 installed plugin 的 bundled skills 在安装后的新 chat/task 或 CLI session 才可用。CLI 的空 marketplace/plugin JSON 属于独立未认证 CLI 环境，不能推翻桌面 config/cache 的直接证据。
+- **修订与非动作**：同步 `SUPERPOWERS_VALIDATION.md`、`SKILLS_SETUP.md`、D-001、PLAN/G-03、过程与审计当前状态；保留 02:55 的历史诊断原文并追加本次状态变化。没有由智能体安装/重装插件、复制 skill、正式调用 Superpowers、执行冷启动、创建实现源码、Open Design run、部署或 `REFLECTION.md`。
+- **门禁结论**：D-001 已从“安装/启用”缩小为“新建 ProjectB task 并实际调用 `writing-plans`”。在新 task 产生真实 invocation/diff 前，不把 fallback 计划标成正式 Superpowers 产物，也不进入 G-03 或实现。
+- **subagent / 两阶段评审**：`/root/superpowers_stale_audit` 先审查课程门禁与当前/历史时态，再审查证据强度和文档质量；发现 `SPEC.md` 风险矩阵的旧 cache-only 当前态、日志字段缺口，以及两处把 config 与具体快照绑定过强的 P1/P2。四项均已修正；复核未发现 Critical/P1，最终 P2 也在提交前关闭，并确认其余路径、版本、hash、14 skills 和新 task 门禁一致。
+- **验证证据**：`scripts/verify_evidence.ps1` 返回 `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；`-RequireDistributionReady` 按预期只因 D-025 的两条 hosting rows 返回 exit 1。Markdown 为 35 文件、21 本地链接、0 坏链接、0 奇数围栏；当前态陈旧措辞扫描 0，focused credential scan 0；`git diff --check` 无 whitespace error，仅有既有 CRLF 提示。
+- **人工修改及原因**：主智能体只修订 9 份规约/过程/审计文档，使安装、启用、会话加载和正式 invocation 四层证据分离；没有重写先前时间戳日志或将学生安装动作归因给智能体。
+- **经验教训**：`enabled = true` 能证明插件来源与开关状态，但不能单独证明具体缓存 hash；具体快照必须由该来源的实际安装目录和 manifest 独立证明。安装成功也不会热更新已运行 task 的 skill catalog。

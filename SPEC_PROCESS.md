@@ -1,6 +1,6 @@
 # SPEC_PROCESS
 
-> 当前状态：学生已于 2026-07-20 整体确认 `SPEC.md`，D-017 至 D-024 及工程候选已收敛为 v1 方向；`PLAN.md` 已形成。2026-07-21 学生在 Open Design 中实际选择 `frontend-design` + `default`（Neutral Modern），0.15.1 daemon、完整 bundled skill 和 fresh MCP 只读发现均已验证；`list_projects=[]` 与 `active=false` 是实现前的真实状态，G-01 环境/选择门禁已通过。Open Design daemon 仅在 MCP 调用或真实 project/run 期间按需运行，实际 project/run/artifact 延后至获准实现后的 UI-01A。G-02A/G-02B 已 PASS；Hugging Face 官方条款复核已完成，并因 Docker Space 付费方案要求触发 D-025/G-02C 门禁。2026-07-22 已完成现有主机/Tailscale 与 Azure Students/Container Apps 的官方候选调查，但没有替学生选择或创建资源。其余门禁是 Superpowers 正式 `writing-plans` 证据或课程接受 fallback、G-03 全新 session 冷启动、冷启动修订后的学生实现批准，以及学生本人 brainstorming 反思。Superpowers v6.1.1 完整 bundle 只存在于 cache；当前配置无 installed/enabled 状态且 task 无 `superpowers:*`，因此不能把 fallback 计划冒充正式 skill 调用。
+> 当前状态：学生已于 2026-07-20 整体确认 `SPEC.md`，D-017 至 D-024 及工程候选已收敛为 v1 方向；`PLAN.md` 已形成。2026-07-21 学生在 Open Design 中实际选择 `frontend-design` + `default`（Neutral Modern），0.15.1 daemon、完整 bundled skill 和 fresh MCP 只读发现均已验证；`list_projects=[]` 与 `active=false` 是实现前的真实状态，G-01 环境/选择门禁已通过。Open Design daemon 仅在 MCP 调用或真实 project/run 期间按需运行，实际 project/run/artifact 延后至获准实现后的 UI-01A。G-02A/G-02B 已 PASS；Hugging Face 官方条款复核已完成，并因 Docker Space 付费方案要求触发 D-025/G-02C 门禁。2026-07-22 已完成现有主机/Tailscale 与 Azure Students/Container Apps 的官方候选调查，但没有替学生选择或创建资源。其余门禁是 Superpowers 正式 `writing-plans` 证据或课程接受 fallback、G-03 全新 session 冷启动、冷启动修订后的学生实现批准，以及学生本人 brainstorming 反思。Superpowers 官方 curated 快照现已安装并启用，14 个 skill 文件完整；但当前安装前 task 的 catalog 仍无 `superpowers:*`，因此必须新建 task 后正式调用，不能把 fallback 计划冒充调用证据。
 
 ## 0. 启动审计（2026-07-17）
 
@@ -450,3 +450,10 @@
 - `docs/engineering/SUPERPOWERS_VALIDATION.md` records the exact bundle hash, detected skills, commands, official sources, non-actions and recovery gate. No user config, authentication, marketplace, cache or project dependency was changed.
 - D-001 is therefore open as an app-level installation/enablement gate, not a mere stale-session refresh. Formal `writing-plans` or explicit course acceptance of the fallback remains required before G-03.
 - The documentation-only correction is committed at `1eb9a7da7a2814b89779861672f0e0f6e75c7d33`; it does not close D-001.
+
+### Superpowers installation recovery and stale-task diagnosis: 2026-07-22T20:16:26+08:00
+
+- The student reported installing Superpowers. Direct read-only verification now finds `[plugins."superpowers@openai-api-curated"]` with `enabled = true` in `config.toml`; its last-write time is `2026-07-22T20:11:10+08:00`.
+- The selected installed snapshot is `openai-api-curated/superpowers/11c74d6b`. Its manifest reports version 5.1.3 and MIT, SHA-256 `CE06DE063CABC2C41FFCE239AEB5CB941FCAB0C98DDDEDE927AA06E854D40AED`; all fourteen skill directories contain `SKILL.md`. The older 6.1.1 remote cache remains historical cache evidence, not the selected enabled snapshot.
+- This already-running task still exposes no `superpowers:*`. Official OpenAI plugin documentation says bundled skills become available in a new chat/task or CLI session after installation, so installation is now proven while session registration and formal invocation remain unproven.
+- No config/cache/plugin state was changed by the agent. D-001 is narrowed to creating a new ProjectB task, verifying `brainstorming`/`writing-plans`, and recording the real `writing-plans` review/diff. G-03 and implementation remain closed.

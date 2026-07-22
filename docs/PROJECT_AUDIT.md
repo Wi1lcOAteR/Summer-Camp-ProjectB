@@ -3,14 +3,14 @@
 初次审计时间：2026-07-17T18:14:41+08:00
 最近历史复查时间：2026-07-19T21:57:09+08:00
 最近外部门禁复查：2026-07-21T21:08:02+08:00（G-01 scope correction）
-最近文档一致性复查：2026-07-22T02:55:19+08:00（Superpowers cache-only 状态纠正）
+最近文档一致性复查：2026-07-22T20:16:26+08:00（Superpowers 安装/启用恢复；当前 task 未重载）
 
 > 当前要求符合性请以 [`REQUIREMENTS_COMPLIANCE_AUDIT.md`](REQUIREMENTS_COMPLIANCE_AUDIT.md) 为准。本文件前半部分保留启动阶段的历史快照，不能用其中“SPEC 不存在”“Open Design 未安装”等旧状态判断当前工作区。
 
 ## 当前权威状态（2026-07-22）
 
 - 项目处于阶段 B 的工程证据与计划门禁收口期，尚未进入正式实现。
-- `SPEC.md` 已由学生整体确认；`PLAN.md` 已形成，但正式 `superpowers:writing-plans` 调用证据仍缺，现有计划明确标记为 fallback。Superpowers 6.1.1 只是完整 cache payload，当前 config 无安装/启用项、task 无相应 skill；D-001 已重新开放。
+- `SPEC.md` 已由学生整体确认；`PLAN.md` 已形成，但正式 `superpowers:writing-plans` 调用证据仍缺，现有计划明确标记为 fallback。Superpowers 官方 curated 快照现已安装并启用，config 与 14 个完整 skill 文件均通过；但这条安装前 task 无相应 skill，D-001 仅剩新 task 注册/正式调用门禁。
 - Open Design 0.15.1、Codex MCP、完整内置 `frontend-design` 和学生选择的 `default`（Neutral Modern）均已验证，G-01 已 PASS。该 bundled skill 不需要另行下载到 Codex；Open Design 也不需要无任务时长期保持开启。
 - `list_projects=[]` 与 `get_active_context.active=false` 是实现前的正常状态。真实 project/run/artifact 只在冷启动完成且学生批准实现后的 UI-01A 中按需创建，不能提前生成 UI 来冒充环境验证。
 - G-02A 工具链/依赖/许可证与 G-02B provider 政策/费用证据已分别 PASS；G-02C 已验证 freezer、OCI base 与 HF runtime 条件，但当前官方付费方案要求触发 D-025，仍为 pending。2026-07-22 已补充现有主机/Tailscale 和 Azure Students/Container Apps 的官方候选比较；没有选择或创建托管资源。
