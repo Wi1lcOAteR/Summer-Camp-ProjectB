@@ -774,4 +774,5 @@
 - **subagent / 两阶段评审**：`/root/superpowers_stale_audit` 先审查课程门禁与当前/历史时态，再审查证据强度和文档质量；发现 `SPEC.md` 风险矩阵的旧 cache-only 当前态、日志字段缺口，以及两处把 config 与具体快照绑定过强的 P1/P2。四项均已修正；复核未发现 Critical/P1，最终 P2 也在提交前关闭，并确认其余路径、版本、hash、14 skills 和新 task 门禁一致。
 - **验证证据**：`scripts/verify_evidence.ps1` 返回 `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；`-RequireDistributionReady` 按预期只因 D-025 的两条 hosting rows 返回 exit 1。Markdown 为 35 文件、21 本地链接、0 坏链接、0 奇数围栏；当前态陈旧措辞扫描 0，focused credential scan 0；`git diff --check` 无 whitespace error，仅有既有 CRLF 提示。
 - **人工修改及原因**：主智能体只修订 9 份规约/过程/审计文档，使安装、启用、会话加载和正式 invocation 四层证据分离；没有重写先前时间戳日志或将学生安装动作归因给智能体。
+- **commit hash**：`178ab5c584849ca3cbf855d48a7a9b074ab220ef`（`docs(D-001): record Superpowers installation recovery [agent: Codex GPT-5]`）。该提交证明文档状态修正，不是正式 Superpowers invocation。
 - **经验教训**：`enabled = true` 能证明插件来源与开关状态，但不能单独证明具体缓存 hash；具体快照必须由该来源的实际安装目录和 manifest 独立证明。安装成功也不会热更新已运行 task 的 skill catalog。
