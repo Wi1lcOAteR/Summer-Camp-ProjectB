@@ -2,7 +2,7 @@
 
 Status: **PASS - G-02A exact dependency and license evidence committed**
 
-Verification date: `2026-07-21` (Asia/Shanghai)
+Verification scope dates (Asia/Shanghai): package closures/component smokes `2026-07-21`; bootstrap artifact supplement `2026-07-26`.
 
 This is an implementation-input evidence ledger, not the production manifest. The two lock artifacts under `docs/engineering/locks/` were resolved and smoke-tested in disposable runtimes and are consumed by T-01 when it creates the real project manifests. They must not be presented as an installed application or clean-machine distribution.
 
@@ -49,6 +49,20 @@ This is an implementation-input evidence ledger, not the production manifest. Th
 | python-lock-closure | Hashed Windows x64 Python closure | 54 exact pins; canonical-LF SHA-256 246083f8b210c3e33904f3057dfd48e7d8db548804d11fa5b087ecb291ad0fc6 | https://pypi.org/simple/ | Exact PyPI metadata and wheel license files | 2026-07-21 | verified | Stored at docs/engineering/locks/python-3.14.6-windows-x64.lock; validator normalizes text line endings before hashing and cross-checks every pin/direct dependency against the table below. |
 | npm-lock-closure | npm lockfile v3 closure | 166 exact package entries; 115 installed on win-x64; canonical-LF SHA-256 071826d575cbcc472020a7df984e2e8f2410a75c1782550c5ddfeed268af3c2f | https://registry.npmjs.org/ | Exact registry URLs, integrity hashes, and package license fields | 2026-07-21 | verified | Stored at docs/engineering/locks/frontend-package-lock.json; 54 optional cross-platform packages remain locked. Validator compares all 16 root direct dependencies and the reviewed license set; npm audit reported zero current findings. |
 | dependency-transitive | Direct and transitive license closure | Python 54 packages and npm 166 entries | https://packaging.python.org/en/latest/guides/repeatable-installs/ | Machine-checked exact pins, hashes, licenses, and notice obligations | 2026-07-21 | verified | Production manifests and the CI license scanner are created later by T-01 and CI-01 from these evidence inputs. |
+
+## Bootstrap Artifact Evidence
+
+This four-column supplement is deliberately outside the 63-row course evidence
+count. `scripts/verify_evidence.ps1` binds every exact term below without changing
+the standard receipt. F-01A must download these files into ignored project-local
+storage, verify bytes before extraction, retain their license texts, and never
+change the system PATH or registry.
+
+| Artifact | Exact source and digest | License / notices | Verification |
+| --- | --- | --- | --- |
+| uv 0.11.14 Windows x64 | `https://github.com/astral-sh/uv/releases/download/0.11.14/uv-x86_64-pc-windows-msvc.zip`; SHA-256 `52ba5d19409aaa688a8a1a6ec8dfb6a4817230d20186e75f4006105c3e39a846` | Apache-2.0 OR MIT; retain tagged upstream `LICENSE-APACHE` and `LICENSE-MIT` | official GitHub release API and per-asset checksum, 2026-07-26 |
+| CPython 3.14.6 embeddable x64 | `https://www.python.org/ftp/python/3.14.6/python-3.14.6-embed-amd64.zip`; SHA-256 `df901e84a896ff1ee720ad03377e0c8d8c2244fda79808aeeaff6316df1cb75c` | PSF-2.0; retain Python license | existing exact component smoke and official checksum evidence, 2026-07-21 |
+| Node 24.18.0 Windows x64 | `https://nodejs.org/dist/v24.18.0/node-v24.18.0-win-x64.zip`; SHA-256 `0ae68406b42d7725661da979b1403ec9926da205c6770827f33aac9d8f26e821` | Node.js MIT plus bundled notices; included npm 11.16.0 is Artistic-2.0 and its notice must be retained | official SHASUMS256 and disposable exact-version smoke, 2026-07-21 |
 
 ## Python License Closure
 

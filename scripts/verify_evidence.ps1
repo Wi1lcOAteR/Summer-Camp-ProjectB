@@ -261,6 +261,62 @@ foreach ($relative in $dependencyEvidenceFiles) {
     }
 }
 if (Test-Path -LiteralPath $dependencyPath -PathType Leaf) {
+    $dependencyText = Get-Content -LiteralPath $dependencyPath -Raw
+    $bootstrapExpectations = @{
+        "uv 0.11.14 Windows x64" = @{
+            Source = @(
+                "https://github.com/astral-sh/uv/releases/download/0.11.14/uv-x86_64-pc-windows-msvc.zip",
+                "52ba5d19409aaa688a8a1a6ec8dfb6a4817230d20186e75f4006105c3e39a846"
+            )
+            License = @("Apache-2.0 OR MIT", "LICENSE-APACHE", "LICENSE-MIT")
+            Verification = @("2026-07-26")
+        }
+        "CPython 3.14.6 embeddable x64" = @{
+            Source = @(
+                "https://www.python.org/ftp/python/3.14.6/python-3.14.6-embed-amd64.zip",
+                "df901e84a896ff1ee720ad03377e0c8d8c2244fda79808aeeaff6316df1cb75c"
+            )
+            License = @("PSF-2.0", "Python license")
+            Verification = @("2026-07-21")
+        }
+        "Node 24.18.0 Windows x64" = @{
+            Source = @(
+                "https://nodejs.org/dist/v24.18.0/node-v24.18.0-win-x64.zip",
+                "0ae68406b42d7725661da979b1403ec9926da205c6770827f33aac9d8f26e821"
+            )
+            License = @("Node.js MIT", "npm 11.16.0 is Artistic-2.0")
+            Verification = @("2026-07-21")
+        }
+    }
+    $bootstrapRows = @{}
+    foreach ($line in ($dependencyText -split "`r?`n")) {
+        if ($line -notmatch '^\s*\|') { continue }
+        $cells = @($line.Trim() -split '\|' | ForEach-Object { $_.Trim() })
+        if ($cells.Count -gt 0 -and $cells[0] -eq "") { $cells = @($cells[1..($cells.Count - 1)]) }
+        if ($cells.Count -gt 0 -and $cells[$cells.Count - 1] -eq "") { $cells = @($cells[0..($cells.Count - 2)]) }
+        if ($cells.Count -ne 4 -or -not $bootstrapExpectations.ContainsKey($cells[0])) { continue }
+        if ($bootstrapRows.ContainsKey($cells[0])) {
+            Add-Error "Duplicate bootstrap evidence row '$($cells[0])'"
+            continue
+        }
+        $bootstrapRows[$cells[0]] = $cells
+    }
+    foreach ($artifact in $bootstrapExpectations.Keys) {
+        if (-not $bootstrapRows.ContainsKey($artifact)) {
+            Add-Error "Missing bootstrap evidence row '$artifact'"
+            continue
+        }
+        $cells = $bootstrapRows[$artifact]
+        foreach ($term in $bootstrapExpectations[$artifact].Source) {
+            if (-not $cells[1].Contains($term)) { Add-Error "Bootstrap source/digest mismatch for '$artifact': $term" }
+        }
+        foreach ($term in $bootstrapExpectations[$artifact].License) {
+            if (-not $cells[2].Contains($term)) { Add-Error "Bootstrap license/notice mismatch for '$artifact': $term" }
+        }
+        foreach ($term in $bootstrapExpectations[$artifact].Verification) {
+            if (-not $cells[3].Contains($term)) { Add-Error "Bootstrap verification mismatch for '$artifact': $term" }
+        }
+    }
     $pythonClosure = @(Get-PythonClosureRows -Path $dependencyPath)
     if ($pythonClosure.Count -ne 54) {
         Add-Error "Python license closure must contain 54 rows; observed $($pythonClosure.Count)"

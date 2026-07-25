@@ -1,6 +1,6 @@
 # SPEC_PROCESS
 
-> **当前状态（2026-07-25）：** 旧的 113-unit / 14-plan 阶段 B 方案已按学生要求收束并作为 `NOT PASS` 历史存档。当前 [`SPEC.md`](SPEC.md) 是精简 v1 待确认稿：材料仅为数字 PDF/TXT/Markdown，provider 范围为 L+P，通用知识点模型以互斥/竞态/死锁三个 evaluator 验收；被删出的复杂能力进入 `ARCHIVED / NOT DISPATCHABLE` 计划。Claude Code 已被学生选为后续不同类型冷启动工具。学生确认当前 SPEC、正式 `writing-plans`、同快照双评审、冷启动修订和实现批准完成前，仍禁止正式实现。D-025 只阻塞 host-specific 发布与最终公网 URL。
+> **当前状态（2026-07-26）：** 旧的 113-unit / 14-plan 阶段 B 方案已按学生要求收束并作为 `NOT PASS` 历史存档。精简 v1 [`SPEC.md`](SPEC.md) 已由学生整体确认；当前唯一 [`PLAN.md`](PLAN.md) 含 31 个单-session task，并已在同一 SPEC/PLAN 哈希上通过规约与质量/安全/许可证双评审。材料仅为数字 PDF/TXT/Markdown，provider 范围为 L+P，通用知识点模型以互斥/竞态/死锁三个 evaluator 验收；被删出的复杂能力进入 `ARCHIVED / NOT DISPATCHABLE` 计划。阶段 B 已冻结，下一门禁是 Claude Code 陌生智能体冷启动；其完成、缺陷修订和学生 G-04 实现批准前，仍禁止正式实现。D-025 只阻塞 host-specific 发布与最终公网 URL。
 
 ## 0. 启动审计（2026-07-17）
 
@@ -550,3 +550,21 @@
 - 对拟提交的 28 个文件运行 token 形式扫描，OpenAI/GitHub/AWS/Google/Slack 模式命中路径 0；`git diff --check` 退出 0，仅有 Git 的工作树换行提示。
 - `scripts/verify_evidence.ps1` 返回 `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`。加 `-RequireDistributionReady` 按预期退出 1，唯一错误是 distribution evidence 未 ready，原因仍是 D-025 的两项 explicitly-blocked hosting row。
 - 两个 SPEC reviewer session 在返回 verdict 前中断，不能记为独立 PASS；正式合规与质量/安全/许可证双评审必须在学生确认后，对同一最终 SPEC/PLAN 哈希重新执行。
+
+## 6. 2026-07-25 精简 SPEC 签字与阶段 B 启动
+
+- **学生原始确认：** `确认当前 SPEC，先把主体做出来先，剩两个门禁我想想办法`。
+- **确认对象：** 回复前重新计算 `SPEC.md` SHA-256 为 `C6231816A62C807D205FC7A3E6142C5636DE18FD8A2C580B48E63B106F959AD6`，与上一轮明确请求确认的快照一致；工作树中的其他既有研究文档修改未进入确认对象。
+- **门禁解释：** 本次回复闭合精简 SPEC 签字并授权继续 `writing-plans`、同快照复审和冷启动准备。因为课程要求冷启动暴露的问题修订后再次取得学生批准，所以“先做主体”不被倒签为未来的 G-04 实现批准。
+- **状态注记：** `SPEC.md` 随后只修改标题、签字状态、范围漂移风险和门禁进度等事实元数据，不改变 M1/M2/M3、L+P、安全、WebUI、分发或 AC 条款。正式 PLAN 和 review receipt 将同时记录签字内容 hash 与当前注记后文件 hash。
+- **下一步：** 正式调用 `writing-plans`，生成唯一、最多 30 个单-session task 的 `PLAN.md`；Critical/Major 清零后才准备 Claude Code 仅 SPEC/PLAN 冷启动包。
+
+## 7. 2026-07-26 精简 PLAN 修订、同哈希双评审与冷启动准备
+
+- **冻结对象：** 学生确认内容快照为 `C6231816A62C807D205FC7A3E6142C5636DE18FD8A2C580B48E63B106F959AD6`；加入签字事实注记后的当前 `SPEC.md` 为 `795791627579BFEBE24717981168A54E2D546F613FEA84CCDF0AC0ECBA387862`。最终 `PLAN.md` 为 `6FDD69F2FD309841CC46DB1C75C142E4E1E8474E1575A2E765F49EF67002A05D`，包含 31 个 dispatch task、31 个 ledger entry、30 条串行依赖和 24 个 AC 映射。
+- **真实修订轨迹：** 第一版 30-task 候选 `35D8...` 未通过评审；修订到 `6AC...` 后规约审查通过，但质量审查指出 F-01 粒度与工具链闭合不足。拆成 F-01A/F-01B 后的 `D639...` 仍被两名 reviewer 指出首个 implementation commit 前没有可运行的凭据扫描器。最终版增加无第三方依赖的 PowerShell bootstrap scanner、fail-closed/redaction 测试，以及结构化 bootstrap 工具链证据校验。旧哈希均只保留为失败/修订过程，不能继承 PASS。
+- **同哈希评审：** `/root/plan_spec_review` 对上述最终 SPEC/PLAN 哈希做只读规约合规审查，返回 `PASS; Critical=0, Major=0, Minor=0`；`/root/plan_quality_review` 对同一哈希做只读正确性、可派发粒度、安全、测试与许可证审查，返回相同零问题 `PASS`。两名 reviewer 均未编辑文件。
+- **机械与证据验证：** 最终候选得到 `PLAN_MECHANICAL_PASS Tasks=31 Ledger=31 Fields=5 DependencyEdges=30 AcRows=24 Placeholders=0`；标准、Linux 和 provider evidence verifier 分别得到 `rows=63 explicitly_blocked=2`、`ci_packages=41 demo_packages=14 license_rows=41`、`rows=7 models=2`。这些是计划/依赖证据，不是产品测试或构建结果。
+- **冷启动准备：** 新增操作员说明 [`docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md`](docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md)，固定只向 fresh Claude Code session 提供上述 `SPEC.md` 与 `PLAN.md`，尝试 F-01A，并记录问题、误解、red/green 产出与差距。runbook 本身不得作为第三份 agent context。
+- **当前阻塞：** 2026-07-26 本机 `Get-Command claude` 返回未找到，故 G-03 尚未执行，也没有伪造 session、版本、transcript 或 diff。学生需控制 Claude Code 的安装/登录/条款并启动全新 session；若冷启动导致 SPEC/PLAN 任一字节变化，必须重新计算哈希并重跑同哈希双评审。
+- **实现边界：** 阶段 B 计划已通过，但这不等于产品已实现或 G-04 已批准。G-03 完成、问题修订和学生再次明确批准前，未创建生产源码、实现 worktree、Open Design run、产品测试/构建、CI、provider 调用或部署。

@@ -891,3 +891,27 @@
 - **Git / commit**：本地分支 `codex/stage-b-scope-reset`，范围重置基线 `519b3000336d18f8b89628fdc14691d3b700002c`；归档 checkpoint 为 `ccd1dfe`，活跃范围/门禁文档 checkpoint 为 `5f54431`；两个提交均不含无关 dirty 文档或生产源码。
 - **门禁 / 下一步**：先完成最终机械验证并提交诚实的 `NOT PASS` 历史检查点；随后只请求学生重新确认当前完整 `SPEC.md`。旧签字不自动覆盖新文本，确认前不得调用 `writing-plans` 或进入冷启动/实现。
 - **经验教训**：活跃入口只保留 SPEC、单一 PLAN 和要求矩阵，可显著降低恢复成本；历史内容仍需以哈希索引和明确恢复条件保全。凭据扫描必须覆盖计划示例和归档草稿，模拟 token 也不应进入可提交历史。
+
+## 2026-07-25T19:13:57.2253721+08:00 - PLAN-V1-001 精简 SPEC 签字与正式计划启动
+
+- **Task 编号**：PLAN-V1-001（记录精简 SPEC 签字并启动正式 `writing-plans`；未进入生产实现）。
+- **触发的 Superpowers skill**：重新读取并使用 `using-superpowers` 与 `writing-plans`；计划完成前不触发 worktree、TDD、执行或 finishing skill。
+- **关键 prompt / context**：学生回复“确认当前 SPEC，先把主体做出来先，剩两个门禁我想想办法”。回复前只读复核当前 `SPEC.md` SHA-256 为 `C6231816A62C807D205FC7A3E6142C5636DE18FD8A2C580B48E63B106F959AD6`，与请求确认的快照一致。
+- **人工确认与边界**：SPEC 整体签字已闭合，`writing-plans` 获准。Claude Code 冷启动、冷启动修订后实现批准、D-025、远程授权和学生 `REFLECTION.md` 仍未闭合；当前回复不替代未来 G-04 批准。
+- **当前动作**：只更新签字/门禁元数据与过程证据，随后把根 `PLAN.md` 重写为最多 30 个单-session task 的唯一实现计划并做同哈希双评审。
+- **未执行**：未创建 backend/frontend、实现 worktree、Open Design run、provider request、测试/构建、CI、部署或远程资源。
+- **Git / commit**：分支 `codex/stage-b-scope-reset`，起始 HEAD `d94235c4ce8d669f7aca2bb8707fd8c55411fc53`；计划 checkpoint 尚未创建，无关 dirty 文档保持 unstaged。
+- **经验教训**：产品方向确认与实现批准是不同时间点的证据；即使学生希望尽快实现，也必须先让冷启动问题进入可审查修订，再请求实现授权。
+
+## 2026-07-26T00:49:31.3372555+08:00 - PLAN-V1-002 精简计划冻结与阶段 B 双评审
+
+- **Task 编号**：PLAN-V1-002（完成精简 implementation PLAN、机械验证、同哈希双评审和 G-03 操作包；不包含产品实现）。
+- **触发的 Superpowers skill**：使用 `using-superpowers`、`writing-plans`、`dispatching-parallel-agents`、`requesting-code-review`、`receiving-code-review`、`systematic-debugging` 与 `verification-before-completion`。worktree、TDD、执行和 finishing skills 仍由 G-03/G-04 门禁阻止。
+- **关键 prompt / context**：学生确认 `C6231816...9AD6` 的精简 SPEC 并要求先推进主体；课程仍要求正式 PLAN 通过、Claude Code 陌生智能体冷启动、修订后再次实现批准。计划必须覆盖三模块、L+P、React WebUI、Credential Manager、双 CI、Windows 单文件、OCI mock demo、公网 URL、README 与学生反思门禁，同时不把四类延期能力带回 v1。
+- **计划结果**：当前 `SPEC.md` 注记后哈希为 `795791627579BFEBE24717981168A54E2D546F613FEA84CCDF0AC0ECBA387862`；唯一 `PLAN.md` 为 `6FDD69F2FD309841CC46DB1C75C142E4E1E8474E1575A2E765F49EF67002A05D`，含 31 个单-session task。F-01 被 reviewer 要求拆为 F-01A/F-01B；首提交扫描缺口随后以 dependency-free、fail-closed、只输出 path/rule ID 的 bootstrap scanner 闭合。
+- **subagent 输出 / review**：只读 reviewer `/root/plan_spec_review` 与 `/root/plan_quality_review` 均对上述同一哈希返回 `PASS; Critical=0, Major=0, Minor=0`，且均未编辑仓库。冻结文档 reviewer `/root/freeze_docs_audit` 返回 `PASS; Critical=0, Major=0`，只指出反思长度一处 `word`/中文字符口径 Minor，已在不改变 SPEC/PLAN 的前提下修正。更早的 `35D8...`、`6AC...` 与 `D639...` 结论只作为真实修订轨迹保留，不继承 PASS。
+- **人工修改及原因**：主智能体只采纳可复现 reviewer findings，拆分 foundation、补齐工具链/许可证/凭据门禁并同步过程证据；学生本轮没有授权 G-04、远程平台、付费 provider、部署或代写反思。无关 `docs/research/*` 与 `docs/engineering/SUPERPOWERS_VALIDATION.md` 改动保持 unstaged。
+- **验证证据**：机械审计为 `Tasks=31 Ledger=31 Fields=5 DependencyEdges=30 AcRows=24 Placeholders=0`；标准 evidence 为 `rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；Linux evidence 为 `ci_packages=41 demo_packages=14 license_rows=41`；provider evidence 为 `rows=7 models=2 expires=2026-08-25`。最终 19 文件 authoring surface 为 `markdown=12 links=10 broken=0 credential_matches=0 utf8_replacement=0`，distribution-strict 按预期只因 D-025 两行退出 1。第一次工作树级 `git diff --check` 未覆盖未跟踪 runbook；暂存后检查发现并修正其一处行尾空格，再对完整 staged set 复验。
+- **Git / commit**：分支 `codex/stage-b-scope-reset`，起始 HEAD `d94235c4ce8d669f7aca2bb8707fd8c55411fc53`；本条记录时阶段 B checkpoint 尚未创建，完成验证后以实际 commit hash 回填。
+- **未执行 / 门禁**：`Get-Command claude` 未找到，G-03 仅准备 runbook，未执行 session 或产出 transcript。没有生产源码、实现 worktree、Open Design run、产品测试/构建、CI、provider call、远程 push/PR、镜像发布、部署或 `REFLECTION.md`。
+- **经验教训**：一个首提交安全门禁不能依赖尚未实现的后续 scanner；bootstrap 路径必须无第三方依赖、失败关闭且在第一次 staged commit 前即可执行。review PASS 必须绑定完全相同的 SPEC/PLAN 字节。

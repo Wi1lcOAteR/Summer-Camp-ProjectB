@@ -2,7 +2,7 @@
 
 Status: **BLOCKED - G-02C found a confirmed paid-plan conflict requiring D-025**
 
-Verification date: `2026-07-21` for the selected HF/freezer/base rows; alternative-host research refreshed `2026-07-22` (Asia/Shanghai). No deployment, account action, payment method, student credit use, Docker build, registry push, or paid resource was created.
+Verification date: `2026-07-21` for the selected HF/freezer/base rows; alternative-host research refreshed `2026-07-22`; the immutable Node builder supplement was frozen `2026-07-25` (Asia/Shanghai). No deployment, account action, payment method, student credit use, Docker build, registry push, or paid resource was created.
 
 The freezer and OCI base can now be selected exactly. The previously selected Hugging Face Docker Space direction cannot satisfy the current no-paid-resource boundary: Hugging Face's current official docs explicitly require a paid plan to create a Gradio or Docker Space even though CPU Basic has no hourly hardware charge. No alternative host is selected silently.
 
@@ -23,6 +23,7 @@ The freezer and OCI base can now be selected exactly. The previously selected Hu
 
 - Hugging Face hub-docs commit: `86be61b3d86b7df41ba4500e6b93de7a41f1d1fb`, committed `2026-07-21T12:37:28Z`; repository license Apache-2.0.
 - Docker Library repo-info commit: `99919ada7d519a93bfafcd36ddab30df211ecdb9`, committed `2026-07-21T15:12:16Z`.
+- Node frontend builder: `node:24.18.0-bookworm-slim@sha256:d45d78e7929b46875bbd4e29bea672d5bc48186c6c3588306521c815e78352d6` for linux/amd64, from the same immutable Docker Library repo-info commit under `repos/node/remote/24.18.0-bookworm-slim.md`; Node.js is MIT with bundled notices and Debian components retain package-specific licenses. DIST-02 must re-resolve, SBOM, inspect, and retain notices before distribution verification.
 - PyInstaller exact PyPI release: 6.21.0, official documentation title also reports 6.21.0.
 
 The Docker registry endpoint and Hugging Face rendered site timed out/reset in this environment. Exact first-party GitHub snapshots were used instead. Docker itself still reports no local daemon, so no image build/run evidence exists.

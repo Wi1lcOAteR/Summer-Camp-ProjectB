@@ -1,0 +1,4 @@
+fastapi==0.139.2
+pydantic==2.13.4
+tzdata==2026.3
+uvicorn==0.51.0

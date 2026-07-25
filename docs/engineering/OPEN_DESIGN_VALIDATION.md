@@ -74,7 +74,7 @@ This closes the earlier stale-endpoint question and confirms that the installed 
 
 ## Deferred Open Design Workflow Evidence
 
-An actual Open Design project/run is still required by the repository's UI workflow rule, but it is not part of the pre-implementation environment gate. After cold-start validation and explicit implementation approval, UI-01A must:
+An actual Open Design project/run is still required by the repository's UI workflow rule, but it is not part of the pre-implementation environment gate. After cold-start validation and explicit implementation approval, UI-01 must:
 
 1. open Open Design for that task and create/use the real ProjectB design project;
 2. run the approved UI brief with `frontend-design` and `default` / `Neutral Modern`;

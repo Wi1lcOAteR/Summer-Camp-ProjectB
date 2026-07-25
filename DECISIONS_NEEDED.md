@@ -1,14 +1,6 @@
 # DECISIONS_NEEDED
 
-> **Current snapshot:** 2026-07-25T12:01:28+08:00. This file lists only decisions or student-owned evidence that remain open. Resolved decision detail remains available in Git history, `SPEC_PROCESS.md`, and the superseded-plan archive.
-
-## Immediate Hard Gate: Confirm the Reduced SPEC
-
-**Status:** Open. The 2026-07-20 signature applies to the previous v1 and does not cover the reduced [`SPEC.md`](SPEC.md).
-
-**Student action:** Read the complete current `SPEC.md` and explicitly confirm it or request changes.
-
-**Why human-owned:** It changes product scope and the authoritative acceptance contract. Until confirmation, `writing-plans`, cold start and implementation remain blocked.
+> **Current snapshot:** 2026-07-26T00:49:31+08:00. This file lists only decisions or student-owned evidence that remain open. The reduced `SPEC.md` content snapshot `C6231816...9AD6` is confirmed; the annotated SPEC `79579162...7862` and PLAN `6FDD69F2...A05D` passed same-hash dual review. Resolved detail remains in Git history, `SPEC_PROCESS.md`, and the archive.
 
 ## D-025: Public OCI Demo Host
 
@@ -28,7 +20,9 @@ No account, payment method, cloud resource, image push or deployment may be crea
 
 **Type decision:** Resolved on 2026-07-25: Claude Code.
 
-**Remaining student-owned action:** After the final SPEC/PLAN review passes, install or open Claude Code, control login/terms, record the exact version, start a clean session with no memory, and provide only `SPEC.md` plus `PLAN.md`.
+**Review prerequisite:** Closed on 2026-07-26. The frozen SPEC/PLAN pair passed both required reviews with no Critical, Major or Minor finding.
+
+**Remaining student-owned action:** Follow [`docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md`](docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md): install or open Claude Code, control login/terms, record the exact version, start a clean session with no memory, and provide only `SPEC.md` plus `PLAN.md`. The local `claude` command was not on `PATH` when checked on 2026-07-26, so no cold-start attempt is claimed.
 
 The cold-start agent must attempt 1--2 named tasks and stop to ask rather than guess. Its questions, misunderstandings, output gap and resulting diffs must be recorded before implementation approval.
 
@@ -41,7 +35,7 @@ The cold-start agent must attempt 1--2 named tasks and stop to ask rather than g
 3. the Claude Code cold start is completed;
 4. exposed SPEC/PLAN defects are repaired and reviewed.
 
-The student must then explicitly approve entering implementation. No earlier “continue” statement is reused as this approval.
+The student must then explicitly approve entering implementation. No earlier `continue` statement is reused as this approval.
 
 ## External Execution Authorizations
 
@@ -63,7 +57,7 @@ The student still needs to provide, in their own words:
 - which brainstorming questions genuinely helped;
 - which parts felt redundant or overly formal;
 - the most important product or engineering trade-off;
-- the final 1500--2500 word `REFLECTION.md`.
+- the final 1500--2500 Chinese-character `REFLECTION.md`.
 
 AI must not draft or conceal authorship of `REFLECTION.md`. After a student draft exists, AI may proofread or identify argument gaps and must disclose the assistance scope.
 
@@ -80,6 +74,7 @@ AI must not draft or conceal authorship of `REFLECTION.md`. After a student draf
 | D-020--D-023 | Deterministic planning; Windows single-file plus OCI demo; synthetic/licensed public fixtures; GitLab primary plus GitHub mirror |
 | D-024 | Open Design `frontend-design` plus `default` / Neutral Modern selected |
 | 2026-07-25 scope reset | Reduced v1; input PDF/TXT/Markdown; modes L+P; generic concept model with mutex/race/deadlock acceptance; deferred capabilities archived |
+| 2026-07-25 reduced SPEC signature | Student explicitly confirmed the complete `C6231816...9AD6` content snapshot; `writing-plans` is now authorized, but cold-start repair and implementation approval remain later gates |
 
 ## Engineering Checks That Are Not Student Decisions
 
