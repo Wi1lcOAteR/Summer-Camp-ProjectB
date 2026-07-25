@@ -3,18 +3,19 @@
 初次审计时间：2026-07-17T18:14:41+08:00
 最近历史复查时间：2026-07-19T21:57:09+08:00
 最近外部门禁复查：2026-07-21T21:08:02+08:00（G-01 scope correction）
-最近文档一致性复查：2026-07-22T20:16:26+08:00（Superpowers 安装/启用恢复；当前 task 未重载）
+最近文档一致性复查：2026-07-25T12:01:28+08:00（阶段 B 范围收束；精简 SPEC 待学生确认）
 
 > 当前要求符合性请以 [`REQUIREMENTS_COMPLIANCE_AUDIT.md`](REQUIREMENTS_COMPLIANCE_AUDIT.md) 为准。本文件前半部分保留启动阶段的历史快照，不能用其中“SPEC 不存在”“Open Design 未安装”等旧状态判断当前工作区。
 
-## 当前权威状态（2026-07-22）
+## 当前权威状态（2026-07-25）
 
-- 项目处于阶段 B 的工程证据与计划门禁收口期，尚未进入正式实现。
-- `SPEC.md` 已由学生整体确认；`PLAN.md` 已形成，但正式 `superpowers:writing-plans` 调用证据仍缺，现有计划明确标记为 fallback。Superpowers 官方 curated 快照现已安装并启用，config 与 14 个完整 skill 文件均通过；但这条安装前 task 无相应 skill，D-001 仅剩新 task 注册/正式调用门禁。
-- Open Design 0.15.1、Codex MCP、完整内置 `frontend-design` 和学生选择的 `default`（Neutral Modern）均已验证，G-01 已 PASS。该 bundled skill 不需要另行下载到 Codex；Open Design 也不需要无任务时长期保持开启。
-- `list_projects=[]` 与 `get_active_context.active=false` 是实现前的正常状态。真实 project/run/artifact 只在冷启动完成且学生批准实现后的 UI-01A 中按需创建，不能提前生成 UI 来冒充环境验证。
-- G-02A 工具链/依赖/许可证与 G-02B provider 政策/费用证据已分别 PASS；G-02C 已验证 freezer、OCI base 与 HF runtime 条件，但当前官方付费方案要求触发 D-025，仍为 pending。2026-07-22 已补充现有主机/Tailscale 和 Azure Students/Container Apps 的官方候选比较；没有选择或创建托管资源。
-- 当前硬门禁是 D-025/G-02C、正式 `writing-plans` 证据或课程明确接受 fallback、不同类型全新 session 的 G-03 冷启动，以及冷启动修订后的学生实现批准。
+- 项目仍处于阶段 B，正式实现、CI、Open Design run、冷启动和部署均未开始。
+- 学生要求把旧 113-unit / 14-plan 方案收束为可交付纵切，同时保存未实现功能。旧 root/detailed plans 已按原始哈希归档并明确标记 `NOT PASS`，不能继续作为当前派发计划。
+- 当前 `SPEC.md` 是待重新确认的精简 v1：M1 数字 PDF/TXT/Markdown 与来源映射，M2 通用概念加互斥/竞态/死锁 evaluator，M3 确定性连续/期末复习；provider 仅 L+P。OCR、模式 F/durable jobs、考试资料自动分析和扩展 rubric 均进入非派发延期计划。
+- 当前 `PLAN.md` 只是 stage-gate ledger。学生签字后才正式调用 `writing-plans` 生成一个活跃 implementation plan；此前不创建源码。
+- Open Design 安装/skill/design-system 选择证据与 G-02A/B 工程 evidence 继续有效。实际 Open Design project/run/artifact 仍后置 UI task；D-025 只约束 host-specific 发布和最终公网 URL。
+- D-005 类型已由学生选择为 Claude Code；实际安装/登录、全新 session 和只提供最终 SPEC/PLAN 的冷启动仍未执行。
+- 当前最近硬门禁是学生确认精简 `SPEC.md`。其后依次为正式 PLAN、同快照双评审、Claude Code 冷启动修订和学生实现批准。
 
 ## 启动时结论（历史）
 
@@ -166,4 +167,13 @@ OpenAI 的 Responses 能力/政策快照还须在每次 P/F 同意前刷新并�
 - G-02A PASS：exact evidence commit `22b516af7b6f4896c6127e75b2585435e407a3c0`；54 个 Python pins、166 个 npm entries、direct/license 双向校验和无网络 smoke 已复审。生产 manifest 与 clean-clone/full-app 仍属于 T-01/DIST-01。
 - G-02B PASS：exact evidence commit `5ac9d47ddda845ed78f1758326fb547610274f4c`；官方模型/价格/PDF/token count/File Search/留存与负能力边界已复审。F 仍为 `source_disabled`，未调用 provider。
 - G-02C PENDING：reviewed blocker checkpoint `be666537706b4c133673029d950e84f15ea3ae1b`。HF Docker Space 需要付费方案，`host-cost`/`host-account` 是仅余两个 blocker；D-025 的候选证据见 `docs/research/PUBLIC_HOSTING_ALTERNATIVES.md`，仍由学生决定，未静默换平台或创建资源。
-- 当前 validator 为 `PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；distribution-strict 模式按预期失败。G-03 与所有正式实现继续关闭。
+- 当前 validator 为 `PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；distribution-strict 模式按预期失败。G-03 当前因 Stage B plan FAIL 与 D-005 未选而关闭，不再因 D-025 关闭；所有正式实现仍继续关闭。
+
+## 2026-07-22 formal writing-plans and three-audit state
+
+- 新 task 的 callable catalog 含 14 个 Superpowers skills。主智能体完整读取、宣布并正式调用 `writing-plans`；`using-superpowers`、`brainstorming`、`dispatching-parallel-agents`、`receiving-code-review` 也已按当前工作完整读取。D-001 已关闭。
+- Formal plan audit 对基线 `7524AE6352733A4EE96B9BA5DED453CEE2A635348664C4AE6127F446B3CAD0BD` 给出 FAIL：45 个 dispatch unit 无代码块、24 个只有局部片段、0 个满足所有实现步骤完整代码；另有复合 checkbox、83 个 angle placeholders、header/Tech Stack 与 file map/path 冲突。
+- Coverage/gate audit 发现 source retrieval、deletion、F lifecycle 的 API/UI 覆盖、M3 attempt owner、UUID/hash/region/LearningEvidence/trace grammar 和 group-child 命名缺口，并确认 D-025 不应成为 G-03 前置。
+- Dispatch audit 确认被审 baseline 的 69/69 标题与 ledger ID 一致、基础字段齐全，同时发现 worktree 前置循环、真实部署 owner 缺失、CI/FIN commit 自引用、G-01 历史证据和 review ledger 缺口。
+- Active remediation 目标为 42 个 planning group、72 个 dispatch unit，17 个 Task Group 不变；新增 T-08、M3-02D、API-01D。该工作树仍是中间态并尚未通过完整 formal re-review，不能用目标计数替代 Stage B PASS 证据。
+- 三类审计阶段均为只读。后续修订按文件所有权另行授权；审计本身没有创建实现、测试、CI、分发、部署或 `REFLECTION.md`。

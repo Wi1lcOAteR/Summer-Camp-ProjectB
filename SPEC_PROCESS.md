@@ -1,6 +1,6 @@
 # SPEC_PROCESS
 
-> 当前状态：学生已于 2026-07-20 整体确认 `SPEC.md`，D-017 至 D-024 及工程候选已收敛为 v1 方向；`PLAN.md` 已形成。2026-07-21 学生在 Open Design 中实际选择 `frontend-design` + `default`（Neutral Modern），0.15.1 daemon、完整 bundled skill 和 fresh MCP 只读发现均已验证；`list_projects=[]` 与 `active=false` 是实现前的真实状态，G-01 环境/选择门禁已通过。Open Design daemon 仅在 MCP 调用或真实 project/run 期间按需运行，实际 project/run/artifact 延后至获准实现后的 UI-01A。G-02A/G-02B 已 PASS；Hugging Face 官方条款复核已完成，并因 Docker Space 付费方案要求触发 D-025/G-02C 门禁。2026-07-22 已完成现有主机/Tailscale 与 Azure Students/Container Apps 的官方候选调查，但没有替学生选择或创建资源。其余门禁是 Superpowers 正式 `writing-plans` 证据或课程接受 fallback、G-03 全新 session 冷启动、冷启动修订后的学生实现批准，以及学生本人 brainstorming 反思。Superpowers 官方 curated 快照现已安装并启用，14 个 skill 文件完整；但当前安装前 task 的 catalog 仍无 `superpowers:*`，因此必须新建 task 后正式调用，不能把 fallback 计划冒充调用证据。
+> **当前状态（2026-07-25）：** 旧的 113-unit / 14-plan 阶段 B 方案已按学生要求收束并作为 `NOT PASS` 历史存档。当前 [`SPEC.md`](SPEC.md) 是精简 v1 待确认稿：材料仅为数字 PDF/TXT/Markdown，provider 范围为 L+P，通用知识点模型以互斥/竞态/死锁三个 evaluator 验收；被删出的复杂能力进入 `ARCHIVED / NOT DISPATCHABLE` 计划。Claude Code 已被学生选为后续不同类型冷启动工具。学生确认当前 SPEC、正式 `writing-plans`、同快照双评审、冷启动修订和实现批准完成前，仍禁止正式实现。D-025 只阻塞 host-specific 发布与最终公网 URL。
 
 ## 0. 启动审计（2026-07-17）
 
@@ -351,16 +351,16 @@
 
 ## 3. PLAN 生成
 
-已生成阶段 B 的 `PLAN.md` 草案并完成结构审查。当前会话仍未注册 `superpowers:writing-plans`，因此正式 skill 调用证据仍缺失；本轮完整读取缓存的上游 `writing-plans` v6.1.1 规则，并由无历史上下文的分工 subagent 按该规则生成、主智能体合并审查，作为明确标注的 fallback，不冒充正式调用。
+阶段 B 正在正式修订。2026-07-22T21:09:21+08:00 的新 ProjectB task 已实际暴露并调用 `superpowers:writing-plans`；该调用关闭了 D-001，但 formal self-review 判定此前的 fallback `PLAN.md` 不符合完整代码、2--5 分钟单动作、路径/所有权一致性和无占位符要求，因此调用本身不等于计划通过。
 
-- 计划包含 41 个 planning group 和 69 个可派发 dispatch unit；17 个宽 group 已明确标记为不可派发，子 unit ID 一一对应台账且无重复。
-- 每个 dispatch unit 记录目标、涉及文件、接口、依赖/并行关系、先失败的测试或失败门禁、验证命令、完成标准、双阶段评审与可执行 commit 命令；group 只保留聚合验收，不接收 worker commit。
-- G-01、G-02A、G-02B 已 PASS；G-02C 仍因 D-025 pending，其余实现/交付 unit 均未开始，共 66 个 dispatch unit pending。未创建正式实现源码、产品测试、CI、分发或部署证据。
-- Open Design G-01 和不同类型冷启动 G-03 被设为硬前置；G-01 已于 2026-07-21 PASS，G-03 仍未执行。D-005 没有由智能体代选，冷启动后仍需学生再次批准实现。
+- 当前根计划是课程要求的依赖/状态入口，包含 77 个可派发 dispatch unit 和 18 个不可派发 planning container；台账 ID、任务标题和依赖 DAG 已通过 77/77、未知依赖 0、自依赖 0、环 0 的结构检查。
+- 根计划的任务骨架记录目标、文件、接口、依赖、验收和证据列；完整可执行步骤将放在逐项链接的详细计划中。`T-01`、`T-02` 目前仍只是待复审草稿，其余详细计划尚未通过，故阶段 B 整体状态为 **NOT PASS**。
+- G-01、G-02A、G-02B 已 PASS；G-02C 因 D-025 继续 pending，但只阻塞 host-specific distribution/deploy/final evidence，不阻塞 G-03。
+- G-03 仍未执行。它要求修订后的完整计划集通过 formal review，并由学生先选择 D-005 的不同智能体类型/版本；冷启动修订后仍须学生再次批准实现。当前未创建正式实现源码、产品测试、CI、分发或部署证据。
 
 ## 4. 陌生智能体冷启动验证
 
-尚未执行。`SPEC.md` 与 fallback `PLAN.md` 内容前置已具备，但阶段 B 的正式 `superpowers:writing-plans` 调用证据仍未闭合，且 G-02C 仍等待 D-025；D-005（不同类型智能体/账号）可以并行选择，但 G-03 只能在正式 skill 调用恢复或取得课程明确接受 fallback 的证据、且 G-02C PASS 后执行。届时冷启动必须使用全新 session，初始只接收这两个文件，并在一次性 workspace 尝试 1–2 个 dispatch unit：上游实现故意不存在，因此只在该实验内允许用最小临时 scaffold/test double 验证任务可理解性，产物不得合并，也不得把依赖未实现误判为 SPEC 缺陷。必须记录初始文件清单、问题、误解、实现差距和修订 diff；修订后仍须学生明确批准进入实现阶段。
+尚未执行。正式 `superpowers:writing-plans` 调用已经发生，但当前计划集仍处于 formal review 的 **NOT PASS** 修订状态；D-005 的不同智能体类型/版本也尚未由学生选择。G-02C/D-025 不再是该可理解性实验的前置。计划通过且 D-005 记录后，冷启动必须使用全新 session，初始只接收 `SPEC.md` 与 `PLAN.md`，并在一次性 workspace 尝试 1--2 个 dispatch unit：上游实现故意不存在，因此只在该实验内允许用最小临时 scaffold/test double 验证任务可理解性，产物不得合并，也不得把依赖未实现误判为 SPEC 缺陷。必须记录初始文件清单、问题、误解、实现差距和修订前后关键 diff；修订后仍须学生明确批准进入实现阶段。
 
 ### 阶段 B 生成过程（2026-07-20T18:45:26+08:00）
 
@@ -457,3 +457,96 @@
 - The selected installed snapshot is `openai-api-curated/superpowers/11c74d6b`. Its manifest reports version 5.1.3 and MIT, SHA-256 `CE06DE063CABC2C41FFCE239AEB5CB941FCAB0C98DDDEDE927AA06E854D40AED`; all fourteen skill directories contain `SKILL.md`. The older 6.1.1 remote cache remains historical cache evidence, not the selected enabled snapshot.
 - This already-running task still exposes no `superpowers:*`. Official OpenAI plugin documentation says bundled skills become available in a new chat/task or CLI session after installation, so installation is now proven while session registration and formal invocation remain unproven.
 - No config/cache/plugin state was changed by the agent. D-001 is narrowed to creating a new ProjectB task, verifying `brainstorming`/`writing-plans`, and recording the real `writing-plans` review/diff. G-03 and implementation remain closed.
+
+### Formal writing-plans invocation and three-audit checkpoint: 2026-07-22T21:09:21+08:00
+
+- **真实 skill 证据**：新 task catalog 暴露 Superpowers 的 14 个 skills。主智能体完整读取并明确宣布使用 `using-superpowers`、`brainstorming`、`dispatching-parallel-agents`、`receiving-code-review`、`writing-plans`，随后正式调用 `writing-plans` 审核已确认 SPEC 与 fallback PLAN。D-001 关闭；没有把旧 cache、手工读取或 fallback 生成记录倒填为本次 invocation。
+- **formal plan 审计**：`/root/plan_skill_audit` 只读检查的 PLAN 基线 SHA-256 为 `7524AE6352733A4EE96B9BA5DED453CEE2A635348664C4AE6127F446B3CAD0BD`。69 个 dispatch unit 中 45 个无代码块、24 个仅局部片段、0 个满足所有实现步骤均给出完整代码；343 个 checkbox 仍含大量复合动作，检测到 83 个 angle placeholders，并发现 header、Tech Stack placeholder、file map/parent-child path 冲突。结论是 Stage B FAIL，而不是 invocation FAIL；该审计阶段未编辑文件，后续新授权仅创建 `docs/engineering/WRITING_PLANS_VALIDATION.md`。
+- **coverage/gate 审计**：`/root/plan_coverage_audit` 只读确认 D-025/G-02C 不应阻塞只依赖 SPEC/PLAN 可理解性的 G-03；host 选择只约束 host-specific distribution/deploy/final。它同时发现 AC-03 source retrieval、AC-06 deletion、AC-26--29 F lifecycle 缺 API/UI 链，M3 review-task attempt owner 悬空，UUID/hash/region/LearningEvidence/trace grammar 不足及 QA/API group-child 命名冲突。审计阶段未编辑；后续新授权仅修订 `SPEC.md`/`PLAN.md`。
+- **active remediation 结构**：coverage owner 的修订把当前目标台账扩为 42 个 planning group、72 个 dispatch unit，17 个不可派发 Task Group 不变；新增 T-08、M3-02D、API-01D。G-03 的目标依赖为 formal writing-plans evidence、G-01 PASS、G-02A/B PASS 和学生已选择 D-005 agent type/version；D-025/G-02C 不再阻塞 Stage C 或 host-neutral core implementation。该数字和 gate 仍须随完整 PLAN formal re-review 一并验证，不能据此提前标为 PASS。
+- **dispatch/worktree/process 审计**：`/root/plan_dispatch_audit` 只读验证 69 个 dispatch 标题与 69 个 ledger ID 一一对应，且目标、文件、依赖/并行和完成标准字段齐全；同时发现 pre-G-04 worktree 规则循环、实际部署 owner 缺失、CI/FIN commit 自引用、G-01 红证据/commit scope 历史偏离、个别 exact command 与两阶段 review ledger 不足。审计阶段未编辑；本条之后的新授权仅更新七份过程/状态文档，不修改 PLAN/SPEC/生产源码。
+- **研究文档同步概览**：本轮主代理协调的窄幅研究基线修订涉及 constrained-port/source locator、OpenAI reference-adapter SDK/Apache-2.0 manifest/notice、L/P/F consent 与 remote lifecycle、provider strategy、threat/deployment/domain-model 表述。它们只把已确认 G-02A/B/SPEC 事实同步到研究说明，没有新增依赖、生产源码、provider 调用、部署或产品决策；三类审计 subagent 均未在审计阶段修改这些研究文件。
+- **门禁结果**：formal invocation 已发生但计划未通过，阶段 B 仍开放修订。D-025 继续等待学生选择但不阻塞冷启动；D-005 仍由学生选择。修订后的计划通过 formal review、G-03 完成并由学生再次批准前，不创建正式实现、worktree product code、Open Design run、CI、分发或部署。
+- **学生本人证据**：`REFLECTION.md` 仍只能由学生本人撰写；本轮没有创建、补写或推断学生反思。
+
+### Detailed-plan second review and dispatch-unit decomposition: 2026-07-22T23:59:35+08:00
+
+- **冻结输入**：T-01/T-02 修订稿在作者停止写入后分别固定为 SHA-256 `33D67D3BE30528B0174BC43C5593D003228A980164A44379191790681C8468BB` 与 `889AA9C9FDF24C6B376A15529D8C7510BEA7C674DA0744E9908CDC6D0D3C6D94`。主智能体只采用文件字节，不把作者未返回的自检当成证据。
+- **两阶段评审**：`/root/plan_coverage_audit` 只读做 SPEC/PLAN/AC 合规审查；`/root/plan_fragment_quality_review` 只读做 writing-plans、正确性、安全、测试和许可证审查；`/root/plan_fragment_syntax_audit` 在临时目录重建显示代码并检查语法/Windows 命令。三者均未编辑项目文件，两个正式 reviewer 都返回 FAIL。
+- **已关闭与仍阻断**：第一轮的 raw lock、`.test.ts`、`material-limits.v1`、enum/quality flag、显式 T-02 Ruff/mypy 和三方身份问题已有正向修订；但正式 root ownership/hash 未同步，T-01 42 路径/82 步和 T-02 13 路径/63 步违反单 fresh-worker 粒度。scanner 仍漏 `.lock/.sql/.sh`、缺 reparse/symlink 边界，runner 在 Windows 裸用 `npm`、可绕过 strict config/Vite wiring，G-02C marker/e2e owner 不闭合；T-02 catalog container/member 校验和 23/74 实际测试计数也未闭合。
+- **修订策略**：拒绝继续在两个超大 fragment 上叠加补丁。旧文件保留为不可派发失败证据；正式 replacement 将写入 `docs/superpowers/plans/`。T-01 拆为 T-01A--T-01F（toolchain/lock、backend、frontend、scanner、runner contracts、gate runner），T-02 拆为 T-02A--T-02C（common errors/IDs/materials、locator/catalog、proof/facade）；根计划同步更新 terminal dependencies、G-02C marker 与所有权后，再对同一哈希快照做 fresh 两阶段复审。
+- **门禁结果**：阶段 B 继续 **NOT PASS**，G-03/D-005 尚未开始，D-025 仍只阻塞 host-specific delivery。没有创建生产源码、实现 worktree、Open Design run、产品测试/CI、provider 调用、部署或 `REFLECTION.md`。
+
+### Replacement snapshot validation and requested pause: 2026-07-23T02:40:20+08:00
+
+- **Superpowers / Git 状态**：当前 task 可调用全部 14 个 Superpowers skills；本轮继续遵循 `using-superpowers`、`writing-plans` 和 `dispatching-parallel-agents`。仓库实际仍在 `master`，HEAD 为 `519b3000336d18f8b89628fdc14691d3b700002c`，且只有根工作树；没有把应用界面的“新分支会话”表述误记为 Git 分支或 worktree。
+- **冻结失败证据**：修订前快照为根计划 `5BFE0EA545180AB0CC55FF9217FE7899039992F5DAA2144B20C9E5C95E86065D`、foundation `39CA455BCAB42EB36AA9EFEC9A5724BFF0795F3881E6C700B4FABFEDD5574C55`、domain `75DA026E6FA72EC55596131B0B2CC57403A9C25E57B6B968D268C55563C61C88`；`/root/snapshot_plan_quality` 与 `/root/snapshot_spec_review` 均判定 FAIL。旧哈希只保留为失败证据。
+- **当前替换快照**：根计划为 `83B9A69272CBF7E831BB386E69AE5376968C931F4188DD23DC2988D8782D6787`；foundation 为 `D00496FAAC456AA4CB0E69DE9104BF085C54621D76A199AC456A06601D73E87E`；domain 为 `E01303C74E2EA22C26CCF3C43D6E118C00C3311850D3E321EA781A92DB61BEA5`。根计划 113/113 dispatch ID 唯一、37/37 group 唯一、ledger/body 双向差异 0；依赖图遍历 113/113，unknown/self/cycle 均为 0；AC 词法覆盖 50/50。
+- **机械验证**：三份计划 required header 与围栏偶数检查通过；根计划可替换占位符为 0。详细计划的尖括号命中经分类均为 HTML/JSX、正则 lookbehind 或数学比较，不是派发占位符。foundation 的 35 个 PowerShell block 与 31 个 Python block、domain 的 77 个 PowerShell block 与 45 个 Python block 均为 0 个解析错误；`git diff --check` exit 0，仅有 Git 的 LF 到 CRLF 提示。这是计划显示代码的语法证据，不是产品测试或实现证据。
+- **评审与暂停边界**：`/root/foundation_snapshot_review`、其机械子审计和 `/root/domain_snapshot_review` 被明确限制为只读；学生要求电脑重启后，主智能体先请求立即收束，随后在它们尚未给出结论时中止。不得把未完成 reviewer 写成 PASS。阶段 B 保持 **NOT PASS**；未启动剩余 subsystem plans、G-03、Open Design run、worktree、TDD、生产源码、CI、部署、真实 provider 调用或 `REFLECTION.md`。
+- **恢复点**：重启后先确认三个哈希是否未变，再重新派发独立只读评审；评审通过也只关闭 T-01/T-02 snapshot，不代表整个 formal plan set PASS。随后继续生成并审查剩余 subsystem plans，最后才处理 D-005 与 G-03 人工门禁。
+
+### Post-restart review failure, full partition, and repair start: 2026-07-23T11:07:28.3604077+08:00
+
+- **恢复与真实 review**：重启后复核的根计划、foundation、domain 哈希与暂停快照一致；新派发的 `/root/foundation_snapshot_review_r2` 与 `/root/domain_snapshot_review_r2` 均为只读，分别返回 NOT PASS。没有把上轮被中止的 reviewer 或本轮语法检查补写成 PASS。
+- **foundation 关键缺口**：pathspec 限制后的 staged-name 查询无法发现 index 中的额外文件，随后裸 `git commit` 可能提交无关改动或 secret；另有未替换标题、runtime 无超时/坏输出测试、额外 npm lifecycle script 可绕过、父目录 reparse 检查不足、gate 类型/输出脱敏与根合同不一致、显示代码不能通过所选 Ruff 规则等问题。
+- **domain 关键缺口**：根/子计划对 `source/__init__.py` 首次 owner 冲突，早期 export 测试与 T-02C 最终导出必然冲突；显示代码临时重建得到 135 pass/1 fail。proof 未证明页码属于完整 catalog，原生命令可掩盖失败，身份正则、稳定错误和 reviewer AC 范围也存在漂移。
+- **采纳与修订边界**：上述可复现问题均作为计划缺陷采纳；foundation/domain 由两个互不写同一文件的作者修复，根计划由协调者收紧 fail-closed native command、whole-index exact staging、五个 T-02 child 和完整连续 1..N page directory 合同。当前仍未形成新 review PASS。
+- **完整分区**：独立审计把 113 个 dispatch unit 精确分为现有两计划 15 个、12 份待生成详细计划 86 个、留在根计划的 coordinator/human/external unit 12 个；`15 + 86 + 12 = 113`。映射、共享路径交接和批次写入 `docs/engineering/PLAN_SUBSYSTEM_PARTITION.md`。
+- **统一作者合同**：新增 `docs/engineering/DETAILED_PLAN_AUTHORING_CONTRACT.md`，锁定 PowerShell 5.1 原生命令错误传播、全 index staged-set 比较、分离红绿/回归/双审查/扫描/commit/hash 动作和 same-snapshot cross-plan review。它只约束阶段 B 计划，不是实现脚本或测试证据。
+- **当前进行中**：`2026-07-23-persistence-repositories.md` 正在覆盖 T-03A/B/C；foundation/domain 修复仍在写入。人工/外部门禁按学生要求统一封装，未轮询或执行 D-005、D-025、G-03、远程 CI、部署、Open Design run 或实现批准。
+- **门禁结果**：formal `writing-plans` 仍为 **ACTIVE REMEDIATION / NOT PASS**。没有创建生产源码、实现 worktree/branch/commit、真实 provider 调用、UI artifact、产品测试、CI、部署或 `REFLECTION.md`。
+
+### R3 same-snapshot reviews and semantic repair: 2026-07-23T11:50:37.7529423+08:00
+
+- **冻结快照**：根计划固定为 `E8740A7D17723C30DB362C1BFEA24AC10B9A5108AB46EB239DFC236314274CCA`；foundation `6B9ADB...353A2`、domain `50F38B...EB40D`、persistence `4217FD...B07E` 分别由三名 fresh reviewer 只读检查。三份 verdict 均为 NOT PASS，reviewer 均未写仓库。
+- **foundation 语义缺口**：原生命令与 Git 尚未全部进入 checked wrapper；review 未绑定最终 staged bytes，commit 前也未重新断言整个 index；scanner 测试源码中的 literal private-key marker 会使最终 clean self-scan 必然失败。另有 executable spoof/environment/redaction、身份正则和 Ruff UP 问题。
+- **domain 语义缺口**：显示代码累计 144 tests 可通过，但 strict mypy 暴露十个 unreachable errors；五个 unit 的绝对 Git/runtime、timeout、unit/base/worktree/HEAD 前置合同仍不完整，且存在 Ruff import-order 失败。此前 facade owner、最终 export、page 1..N 和稳定错误等 finding 保持关闭。
+- **persistence 语义缺口**：唯一 migration 无法支撑后续 durable lease/payload、MaterialBatch 和 Attempt；remote consent 未严格绑定 F 与材料/hash/role，awaiting-consent 和 revoke cleanup 合同冲突；audit value 可保存私人路径。额外 probe 复现这些缺陷，26 个原显示测试通过不构成充分性证据。
+- **处理**：三份计划分别回到独占作者修复；没有调整产品目标或代选用户决策。当前只修 plan code、TDD 步骤、review scope 与静态验证，不产生实现/测试 PASS。
+- **门禁**：Stage B 继续 **NOT PASS**；G-03/D-005、D-025 host 链、Open Design run、worktree、实现、CI、部署和学生 `REFLECTION.md` 均未执行。
+### PLAN-012 详细计划独立复审与继续修订（2026-07-23T13:28:52.5541243+08:00）
+
+- 根计划冻结为 `4BCFE8470DE57C0DD54004935285CAAD5CD9D1AFF0AA7370CC4E098887745F08`。domain 计划 `40C48BB62A87F17BFCFB635871F51C350EA2EC9F1AAFEE5ED2D9B7A7C7629C0B` 经 fresh reviewer 在 144 个临时重建测试、Ruff 0.15.22、mypy 2.3.0 strict、compileall 与 PowerShell AST 全部通过后判定 PASS；该结论只覆盖 T-02A/B1/B2A/B2B/C。
+- foundation `837F1E...A59` 与 persistence `2F6728...810` 的 fresh review 均为 NOT PASS。foundation 仍缺完整 unit/base/worktree/identity、imports、process-tree timeout、npm raw-lock 与 reparse/TOCTOU 负例；persistence 仍可在撤销后恢复 token、无 provider 删除证据 tombstone、直接插入非法 hash/UTC，且 Ruff/mypy 和 2--5 分钟粒度失败。两份计划回到原独占作者，新 hash 不继承旧 reviewer 结论。
+- 所有后续计划统一加严为有界原生命令、递归进程清理、脱敏诊断、whole-index staged set、scanner 后实际 staged diff packet、review tree ID、edit invalidation、precommit/postcommit tree equality。机械解析、临时测试通过或作者自检均不单独构成 review PASS。
+- T-04--T-07 的本地信任/供应商控制面详细计划已开始生成；其 snapshot 头部曾残留旧 hash，已在冻结前纠正为当前 root 和已通过 domain，并把 foundation/persistence final hash 明确列为 cross-plan review 前置。没有把修订中稿件写入根台账。
+- 标准 evidence validator 仍为 `PASS rows=63 explicitly_blocked=2`，distribution-strict 仍只因 D-025 两项 hosting evidence 失败。D-005、G-03、实现批准、Open Design 实际 run、远程 CI/部署和学生 `REFLECTION.md` 均保持未执行；无人值守阶段不轮询或猜测这些人工/外部门禁。
+
+## 5. 2026-07-25 范围收束与可恢复存档
+
+### 学生指令与明确选择
+
+- 学生指出旧方案读取/维护成本过高，要求在满足课程文档要求的同时收束范围，并把未实现能力以计划文档存档，便于以后恢复。
+- 对逐项范围问题的回答为：采用精简纵切；provider 保留 L+P、移除整文件 F；材料仅数字 PDF/TXT/Markdown；领域模型保持通用并以互斥、竞态、死锁三个概念验收；不同类型冷启动选择 Claude Code。
+- 学生随后批准执行“阶段 B 精简与可恢复存档计划”。这项批准授权文档收束，不等于确认收束后的完整 SPEC，也不等于批准正式实现。
+
+### 旧计划冻结与迁移
+
+- 在分支 `codex/stage-b-scope-reset` 上执行 coordinator 文档任务。未使用实现 worktree，因为课程 G-04 仍须等冷启动和实现批准；该偏离只涉及阶段 B 文档门禁，不涉及生产代码。
+- 旧根计划按原字节保存为 `docs/superpowers/plans/archive/superseded-2026-07-23/PLAN.not-pass.md`；六份详细计划、三个旧 fragment、旧 partition/authoring contract 同样迁入该目录并由 archive index 记录原路径、字节数和 SHA-256。
+- 提交前 credential-pattern 扫描在 local-trust 草稿的两个 synthetic token fixture 上命中。原始文件按 SHA-256 保存在被忽略的本地存档，可提交副本仅将两处字面量改为 `[REDACTED_FAKE_TEST_TOKEN]`；archive index 同时记录原始与安全副本 hash，未输出完整命中值。
+- `.r5-verify-final-20260723` 是计划显示代码重建，不是正式实现。它被移动到被 `.gitignore` 覆盖的 `tmp/stage-b-archive-20260725/r5-verify-final-20260723`；摘要为 `files=1021`、`bytes=35989967`、manifest-v1 SHA-256 `50187D07B1BC03226B26AD3DD8873C01C6EDD2E244D069116CC60FD728277C3D`。manifest-v1 按相对路径排序，对每个文件的 `path<TAB>bytes<TAB>file_sha256<LF>` UTF-8 行连接结果取 SHA-256，避免留下不可复现的“树哈希”。
+- 没有执行 reset、clean、历史重写或删除；旧 domain 的 PASS 只绑定旧 root，不能继承到当前范围。
+- 归档 checkpoint 已以 `ccd1dfe` 提交；该提交只包含归档索引、旧计划字节副本、四份延期计划和保护归档字节的 `.gitattributes`，不包含生产源码或实现授权。
+
+### 精简规约与延期边界
+
+- 当前 `SPEC.md` 重写为待学生确认的精简 v1，并继续包含课程要求的问题陈述、8 个用户故事、三模块规约、NFR、架构/数据流、数据模型、凭据威胁模型、WebUI、技术选型、分发/CI、24 项验收标准、风险和阶段门禁。
+- 四类移出 v1 的能力分别形成 `ARCHIVED / NOT DISPATCHABLE` 计划：OCR/图片/扫描件/大批量、远端 F 与 durable jobs、考试资料智能分析、扩展 concept rubrics。每份都记录恢复依赖、首个失败测试、验证命令、验收和人工决策。
+- D-025 没有被归档或静默解决，因为公网 WebUI URL 是课程硬要求；它继续只阻塞 host-specific 发布和最终验收。
+
+### 当前门禁
+
+- 当前 `PLAN.md` 只是 scope-reset gate ledger，不是可派发 implementation plan。
+- 下一步必须由学生阅读并整体确认当前 `SPEC.md`。确认后才再次正式调用 `writing-plans` 生成最多约 30 个单-session task 的唯一活跃计划，并执行同快照 SPEC/质量双评审。
+- 后续仍必须执行 Claude Code 冷启动、记录问题与关键 diff、再次取得学生实现批准；在此之前没有创建 production backend/frontend、CI、Open Design run、provider call 或部署。
+
+### 提交前验证快照
+
+- 当前待确认 SPEC 的 SHA-256 为 `C6231816A62C807D205FC7A3E6142C5636DE18FD8A2C580B48E63B106F959AD6`；机械检查得到 14 个必需二级章节、8 个唯一用户故事、24 个唯一 AC，当前 authoring surface 没有未分类占位符。
+- 归档索引的 12 个文件均匹配记录的字节数和 SHA-256；四份延期计划均有要求的八类恢复信息和第二行 `ARCHIVED / NOT DISPATCHABLE` 状态；旧活跃路径均已移出，`.r5` 本地存档受 `.gitignore` 保护。
+- `rg --files` 枚举的 42 份非 superseded Markdown 中，本地链接 21 个、坏链接 0。首次使用递归 `Get-ChildItem` 时因无权读取既有 `.pytest_cache` 中断，改用仓库文件清单后通过；未删除或提权访问该缓存。
+- 对拟提交的 28 个文件运行 token 形式扫描，OpenAI/GitHub/AWS/Google/Slack 模式命中路径 0；`git diff --check` 退出 0，仅有 Git 的工作树换行提示。
+- `scripts/verify_evidence.ps1` 返回 `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`。加 `-RequireDistributionReady` 按预期退出 1，唯一错误是 distribution evidence 未 ready，原因仍是 D-025 的两项 explicitly-blocked hosting row。
+- 两个 SPEC reviewer session 在返回 verdict 前中断，不能记为独立 PASS；正式合规与质量/安全/许可证双评审必须在学生确认后，对同一最终 SPEC/PLAN 哈希重新执行。

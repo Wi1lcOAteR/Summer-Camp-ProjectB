@@ -44,4 +44,4 @@ The previously selected HF host is proven incompatible with the no-paid-resource
 2. approve the documented Azure for Students + Container Apps SPEC diff, account/resource creation and student-credit use while forbidding pay-as-you-go upgrade;
 3. explicitly authorize a paid Hugging Face plan and recurring-cost boundary, which is outside the current Goal authorization.
 
-Until D-025 is resolved, G-02C remains pending and blocks G-03, T-01, DIST-02, and any claim of a public WebUI URL. The verified PyInstaller and base-image rows remain usable after the host decision.
+Until D-025 is resolved, the host-specific G-02C2/release path, final public deployment and any claim of a public WebUI URL remain blocked. It does not block reduced-SPEC confirmation, implementation-plan authoring, G-03 cold start, or host-neutral local work after implementation approval. The verified PyInstaller and base-image rows remain usable inputs, but full application and clean-environment proof still belongs to future DIST tasks.

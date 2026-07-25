@@ -11,9 +11,9 @@
 
 ### ProjectB 当前状态（2026-07-22）
 
-当前状态已变为 **已安装并启用，但本任务未重新加载**：`config.toml` 已有 `[plugins."superpowers@openai-api-curated"]` 与 `enabled = true`；所选安装快照 `11c74d6b` 的 manifest 版本为 `5.1.3`，14 个 skill 目录及其 `SKILL.md` 均完整。此前 `openai-curated-remote` 下的 6.1.1 仅作为旧 cache 保留，不再用于判断当前安装状态。当前 task 仍未暴露任何 `superpowers:*` skill；Codex CLI 0.144.4 的空 marketplace/plugin 列表属于独立 CLI 环境，不能推翻桌面端 config/cache 直接证据。精确证据见 [`docs/engineering/SUPERPOWERS_VALIDATION.md`](docs/engineering/SUPERPOWERS_VALIDATION.md)。
+当前状态是 **已安装、已启用、当前 task 可调用**：`config.toml` 已有 `[plugins."superpowers@openai-api-curated"]` 与 `enabled = true`；所选安装快照 `11c74d6b` 的 manifest 版本为 `5.1.3`，catalog 暴露全部 14 个 Superpowers skills。D-001 已关闭，精确证据见 [`docs/engineering/SUPERPOWERS_VALIDATION.md`](docs/engineering/SUPERPOWERS_VALIDATION.md)。
 
-因此现在不需要重新下载 skill 或重复安装；只需在安装完成后**新建 ProjectB task** 验证。不要把本任务的旧 skill 快照、手工读取 `SKILL.md` 或现有 fallback `PLAN.md` 当作正式 skill 调用。
+旧 113-unit 计划的 formal review 为 NOT PASS，现已按原始哈希归档。当前 `SPEC.md` 是精简 v1 待确认稿；学生签字后才再次调用 `writing-plans` 生成新的单一 implementation plan。Claude Code 已被学生选为不同类型冷启动工具，但安装/登录和干净 session 尚未执行。现在不需要重新下载 Superpowers 或 Open Design，也不得把旧 invocation/旧计划当作新范围的 PASS。
 
 安装方式按你实际使用的编码智能体选择一种：
 
