@@ -17,8 +17,8 @@
 | SR-01 | Freeze hashes and preserve the old root/detailed plans | approved scope-reset design | complete | archive index records paths, bytes and SHA-256; checkpoint `ccd1dfe` |
 | SR-02 | Move `.r5` plan reconstruction out of the active source tree | SR-01 | complete | ignored local archive tree digest; no production-source claim; checkpoint `ccd1dfe` |
 | SR-03 | Draft reduced v1 SPEC and deferred-plan set | SR-01 | complete | current `SPEC.md` plus four `ARCHIVED / NOT DISPATCHABLE` plans; archive checkpoint `ccd1dfe` |
-| SR-04 | Synchronize requirements, process and decision documents | SR-03 | complete | reduced SPEC, current matrix, decisions, process log and handoff agree on the confirmation gate |
-| SR-05 | Run document, credential, link and evidence validation | SR-04 | complete | SPEC `C6231816...9AD6`; archive/deferred/link/credential/diff checks pass; standard evidence is 63/2 and strict fails only at D-025 |
+| SR-04 | Synchronize requirements, process and decision documents | SR-03 | complete | reduced SPEC, current matrix, decisions, process log and handoff agree on the confirmation gate; checkpoint `5f54431` |
+| SR-05 | Run document, credential, link and evidence validation | SR-04 | complete | SPEC `C6231816...9AD6`; archive/deferred/link/credential/diff checks pass; standard evidence is 63/2 and strict fails only at D-025; checkpoint `5f54431` |
 | SR-06 | Student confirms the complete reduced SPEC | SR-05 | blocked on student | explicit student response naming the current SPEC snapshot |
 | SR-07 | Invoke `superpowers:writing-plans` and replace this ledger with the implementation PLAN | SR-06 | blocked | one active plan, at most about 30 fresh-agent units, exact red/green/review commands |
 | SR-08 | Review the same SPEC/PLAN hashes for compliance and quality | SR-07 | blocked | independent SPEC and quality/security/license PASS receipts |

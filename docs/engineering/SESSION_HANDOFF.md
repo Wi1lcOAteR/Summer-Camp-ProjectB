@@ -5,7 +5,7 @@
 
 ## 当前状态
 
-- 分支：`codex/stage-b-scope-reset`；范围重置前基线：`519b3000336d18f8b89628fdc14691d3b700002c`；归档 checkpoint：`ccd1dfe`。
+- 分支：`codex/stage-b-scope-reset`；范围重置前基线：`519b3000336d18f8b89628fdc14691d3b700002c`；归档 checkpoint：`ccd1dfe`；活跃文档 checkpoint：`5f54431`。
 - 阶段：Stage B `ACTIVE REMEDIATION / NOT PASS`。
 - 当前 `SPEC.md` 是精简 v1 待学生重新确认稿；旧签字不适用于重写后的文本。
 - 当前 `PLAN.md` 只是范围重置门禁台账，不是可派发实现计划。

@@ -888,6 +888,6 @@
 - **subagent 输出 / review**：`/root/archive_docs` 创建归档索引和四份延期计划，并报告 5/5 diff、结构、占位符和旧哈希校验通过；主智能体随后独立核验并对模拟凭据执行安全替换。`/root/scope_spec_review` 与 `/root/spec_compliance_fast` 均被中断且没有返回结论，故不计作独立复审或 PASS；正式双评审仍留在学生确认后的同哈希 SPEC/PLAN 门禁。
 - **验证结果**：当前 SPEC `C6231816...9AD6` 为 14 章/8 个唯一故事/24 个唯一 AC；12 个归档文件逐项匹配索引，4 份延期计划结构通过，`.r5` 为 1021 文件/35989967 字节且 manifest-v1 `50187D07...77C3D`；42 份非旧档 Markdown 的 21 个本地链接全部存在；拟提交 28 文件的配置化凭据模式命中 0；`git diff --check` 退出 0。标准证据返回 `PASS rows=63 explicitly_blocked=2`；distribution-strict 只因 D-025 两行 hosting evidence 按预期退出 1。首次递归链接枚举被既有 `.pytest_cache` 的访问拒绝中断，随后用 `rg --files` 限定仓库 Markdown 并通过，没有删除或提权访问缓存。
 - **未执行**：没有创建生产源码、实现 worktree、Open Design run、provider request、测试/构建、CI、远程 push/PR、镜像发布、部署、付费资源或 `REFLECTION.md`。
-- **Git / commit**：本地分支 `codex/stage-b-scope-reset`，范围重置基线 `519b3000336d18f8b89628fdc14691d3b700002c`；归档 checkpoint 为 `ccd1dfe`（仅归档、延期计划和 `.gitattributes`），无关 dirty 文档仍未 stage；活跃文档 checkpoint 待提交。
+- **Git / commit**：本地分支 `codex/stage-b-scope-reset`，范围重置基线 `519b3000336d18f8b89628fdc14691d3b700002c`；归档 checkpoint 为 `ccd1dfe`，活跃范围/门禁文档 checkpoint 为 `5f54431`；两个提交均不含无关 dirty 文档或生产源码。
 - **门禁 / 下一步**：先完成最终机械验证并提交诚实的 `NOT PASS` 历史检查点；随后只请求学生重新确认当前完整 `SPEC.md`。旧签字不自动覆盖新文本，确认前不得调用 `writing-plans` 或进入冷启动/实现。
 - **经验教训**：活跃入口只保留 SPEC、单一 PLAN 和要求矩阵，可显著降低恢复成本；历史内容仍需以哈希索引和明确恢复条件保全。凭据扫描必须覆盖计划示例和归档草稿，模拟 token 也不应进入可提交历史。

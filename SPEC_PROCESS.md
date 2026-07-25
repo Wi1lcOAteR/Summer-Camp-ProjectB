@@ -528,7 +528,7 @@
 - 提交前 credential-pattern 扫描在 local-trust 草稿的两个 synthetic token fixture 上命中。原始文件按 SHA-256 保存在被忽略的本地存档，可提交副本仅将两处字面量改为 `[REDACTED_FAKE_TEST_TOKEN]`；archive index 同时记录原始与安全副本 hash，未输出完整命中值。
 - `.r5-verify-final-20260723` 是计划显示代码重建，不是正式实现。它被移动到被 `.gitignore` 覆盖的 `tmp/stage-b-archive-20260725/r5-verify-final-20260723`；摘要为 `files=1021`、`bytes=35989967`、manifest-v1 SHA-256 `50187D07B1BC03226B26AD3DD8873C01C6EDD2E244D069116CC60FD728277C3D`。manifest-v1 按相对路径排序，对每个文件的 `path<TAB>bytes<TAB>file_sha256<LF>` UTF-8 行连接结果取 SHA-256，避免留下不可复现的“树哈希”。
 - 没有执行 reset、clean、历史重写或删除；旧 domain 的 PASS 只绑定旧 root，不能继承到当前范围。
-- 归档 checkpoint 已以 `ccd1dfe` 提交；该提交只包含归档索引、旧计划字节副本、四份延期计划和保护归档字节的 `.gitattributes`，不包含生产源码或实现授权。
+- 归档 checkpoint 已以 `ccd1dfe` 提交；活跃范围/门禁文档随后以 `5f54431` 提交。两个提交只包含文档与归档证据，不包含生产源码或实现授权。
 
 ### 精简规约与延期边界
 
