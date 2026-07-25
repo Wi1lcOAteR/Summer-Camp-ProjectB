@@ -1,0 +1,4 @@
+# Archived plans are evidence artifacts; preserve their exact bytes and hashes.
+docs/superpowers/plans/archive/** -text
+# Superseded drafts may contain historical CRLF and are checked by blob hash instead of a text diff.
+docs/superpowers/plans/archive/superseded-2026-07-23/** -diff
