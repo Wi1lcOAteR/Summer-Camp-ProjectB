@@ -1,6 +1,6 @@
 # SPEC_PROCESS
 
-> **当前状态（2026-07-27）：** 精简 v1 产品方向仍来自学生确认的 `C6231816...9AD6`。首轮 G-03P 和随后双评审暴露了 staged-index 扫描、任务完整性、CI/远程闭环、材料版本及 finals 算法等缺口；当前修订候选为 SPEC `69A534D9...855E`、PLAN `47624A3E...225A`，含 32 个单-session task 和统一 2--5 分钟 step 合同。阶段 B 仍是 `COLD-START REMEDIATION / NOT DISPATCHABLE`：当前哈希尚待新双评审，F-01S 的 G-03P 重跑还在等待桌面跨目录读取审批，正式不同类型 G-03 和学生 G-04 均未完成。D-025 仍只阻塞 host-specific 发布与公网 URL。
+> **当前状态（2026-07-27）：** 精简 v1 产品方向仍来自学生确认的 `C6231816...9AD6`。多轮 G-03P/双评审暴露并修复 staged-index、任务粒度、CI/远程闭环、材料版本、许可证、反思顺序和 scanner 自扫描等缺口。最终 Stage-B 候选为 SPEC `6A0DB7CA...11E56`、PLAN `E96C415A...972C1`，含 35 个单-session task 和固定 2--5 分钟步骤；当前哈希 SR-08 双评审已 PASS。阶段仍为 `NOT DISPATCHABLE`：正式不同类型 G-03 和学生 G-04 未完成。D-025 仍只阻塞 host-specific 发布与公网 URL。
 
 ## 0. 启动审计（2026-07-17）
 
@@ -592,3 +592,22 @@
 - **规约澄清：** 新增 `MaterialVersion` 和跨课程 `MaterialBlobRef`，最后引用消失前不得删共享 bytes；finals 固定 mastery 倍率表为 unknown 1/2、demonstrated 3/4、retained 1。两项都是对已签字“parser 升级不覆写、期末压缩”的可测试化，不新增产品模块。
 - **许可证证据：** 直接 PowerShell/curl raw 下载因 Schannel `SEC_E_NO_CREDENTIALS` 失败，Python raw 请求超时；随后用 GitHub 官方 Contents/Refs API 解析 4 个 release tag 和 5 份 base64 原始文本，记录 commit/blob/byte/SHA-256 到 `docs/engineering/BOOTSTRAP_LICENSE_EVIDENCE.md`。失败 transport 未冒充证据。
 - **当前重跑阻塞：** 旧 projectless Codex task 和新 task `019fa224-046d-7a41-9841-b6632be08057` 都因读取 ProjectB 中两份源文件触发桌面审批。未代替学生批准，也未把旧 12-case 绿灯继承给新 index 合同；当前 F-01S G-03P recheck 明确为 pending。
+
+## 10. 2026-07-27 桌面审批事故核对、第二轮评审失败与第三轮修订
+
+- **审批事故核对：** 学生误批两个项目外 Codex 任务的桌面请求后立即停止它们。复查确认 ProjectB 仓库只保留学生原有的 `docs/research/*` 与 `docs/engineering/SUPERPOWERS_VALIDATION.md` 未暂存修改，暂存区为空，SPEC/PLAN 当时哈希仍为 `69A534...855E` / `47624A...225A`。两个任务只复制了获准的 SPEC/PLAN；旧任务删除了自己先前的 `outputs/scripts`，因此旧文件证据丢失但线程收据仍在。没有发现仓库写入、额外 ProjectB 文件复制、reparse link 或提交。
+- **恢复动作：** 旧任务保持停止；新项目外任务 `019fa224-046d-7a41-9841-b6632be08057` 只从已复制的两份文件继续，先得到真实 `CONTRACT_RED scanner_missing`，再调试 complete F-01S。由于本轮评审随后改变 SPEC/PLAN，该尝试无论结果如何都只能成为 superseded-hash remediation evidence。
+- **第二轮同哈希评审：** 规约 reviewer 对 `69A534...855E` / `47624A...225A` 返回 `Critical=0, Major=3, Minor=0`：locator 缺 `material_version_id`、早期分支 push CI 不运行当前核心测试、最终 commit 未依赖学生反思。质量 reviewer 返回 `Critical=0, Major=6, Minor=2`：F-01S rule grammar、复合 F-01A、许可证输入链、CI runner、reflection 顺序和九分支 stacked closure 仍不完整；Open Design receipt 与缩写哈希为 Minor。两份 verdict 均为 NOT PASS。
+- **第三轮修订：** locator 两种联合都显式加入 `material_version_id`；F-01A 拆为 runtime/lock、license、frontend harness、portable push CI 和 shared quality gate 五张卡，总 ledger 为 35。F-01S 固定每个 rule ID、字面前缀、PEM/shell-variable/encoded-boundary grammar。F-01D 固定 PowerShell/Python/Node 容器 digest、checkout full SHA、least permission 和 current-suite fail-closed 规则；CI-01 只在不削弱已有核心任务的前提下追加 distribution。
+- **远程与学生边界：** 九个 worktree 固定为 stacked base chain；最终按依赖顺序把每个既有 PR/MR 逐个 retarget 到默认分支并使用普通 merge commit 闭合，禁止 squash/rebase/history rewrite，保留所有 terminal task commit 的祖先关系。`REFLECTION-CLOSE` 必须先由学生完成并声明 AI 辅助范围，之后才可进入 release source commit 和最终双 CI。D-025、远程授权、正式异类型 G-03、G-04 均未代选或绕过。
+- **许可证 TDD：** 修改 `scripts/verify_evidence.ps1` 前的静态合同以 `CONTRACT_RED bootstrap_license_binding_missing=...`、exit 1 失败；最小实现绑定账本 raw SHA-256、五个 target、commit/raw URL/blob/bytes/hash/license shape 后同一合同 PASS。对临时副本追加一字节时，真实 verifier 以 `Bootstrap license evidence hash mismatch`、exit 1 拒绝；标准收据保持 `rows=63 explicitly_blocked=2`。
+- **当前候选：** SPEC `6A0DB7CAD19533FE9A31EA81A6B30ED493C01BE59D4C98DEB6EC04A89BD11E56`（27188 bytes）；PLAN `7B13DB324B1AF0A0838A3CD568AB04486C691BB26CA58CC3D42ED55EFF8BA7EE`（76980 bytes）。机械检查为 `Tasks=35 Ledger=35 Fields=5 AcRows=24 Placeholders=0`。新双评审与当前哈希 G-03P 尚未完成，不声称 Stage B PASS。
+
+## 11. 2026-07-27 最终 G-03P、self-scan 修订与 SR-08 闭合
+
+- **fresh 占位输入：** projectless task `019fa331-3da1-7f80-a37c-ac7abb135a46` 只复制 SPEC `6A0DB7...11E56`（27188 bytes）与当时 PLAN `D574B8...1D742`（81902 bytes）；没有读取仓库其他文件、提交、网络、凭据或远程资源。歧义门返回 none。
+- **真实执行：** 完整合同先以 exit 1、`CONTRACT_RED scanner_missing` 失败；十一 helper 按 PLAN 顺序加入，最终同一命令 exit 0，并依次输出 `usage_and_output`、`token_rules`、`assignment_quotes_boundaries`、`encodings_and_types`、`staged_vs_worktree`、`index_modes_and_rename`、`path_safety_and_errors`、`redaction` 和 `BOOTSTRAP_SCANNER_CONTRACT_PASS`。contract/scanner SHA-256 为 `E970C52C...3A79B` / `097F5683...9F64`，仅在项目外输出目录。
+- **输出 gap：** 额外 tracked+staged self-scan exit 2，在 contract 的 index/worktree 两源都报告 `credential_assignment`；合同行为绿但产物不能通过提交门禁。独立 AST substitute 未另行取得输出，不伪造 PASS。该事实证明必须把 artifact self-scan 纳入 Green/Done，而不是只依赖 behavioral contract。
+- **最终修订：** PLAN `E96C415A...972C1`（82442 bytes）要求两份脚本在新 disposable Git 中同时 tracked+staged，精确得到 `CREDENTIAL_SCAN_PASS files=4`；direct/assignment/private/encoded 正例都必须由非匹配碎片在运行时拼接。F-01S 正式 ledger 仍为 not started。
+- **最终 SR-08：** 当前 SPEC/PLAN focused 课程/SPEC review 返回 `PASS; 0/0/0`；质量/安全/许可证 review 返回 `PASS; Critical=0, Major=0, Minor=1`。唯一 Minor 是 Pillow 12.3.0 在 v1 没有明确生产角色，F-01A 应证明必要性或通过受审 evidence/lock 更新移除。bootstrap license owner 修订后的 evidence hash 为 `FD65C5...4F310`，stale-hash red 与新 hash green 均真实运行。
+- **门禁结论：** SR-08 已闭合，但 G-03P 不是不同类型智能体。正式 G-03 必须使用最终 `6A0DB7...11E56` / `E96C415A...972C1`，随后学生才能作 G-04 实现批准。未创建产品源码、实现 worktree、远程 CI、分发物、部署或 `REFLECTION.md`。

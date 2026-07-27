@@ -943,3 +943,30 @@
 - **人工修改及原因**：学生未新增产品/托管/付费选择；finals 数值和 material ref 语义是对既有已签字承诺的确定性实现合同。D-025、正式非 Codex G-03、G-04、远程授权和 `REFLECTION.md` 均保持开放。
 - **commit hash**：`c34ed0e01b0e1849a62298d6d0807d2bb2edfef0`（`docs(stage-b): checkpoint cold-start remediation [agent: Codex]`）；这是诚实的 `NOT PASS` 修订检查点，不是 SR-08/G-03/G-04 closure。无关 `docs/research/*` 与 `docs/engineering/SUPERPOWERS_VALIDATION.md` 修改保持 unstaged。
 - **经验教训**：只检查 staged 文件名不等于检查 staged 内容；提交安全门禁必须把 Git index 和工作树视为两个独立、不可信字节源。最终 README commit 也必须落在最终 PR/MR 与 CI 证据之前，而不是之后。
+
+## 2026-07-27T18:18:41+08:00 - G-03P-003 审批事故核对与第三轮计划修订
+
+- **Task 编号**：G-03P-003（只处理 Stage-B 事故核对、评审修订和证据验证；不包含产品实现）。
+- **触发的 Superpowers skill**：`using-superpowers`、`systematic-debugging`、`brainstorming`、`writing-plans`、`test-driven-development`、`requesting-code-review`；继续遵守 `verification-before-completion`。因门禁未闭合，没有使用 worktree、正式 subagent implementation、产品 TDD 或 finishing。
+- **关键 prompt / context**：学生说明误批两个桌面请求后已停止任务，要求检查文件并继续；此前授权无人值守修复可自动推进项，但不授权绕过课程人工门禁。主智能体先只读核对仓库、两个 thread 和两个项目外输出目录。
+- **事故结果**：仓库未被两个桌面任务改写，index 为空；旧 task 自己的 `outputs/scripts` 被删除，旧文件级证据丢失但 thread transcript 保留。新 task 仅有获准的 SPEC/PLAN 精确副本，随后从副本恢复并产生 requirement-shaped red。无 ProjectB 额外读取/复制或真实凭据迹象。
+- **review 输出**：对 SPEC `69A534...855E` / PLAN `47624A...225A`，`/root/g03p_spec_review` 返回 `Critical=0, Major=3, Minor=0`，`/root/g03p_quality_review` 返回 `Critical=0, Major=6, Minor=2`。两者均只读；共同阻塞 locator version、F-01A 粒度、current-suite CI、许可证、runner、reflection/final commit 和 stacked PR closure。
+- **主智能体修订**：SPEC locator 补 `material_version_id`；PLAN 将 foundation 拆成 F-01A--E，固定 scanner grammar、CI images/action、九分支 stacked base/依赖顺序 retarget-and-merge、Open Design receipt 和学生反思先于最终 commit。过程中的 `7B13DB32...A7EE` 候选又因 current-suite 空后端自审被替换；最终哈希须在修订停止后重算。35 task/35 ledger/24 AC/0 placeholder；当前双评审尚未返回，仍是 NOT PASS。
+- **TDD / 验证证据**：bootstrap license binding 静态合同先 exit 1，再 PASS；真实一字节 mutation 被 verifier 以 exit 1 拒绝。标准 evidence PASS 为 `rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；此前同轮 Linux/provider 分别 PASS `41/14/41` 与 `7/2`；strict distribution 只因 D-025 两行按预期失败。
+- **人工修改及原因**：学生没有新增产品、托管、付费、远程或 provider 决策。任务拆分、CI current-suite 和 versioned locator 是修复已确认合同的工程细化；`REFLECTION.md` 未创建或代写。无关 research/validation 修改保持 unstaged。
+- **commit hash**：待新双评审、当前哈希 G-03P、全量文档/凭据/Git 校验后填写；本条不预造 commit 或 PASS。
+- **经验教训**：桌面批准必须先看目标路径和动作；即使隔离任务没有触碰仓库，删除其旧输出仍会损失可复验文件。远程 CI 合同必须在首次 push 前执行“该 tip 当前存在的所有测试”，不能依赖未来的 CI 扩展补救历史分支。
+
+## 2026-07-27T19:17:43+08:00 - G-03P-004 最终占位、self-scan 修订与 SR-08
+
+- **Task 编号**：G-03P-004（fresh Codex 占位冷启动、输出 gap 修订、最终同哈希双评审；不满足正式 G-03，不包含产品实现）。
+- **触发的 Superpowers skill**：主智能体使用 `systematic-debugging`、`brainstorming`、`writing-plans`、`test-driven-development`、`requesting-code-review` 和证据优先验证；fresh task 使用 `executing-plans`/TDD/verification。没有 worktree、正式实现派发或 finishing。
+- **关键 prompt / context**：学生要求在误批停止后检查文件并继续，且此前明确要求用 Codex 先做同类型冷启动占位。fresh projectless task 只获准读取最终候选的 SPEC/PLAN 两路径，不得枚举仓库、提交、联网或集成。
+- **G-03P 输出**：task `019fa331-3da1-7f80-a37c-ac7abb135a46` 验证 SPEC `6A0DB7...11E56` 和 predecessor PLAN `D574B8...1D742`；先得到 exit 1 `CONTRACT_RED scanner_missing`，再以同一命令得到八组 exit 0 green。十一 helper 顺序符合 PLAN；项目外 contract/scanner hash 为 `E970C52C...3A79B` / `097F5683...9F64`。
+- **真实 gap 与修订**：两文件 tracked+staged self-scan exit 2，在 contract 的 index/worktree 源均发现 `credential_assignment`；独立 AST review substitute 未执行，不补造收据。PLAN 因此新增 runtime-fragment fixture 和精确 `CREDENTIAL_SCAN_PASS files=4` Green/Done 条件，形成最终 hash `E96C415A...972C1`；F-01S ledger 仍为 not started。
+- **许可证 TDD**：把 bootstrap license owner 从 F-01A 修正到 F-01B 后，旧 verifier 真实返回 `Bootstrap license evidence hash mismatch`；更新到 `FD65C5D2...4F310` 后标准收据恢复 `rows=63 explicitly_blocked=2`。`DEPENDENCY_BASELINE.md` 同步 F-01A/F-01B/F-01E ownership。
+- **最终 review**：current-hash course/SPEC review 为 `PASS; Critical=0, Major=0, Minor=0`；quality/security/license review 为 `PASS; Critical=0, Major=0, Minor=1`。唯一 Minor 是 Pillow 未有明确 v1 生产用途；不得因此宣称依赖最小化已完成。
+- **最终身份与门禁**：SPEC `6A0DB7CAD19533FE9A31EA81A6B30ED493C01BE59D4C98DEB6EC04A89BD11E56`（27188 bytes）；PLAN `E96C415AD716B002AD9B1EB3C2AFD7C78F693486CB83A795110B99B6755972C1`（82442 bytes）；35 task/35 ledger/24 AC/0 placeholder。SR-08 closed；正式非 Codex G-03、学生 G-04、D-025、远程授权和 `REFLECTION.md` 仍开放。
+- **人工修改及原因**：学生未新增产品/托管/付费选择。主智能体只修复评审与 cold-start 暴露的确定性合同，并保持无关 research/validation 修改 unstaged；没有代批任何桌面权限或外部操作。
+- **commit hash**：待本轮最终 staged scan、验证和检查点提交后填写。
+- **经验教训**：合同测试全绿仍可能无法通过同一提交安全门；cold-start task 的 Done 必须验证它自己将提交的字节，而不是只验证被测行为。PLAN 中的 task owner 变化也必须同步所有冻结 evidence ledger，否则“唯一权威输入”会互相矛盾。

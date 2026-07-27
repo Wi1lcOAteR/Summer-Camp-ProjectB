@@ -1,12 +1,12 @@
 # G-03 Different-Agent Runbook and G-03P Receipt
 
-> **Status:** OLD G-03P RECEIPT HISTORICAL / F-01S RECHECK PENDING / FORMAL G-03 OPEN
+> **Status:** CURRENT SR-08 PASS / G-03P REMEDIATION COMPLETE / FORMAL G-03 OPEN
 > **Purpose:** Operator-only procedure. This file is evidence and must not be supplied to the cold-start agent as a third context file.
 
 ## Frozen Inputs
 
-- `SPEC.md` SHA-256: `69A534D9E5145BF86B3A5CDAE94C7C8679C100A277C4638ED6DE51904555855E`
-- `PLAN.md` SHA-256: `47624A3E4F9F03F6B913C4ED435159B043C0648D8774CC9F37D939600B7D225A`
+- `SPEC.md` SHA-256: `6A0DB7CAD19533FE9A31EA81A6B30ED493C01BE59D4C98DEB6EC04A89BD11E56`
+- `PLAN.md` SHA-256: `E96C415AD716B002AD9B1EB3C2AFD7C78F693486CB83A795110B99B6755972C1`
 - Attempted task: complete dependency-free `F-01S`
 - Workspace: a disposable empty directory, not the real repository and not an implementation worktree
 
@@ -24,7 +24,7 @@ If either hash differs, stop. Re-run the same-hash mechanical and two-reviewer S
 ```text
 You are a cold-start implementation agent. You have exactly two authoritative context files: SPEC.md and PLAN.md. Do not search for, infer, or request access to any repository history or other project documents.
 
-First report the SHA-256 of both files and the complete file list you can see. Then attempt only complete PLAN task F-01S. Create only scripts/tests/bootstrap_scanner_contract.ps1 and scripts/bootstrap_scan_credentials.ps1, run its exact red then green command, and stop. The unchanged contract must cover index-blob/worktree separation, staged-secret with clean worktree, clean index with dirty worktree, both-source reporting, boundary/quote rules, index modes, and redaction. Stop and ask a precise question whenever either file is ambiguous; do not guess. Do not use real credentials, paid APIs, remote repositories, cloud resources, commits, pushes, PRs, or deployment. Keep outputs, diff, assumptions, questions, and any requirement you could not satisfy.
+First report the SHA-256 of both files and the complete file list you can see. Then attempt only complete PLAN task F-01S. Create only scripts/tests/bootstrap_scanner_contract.ps1 and scripts/bootstrap_scan_credentials.ps1, run its exact red then green command, and stop. The unchanged contract must cover all eight named groups, eleven helpers, every stable error proof, index-blob/worktree separation, both-source reporting, boundaries/quotes/encoding/index modes, and redaction. After behavioral green, put exact copies of only those two scripts in a fresh disposable Git repository, stage both, and require exactly CREDENTIAL_SCAN_PASS files=4 from -Tracked -Staged; construct every positive fixture from non-matching fragments at runtime. Stop and ask a precise question whenever either file is ambiguous; do not guess. Do not use real credentials, paid APIs, remote repositories, cloud resources, commits, pushes, PRs, or deployment. Keep outputs, diff, assumptions, questions, and any requirement you could not satisfy.
 ```
 
 ## Evidence To Capture
@@ -55,7 +55,11 @@ Do not rewrite or summarize the transcript as if it were contemporaneous evidenc
 
 ## Current G-03P Recheck
 
-Projectless tasks `019fa1f5-8031-7450-883c-2462fc623703` and `019fa224-046d-7a41-9841-b6632be08057` were instructed to use the current hashes and the complete F-01S task. Both are waiting for the Codex desktop approval needed to read the two exact ProjectB source files. No approval was inferred, no new files were read, and no current-hash red/green result is claimed.
+- Fresh projectless task `019fa331-3da1-7f80-a37c-ac7abb135a46` received only SPEC `6A0DB7...11E56` and predecessor PLAN `D574B8...1D742`.
+- It produced the exact missing-scanner red and unchanged eight-group green with all eleven helpers. Projectless contract/scanner SHA-256 values were `E970C52C...3A79B` / `097F5683...9F64`.
+- Its added self-scan found assignment fixtures in contract index/worktree bytes and exited 2. This was not hidden or called PASS.
+- Final PLAN `E96C415A...972C1` makes runtime-fragment fixtures and exact `files=4` self-scan mandatory. Focused current-hash course/SPEC and quality/security/license reviews both passed with no Critical/Major issue.
+- This repair evidence remains same-family G-03P and does not replace the formal run described above.
 
 ## Current Blocker
 

@@ -48,15 +48,16 @@ This is an implementation-input evidence ledger, not the production manifest. Th
 | windows-freezer | PyInstaller | 6.21.0 | https://pypi.org/pypi/pyinstaller/6.21.0/json | GPL-2.0-or-later WITH Bootloader-exception; runtime hooks Apache-2.0 | 2026-07-21 | verified | Supports Python below 3.16 and publishes a win_amd64 wheel. Full application clean-machine evidence remains DIST-01. |
 | python-lock-closure | Hashed Windows x64 Python closure | 54 exact pins; canonical-LF SHA-256 246083f8b210c3e33904f3057dfd48e7d8db548804d11fa5b087ecb291ad0fc6 | https://pypi.org/simple/ | Exact PyPI metadata and wheel license files | 2026-07-21 | verified | Stored at docs/engineering/locks/python-3.14.6-windows-x64.lock; validator normalizes text line endings before hashing and cross-checks every pin/direct dependency against the table below. |
 | npm-lock-closure | npm lockfile v3 closure | 166 exact package entries; 115 installed on win-x64; canonical-LF SHA-256 071826d575cbcc472020a7df984e2e8f2410a75c1782550c5ddfeed268af3c2f | https://registry.npmjs.org/ | Exact registry URLs, integrity hashes, and package license fields | 2026-07-21 | verified | Stored at docs/engineering/locks/frontend-package-lock.json; 54 optional cross-platform packages remain locked. Validator compares all 16 root direct dependencies and the reviewed license set; npm audit reported zero current findings. |
-| dependency-transitive | Direct and transitive license closure | Python 54 packages and npm 166 entries | https://packaging.python.org/en/latest/guides/repeatable-installs/ | Machine-checked exact pins, hashes, licenses, and notice obligations | 2026-07-21 | verified | Production manifests and the license scanner are created by F-01A/F-01B; CI-01 consumes them. |
+| dependency-transitive | Direct and transitive license closure | Python 54 packages and npm 166 entries | https://packaging.python.org/en/latest/guides/repeatable-installs/ | Machine-checked exact pins, hashes, licenses, and notice obligations | 2026-07-21 | verified | F-01A creates production manifests, F-01B retains bootstrap licenses, and F-01E creates the production scanner/license verifier; CI consumes their gates. |
 
 ## Bootstrap Artifact Evidence
 
 This four-column supplement is deliberately outside the 63-row course evidence
 count. `scripts/verify_evidence.ps1` binds every exact term below without changing
-the standard receipt. F-01A must download these files into ignored project-local
-storage, verify bytes before extraction, retain their license texts, and never
-change the system PATH or registry.
+the standard receipt. F-01A must download runtime artifacts into ignored
+project-local storage, verify bytes before extraction, and never change the system
+PATH or registry. F-01B separately retains the exact license texts before any
+later distribution task.
 
 | Artifact | Exact source and digest | License / notices | Verification |
 | --- | --- | --- | --- |
@@ -129,7 +130,7 @@ The validator requires exactly the same 54 normalized name/version pairs in this
 
 The lock contains 166 non-root package entries: 112 non-optional and 54 optional cross-platform entries. All have an exact version, npm registry tarball URL, integrity hash, and license field. License counts are MIT 111, Apache-2.0 28, MPL-2.0 14, ISC 4, BSD-2-Clause 2, BSD-3-Clause 2, MIT-0 2, 0BSD 1, BlueOak-1.0.0 1, and CC0-1.0 1. No blank, GPL, AGPL, or SSPL license entry was observed.
 
-Distribution must retain the PyInstaller exception and COPYING, all pypdfium2/PDFium notices, MPL-2.0 texts and covered-file obligations, Node LICENSE and npm Artistic-2.0 terms, Playwright NOTICE/ThirdPartyNotices, axe third-party license, TypeScript NOTICE, Vite composite LICENSE, Lucide ISC notice, and setuptools vendor notices. CI-01 must regenerate this closure from the production locks and fail on a new unknown or incompatible license.
+Distribution must retain the PyInstaller exception and COPYING, all pypdfium2/PDFium notices, MPL-2.0 texts and covered-file obligations, Node LICENSE and npm Artistic-2.0 terms, Playwright NOTICE/ThirdPartyNotices, axe third-party license, TypeScript NOTICE, Vite composite LICENSE, Lucide ISC notice, and setuptools vendor notices. F-01E must regenerate this closure from the production locks and fail on a new unknown or incompatible license; CI-01 verifies that both pipelines invoke that unchanged gate.
 
 ## Functional Evidence and Residual Boundaries
 
@@ -168,4 +169,4 @@ Validator regression fixtures also passed: converting both committed lock copies
 
 ## Gate
 
-G-02A passed in commit `22b516af7b6f4896c6127e75b2585435e407a3c0`. F-01A/F-01B must consume these exact selections, create production manifests/locks and scanners, rerun compatibility and license checks, and record any required change as a reviewed evidence update rather than silently drifting versions.
+G-02A passed in commit `22b516af7b6f4896c6127e75b2585435e407a3c0`. F-01A/F-01B/F-01E must consume these exact selections according to their manifest, bootstrap-license, and scanner/verifier ownership, rerun compatibility and license checks, and record any required change as a reviewed evidence update rather than silently drifting versions.

@@ -60,8 +60,8 @@ TXT/Markdown 解码必须拒绝非法 UTF-8，并在抽取视图中把 CRLF/CR �
 
 来源只允许两种判别联合：
 
-- PDF：`{kind:"pdf_page", material_id, content_hash, page}`，`page` 从 1 开始且存在于已验证页目录。
-- 文本：`{kind:"text_lines", material_id, content_hash, line_start, line_end}`，行号从 1 开始且形成非空闭区间。
+- PDF：`{kind:"pdf_page", material_id, material_version_id, content_hash, page}`，`page` 从 1 开始且存在于该 `material_version_id` 的已验证页目录。
+- 文本：`{kind:"text_lines", material_id, material_version_id, content_hash, line_start, line_end}`，行号从 1 开始且形成该版本中的非空闭区间。
 
 用户创建或编辑 `KnowledgeConcept`，再从有效 locator 中确认 `CoverageDecision`。系统不在 v1 自动分析往年卷、老师重点或整门课程。材料删除会移除本地原件和抽取内容，使相关 locator、coverage 和未开始复习任务失效；历史证据只保留不含正文的 tombstone 与 opaque ID。
 

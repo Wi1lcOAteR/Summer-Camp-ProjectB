@@ -1,6 +1,6 @@
 # DECISIONS_NEEDED
 
-> **Current snapshot:** 2026-07-27T14:01:29+08:00. This file lists only decisions or student-owned evidence that remain open. The reduced product direction remains confirmed. Current remediation candidate is SPEC `69A534D9...855E` and PLAN `47624A3E...225A`; previous review verdicts are historical or failed, and current bytes are not dispatchable until fresh dual review, formal G-03, and G-04.
+> **Current snapshot:** 2026-07-27T19:17:43+08:00. This file lists only decisions or student-owned evidence that remain open. The reduced product direction remains confirmed. Final Stage-B candidate is SPEC `6A0DB7CA...11E56` and PLAN `E96C415A...972C1`; current-byte SR-08 passed, but the project remains non-dispatchable until formal different-type G-03 and G-04.
 
 ## D-025: Public OCI Demo Host
 
@@ -20,20 +20,20 @@ No account, payment method, cloud resource, image push or deployment may be crea
 
 **Status:** Open. Claude Code was rejected by the available service path, Gemini currently requires an unavailable special relay, and Copilot is not provisioned. Any newly accessible non-Codex coding agent may be used; the student controls its account, login and terms.
 
-**G-03P receipt:** The first projectless Codex task completed the earlier scanner slice with real red/green and exposed plan ambiguity. Subsequent security review found that version did not prove index-blob scanning, so its 12-group green is historical only. F-01S now includes exact index/worktree regressions; two projectless reruns are waiting on the desktop's cross-directory read approval and no new pass is claimed.
+**G-03P receipt:** Fresh projectless Codex task `019fa331-3da1-7f80-a37c-ac7abb135a46` received only SPEC `6A0DB7...11E56` and predecessor PLAN `D574B8...1D742`. It reported no material ambiguity, produced exact `CONTRACT_RED scanner_missing`, then an unchanged eight-group `BOOTSTRAP_SCANNER_CONTRACT_PASS` using all eleven named helpers. Its extra tracked+staged self-scan exited 2 because the generated contract stored assignment fixtures; this output gap was repaired in final PLAN `E96C...` by requiring runtime-fragment fixtures and exact `CREDENTIAL_SCAN_PASS files=4`. Focused current-hash dual review passed. G-03P remains same-family and cannot close formal G-03.
 
 **Remaining student-owned action:** When one non-Codex service becomes usable, follow [`docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md`](docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md) in a fresh session with no memory and provide only the final `SPEC.md` plus `PLAN.md`. Record the tool/version/session and return its exact questions, misunderstandings, diff and red/green receipt. Do not supply G-03P output as a third context file.
 
-The current SPEC/PLAN bytes need fresh same-hash dual review. Neither old review, the failed review, nor G-03P authorizes implementation.
+**Remaining student-owned action:** run one fresh non-Codex coding agent on the final hashes, using only `SPEC.md` and `PLAN.md`, and return its raw questions/red/green/self-scan receipt. Current same-hash dual review is already closed; neither that review nor G-03P authorizes implementation.
 
 ## Future Implementation Approval
 
 **Status:** Not yet requestable. It becomes available only after:
 
 1. the reduced SPEC is confirmed;
-2. `writing-plans` produces a reviewed implementation PLAN;
-3. a different-type coding-agent cold start is completed;
-4. exposed SPEC/PLAN defects are repaired and reviewed.
+2. `writing-plans` produces a reviewed implementation PLAN (**closed**);
+3. a different-type coding-agent cold start is completed (**open**);
+4. exposed SPEC/PLAN defects are repaired and reviewed (**G-03P defects closed; formal G-03 may still expose more**).
 
 The student must then explicitly approve entering implementation. No earlier `continue` statement is reused as this approval.
 

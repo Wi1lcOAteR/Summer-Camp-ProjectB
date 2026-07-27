@@ -34,6 +34,19 @@ $expectedLockHashes = @{
     Npm = "071826d575cbcc472020a7df984e2e8f2410a75c1782550c5ddfeed268af3c2f"
 }
 
+$bootstrapLicenseEvidence = @{
+    Path = "docs/engineering/BOOTSTRAP_LICENSE_EVIDENCE.md"
+    Sha256 = "FD65C5D2F8421F7B99AE4D540B80A8BBED1C28C78EF45851F7C6E5051034F310"
+    Targets = @(
+        "licenses/bootstrap/uv-LICENSE-APACHE",
+        "licenses/bootstrap/uv-LICENSE-MIT",
+        "licenses/bootstrap/cpython-LICENSE",
+        "licenses/bootstrap/node-LICENSE",
+        "licenses/bootstrap/npm-LICENSE"
+    )
+    Receipt = "BOOTSTRAP_LICENSE_EVIDENCE_PASS"
+}
+
 $pythonDirectDependencies = @{
     "backend-fastapi" = @{ Package = "fastapi"; Version = "0.139.2" }
     "backend-asgi" = @{ Package = "uvicorn"; Version = "0.51.0" }
@@ -133,6 +146,18 @@ function Get-CanonicalTextSha256([string]$Path) {
         $hashBytes = $sha256.ComputeHash($encoding.GetBytes($canonical))
         return (($hashBytes | ForEach-Object { $_.ToString("x2") }) -join "")
     } finally {
+        $sha256.Dispose()
+    }
+}
+
+function Get-RawFileSha256([string]$Path) {
+    $stream = [System.IO.File]::OpenRead($Path)
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $hashBytes = $sha256.ComputeHash($stream)
+        return (($hashBytes | ForEach-Object { $_.ToString("x2") }) -join "")
+    } finally {
+        $stream.Dispose()
         $sha256.Dispose()
     }
 }
@@ -250,6 +275,58 @@ foreach ($relative in $requiredFiles) {
         }
         if ($row.Status -notin @("verified", "explicitly-blocked")) {
             Add-Error "Invalid status for '$requiredId' in ${relative}: $($row.Status)"
+        }
+    }
+}
+
+$bootstrapLicensePath = Join-Path $Root $bootstrapLicenseEvidence.Path
+if (-not (Test-Path -LiteralPath $bootstrapLicensePath -PathType Leaf)) {
+    Add-Error "Missing bootstrap license evidence file: $($bootstrapLicenseEvidence.Path)"
+} else {
+    $bootstrapLicenseHash = Get-RawFileSha256 -Path $bootstrapLicensePath
+    if ($bootstrapLicenseHash -ine $bootstrapLicenseEvidence.Sha256) {
+        Add-Error "Bootstrap license evidence hash mismatch"
+    }
+
+    $licenseRows = [System.Collections.Generic.List[object]]::new()
+    foreach ($line in ((Get-Content -LiteralPath $bootstrapLicensePath -Raw -Encoding UTF8) -split "`r?`n")) {
+        if ($line -notmatch '^\| `licenses/bootstrap/') { continue }
+        $cells = @($line.Trim() -split '\|' | ForEach-Object { $_.Trim() })
+        if ($cells[0] -eq "") { $cells = @($cells[1..($cells.Count - 1)]) }
+        if ($cells[$cells.Count - 1] -eq "") { $cells = @($cells[0..($cells.Count - 2)]) }
+        if ($cells.Count -ne 7) {
+            Add-Error "Malformed bootstrap license evidence row"
+            continue
+        }
+        [void]$licenseRows.Add([PSCustomObject]@{
+            Target = $cells[0].Trim('`')
+            Tag = $cells[1]
+            Immutable = $cells[2]
+            Blob = $cells[3].Trim('`')
+            Bytes = $cells[4]
+            Sha256 = $cells[5].Trim('`')
+            License = $cells[6]
+        })
+    }
+
+    if ($licenseRows.Count -ne 5) {
+        Add-Error "Bootstrap license evidence must contain 5 rows; observed $($licenseRows.Count)"
+    }
+    foreach ($target in $bootstrapLicenseEvidence.Targets) {
+        $matches = @($licenseRows | Where-Object { $_.Target -eq $target })
+        if ($matches.Count -ne 1) {
+            Add-Error "Bootstrap license target must appear exactly once: $target"
+            continue
+        }
+        $row = $matches[0]
+        $commitMatches = @([regex]::Matches($row.Immutable, '(?i)[0-9a-f]{40}') | ForEach-Object { $_.Value.ToLowerInvariant() } | Select-Object -Unique)
+        $rawMatch = [regex]::Match($row.Immutable, 'https://raw\.githubusercontent\.com/[^/\s`]+/[^/\s`]+/(?<commit>[0-9a-f]{40})/[^\s`]+')
+        if ($commitMatches.Count -ne 1 -or -not $rawMatch.Success -or $rawMatch.Groups['commit'].Value.ToLowerInvariant() -ne $commitMatches[0]) {
+            Add-Error "Bootstrap license source is not bound to one immutable commit: $target"
+        }
+        if ($row.Blob -notmatch '^[0-9a-f]{40}$' -or $row.Bytes -notmatch '^[1-9][0-9]*$' -or
+            $row.Sha256 -notmatch '^[0-9A-Fa-f]{64}$' -or [string]::IsNullOrWhiteSpace($row.License)) {
+            Add-Error "Incomplete bootstrap license identity: $target"
         }
     }
 }
