@@ -941,5 +941,5 @@
 - **机械证据**：修订候选得到 `PLAN_MECHANICAL_PASS Tasks=32 Ledger=32 Fields=5 DependencyEdges=31 AcRows=24 Placeholders=0`；候选 SPEC `69A534D9...855E`，PLAN `47624A3E...225A`。本条不把尚未返回的新双评审写成 PASS。
 - **G-03P 重跑**：旧 task 收到新输入请求后因删除旧输出触发审批，已改为保留旧证据；另建 projectless task `019fa224-046d-7a41-9841-b6632be08057`，但其只读复制两份 ProjectB 文件同样触发桌面审批。没有代批、没有读取额外文件、没有新红/绿证据。
 - **人工修改及原因**：学生未新增产品/托管/付费选择；finals 数值和 material ref 语义是对既有已签字承诺的确定性实现合同。D-025、正式非 Codex G-03、G-04、远程授权和 `REFLECTION.md` 均保持开放。
-- **commit hash**：待最终文档同步、重审和扫描后填写。无关 `docs/research/*` 与 `docs/engineering/SUPERPOWERS_VALIDATION.md` 修改保持 unstaged。
+- **commit hash**：`c34ed0e01b0e1849a62298d6d0807d2bb2edfef0`（`docs(stage-b): checkpoint cold-start remediation [agent: Codex]`）；这是诚实的 `NOT PASS` 修订检查点，不是 SR-08/G-03/G-04 closure。无关 `docs/research/*` 与 `docs/engineering/SUPERPOWERS_VALIDATION.md` 修改保持 unstaged。
 - **经验教训**：只检查 staged 文件名不等于检查 staged 内容；提交安全门禁必须把 Git index 和工作树视为两个独立、不可信字节源。最终 README commit 也必须落在最终 PR/MR 与 CI 证据之前，而不是之后。
