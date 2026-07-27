@@ -4,7 +4,7 @@ Status: **PASS - G-02A exact dependency and license evidence committed**
 
 Verification scope dates (Asia/Shanghai): package closures/component smokes `2026-07-21`; bootstrap artifact supplement `2026-07-26`.
 
-This is an implementation-input evidence ledger, not the production manifest. The two lock artifacts under `docs/engineering/locks/` were resolved and smoke-tested in disposable runtimes and are consumed by T-01 when it creates the real project manifests. They must not be presented as an installed application or clean-machine distribution.
+This is an implementation-input evidence ledger, not the production manifest. The Windows and npm lock artifacts under `docs/engineering/locks/` were resolved and smoke-tested in disposable runtimes and are consumed by F-01A when it creates the real project manifests; Linux locks are covered by the separate Linux supplement. They must not be presented as an installed application or clean-machine distribution.
 
 ## Selected Direct Dependencies
 
@@ -48,7 +48,7 @@ This is an implementation-input evidence ledger, not the production manifest. Th
 | windows-freezer | PyInstaller | 6.21.0 | https://pypi.org/pypi/pyinstaller/6.21.0/json | GPL-2.0-or-later WITH Bootloader-exception; runtime hooks Apache-2.0 | 2026-07-21 | verified | Supports Python below 3.16 and publishes a win_amd64 wheel. Full application clean-machine evidence remains DIST-01. |
 | python-lock-closure | Hashed Windows x64 Python closure | 54 exact pins; canonical-LF SHA-256 246083f8b210c3e33904f3057dfd48e7d8db548804d11fa5b087ecb291ad0fc6 | https://pypi.org/simple/ | Exact PyPI metadata and wheel license files | 2026-07-21 | verified | Stored at docs/engineering/locks/python-3.14.6-windows-x64.lock; validator normalizes text line endings before hashing and cross-checks every pin/direct dependency against the table below. |
 | npm-lock-closure | npm lockfile v3 closure | 166 exact package entries; 115 installed on win-x64; canonical-LF SHA-256 071826d575cbcc472020a7df984e2e8f2410a75c1782550c5ddfeed268af3c2f | https://registry.npmjs.org/ | Exact registry URLs, integrity hashes, and package license fields | 2026-07-21 | verified | Stored at docs/engineering/locks/frontend-package-lock.json; 54 optional cross-platform packages remain locked. Validator compares all 16 root direct dependencies and the reviewed license set; npm audit reported zero current findings. |
-| dependency-transitive | Direct and transitive license closure | Python 54 packages and npm 166 entries | https://packaging.python.org/en/latest/guides/repeatable-installs/ | Machine-checked exact pins, hashes, licenses, and notice obligations | 2026-07-21 | verified | Production manifests and the CI license scanner are created later by T-01 and CI-01 from these evidence inputs. |
+| dependency-transitive | Direct and transitive license closure | Python 54 packages and npm 166 entries | https://packaging.python.org/en/latest/guides/repeatable-installs/ | Machine-checked exact pins, hashes, licenses, and notice obligations | 2026-07-21 | verified | Production manifests and the license scanner are created by F-01A/F-01B; CI-01 consumes them. |
 
 ## Bootstrap Artifact Evidence
 
@@ -168,4 +168,4 @@ Validator regression fixtures also passed: converting both committed lock copies
 
 ## Gate
 
-G-02A passed in commit `22b516af7b6f4896c6127e75b2585435e407a3c0`. T-01 must consume these exact selections, create production manifests/locks, rerun compatibility and license checks, and record any required change as a reviewed evidence update rather than silently drifting versions.
+G-02A passed in commit `22b516af7b6f4896c6127e75b2585435e407a3c0`. F-01A/F-01B must consume these exact selections, create production manifests/locks and scanners, rerun compatibility and license checks, and record any required change as a reviewed evidence update rather than silently drifting versions.

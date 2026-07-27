@@ -915,3 +915,31 @@
 - **Git / commit**：分支 `codex/stage-b-scope-reset`，起始 HEAD `d94235c4ce8d669f7aca2bb8707fd8c55411fc53`；阶段 B 冻结 checkpoint 为 `d1941701373dd38312b9a9145376da8071fa2966`，只包含上述 19 个计划/证据文件，不含生产源码或无关 dirty 文档。
 - **未执行 / 门禁**：`Get-Command claude` 未找到，G-03 仅准备 runbook，未执行 session 或产出 transcript。没有生产源码、实现 worktree、Open Design run、产品测试/构建、CI、provider call、远程 push/PR、镜像发布、部署或 `REFLECTION.md`。
 - **经验教训**：一个首提交安全门禁不能依赖尚未实现的后续 scanner；bootstrap 路径必须无第三方依赖、失败关闭且在第一次 staged commit 前即可执行。review PASS 必须绑定完全相同的 SPEC/PLAN 字节。
+
+## 2026-07-27T13:26:43+08:00 - G-03P-001 Codex 同类型冷启动占位
+
+- **Task 编号**：G-03P-001（同类型 Codex 占位冷启动和文档修订；不满足正式 G-03，不包含产品实现）。
+- **触发的 Superpowers skill**：使用 `executing-plans`、`writing-plans`、`receiving-code-review` 与证据优先的验证纪律；因仍在实现门禁前，未触发 worktree、正式 TDD 派发或 finishing。还读取 `openai-docs` 以核对 Codex 使用入口，但本机官方手册 helper 因 Windows Schannel `SEC_E_NO_CREDENTIALS` 未取得在线结果，故只使用本地 CLI 帮助与桌面任务能力，不把失败查询写成官方结论。
+- **关键 prompt / context**：学生报告 Claude 被拒、Gemini 需特殊中转、Copilot 未开通，要求先用 Codex CLI 或 Codex 做占位，后续再补异类型冷启动；随后允许无人值守继续，但“能跳的门禁”不构成绕过课程人工门禁的授权。
+- **CLI 结果**：`codex-cli 0.144.4` 以 `--ephemeral --ignore-user-config --ignore-rules --sandbox workspace-write` 在系统临时 disposable 目录启动，只含 SPEC/PLAN。约 4 分钟无输出或 scaffold 后安全终止，未形成红/绿证据；输入副本保留，未改项目仓库。
+- **subagent / task 输出**：用户明确创建的项目外 Codex 桌面任务 ID 为 `019fa1f5-8031-7450-883c-2462fc623703`。旧哈希首轮在红测前正确停止并指出 F-01A 输入不可获得；第二轮提出 7 组 scanner 合同问题；当前哈希第三轮报告问题全部闭合、`NEW_QUESTIONS None`。
+- **修订与人工边界**：主智能体只修订 SPEC 的 G-03/G-03P 过程门禁和 PLAN 的 F-01A 无依赖 scanner 切片合同；产品范围、31-task ledger、D-025、远程授权、学生反思和 G-04 均未改变。项目外生成脚本未合入仓库，也未标记 F-01A started/completed。
+- **红/绿证据**：精确命令 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tests/bootstrap_scanner_contract.ps1` 先以 exit 1、`CONTRACT_RED scanner_missing` 失败；最小实现后同一命令 fresh rerun 为 exit 0，12 个行为组通过并输出 `BOOTSTRAP_SCANNER_CONTRACT_PASS cases=12`。测试中先遇到系统 temp sandbox 限制，改把 disposable repos 放到输出目录；随后修复 PowerShell 5.1 `String.Split` overload 和空路径 JSON 语义，未删减测试或断言。
+- **哈希 / 产物**：SPEC `6003950E...ED71`；PLAN `8A4BE778...AFD`；项目外 scanner `37CC6252...2D60`；项目外 contract `F0CA58FA...C516`。临时 contract repositories 已清理，原仓库无生产源码变更。
+- **评审与门禁**：占位任务明确声明同类型限制。旧 same-hash 双评审因 SPEC/PLAN 字节变化而失效；当前字节的机械审计和双评审、正式非 Codex G-03、学生 G-04 仍待完成，未授权正式实现。
+- **commit hash**：待本次过程文档验证后填写；无关 `docs/research/*` 与 `docs/engineering/SUPERPOWERS_VALIDATION.md` 修改保持 unstaged。
+- **经验教训**：冷启动 task 不能把“正式实现阶段可从仓库取得的输入”误当成两文档 disposable 环境已有输入。把一个无依赖、行为闭合的安全切片明确嵌入首 task，可在不提前实现完整工具链的情况下验证计划可执行性。
+
+## 2026-07-27T14:01:29+08:00 - G-03P-002 同哈希评审失败与安全修订
+
+- **Task 编号**：G-03P-002（修复 G-03P 后评审 findings；仍不包含正式实现）。
+- **触发的 Superpowers skill**：使用 `writing-plans`、`requesting-code-review`、`receiving-code-review`、`systematic-debugging` 和 `verification-before-completion` 的约束；没有触发实现 worktree、正式 TDD dispatch 或 finishing。
+- **关键 prompt / context**：学生允许无人值守继续所有可跳过的工作，但课程硬门禁仍不可跳。评审对象固定为 SPEC `6003950E...ED71` 和 PLAN `8A4BE778...AFD`，要求分别审查课程合规和质量/安全/许可证。
+- **review 输出**：`/root/g03p_spec_review` 为 `FAIL; Critical=0, Major=3, Minor=2`；`/root/g03p_quality_review` 为 `NOT PASS; Critical=1, Major=10, Minor=1`。Critical 复现的是 index 中有秘密、工作树已清理时 staged scanner 读取错误字节源；两名 reviewer 均只读、未改仓库。
+- **主智能体修订**：将 scanner 拆为完整 F-01S，强制从 index OID binary-safe 读取 blob，并分别报告 index/worktree；新增两类交叉状态回归。计划增至 32 个 session task，增加统一 2--5 分钟 microstep、初始 push CI、最终远程 CI、GitHub visibility、mutable-ledger 例外、coordinator scan、学生手写声明、clean VM gate、精确文件 ownership。SPEC 补 MaterialVersion/MaterialBlobRef 和 finals 固定倍率表。
+- **许可证核验**：PowerShell/curl raw 因 Schannel `SEC_E_NO_CREDENTIALS` 失败，Python raw 读取超时；GitHub 官方 Contents/Refs API 随后成功返回 5 份文本和 4 个 tag commit。实际 byte/hash 记录于 `docs/engineering/BOOTSTRAP_LICENSE_EVIDENCE.md`，其 SHA-256 为 `E9EFCF96...E7E0`。无 key、付费调用或第三方模板。
+- **机械证据**：修订候选得到 `PLAN_MECHANICAL_PASS Tasks=32 Ledger=32 Fields=5 DependencyEdges=31 AcRows=24 Placeholders=0`；候选 SPEC `69A534D9...855E`，PLAN `47624A3E...225A`。本条不把尚未返回的新双评审写成 PASS。
+- **G-03P 重跑**：旧 task 收到新输入请求后因删除旧输出触发审批，已改为保留旧证据；另建 projectless task `019fa224-046d-7a41-9841-b6632be08057`，但其只读复制两份 ProjectB 文件同样触发桌面审批。没有代批、没有读取额外文件、没有新红/绿证据。
+- **人工修改及原因**：学生未新增产品/托管/付费选择；finals 数值和 material ref 语义是对既有已签字承诺的确定性实现合同。D-025、正式非 Codex G-03、G-04、远程授权和 `REFLECTION.md` 均保持开放。
+- **commit hash**：待最终文档同步、重审和扫描后填写。无关 `docs/research/*` 与 `docs/engineering/SUPERPOWERS_VALIDATION.md` 修改保持 unstaged。
+- **经验教训**：只检查 staged 文件名不等于检查 staged 内容；提交安全门禁必须把 Git index 和工作树视为两个独立、不可信字节源。最终 README commit 也必须落在最终 PR/MR 与 CI 证据之前，而不是之后。

@@ -1,6 +1,6 @@
 # SPEC_PROCESS
 
-> **当前状态（2026-07-26）：** 旧的 113-unit / 14-plan 阶段 B 方案已按学生要求收束并作为 `NOT PASS` 历史存档。精简 v1 [`SPEC.md`](SPEC.md) 已由学生整体确认；当前唯一 [`PLAN.md`](PLAN.md) 含 31 个单-session task，并已在同一 SPEC/PLAN 哈希上通过规约与质量/安全/许可证双评审。材料仅为数字 PDF/TXT/Markdown，provider 范围为 L+P，通用知识点模型以互斥/竞态/死锁三个 evaluator 验收；被删出的复杂能力进入 `ARCHIVED / NOT DISPATCHABLE` 计划。阶段 B 已冻结，下一门禁是 Claude Code 陌生智能体冷启动；其完成、缺陷修订和学生 G-04 实现批准前，仍禁止正式实现。D-025 只阻塞 host-specific 发布与最终公网 URL。
+> **当前状态（2026-07-27）：** 精简 v1 产品方向仍来自学生确认的 `C6231816...9AD6`。首轮 G-03P 和随后双评审暴露了 staged-index 扫描、任务完整性、CI/远程闭环、材料版本及 finals 算法等缺口；当前修订候选为 SPEC `69A534D9...855E`、PLAN `47624A3E...225A`，含 32 个单-session task 和统一 2--5 分钟 step 合同。阶段 B 仍是 `COLD-START REMEDIATION / NOT DISPATCHABLE`：当前哈希尚待新双评审，F-01S 的 G-03P 重跑还在等待桌面跨目录读取审批，正式不同类型 G-03 和学生 G-04 均未完成。D-025 仍只阻塞 host-specific 发布与公网 URL。
 
 ## 0. 启动审计（2026-07-17）
 
@@ -568,3 +568,27 @@
 - **冷启动准备：** 新增操作员说明 [`docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md`](docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md)，固定只向 fresh Claude Code session 提供上述 `SPEC.md` 与 `PLAN.md`，尝试 F-01A，并记录问题、误解、red/green 产出与差距。runbook 本身不得作为第三份 agent context。
 - **当前阻塞：** 2026-07-26 本机 `Get-Command claude` 返回未找到，故 G-03 尚未执行，也没有伪造 session、版本、transcript 或 diff。学生需控制 Claude Code 的安装/登录/条款并启动全新 session；若冷启动导致 SPEC/PLAN 任一字节变化，必须重新计算哈希并重跑同哈希双评审。
 - **实现边界：** 阶段 B 计划已通过，但这不等于产品已实现或 G-04 已批准。G-03 完成、问题修订和学生再次明确批准前，未创建生产源码、实现 worktree、Open Design run、产品测试/构建、CI、provider 调用或部署。
+
+## 8. 2026-07-27 Codex 同类型占位冷启动与修订
+
+- **学生授权：** Claude 直接拒绝访问、Gemini 需要特殊中转、Copilot 尚不可用。学生明确要求先用 Codex 做冷启动占位，待任一非 Codex 服务可访问后再补正式 G-03；这不是对“不同类型智能体”课程门禁的豁免。
+- **CLI 尝试：** 本地 `codex-cli 0.144.4` 在只含旧哈希 SPEC/PLAN 的系统临时目录中以 ephemeral/ignore-user-config/ignore-rules 模式启动，约 4 分钟没有生成输出或 scaffold；进程仍响应但无法形成可用证据，故于 13:03:34 安全终止。目录只保留输入副本，不声称执行成功。
+- **桌面占位任务：** 全新、项目外 Codex 任务 `019fa1f5-8031-7450-883c-2462fc623703` 只接收 SPEC/PLAN。第一次尝试确认旧哈希后在红测前停止，因为 F-01A 没有给出可由两份文档独立获得的依赖锁、前端配置和许可证输入；这证明原计划不满足真正冷启动。
+- **关键修订 diff：** SPEC 将 AC-24 和风险改为“正式 G-03 必须为不同类型智能体，Codex 只可作 G-03P”；PLAN 将 G-03/G-03P 的实验切片限定为两个无依赖 PowerShell 文件，并补齐 tracked/staged 集合、路径与 reparse 拒绝、文本/二进制类型、UTF-8/UTF-16 解码、凭据规则、稳定错误码、排序 JSON 和退出码。正式 F-01A 的锁、许可证和 React 工具链工作仍留在 G-04 后，task 总数保持 31。
+- **第二轮提问：** 占位任务就凭据精确模式与长度、赋值语法和安全占位符、编码秘密的格式与解码深度、稳定错误码、JSON 输出与排序、祖先 reparse 检查、UTF-16 与无 BOM NUL 提出 7 组问题。修订后的 PLAN 对 7 组问题均给出确定答案；第三轮报告 `NEW_QUESTIONS None`。
+- **真实红灯：** 在项目外 disposable workspace 运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tests/bootstrap_scanner_contract.ps1`，实现文件不存在时退出 1，并输出 `CONTRACT_RED scanner_missing`。失败原因正是缺少 production scanner，未依赖真实凭据、网络或项目仓库。
+- **真实绿灯：** 同一命令在最小 scanner 后退出 0，12 组契约全部 PASS：clean、rules/redaction、assignment/placeholders、tracked/staged union、rename、encoding、decode/NUL errors、file types、usage/Git root、Git list failure、read failure、reparse ancestor。最终输出 `BOOTSTRAP_SCANNER_CONTRACT_PASS cases=12`；没有减弱断言，临时 Git 仓库已清理。
+- **隔离与哈希：** 占位目录中的 SPEC/PLAN 分别保持 `6003950E2D1A8300CE0124D28CFCD2BFC3CBF402ED50C551BF0A386AF425ED71` 和 `8A4BE77895082C9C239027403B511F5023584C3AB077E492CFDF2BDC91D81AFD`。生成的 scanner 与契约脚本只保留为项目外占位产物，SHA-256 分别为 `37CC6252...2D60`、`F0CA58FA...C516`，未复制、提交或计为 F-01A 实现。
+- **门禁结论：** G-03P 仅证明修订后的 scanner 切片可由两份文档执行；正式 G-03、当前字节的 SR-08 同哈希双评审以及学生 G-04 仍未完成。旧 `795791...7862` / `6FDD69...A05D` PASS 不继承到当前字节。
+
+## 9. 2026-07-27 G-03P 后双评审失败与第二轮修订
+
+- **冻结评审输入：** SPEC `6003950E2D1A8300CE0124D28CFCD2BFC3CBF402ED50C551BF0A386AF425ED71`；PLAN `8A4BE77895082C9C239027403B511F5023584C3AB077E492CFDF2BDC91D81AFD`。两名 reviewer 均只读且先核对哈希。
+- **规约评审结论：** `/root/g03p_spec_review` 返回 `FAIL; Critical=0, Major=3, Minor=2`。Major 为任务缺少显式 2--5 分钟 step 合同、早期分支首次 push 尚无 CI、GitHub public/TA collaborator 证据未闭合；Minor 为矩阵未单列三轮 brainstorming 证据和学生手写代码顶部声明。
+- **质量/安全评审结论：** `/root/g03p_quality_review` 返回 `NOT PASS; Critical=1, Major=10, Minor=1`。Critical 是 `-Staged` 只枚举 index 路径却读取工作树字节，可漏掉“index 有 secret、工作树已清理”的提交。Major 覆盖完整冷启动 task、精确 owned paths、npm/license 输入、DOC/audit ownership、最终文档 CI、PLAN mutable ledger、clean VM、coordinator commit scan、MaterialVersion/blob refs 和 finals 压缩算法；Minor 是依赖基线残留 `T-01`。
+- **安全修订：** scanner 独立为完整 `F-01S`。`-Staged` 必须用 stage-0 OID 和 binary-safe `git cat-file` 扫描 index blob；`-Tracked` 扫工作树；两开关同时扫描两个 source/path pair。输出新增 `source`，并要求 staged-secret/clean-worktree、clean-index/dirty-worktree、index mode、边界/引号和无 OID 泄露回归。
+- **计划修订：** ledger 变为 32 项；F-01A 只负责工具链、byte-pinned licenses、React harness 和初始 push CI，CI-01 扩展完整流水线。增加统一的 2--5 分钟逐 assertion step 算法、精确路径别名/文件、normative plan 与 evidence-only ledger 差异、每个 coordinator commit 扫描和学生手写代码声明。
+- **发布闭环：** 远程流程拆为 `EXT-REMOTE-PREP` 与 `EXT-REMOTE-FINAL`；前者记录 GitHub public 或 TA collaborator、每个 branch tip 的 push CI 和 OCI digest，后者在 DOC-01 后把最终 commit 推入同一 PR/MR并观察最终 GitLab `unit-test`/GitHub Actions。Windows clean VM 改为独立 `DIST-01-VM-CLOSE`。
+- **规约澄清：** 新增 `MaterialVersion` 和跨课程 `MaterialBlobRef`，最后引用消失前不得删共享 bytes；finals 固定 mastery 倍率表为 unknown 1/2、demonstrated 3/4、retained 1。两项都是对已签字“parser 升级不覆写、期末压缩”的可测试化，不新增产品模块。
+- **许可证证据：** 直接 PowerShell/curl raw 下载因 Schannel `SEC_E_NO_CREDENTIALS` 失败，Python raw 请求超时；随后用 GitHub 官方 Contents/Refs API 解析 4 个 release tag 和 5 份 base64 原始文本，记录 commit/blob/byte/SHA-256 到 `docs/engineering/BOOTSTRAP_LICENSE_EVIDENCE.md`。失败 transport 未冒充证据。
+- **当前重跑阻塞：** 旧 projectless Codex task 和新 task `019fa224-046d-7a41-9841-b6632be08057` 都因读取 ProjectB 中两份源文件触发桌面审批。未代替学生批准，也未把旧 12-case 绿灯继承给新 index 合同；当前 F-01S G-03P recheck 明确为 pending。

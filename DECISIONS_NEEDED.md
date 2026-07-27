@@ -1,6 +1,6 @@
 # DECISIONS_NEEDED
 
-> **Current snapshot:** 2026-07-26T00:49:31+08:00. This file lists only decisions or student-owned evidence that remain open. The reduced `SPEC.md` content snapshot `C6231816...9AD6` is confirmed; the annotated SPEC `79579162...7862` and PLAN `6FDD69F2...A05D` passed same-hash dual review. Resolved detail remains in Git history, `SPEC_PROCESS.md`, and the archive.
+> **Current snapshot:** 2026-07-27T14:01:29+08:00. This file lists only decisions or student-owned evidence that remain open. The reduced product direction remains confirmed. Current remediation candidate is SPEC `69A534D9...855E` and PLAN `47624A3E...225A`; previous review verdicts are historical or failed, and current bytes are not dispatchable until fresh dual review, formal G-03, and G-04.
 
 ## D-025: Public OCI Demo Host
 
@@ -16,15 +16,15 @@
 
 No account, payment method, cloud resource, image push or deployment may be created before the student selects a route and authorizes the corresponding external action.
 
-## G-03: Claude Code Cold Start
+## G-03: Different-Type Cold Start
 
-**Type decision:** Resolved on 2026-07-25: Claude Code.
+**Status:** Open. Claude Code was rejected by the available service path, Gemini currently requires an unavailable special relay, and Copilot is not provisioned. Any newly accessible non-Codex coding agent may be used; the student controls its account, login and terms.
 
-**Review prerequisite:** Closed on 2026-07-26. The frozen SPEC/PLAN pair passed both required reviews with no Critical, Major or Minor finding.
+**G-03P receipt:** The first projectless Codex task completed the earlier scanner slice with real red/green and exposed plan ambiguity. Subsequent security review found that version did not prove index-blob scanning, so its 12-group green is historical only. F-01S now includes exact index/worktree regressions; two projectless reruns are waiting on the desktop's cross-directory read approval and no new pass is claimed.
 
-**Remaining student-owned action:** Follow [`docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md`](docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md): install or open Claude Code, control login/terms, record the exact version, start a clean session with no memory, and provide only `SPEC.md` plus `PLAN.md`. The local `claude` command was not on `PATH` when checked on 2026-07-26, so no cold-start attempt is claimed.
+**Remaining student-owned action:** When one non-Codex service becomes usable, follow [`docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md`](docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md) in a fresh session with no memory and provide only the final `SPEC.md` plus `PLAN.md`. Record the tool/version/session and return its exact questions, misunderstandings, diff and red/green receipt. Do not supply G-03P output as a third context file.
 
-The cold-start agent must attempt 1--2 named tasks and stop to ask rather than guess. Its questions, misunderstandings, output gap and resulting diffs must be recorded before implementation approval.
+The current SPEC/PLAN bytes need fresh same-hash dual review. Neither old review, the failed review, nor G-03P authorizes implementation.
 
 ## Future Implementation Approval
 
@@ -32,7 +32,7 @@ The cold-start agent must attempt 1--2 named tasks and stop to ask rather than g
 
 1. the reduced SPEC is confirmed;
 2. `writing-plans` produces a reviewed implementation PLAN;
-3. the Claude Code cold start is completed;
+3. a different-type coding-agent cold start is completed;
 4. exposed SPEC/PLAN defects are repaired and reviewed.
 
 The student must then explicitly approve entering implementation. No earlier `continue` statement is reused as this approval.

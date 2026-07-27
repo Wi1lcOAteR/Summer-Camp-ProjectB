@@ -1,6 +1,8 @@
 # ProjectB 精简 v1 规约
 
 > **状态：学生已于 2026-07-25T19:13:57+08:00 整体确认。** 被确认的内容快照 SHA-256 为 `C6231816A62C807D205FC7A3E6142C5636DE18FD8A2C580B48E63B106F959AD6`。确认范围是：精简纵向切片、模型范围 `L+P`、数字 PDF + UTF-8 文本/Markdown、通用知识点模型并以互斥/竞态/死锁三个概念验收、使用 Claude Code 做后续冷启动。本文取代 2026-07-20 的旧 v1 文本。
+
+> **2026-07-27 过程修订：** Claude Code、Gemini CLI 与 GitHub Copilot CLI 当前均因访问或账号条件不可用。学生明确授权先用全新 Codex 任务做同类型占位预审 `G-03P`，待可访问非 Codex 类型后补做正式 `G-03`。这项修订不改变产品功能范围；`G-03P` 不满足“不同类型智能体”要求，也不解除实现门禁。
 >
 > **实现门禁：** 当前可以用 `superpowers:writing-plans` 重写 `PLAN.md`。完整计划双评审、不同类型智能体冷启动、缺陷修订和学生再次明确批准实现完成前，禁止创建正式实现源码。
 
@@ -45,14 +47,16 @@ ProjectB 是面向单个学生的本地优先课程学习工作台。它把材�
 | 项目 | v1 合同 |
 | --- | --- |
 | 输入 | 可提取文本的数字 PDF、扩展名 `.txt` 的 UTF-8 文本、扩展名 `.md` 的 UTF-8 Markdown |
-| 行为 | 校验类型和限制，计算原始文件字节 SHA-256，将原文件保存在当前用户应用数据目录，将材料元数据和抽取文本写入 SQLite；重复哈希在同一课程内幂等；每个文件独立事务，批次返回逐文件结果 |
-| 输出 | `Material`、材料版本、抽取状态、PDF 页目录或文本行目录 |
+| 行为 | 校验类型和限制，计算原始文件字节 SHA-256，将原文件保存在当前用户应用数据目录，将材料元数据和抽取文本写入 SQLite；重复哈希在同一课程内返回同一 `Material`，相同原件由不同 parser contract 处理时追加 `MaterialVersion`；每个文件独立事务，批次返回逐文件结果 |
+| 输出 | `Material`、`MaterialVersion`、抽取状态、PDF 页目录或文本行目录 |
 | 边界 | 每次最多 5 个文件、单文件最多 20 MiB、单次总计最多 50 MiB、PDF 每文件最多 200 页、文本最多 1,000,000 个 Unicode code points |
 | 错误 | 类型伪装、超限、无可提取文本、非法 UTF-8、解析超时或损坏文件均在权威写入前失败；不得留下半完成材料版本 |
 
 `content_hash` 是原始文件字节的 SHA-256，格式为 64 个小写十六进制字符，不带前缀。PDF 中允许空白页，但整份 PDF 没有任何可提取文本时返回 `unsupported_scanned_pdf`。OCR、图片输入和扫描件属于延期能力。批次先校验总文件数/总字节限制，再按文件提交；一个文件失败不回滚其他成功文件，但失败文件不得留下 Material、原件或抽取内容。
 
-TXT/Markdown 解码必须拒绝非法 UTF-8，并在抽取视图中把 CRLF/CR 规范化为 LF 后编号；原始文件和 `content_hash` 不做规范化。PDF 抽取结果记录 parser ID/version，升级 parser 只能创建新材料版本，不能静默改写旧 locator。
+TXT/Markdown 解码必须拒绝非法 UTF-8，并在抽取视图中把 CRLF/CR 规范化为 LF 后编号；原始文件和 `content_hash` 不做规范化。PDF 抽取结果记录 parser ID/version，升级 parser 只能在同一逻辑 `Material` 下创建新的 `MaterialVersion`，不能静默改写旧 locator。`MaterialVersion` 的唯一键为 `(material_id, parser_id, parser_version, extraction_contract_version)`；locator 必须绑定 `material_version_id` 和原始 `content_hash`。
+
+原始字节存储以全局 `content_hash` 为内容地址，但每个课程拥有独立的 `Material` 和 `MaterialBlobRef`。两个课程导入同一字节时可共享一个 blob，删除一个课程中的材料只删除该课程的逻辑材料、版本和引用；只有事务提交后已不存在任何 `MaterialBlobRef` 时才可删除 blob 字节。删除失败必须保留可重试 tombstone，不得先删共享字节。相同课程+相同 hash+相同 parser contract 完全幂等；相同 hash+新 parser contract 只新增版本。
 
 来源只允许两种判别联合：
 
@@ -91,8 +95,9 @@ P 请求只能包含已确认、哈希仍匹配的来源片段和最少必要指
 - 模式只允许 `continuous` 或 `finals`；IANA 时区必填。
 - `daily_budget_minutes` 为 10--120、步长 5、默认 30；任务时长固定为 10 分钟，不拆分、不超预算。
 - 基础复习间隔为 `[1, 3, 7, 14, 30]` 天。
+- `continuous` 直接使用基础间隔。`finals` 按生成时的 mastery 使用固定倍率压缩每个基础间隔：`unknown=1/2`、`demonstrated_now=3/4`、`retained=1`，采用整数向上取整且最少 1 天；因此三种状态的间隔分别为 `[1,2,4,7,15]`、`[1,3,6,11,23]`、`[1,3,7,14,30]`。同日重复 due date 只保留最弱 evidence 对应的一个任务。
 - 稳定优先级依次为 evidence weakness、请求日期、concept ID；系统/来源错误不伪装成学习失败。
-- `continuous` 生成未来 30 个本地日；`finals` 必须提供考试本地日期，所有任务不得晚于该日期，日期已过去时生成零任务并进入归档状态。
+- `continuous` 生成未来 30 个本地日；`finals` 必须提供考试本地日期，压缩后仍晚于考试日期的任务被截断，所有任务不得晚于该日期，日期已过去时生成零任务并进入归档状态。
 - 相同规范化输入必须得到相同任务顺序和 `plan_input_hash`；输入未变化时不创建新 revision。
 
 计划 revision 追加保存。重新导入、coverage 变化、新 evidence、预算/考试日期变化会生成可比较的新 revision；已完成任务不被改写，未开始任务可以按上一 revision 恢复。v1 不提供通知、日历同步或跨设备同步。
@@ -174,8 +179,10 @@ React/Vite WebUI
 | 实体 | 核心字段与约束 |
 | --- | --- |
 | `Course` | opaque ID、名称、时区、创建时间；首版单本地 actor |
-| `Material` | course、文件名、媒体类型、原始 content hash、parser ID/version、材料版本、状态；同课程 hash 幂等 |
-| `SourceLocator` | PDF page 或 text lines 判别联合；必须绑定当前材料 hash |
+| `Material` | course、文件名、媒体类型、原始 content hash、状态；`(course_id, content_hash)` 唯一且幂等 |
+| `MaterialVersion` | material、parser ID/version、extraction contract version、抽取状态/目录；四元唯一键，旧版本不可改写 |
+| `MaterialBlobRef` | material、content hash；跨课程 blob 引用，最后一个引用删除后才允许删除内容地址字节 |
+| `SourceLocator` | PDF page 或 text lines 判别联合；必须绑定 material version 和原始 hash |
 | `KnowledgeConcept` | course、名称、可空 evaluator ID、版本、active/explanation_only 状态 |
 | `CoverageDecision` | concept、locator IDs、confirmed/rejected、版本和确认时间；追加历史 |
 | `ProviderProfile` | 内置 adapter ID、受支持模型、预算、credential ref、config/policy fingerprint；无 secret |
@@ -230,9 +237,9 @@ React/Vite WebUI
 | ID | 客观判定 |
 | --- | --- |
 | AC-01 | 可创建课程并增量导入合法 PDF/TXT/MD；超限、伪装和无文本 PDF 在写入前失败 |
-| AC-02 | 原始字节 hash、PDF 页和文本行 locator 可重复生成且越界被拒绝 |
+| AC-02 | 原始字节 hash、PDF 页和文本行 locator 可重复生成且越界被拒绝；同 hash 新 parser 只新增版本 |
 | AC-03 | 用户可创建多个知识点并确认/拒绝来源映射；未确认映射不能进入学习或计划 |
-| AC-04 | 删除材料会移除本地内容并阻止失效 locator 产生新权威记录 |
+| AC-04 | 删除材料会移除该课程引用并阻止失效 locator 产生新权威记录；跨课程仍引用同 hash 时不得删除共享 blob |
 | AC-05 | 三个内置并发 evaluator 对 golden/negative fixtures 给出确定性相同结果 |
 | AC-06 | explanation-only 概念可解释但不能产生掌握证据 |
 | AC-07 | 无 consent 时 P 网络调用为 0；consent 精确绑定 locator/hash/port/profile/预算 |
@@ -240,7 +247,7 @@ React/Vite WebUI
 | AC-09 | provider 失败不改变 coverage、evidence、mastery 或 plan；本地流程仍可使用 |
 | AC-10 | LearningEvidence 幂等追加，重复 attempt key 不产生第二条记录，学生答案不进入日志/provider |
 | AC-11 | mastery 只由完整 evidence 历史确定性推导并满足 demonstrated/retained 时序规则 |
-| AC-12 | continuous/finals 计划遵守预算、间隔、稳定顺序和考试截止，重复输入产生相同 hash/任务 |
+| AC-12 | continuous/finals 计划遵守预算、固定 mastery 压缩表、稳定顺序和考试截止，重复输入产生相同 hash/任务 |
 | AC-13 | 新 evidence 或设置变化产生 revision diff；已完成任务不被重写，未开始任务可恢复 |
 | AC-14 | key 可隐藏录入、更新、清除；状态不回显明文；SQLite/config/log/browser/Git 无 secret |
 | AC-15 | loopback、Host、Origin、CSRF 和审计字段白名单均有自动化正反测试 |
@@ -252,7 +259,7 @@ React/Vite WebUI
 | AC-21 | 最终提供可访问 HTTPS WebUI URL，README 记录部署架构和 CI/CD；D-025 有学生选择证据 |
 | AC-22 | 每个实现 task 有红/绿/回归、两阶段评审、凭据扫描、commit hash 和 AGENT_LOG 记录 |
 | AC-23 | 不含真实凭据或未记录许可证；第三方来源与许可证在 README/清单中可追溯 |
-| AC-24 | Claude Code 冷启动只凭最终 SPEC/PLAN 尝试 1--2 个 task，问题和修订 diff 写入 SPEC_PROCESS |
+| AC-24 | 不同类型的新鲜编码智能体只凭最终 SPEC/PLAN 尝试 1--2 个 task，问题和修订 diff 写入 SPEC_PROCESS；同类型 Codex 只能记为 G-03P 占位预审 |
 
 ## 12. 延期功能与恢复规则
 
@@ -271,7 +278,7 @@ React/Vite WebUI
 | --- | --- |
 | 已确认 SPEC 后发生范围漂移 | 任何产品条款变化必须形成明确 diff 并重新由学生确认；状态/证据元数据不得静默改变验收合同 |
 | D-025 公网托管 | 保持开放，仅阻塞 host-specific 发布和最终 URL；不阻塞本地实现 |
-| Claude Code 尚未安装/登录 | 学生已选择其作为 D-005 类型；G-03 前由学生控制账号与全新 session |
+| 当前非 Codex 冷启动工具均不可访问 | 允许 G-03P 先暴露问题但不得越过门禁；正式 G-03 等待学生可访问的不同类型工具 |
 | 真实课件许可未知 | 只允许本地私人使用；仓库、CI、分发和 demo 只能使用合成或明确许可 fixture |
 | Provider 能力/政策/价格会变化 | 每次实现/运行前刷新 allowlisted snapshot；无法证明时失败关闭 |
 | Windows/OCI 打包兼容性未证明 | 保留为 DIST task，必须用当次干净环境证据闭合 |
@@ -282,7 +289,7 @@ React/Vite WebUI
 
 1. 学生确认本精简 `SPEC.md`。**已于 2026-07-25 完成。**
 2. 正式调用 `writing-plans` 生成单一、可派发且经双评审的 `PLAN.md`。
-3. 使用 Claude Code 全新 session、仅凭 SPEC/PLAN 完成冷启动尝试并记录修订。
+3. 先记录同类型 Codex 的 G-03P 占位结果；随后使用可访问的不同类型全新 session、仅凭最终 SPEC/PLAN 完成正式 G-03 并记录修订。
 4. 学生确认冷启动修订并明确批准实现。
 5. 才可使用 worktree、subagent、TDD 和两阶段评审编写正式代码。
 
