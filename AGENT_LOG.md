@@ -980,5 +980,5 @@
 - **安全与许可证边界**：未运行登录、未读取钥匙串、未输入或输出账号凭据/API Key、未调用模型服务。安装物只存在于 Git 忽略的 `tmp/toolchains/claude-code/`，不是产品依赖，也未加入分发。包清单声明 `SEE LICENSE IN README.md`，README 指向 Anthropic Commercial Terms 和 Privacy Policy；正式使用时由学生本人接受账号与服务条款。
 - **文档修改**：把 `docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md` 和 `DECISIONS_NEEDED.md` 改为中文，保留命令、哈希、任务编号和原始工具输出字面值；合并重复 G-03 待办，并新增经本机 `--help` 验证的 `--safe-mode`、空 MCP、新 session 隔离命令。今后学生需要阅读、操作或签字的 README/操作手册/决策文档默认中文；工程审计和机器证据可以保留技术原文。`REFLECTION.md` 仍只能由学生本人撰写。
 - **人工修改及原因**：没有修改已冻结并通过评审的 `SPEC.md`、`PLAN.md`，避免使 SR-08 同哈希评审失效；没有接触用户已有的 `docs/research/*` 和 `docs/engineering/SUPERPOWERS_VALIDATION.md` 修改。
-- **subagent 输出或 commit hash**：本 task 未派发 subagent；commit hash 在本次验证并提交后填写。正式非 Codex G-03 尚未执行。
+- **subagent 输出或 commit hash**：本 task 未派发 subagent；文档与安装收据提交为 `c9adf685d29634f78735be282a4551bca1f9def3`。正式非 Codex G-03 尚未执行。
 - **经验教训**：Windows PowerShell 的 `npm.ps1` 执行策略和 npm 缓存写权限是两个独立问题；使用 `npm.cmd` 解决前者，项目内 `--cache`/`--prefix` 解决后者，无需提权或修改系统策略。工具安装成功不等于账号或服务路径可用，门禁状态必须继续区分。
