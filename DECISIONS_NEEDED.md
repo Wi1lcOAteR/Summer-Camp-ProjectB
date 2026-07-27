@@ -1,81 +1,88 @@
-# DECISIONS_NEEDED
+# 需要学生决定或完成的事项
 
-> **Current snapshot:** 2026-07-27T19:17:43+08:00. This file lists only decisions or student-owned evidence that remain open. The reduced product direction remains confirmed. Final Stage-B candidate is SPEC `6A0DB7CA...11E56` and PLAN `E96C415A...972C1`; current-byte SR-08 passed, but the project remains non-dispatchable until formal different-type G-03 and G-04.
+> **当前快照：** 2026-07-28。精简后的产品方向已经确认。Stage B 最终候选为 SPEC `6A0DB7CA...11E56` 和 PLAN `E96C415A...972C1`；当前字节的 SR-08 已通过，但在正式异类智能体 G-03 和学生 G-04 批准完成前，项目仍不可派发实现。
+>
+> **语言约定：** 从 G-03 起，学生需要阅读、操作或签字的文档默认使用中文。命令、文件名、哈希、任务编号和工具原始输出保持原样。工程审计与机器证据不要求学生逐份阅读，可保留技术原文。
 
-## D-025: Public OCI Demo Host
+## 你现在只需要处理的门禁
 
-**Status:** Open, but not a blocker for SPEC confirmation, plan authoring, cold start or host-neutral local implementation. It blocks host-specific release work and the required public HTTPS URL.
+1. **G-03：** 用已安装的 Claude Code 完成一次正式异类智能体冷启动；如果登录或服务仍不可用，返回完整错误即可。
+2. **G-04：** G-03 完成并修订问题后，你需要明确回复是否批准进入实现阶段。
 
-**Confirmed conflict:** The previously selected Hugging Face Docker Space route requires an eligible paid plan and is incompatible with the current no-paid-resource authorization.
+D-025 公网托管、远程仓库授权和学生反思都不是当前这一步需要立即完成的事项。
 
-**Options retained for later decision:**
+## G-03：异类智能体冷启动
 
-1. Use an existing student/NJU-controlled x64 Docker host with existing HTTPS or an explicitly accepted Tailscale Funnel boundary.
-2. Use Azure for Students plus Azure Container Apps Consumption, subject to eligibility, explicit resource authorization and no pay-as-you-go upgrade.
-3. Explicitly authorize a paid Hugging Face plan and a recurring cost ceiling.
+**状态：** 待执行。Claude Code `2.1.220` 已安装到项目忽略目录并通过 `--version` 验证；账号登录与服务可达性尚未验证。Gemini 仍需要特殊中转，Copilot 尚未开通。
 
-No account, payment method, cloud resource, image push or deployment may be created before the student selects a route and authorizes the corresponding external action.
+**此前的 G-03P 证据：** 全新、无项目历史的 Codex 任务 `019fa331-3da1-7f80-a37c-ac7abb135a46` 只收到 SPEC `6A0DB7...11E56` 和前一版 PLAN `D574B8...1D742`。它得到精确 `CONTRACT_RED scanner_missing`，随后以未修改合同完成八组 `BOOTSTRAP_SCANNER_CONTRACT_PASS` 和全部十一个 helper。附加 tracked+staged 自扫描因为合同保存了赋值 fixture 而以 exit 2 失败；最终 PLAN `E96C...` 已要求在运行时拼接 fixture，并精确得到 `CREDENTIAL_SCAN_PASS files=4`。当前哈希的双评审已通过，但同类型 Codex 占位不能关闭正式 G-03。
 
-## G-03: Different-Type Cold Start
+**学生需要执行：** 按 [`docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md`](docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md) 在全新、无历史会话中只提供最终 `SPEC.md` 和 `PLAN.md`。返回工具版本、会话编号、原始问题、误解、diff、红测/绿测/自扫描收据。不要把 G-03P 输出作为第三份上下文。
 
-**Status:** Open. Claude Code was rejected by the available service path, Gemini currently requires an unavailable special relay, and Copilot is not provisioned. Any newly accessible non-Codex coding agent may be used; the student controls its account, login and terms.
+## G-04：批准进入实现阶段
 
-**G-03P receipt:** Fresh projectless Codex task `019fa331-3da1-7f80-a37c-ac7abb135a46` received only SPEC `6A0DB7...11E56` and predecessor PLAN `D574B8...1D742`. It reported no material ambiguity, produced exact `CONTRACT_RED scanner_missing`, then an unchanged eight-group `BOOTSTRAP_SCANNER_CONTRACT_PASS` using all eleven named helpers. Its extra tracked+staged self-scan exited 2 because the generated contract stored assignment fixtures; this output gap was repaired in final PLAN `E96C...` by requiring runtime-fragment fixtures and exact `CREDENTIAL_SCAN_PASS files=4`. Focused current-hash dual review passed. G-03P remains same-family and cannot close formal G-03.
+**状态：** 现在还不能批准。只有以下条件全部满足后，才会请求你明确批准：
 
-**Remaining student-owned action:** When one non-Codex service becomes usable, follow [`docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md`](docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md) in a fresh session with no memory and provide only the final `SPEC.md` plus `PLAN.md`. Record the tool/version/session and return its exact questions, misunderstandings, diff and red/green receipt. Do not supply G-03P output as a third context file.
+1. 精简 SPEC 已确认；
+2. `writing-plans` 已生成并评审实现 PLAN（已关闭）；
+3. 异类编码智能体冷启动完成（待完成）；
+4. 冷启动暴露的 SPEC/PLAN 缺陷已修复并重新评审（G-03P 缺陷已关闭，正式 G-03 仍可能发现新问题）。
 
-**Remaining student-owned action:** run one fresh non-Codex coding agent on the final hashes, using only `SPEC.md` and `PLAN.md`, and return its raw questions/red/green/self-scan receipt. Current same-hash dual review is already closed; neither that review nor G-03P authorizes implementation.
+届时请明确回复“批准进入实现阶段”或拒绝并说明原因。此前的“继续”、SPEC 确认或允许无人值守都不自动算作 G-04 批准。
 
-## Future Implementation Approval
+## D-025：公网 OCI 演示托管
 
-**Status:** Not yet requestable. It becomes available only after:
+**状态：** 待决定，但不阻塞 SPEC、计划、冷启动和与主机无关的本地实现。它只阻塞主机专用发布工作和课程要求的公网 HTTPS URL。
 
-1. the reduced SPEC is confirmed;
-2. `writing-plans` produces a reviewed implementation PLAN (**closed**);
-3. a different-type coding-agent cold start is completed (**open**);
-4. exposed SPEC/PLAN defects are repaired and reviewed (**G-03P defects closed; formal G-03 may still expose more**).
+**已确认冲突：** 原先选择的 Hugging Face Docker Space 路线需要符合条件的付费计划，与当前“不创建付费资源”的授权冲突。
 
-The student must then explicitly approve entering implementation. No earlier `continue` statement is reused as this approval.
+后续可选方案：
 
-## External Execution Authorizations
+1. 使用学生或 NJU 已有的 x64 Docker 主机和现成 HTTPS；或由学生明确接受 Tailscale Funnel 的暴露边界。
+2. 使用 Azure for Students 加 Azure Container Apps Consumption，但前提是学生资格有效、明确授权创建资源，并且不升级到按量付费账户。
+3. 明确授权付费 Hugging Face 计划，并给出可接受的周期性费用上限。
 
-These are deferred until their PLAN tasks are ready and remain separate approvals:
+在学生选择路线并授权对应外部操作前，不得创建账号、付款方式、云资源，不得推送镜像或部署。
 
-- create or configure NJU Git/GitLab and GitHub repositories;
-- push branches, create PR/MR, or mirror commits;
-- observe remote CI as final evidence;
-- publish an OCI image or Windows release artifact;
-- create cloud resources or deploy the public WebUI;
-- perform an explicitly bounded live OpenAI integration observation.
+## 后续外部操作授权
 
-Local implementation, mocks, tests and builds do not imply permission for these external actions.
+这些授权延后到对应 PLAN task 准备执行时分别确认：
 
-## Student-Written Process Evidence
+- 创建或配置 NJU Git/GitLab 与 GitHub 仓库；
+- push 分支、创建 PR/MR 或镜像提交；
+- 把远程 CI 运行结果作为最终证据；
+- 发布 OCI 镜像或 Windows release 产物；
+- 创建云资源或部署公网 WebUI；
+- 执行一次范围明确、成本受控的真实 OpenAI 集成观察。
 
-The student still needs to provide, in their own words:
+本地实现、mock、测试和构建不自动包含这些外部权限。
 
-- which brainstorming questions genuinely helped;
-- which parts felt redundant or overly formal;
-- the most important product or engineering trade-off;
-- the final 1500--2500 Chinese-character `REFLECTION.md`.
+## 学生本人撰写的过程证据
 
-AI must not draft or conceal authorship of `REFLECTION.md`. After a student draft exists, AI may proofread or identify argument gaps and must disclose the assistance scope.
+学生后续仍需用自己的话提供：
 
-## Resolved Decision Index
+- 哪些 brainstorming 问题确实有帮助；
+- 哪些过程感觉重复或过度形式化；
+- 最重要的产品或工程取舍；
+- 最终 1500--2500 个中文字符的 `REFLECTION.md`。
 
-| IDs / topic | Resolved outcome |
+AI 不得代写或隐瞒 `REFLECTION.md` 的作者身份。学生初稿存在后，AI 可以校对、压缩或指出论证缺口，并必须说明辅助范围。
+
+## 已关闭决定索引
+
+| 编号或主题 | 已确认结果 |
 | --- | --- |
-| D-001 | Superpowers installed, enabled and callable; 14 skills detected; formal `writing-plans` invocation previously occurred |
-| D-002, D-006, D-007 | Single-user course-learning workbench; first validation domain is operating-systems concurrency |
-| D-008--D-010 | Local-first Windows x64 WebUI and explicit user-controlled material handling |
-| D-011--D-012 | Understanding plus ongoing/finals review loop |
-| D-013 | v1 has constrained model ports and no autonomous agent loop |
-| D-015--D-018 | One provider-neutral boundary, built-in OpenAI adapter, no arbitrary endpoint/plugin |
-| D-020--D-023 | Deterministic planning; Windows single-file plus OCI demo; synthetic/licensed public fixtures; GitLab primary plus GitHub mirror |
-| D-024 | Open Design `frontend-design` plus `default` / Neutral Modern selected |
-| 2026-07-25 scope reset | Reduced v1; input PDF/TXT/Markdown; modes L+P; generic concept model with mutex/race/deadlock acceptance; deferred capabilities archived |
-| 2026-07-25 reduced SPEC signature | Student explicitly confirmed the complete `C6231816...9AD6` content snapshot; `writing-plans` is now authorized, but cold-start repair and implementation approval remain later gates |
+| D-001 | Superpowers 已安装、启用并可调用；检测到 14 个 skills；此前已正式调用 `writing-plans` |
+| D-002、D-006、D-007 | 单用户课程学习工作台；首个验收领域为操作系统并发 |
+| D-008--D-010 | 本地优先的 Windows x64 WebUI，并由用户显式控制材料处理 |
+| D-011--D-012 | 理解学习加连续复习与期末复习闭环 |
+| D-013 | v1 使用受约束模型端口，不包含自主 agent 主循环 |
+| D-015--D-018 | 单一 provider-neutral 边界、内置 OpenAI adapter、不支持任意 endpoint/plugin |
+| D-020--D-023 | 确定性计划；Windows 单文件加 OCI demo；合成或有许可的公开 fixture；GitLab 主仓加 GitHub 镜像 |
+| D-024 | Open Design `frontend-design` 加 `default` / Neutral Modern |
+| 2026-07-25 范围收束 | 精简 v1；输入 PDF/TXT/Markdown；L+P 模式；通用概念模型，以互斥/竞态/死锁验收；延期能力已归档 |
+| 2026-07-25 精简 SPEC 签字 | 学生明确确认完整 `C6231816...9AD6` 内容快照；已授权 `writing-plans`，但冷启动修订和实现批准仍是后续门禁 |
 
-## Engineering Checks That Are Not Student Decisions
+## 不需要学生决定的工程检查
 
-Dependency licenses, exact toolchain materialization, provider capability/policy refresh, parser and package compatibility, secret scanning, clean-machine build, browser evidence, CI schema and performance measurements remain engineering verification tasks. A failed check may require a later SPEC change, but it must not be presented as a product choice unless it actually changes user-visible scope, cost or external authority.
+依赖许可证、精确工具链物化、provider 能力/政策刷新、解析器与包兼容性、凭据扫描、干净机器构建、浏览器证据、CI schema 和性能测量都属于工程验证。检查失败可能导致后续修改 SPEC，但只有当它实际改变用户可见范围、成本或外部权限时，才会上升为学生产品决策。

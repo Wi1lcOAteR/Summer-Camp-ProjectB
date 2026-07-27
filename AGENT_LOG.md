@@ -970,3 +970,15 @@
 - **人工修改及原因**：学生未新增产品/托管/付费选择。主智能体只修复评审与 cold-start 暴露的确定性合同，并保持无关 research/validation 修改 unstaged；没有代批任何桌面权限或外部操作。
 - **commit hash**：`059082cf700f40a43b2bb931b996b04fac654f69`（`docs(stage-b): close reviewed cold-start remediation [agent: Codex]`）；这是 SR-08/current G-03P remediation 检查点，不是正式 G-03、G-04 或实现完成。
 - **经验教训**：合同测试全绿仍可能无法通过同一提交安全门；cold-start task 的 Done 必须验证它自己将提交的字节，而不是只验证被测行为。PLAN 中的 task owner 变化也必须同步所有冻结 evidence ledger，否则“唯一权威输入”会互相矛盾。
+
+## 2026-07-28T07:32:59+08:00 - G-03-SETUP Claude Code 本地安装与学生文档中文化
+
+- **Task 编号**：G-03-SETUP（只准备异类智能体工具和中文操作材料；不执行正式冷启动，不进入产品实现）。
+- **触发的 Superpowers skill**：使用 `using-superpowers` 约束技能选择；npm 首次读取失败后完整使用 `systematic-debugging`，先复现并定位默认缓存目录权限问题，再改变单一变量复验；完成前使用 `verification-before-completion`。未触发实现 worktree、产品 TDD、subagent 派发或 finishing。
+- **关键 prompt / context**：学生要求尝试通过 Node.js 安装 Claude Code，并要求 G-03 操作手册及后续所有需要学生阅读的文档使用中文。冻结 SPEC/PLAN 不得因翻译操作而改变，正式 G-03、G-04 和 D-025 仍保持门禁状态。
+- **安装证据**：本机 `node v24.14.0`、`npm.cmd 11.9.0`、Git for Windows `2.55.0.windows.3`；npm registry 元数据返回 `@anthropic-ai/claude-code 2.1.220`、Node engine `>=22.0.0` 和 integrity `sha512-ogBr...2Auyw==`。首次 `npm view` 因默认 `C:\Users\22078\AppData\Local\npm-cache` 无写权限返回 `EPERM`；把 cache 和 prefix 限定到仓库已忽略的 `tmp/` 后成功安装 2 个 package。`tmp/toolchains/claude-code/node_modules/.bin/claude.cmd --version` 实际输出 `2.1.220 (Claude Code)`；手册中的 `--safe-mode`、空 MCP、新 session 参数组合也通过本机参数解析并返回同一版本。
+- **安全与许可证边界**：未运行登录、未读取钥匙串、未输入或输出账号凭据/API Key、未调用模型服务。安装物只存在于 Git 忽略的 `tmp/toolchains/claude-code/`，不是产品依赖，也未加入分发。包清单声明 `SEE LICENSE IN README.md`，README 指向 Anthropic Commercial Terms 和 Privacy Policy；正式使用时由学生本人接受账号与服务条款。
+- **文档修改**：把 `docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md` 和 `DECISIONS_NEEDED.md` 改为中文，保留命令、哈希、任务编号和原始工具输出字面值；合并重复 G-03 待办，并新增经本机 `--help` 验证的 `--safe-mode`、空 MCP、新 session 隔离命令。今后学生需要阅读、操作或签字的 README/操作手册/决策文档默认中文；工程审计和机器证据可以保留技术原文。`REFLECTION.md` 仍只能由学生本人撰写。
+- **人工修改及原因**：没有修改已冻结并通过评审的 `SPEC.md`、`PLAN.md`，避免使 SR-08 同哈希评审失效；没有接触用户已有的 `docs/research/*` 和 `docs/engineering/SUPERPOWERS_VALIDATION.md` 修改。
+- **subagent 输出或 commit hash**：本 task 未派发 subagent；commit hash 在本次验证并提交后填写。正式非 Codex G-03 尚未执行。
+- **经验教训**：Windows PowerShell 的 `npm.ps1` 执行策略和 npm 缓存写权限是两个独立问题；使用 `npm.cmd` 解决前者，项目内 `--cache`/`--prefix` 解决后者，无需提权或修改系统策略。工具安装成功不等于账号或服务路径可用，门禁状态必须继续区分。
