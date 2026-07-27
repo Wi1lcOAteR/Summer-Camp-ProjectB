@@ -968,5 +968,5 @@
 - **最终 review**：current-hash course/SPEC review 为 `PASS; Critical=0, Major=0, Minor=0`；quality/security/license review 为 `PASS; Critical=0, Major=0, Minor=1`。唯一 Minor 是 Pillow 未有明确 v1 生产用途；不得因此宣称依赖最小化已完成。
 - **最终身份与门禁**：SPEC `6A0DB7CAD19533FE9A31EA81A6B30ED493C01BE59D4C98DEB6EC04A89BD11E56`（27188 bytes）；PLAN `E96C415AD716B002AD9B1EB3C2AFD7C78F693486CB83A795110B99B6755972C1`（82442 bytes）；35 task/35 ledger/24 AC/0 placeholder。SR-08 closed；正式非 Codex G-03、学生 G-04、D-025、远程授权和 `REFLECTION.md` 仍开放。
 - **人工修改及原因**：学生未新增产品/托管/付费选择。主智能体只修复评审与 cold-start 暴露的确定性合同，并保持无关 research/validation 修改 unstaged；没有代批任何桌面权限或外部操作。
-- **commit hash**：待本轮最终 staged scan、验证和检查点提交后填写。
+- **commit hash**：`059082cf700f40a43b2bb931b996b04fac654f69`（`docs(stage-b): close reviewed cold-start remediation [agent: Codex]`）；这是 SR-08/current G-03P remediation 检查点，不是正式 G-03、G-04 或实现完成。
 - **经验教训**：合同测试全绿仍可能无法通过同一提交安全门；cold-start task 的 Done 必须验证它自己将提交的字节，而不是只验证被测行为。PLAN 中的 task owner 变化也必须同步所有冻结 evidence ledger，否则“唯一权威输入”会互相矛盾。
