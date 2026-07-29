@@ -1013,5 +1013,5 @@
 - **模型输出与费用**：Claude 报告正确哈希/文件列表并读取 F-01S，检查 Git/PowerShell 后只创建空 `scripts/tests`。可用 Bash/Edit/Read，实际没有 Edit；没有问题、diff、红测、绿测或自扫描。结果为空 `end_turn`，CLI exit 0、permission denial 0、费用约 `$0.4712`。独立文件检查确认仍只有 SPEC/PLAN。
 - **故障根因与 TDD 修订**：runner 错把 CLI exit 0 视为任务完成，没有验证 task 产物。先新增本地后置条件测试并观察实现文件缺失红；最小 helper 后测试输出 `G03_POSTCONDITION_TEST_PASS`。runner 现要求隔离目录恰好包含两份冻结输入和两份非空脚本，否则写 `COLD_START_INCOMPLETE`；本次目录被精确判为 `required_artifact_missing`。下一次默认模型单变量改为端点列出的 `claude-sonnet-4-6`。
 - **人工修改及原因**：只修改 Git 忽略的 runner/helper/test 和过程文档；SPEC/PLAN、产品源码、远程资源、用户研究草稿与 `REFLECTION.md` 均未修改。
-- **subagent 输出或 commit hash**：没有派发 Codex subagent；异类智能体即上述隔离 Claude Code session。过程文档提交哈希待提交。G-03、G-04 仍开放。
+- **subagent 输出或 commit hash**：没有派发 Codex subagent；异类智能体即上述隔离 Claude Code session。过程文档收据为 `4e7f7ed8c6110caa4776ff1d9cea150b2c03758c`。G-03、G-04 仍开放。
 - **经验教训**：进程成功只证明 CLI 正常结束。冷启动门禁必须同时验证冻结上下文、实际产物和测试收据；第三方兼容端点返回空 `end_turn` 时必须按不完整失败处理，不能靠 exit code 制造 PASS。
