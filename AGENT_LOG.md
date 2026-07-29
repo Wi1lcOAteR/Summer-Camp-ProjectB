@@ -1002,5 +1002,5 @@
 - **公开探针**：浏览器安全层拒绝自定义域名，Windows curl 又因 Schannel `SEC_E_NO_CREDENTIALS` 失败；未关闭 TLS 校验，改用 Node 24 fetch。根路径返回 200；无凭据 `/v1/models` 返回 `API_KEY_REQUIRED` 并声明支持 Bearer、`x-api-key`、`x-goog-api-key`；Anthropic `/v1/messages` 对假的 x-api-key 和 Bearer 均返回 `INVALID_API_KEY`。未使用真实凭据、未产生模型 token 或费用。
 - **runner 修订**：端点改为 `ai2.1343263.xyz`，保留 Bearer token；隐藏输入后先查询 `/v1/models`，过滤真实 Claude 模型并在多个候选时要求终端选择；所选模型写入脱敏 metadata 并通过 `--model` 传给 Claude Code。旧 401 保留为历史证据，不倒写成功。
 - **人工修改及原因**：只修改 Git 忽略的本地 runner 和中文过程文档，不改 SPEC/PLAN、产品 provider 设计、源码、远程资源或 `REFLECTION.md`。
-- **subagent 输出或 commit hash**：没有派发 subagent；runner 的 PowerShell 语法、静态安全约束和假凭据失败路径已在本地复验，正式 Claude turn 仍未发生。端点修订收据将在提交后另行绑定；G-03 与 G-04 仍开放。
+- **subagent 输出或 commit hash**：没有派发 subagent；runner 的 PowerShell 语法、静态安全约束和假凭据失败路径已在本地复验，正式 Claude turn 仍未发生。端点修订收据为 `5af19473006c0a6628554f5b3358e4a5278b71cd`；G-03 与 G-04 仍开放。
 - **经验教训**：自定义端点的网页首页可访问不代表 API 配置正确；必须分别验证协议路径、认证头和服务实际返回的模型 ID。模型发现应优先于硬编码别名，尤其是第三方 Anthropic-compatible gateway。
