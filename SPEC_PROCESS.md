@@ -611,3 +611,11 @@
 - **最终修订：** PLAN `E96C415A...972C1`（82442 bytes）要求两份脚本在新 disposable Git 中同时 tracked+staged，精确得到 `CREDENTIAL_SCAN_PASS files=4`；direct/assignment/private/encoded 正例都必须由非匹配碎片在运行时拼接。F-01S 正式 ledger 仍为 not started。
 - **最终 SR-08：** 当前 SPEC/PLAN focused 课程/SPEC review 返回 `PASS; 0/0/0`；质量/安全/许可证 review 返回 `PASS; Critical=0, Major=0, Minor=1`。唯一 Minor 是 Pillow 12.3.0 在 v1 没有明确生产角色，F-01A 应证明必要性或通过受审 evidence/lock 更新移除。bootstrap license owner 修订后的 evidence hash 为 `FD65C5...4F310`，stale-hash red 与新 hash green 均真实运行。
 - **门禁结论：** SR-08 已闭合，但 G-03P 不是不同类型智能体。正式 G-03 必须使用最终 `6A0DB7...11E56` / `E96C415A...972C1`，随后学生才能作 G-04 实现批准。未创建产品源码、实现 worktree、远程 CI、分发物、部署或 `REFLECTION.md`。
+
+## 12. 2026-07-29 正式 G-03 认证失败收据
+
+- **冻结输入与隔离：** 会话 `a7671467-4cdb-4473-a9ab-587c336ef68d` 使用 Claude Code `2.1.220`，初始目录精确包含 `SPEC.md` 和 `PLAN.md`。SHA-256 分别为 `6A0DB7CAD19533FE9A31EA81A6B30ED493C01BE59D4C98DEB6EC04A89BD11E56` 与 `E96C415AD716B002AD9B1EB3C2AFD7C78F693486CB83A795110B99B6755972C1`，与最终冻结输入一致。
+- **运行结果：** CLI 初始化后当前中转端点连续返回 `401 authentication_failed`，最终 exit 1。模型没有收到 prompt token，也没有输出 token；报告费用为 0。隔离目录仍只有两份输入文件，没有问题、diff、红测、绿测、自扫描或 F-01S 产物。
+- **安全处理：** 凭据由隐藏提示输入，只进入 runner/Claude 父进程；保存日志对 key 模式和服务端掩码后缀再次脱敏。后续 runner 明确启用 `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1`，防止 Bash、hooks 或 MCP 子进程继承认证信息；不记录或复述密钥。
+- **暴露的执行器问题与修订：** 首次 runner 的内联 MCP JSON 经 Windows `.cmd` 后丢失引号，已删除；用户级 Claude `env` 会重新注入旧认证，已改为 `--setting-sources project` 并显式配置当前中转；增加 `--allowedTools`、API 120 秒超时和 2 次重试上限。PowerShell 5.1 对无 BOM UTF-8 的中文解析问题通过 UTF-8 BOM 修复并完成文件级语法复验。
+- **门禁结论：** 这是同期、可核验的失败 transport/auth 收据，但没有执行冷启动 task，不能闭合 G-03。下一次运行前必须由学生确认凭据所属 API base URL、认证头类型和模型名；不得凭猜测反复发送。

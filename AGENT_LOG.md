@@ -982,3 +982,14 @@
 - **人工修改及原因**：没有修改已冻结并通过评审的 `SPEC.md`、`PLAN.md`，避免使 SR-08 同哈希评审失效；没有接触用户已有的 `docs/research/*` 和 `docs/engineering/SUPERPOWERS_VALIDATION.md` 修改。
 - **subagent 输出或 commit hash**：本 task 未派发 subagent；文档与安装收据提交为 `c9adf685d29634f78735be282a4551bca1f9def3`。正式非 Codex G-03 尚未执行。
 - **经验教训**：Windows PowerShell 的 `npm.ps1` 执行策略和 npm 缓存写权限是两个独立问题；使用 `npm.cmd` 解决前者，项目内 `--cache`/`--prefix` 解决后者，无需提权或修改系统策略。工具安装成功不等于账号或服务路径可用，门禁状态必须继续区分。
+
+## 2026-07-29T16:35:21+08:00 - G-03-001 正式异类冷启动认证失败
+
+- **Task 编号**：G-03-001（正式异类智能体冷启动 transport/auth 尝试；未到达 F-01S 实现）。
+- **触发的 Superpowers skill**：使用 `using-superpowers`、`systematic-debugging` 和 `verification-before-completion`；因为模型 turn 未开始，没有触发产品 TDD、worktree、subagent implementation 或 finishing。
+- **关键 prompt / context**：学生要求用 Claude Code 和一次性 API 凭据执行 G-03。主智能体拒绝把聊天中已公开的 key 写入工具参数或文件，改用 PowerShell `Read-Host -AsSecureString` 隐藏输入；runner 只复制冻结 SPEC/PLAN 到系统临时目录。
+- **运行收据**：会话 `a7671467-4cdb-4473-a9ab-587c336ef68d`，Claude Code `2.1.220`；SPEC/PLAN 哈希精确为 `6A0DB7...11E56` / `E96C415A...972C1`，初始文件数 2。中转返回 `401 authentication_failed`，exit 1，input/output token 0、费用 0，隔离目录无新增文件。
+- **故障根因与修订**：Windows `.cmd` 破坏内联 MCP JSON；用户设置又覆盖显式 API key。runner 已删除内联 JSON，改用 Bearer token、project-only settings、显式当前中转/模型、subprocess credential scrub、`--allowedTools`、120 秒 API timeout 和 2 次 retry；并将文件写为带 BOM UTF-8 以兼容 PowerShell 5.1。当前凭据仍被端点拒绝，因此没有再次猜测认证配置。
+- **安全与人工边界**：日志对 key 和掩码后缀脱敏；未把凭据提交、写入过程文档或回显。学生仍需确认凭据平台的 base URL、认证方式和模型名。没有修改 SPEC/PLAN、产品源码、远程资源或 `REFLECTION.md`。
+- **subagent 输出或 commit hash**：没有派发 subagent；本条将在验证后的失败收据提交中记录。正式 G-03 和 G-04 仍开放。
+- **经验教训**：CLI init 不等于模型已执行；只有出现模型问题/产物和 task 验证才可能闭合 G-03。代理端点、认证头和模型必须作为一个不可拆分的配置三元组核对，不能只凭“key 已生成”推断可用。

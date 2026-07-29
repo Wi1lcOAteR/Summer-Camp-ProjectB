@@ -1,6 +1,6 @@
 # G-03 异类智能体冷启动操作手册与 G-03P 收据
 
-> **状态：** 当前 `SR-08 PASS / G-03P 修订完成 / 正式 G-03 待执行`
+> **状态：** 当前 `SR-08 PASS / G-03P 修订完成 / 正式 G-03 认证失败待重跑`
 > **用途：** 仅供学生操作。此文件属于过程证据，不能作为第三份上下文交给冷启动智能体。
 > **语言约定：** 学生需要阅读或操作的后续文档默认使用中文；命令、文件名、哈希、任务编号和工具原始输出保持原样。
 
@@ -13,7 +13,7 @@
 - 本地启动器：`tmp/toolchains/claude-code/node_modules/.bin/claude.cmd`
 - Git for Windows Bash：`C:\Program Files\Git\bin\bash.exe`
 
-安装只证明命令可运行，尚未验证你的 Anthropic 账号、登录状态或当前网络路径能否访问服务。正式 G-03 仍需由你本人处理登录和服务条款，然后按本手册运行一次。不要向我或仓库提供账号密码、会话令牌或真实项目 API Key。
+2026-07-29 的正式尝试会话 `a7671467-4cdb-4473-a9ab-587c336ef68d` 已证明 CLI 和中转网络可达，但中转以 `401 authentication_failed` 拒绝隐藏输入的凭据。该次运行 token 和费用均为 0，也没有生成 F-01S 文件，所以必须在凭据与端点匹配后重跑。不要向聊天或仓库提供账号密码、会话令牌或真实项目 API Key。
 
 ## 冻结输入
 
@@ -48,18 +48,20 @@ Get-FileHash .\PLAN.md -Algorithm SHA256
 
 ## 第二步：启动全新 Claude Code 会话
 
-先生成并记下一个新会话编号：
+当前机器已准备本地、Git 忽略的隔离执行器。它会生成新会话编号、隐藏读取凭据、限制费用、清除子进程凭据并保存脱敏证据：
 
 ```powershell
-$ColdStartSession = [guid]::NewGuid().ToString()
-Write-Output $ColdStartSession
-& $ClaudeCli --safe-mode --no-chrome --strict-mcp-config --mcp-config '{"mcpServers":{}}' --session-id $ColdStartSession --name ProjectB-G03
+powershell -NoProfile -ExecutionPolicy Bypass -File 'E:\Personal_Documentary\ResearchProjects\ProjectB\tmp\run-g03-claude.ps1'
 ```
 
-参数含义：
+运行前必须确认凭据平台给出的 API base URL、认证方式和模型名与执行器顶部配置一致。当前本机中转配置为 `api.chatanywhere.tech`、Bearer token 和 `deepseek-v4-pro`；如果凭据来自其他平台，不得猜测或继续重试，先修改为平台提供的准确配置。
 
-- `--safe-mode`：关闭 `CLAUDE.md`、skills、plugins、hooks、MCP、agents 等自定义上下文；
-- `--strict-mcp-config` 与空 MCP 配置：不加载其他 MCP；
+隔离参数含义：
+
+- `--bare` 与 `--safe-mode`：关闭自动记忆、`CLAUDE.md`、skills、plugins、hooks、MCP 和其他自定义上下文；
+- `--setting-sources project`：排除用户设置中的旧认证值；
+- `--strict-mcp-config`：不加载其他 MCP；
+- `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1`：主进程可认证，但 Bash 等子进程看不到凭据；
 - 新 `--session-id`：避免恢复旧对话；
 - 不使用 `--continue`、`--resume`、`--add-dir` 或 `--dangerously-skip-permissions`。
 
@@ -115,4 +117,4 @@ Write-Output $ColdStartSession
 
 ## 当前阻塞
 
-Claude Code `2.1.220` 已通过 Node.js 安装并完成本地版本验证，但账号登录和服务可达性尚未验证。正式 G-03 只有在 Claude Code 或其他非 Codex 编码智能体按最终哈希完成上述流程后才关闭；G-03P 不能满足异类要求，不能批准实现，也不能关闭 G-04。
+Claude Code `2.1.220` 已安装，中转网络已到达，但会话 `a7671467-4cdb-4473-a9ab-587c336ef68d` 因凭据被当前端点拒绝而在首个模型 turn 前停止。正式 G-03 只有在 Claude Code 或其他非 Codex 编码智能体按最终哈希产出问题、diff、红/绿和自扫描证据后才关闭；G-03P 或本次 401 收据都不能批准实现，也不能关闭 G-04。
