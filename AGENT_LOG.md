@@ -991,5 +991,5 @@
 - **运行收据**：会话 `a7671467-4cdb-4473-a9ab-587c336ef68d`，Claude Code `2.1.220`；SPEC/PLAN 哈希精确为 `6A0DB7...11E56` / `E96C415A...972C1`，初始文件数 2。中转返回 `401 authentication_failed`，exit 1，input/output token 0、费用 0，隔离目录无新增文件。
 - **故障根因与修订**：Windows `.cmd` 破坏内联 MCP JSON；用户设置又覆盖显式 API key。runner 已删除内联 JSON，改用 Bearer token、project-only settings、显式当前中转/模型、subprocess credential scrub、`--allowedTools`、120 秒 API timeout 和 2 次 retry；并将文件写为带 BOM UTF-8 以兼容 PowerShell 5.1。当前凭据仍被端点拒绝，因此没有再次猜测认证配置。
 - **安全与人工边界**：日志对 key 和掩码后缀脱敏；未把凭据提交、写入过程文档或回显。学生仍需确认凭据平台的 base URL、认证方式和模型名。没有修改 SPEC/PLAN、产品源码、远程资源或 `REFLECTION.md`。
-- **subagent 输出或 commit hash**：没有派发 subagent；本条将在验证后的失败收据提交中记录。正式 G-03 和 G-04 仍开放。
+- **subagent 输出或 commit hash**：没有派发 subagent；失败收据提交为 `47e91fef3987a0ad7f6f95c3b9835979afea2277`。正式 G-03 和 G-04 仍开放。
 - **经验教训**：CLI init 不等于模型已执行；只有出现模型问题/产物和 task 验证才可能闭合 G-03。代理端点、认证头和模型必须作为一个不可拆分的配置三元组核对，不能只凭“key 已生成”推断可用。
