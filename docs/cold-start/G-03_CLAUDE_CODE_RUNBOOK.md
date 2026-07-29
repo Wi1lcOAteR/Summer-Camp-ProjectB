@@ -1,6 +1,6 @@
 # G-03 异类智能体冷启动操作手册与 G-03P 收据
 
-> **状态：** 当前 `SR-08 PASS / G-03P 修订完成 / 正式 G-03 认证失败待重跑`
+> **状态：** 当前 `SR-08 PASS / G-03P 修订完成 / 正式 G-03 端点已修正待重跑`
 > **用途：** 仅供学生操作。此文件属于过程证据，不能作为第三份上下文交给冷启动智能体。
 > **语言约定：** 学生需要阅读或操作的后续文档默认使用中文；命令、文件名、哈希、任务编号和工具原始输出保持原样。
 
@@ -13,7 +13,7 @@
 - 本地启动器：`tmp/toolchains/claude-code/node_modules/.bin/claude.cmd`
 - Git for Windows Bash：`C:\Program Files\Git\bin\bash.exe`
 
-2026-07-29 的正式尝试会话 `a7671467-4cdb-4473-a9ab-587c336ef68d` 已证明 CLI 和中转网络可达，但中转以 `401 authentication_failed` 拒绝隐藏输入的凭据。该次运行 token 和费用均为 0，也没有生成 F-01S 文件，所以必须在凭据与端点匹配后重跑。不要向聊天或仓库提供账号密码、会话令牌或真实项目 API Key。
+2026-07-29 的正式尝试会话 `a7671467-4cdb-4473-a9ab-587c336ef68d` 使用了错误的旧端点，因 `401 authentication_failed` 停止；token 和费用均为 0，也没有生成 F-01S 文件。学生随后确认正确端点为 `https://ai2.1343263.xyz`，属于直接 Claude 分组。执行器已修正并将在隐藏输入后查询真实模型列表。不要向聊天或仓库提供账号密码、会话令牌或真实项目 API Key。
 
 ## 冻结输入
 
@@ -54,7 +54,7 @@ Get-FileHash .\PLAN.md -Algorithm SHA256
 powershell -NoProfile -ExecutionPolicy Bypass -File 'E:\Personal_Documentary\ResearchProjects\ProjectB\tmp\run-g03-claude.ps1'
 ```
 
-运行前必须确认凭据平台给出的 API base URL、认证方式和模型名与执行器顶部配置一致。当前本机中转配置为 `api.chatanywhere.tech`、Bearer token 和 `deepseek-v4-pro`；如果凭据来自其他平台，不得猜测或继续重试，先修改为平台提供的准确配置。
+当前执行器固定端点为 `https://ai2.1343263.xyz`，使用该端点公开声明支持的 Bearer 认证。输入隐藏凭据后，它先请求 `/v1/models`，只列出名称中包含 `claude` 的模型；若有多个模型，由学生在终端选择。没有 Claude 模型或模型查询失败时会立即停止，不猜模型名。
 
 隔离参数含义：
 
@@ -117,4 +117,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File 'E:\Personal_Documentary\Res
 
 ## 当前阻塞
 
-Claude Code `2.1.220` 已安装，中转网络已到达，但会话 `a7671467-4cdb-4473-a9ab-587c336ef68d` 因凭据被当前端点拒绝而在首个模型 turn 前停止。正式 G-03 只有在 Claude Code 或其他非 Codex 编码智能体按最终哈希产出问题、diff、红/绿和自扫描证据后才关闭；G-03P 或本次 401 收据都不能批准实现，也不能关闭 G-04。
+Claude Code `2.1.220` 已安装，正确端点的公开协议探针已通过，但修正后的认证和模型发现尚未运行。正式 G-03 只有在 Claude Code 或其他非 Codex 编码智能体按最终哈希产出问题、diff、红/绿和自扫描证据后才关闭；G-03P 或旧端点 401 收据都不能批准实现，也不能关闭 G-04。

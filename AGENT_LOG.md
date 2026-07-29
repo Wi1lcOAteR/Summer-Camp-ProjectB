@@ -993,3 +993,14 @@
 - **安全与人工边界**：日志对 key 和掩码后缀脱敏；未把凭据提交、写入过程文档或回显。学生仍需确认凭据平台的 base URL、认证方式和模型名。没有修改 SPEC/PLAN、产品源码、远程资源或 `REFLECTION.md`。
 - **subagent 输出或 commit hash**：没有派发 subagent；失败收据提交为 `47e91fef3987a0ad7f6f95c3b9835979afea2277`。正式 G-03 和 G-04 仍开放。
 - **经验教训**：CLI init 不等于模型已执行；只有出现模型问题/产物和 task 验证才可能闭合 G-03。代理端点、认证头和模型必须作为一个不可拆分的配置三元组核对，不能只凭“key 已生成”推断可用。
+
+## 2026-07-29 - G-03-002 正确端点确认与模型发现修订
+
+- **Task 编号**：G-03-002（只修正正式冷启动 transport 配置并验证公开协议；尚未执行模型 turn）。
+- **触发的 Superpowers skill**：使用 `using-superpowers`、`systematic-debugging` 和 `verification-before-completion`；未触发产品 TDD、worktree、subagent implementation 或 finishing。
+- **关键 prompt / context**：学生确认凭据对应 `https://ai2.1343263.xyz` 的直接 Claude 分组，并预计后续继续使用该服务。该信息替代 runner 的旧 ChatAnywhere/deepseek 临时配置，但不改变产品 SPEC 中内置 OpenAI adapter 的交付范围。
+- **公开探针**：浏览器安全层拒绝自定义域名，Windows curl 又因 Schannel `SEC_E_NO_CREDENTIALS` 失败；未关闭 TLS 校验，改用 Node 24 fetch。根路径返回 200；无凭据 `/v1/models` 返回 `API_KEY_REQUIRED` 并声明支持 Bearer、`x-api-key`、`x-goog-api-key`；Anthropic `/v1/messages` 对假的 x-api-key 和 Bearer 均返回 `INVALID_API_KEY`。未使用真实凭据、未产生模型 token 或费用。
+- **runner 修订**：端点改为 `ai2.1343263.xyz`，保留 Bearer token；隐藏输入后先查询 `/v1/models`，过滤真实 Claude 模型并在多个候选时要求终端选择；所选模型写入脱敏 metadata 并通过 `--model` 传给 Claude Code。旧 401 保留为历史证据，不倒写成功。
+- **人工修改及原因**：只修改 Git 忽略的本地 runner 和中文过程文档，不改 SPEC/PLAN、产品 provider 设计、源码、远程资源或 `REFLECTION.md`。
+- **subagent 输出或 commit hash**：没有派发 subagent；runner 的 PowerShell 语法、静态安全约束和假凭据失败路径已在本地复验，正式 Claude turn 仍未发生。端点修订收据将在提交后另行绑定；G-03 与 G-04 仍开放。
+- **经验教训**：自定义端点的网页首页可访问不代表 API 配置正确；必须分别验证协议路径、认证头和服务实际返回的模型 ID。模型发现应优先于硬编码别名，尤其是第三方 Anthropic-compatible gateway。

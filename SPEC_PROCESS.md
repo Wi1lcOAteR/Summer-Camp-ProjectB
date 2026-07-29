@@ -619,3 +619,4 @@
 - **安全处理：** 凭据由隐藏提示输入，只进入 runner/Claude 父进程；保存日志对 key 模式和服务端掩码后缀再次脱敏。后续 runner 明确启用 `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1`，防止 Bash、hooks 或 MCP 子进程继承认证信息；不记录或复述密钥。
 - **暴露的执行器问题与修订：** 首次 runner 的内联 MCP JSON 经 Windows `.cmd` 后丢失引号，已删除；用户级 Claude `env` 会重新注入旧认证，已改为 `--setting-sources project` 并显式配置当前中转；增加 `--allowedTools`、API 120 秒超时和 2 次重试上限。PowerShell 5.1 对无 BOM UTF-8 的中文解析问题通过 UTF-8 BOM 修复并完成文件级语法复验。
 - **门禁结论：** 这是同期、可核验的失败 transport/auth 收据，但没有执行冷启动 task，不能闭合 G-03。下一次运行前必须由学生确认凭据所属 API base URL、认证头类型和模型名；不得凭猜测反复发送。
+- **学生端点修正：** 学生随后确认凭据对应 `https://ai2.1343263.xyz` 的直接 Claude 分组，并表示后续预计继续使用该服务。无凭据 Node TLS 探针得到根路径 200；`/v1/models` 无认证时返回 `API_KEY_REQUIRED`，明确接受 Bearer、`x-api-key` 或 `x-goog-api-key`；`/v1/messages` 对两种假凭据均返回结构化 `INVALID_API_KEY`。runner 因此改用该端点和 Bearer token，并在隐藏输入后先查询真实模型列表，不再硬编码旧服务的 `deepseek-v4-pro`。

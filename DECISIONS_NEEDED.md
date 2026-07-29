@@ -6,18 +6,18 @@
 
 ## 你现在只需要处理的门禁
 
-1. **G-03：** 当前 Claude Code 冷启动已到达中转认证，但新凭据被端点以 401 拒绝。先确认凭据属于当前中转服务，或提供与凭据匹配的服务端点，再重新运行。
+1. **G-03：** 学生已确认凭据对应端点为 `https://ai2.1343263.xyz`，属于直接 Claude 分组。执行器已改为先查询该端点的真实 Claude 模型列表；现在需要用隐藏输入重新运行。
 2. **G-04：** G-03 完成并修订问题后，你需要明确回复是否批准进入实现阶段。
 
 D-025 公网托管、远程仓库授权和学生反思都不是当前这一步需要立即完成的事项。
 
 ## G-03：异类智能体冷启动
 
-**状态：** 认证失败，尚未完成。会话 `a7671467-4cdb-4473-a9ab-587c336ef68d` 使用 Claude Code `2.1.220`，只看到最终 `SPEC.md` 与 `PLAN.md`，两个哈希正确；当前中转端点返回 `401 authentication_failed`。该次运行输入/输出 token 均为 0、费用为 0，隔离目录没有生成 F-01S 文件，因此不能作为正式 G-03 完成证据。
+**状态：** 已修正端点，待重跑。会话 `a7671467-4cdb-4473-a9ab-587c336ef68d` 对旧端点的认证失败仍保留为历史收据；学生随后确认正确端点是 `https://ai2.1343263.xyz`。无凭据探针已验证其 `/v1/models` 和 `/v1/messages` 路径可达，并接受 Bearer 或 `x-api-key` 认证格式，但真实模型列表必须在隐藏输入后查询。
 
 **此前的 G-03P 证据：** 全新、无项目历史的 Codex 任务 `019fa331-3da1-7f80-a37c-ac7abb135a46` 只收到 SPEC `6A0DB7...11E56` 和前一版 PLAN `D574B8...1D742`。它得到精确 `CONTRACT_RED scanner_missing`，随后以未修改合同完成八组 `BOOTSTRAP_SCANNER_CONTRACT_PASS` 和全部十一个 helper。附加 tracked+staged 自扫描因为合同保存了赋值 fixture 而以 exit 2 失败；最终 PLAN `E96C...` 已要求在运行时拼接 fixture，并精确得到 `CREDENTIAL_SCAN_PASS files=4`。当前哈希的双评审已通过，但同类型 Codex 占位不能关闭正式 G-03。
 
-**学生需要执行：** 不要再把密钥粘贴到聊天。先在发放凭据的平台确认它适用的 API base URL、认证头类型和模型名；当前本地配置使用 `api.chatanywhere.tech`、Bearer token 和 `deepseek-v4-pro`。确认匹配后，按 [`docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md`](docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md) 重跑，并返回原始问题、误解、diff、红测/绿测/自扫描收据。
+**学生需要执行：** 不要再把密钥粘贴到聊天。按 [`docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md`](docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md) 重跑本地执行器；它会隐藏读取凭据、查询 `ai2.1343263.xyz` 的 Claude 模型并要求选择，然后执行 F-01S。完成后返回原始问题、误解、diff、红测/绿测/自扫描收据。
 
 ## G-04：批准进入实现阶段
 
