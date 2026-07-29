@@ -1023,5 +1023,5 @@
 - **关键 prompt / context**：学生报告 Claude Code exit 1 与脱敏日志路径。主智能体只读检查 `metadata.json`、`completion.json`、`models.json`、隔离目录和结构化 `claude-output.log`，没有再次调用模型或读取密钥。
 - **运行收据**：会话 `32b62490-7817-4d3d-8452-7a29a4de94ea`，Claude Code `2.1.220`，模型 `claude-sonnet-4-6`，SPEC/PLAN 哈希 `6A0DB7...11E56` / `E96C415A...972C1`，初始文件数 2。模型读取文件并用 `certutil` 得到正确哈希后，网关返回 `API Error: 504 Gateway Time-out`；runner 状态 `CLAUDE_FAILED`、exit 1，费用约 `$0.1818`，隔离目录无新增文件。
 - **人工修改及原因**：记录第二次正式异类失败事实；不修改 SPEC/PLAN、产品源码、远程资源、用户研究草稿或 `REFLECTION.md`。
-- **subagent 输出或 commit hash**：没有派发 Codex subagent；异类智能体即上述隔离 Claude Code session。过程文档提交哈希待提交。G-03、G-04 仍开放。
+- **subagent 输出或 commit hash**：没有派发 Codex subagent；异类智能体即上述隔离 Claude Code session。过程文档收据为 `0047d3efba1e35afa27d1e96421973924afbbf9c`。G-03、G-04 仍开放。
 - **经验教训**：在同一中转上换用 Sonnet 4.6 后仍失败，继续盲目重试会消耗费用但不能增加工程确定性。下一步必须明确模型/端点策略，而不是把 504 当成可忽略的偶发输出。
