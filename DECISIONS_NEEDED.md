@@ -6,18 +6,18 @@
 
 ## 你现在只需要处理的门禁
 
-1. **G-03：** 正确端点上的首次正式异类尝试已到达 `claude-sonnet-5`，但模型在 F-01S 写入前以空 `end_turn` 结束。执行器现已增加产物后置条件，并把下一次默认模型改为 `claude-sonnet-4-6`；仍需隐藏输入重跑一次。
+1. **G-03：** 正确端点已完成两次正式异类尝试：`claude-sonnet-5` 空 `end_turn`，`claude-sonnet-4-6` 在哈希验证后返回 `504 Gateway Time-out`。两次都没有 F-01S 脚本或红绿收据；继续付费重试前需要学生明确方向。
 2. **G-04：** G-03 完成并修订问题后，你需要明确回复是否批准进入实现阶段。
 
 D-025 公网托管、远程仓库授权和学生反思都不是当前这一步需要立即完成的事项。
 
 ## G-03：异类智能体冷启动
 
-**状态：** 正式异类尝试已发生，但任务未完成。会话 `71a50d25-4cd7-48b1-9472-8107e82779ed` 使用 Claude Code `2.1.220` 和 `claude-sonnet-5`，只看到最终 SPEC/PLAN，模型调用成功并花费约 `$0.4712`。它报告了正确哈希和初始文件列表，随后只创建空的 `scripts/tests` 目录；没有脚本、问题、diff、规定红测、绿测或 `files=4` 自扫描。最终 API 返回空 `end_turn`，CLI exit 0 不能关闭 G-03。
+**状态：** 正式异类尝试已发生，但任务未完成。会话 `71a50d25-4cd7-48b1-9472-8107e82779ed` 使用 `claude-sonnet-5`，报告正确哈希后只创建空目录并以空 `end_turn` 结束，费用约 `$0.4712`。会话 `32b62490-7817-4d3d-8452-7a29a4de94ea` 使用 `claude-sonnet-4-6`，读取两份文件并验证哈希后由 `ai2.1343263.xyz` 返回 `504 Gateway Time-out`，费用约 `$0.1818`。两次都没有脚本、问题、diff、规定红测、绿测或 `files=4` 自扫描，因此不能关闭 G-03。
 
 **此前的 G-03P 证据：** 全新、无项目历史的 Codex 任务 `019fa331-3da1-7f80-a37c-ac7abb135a46` 只收到 SPEC `6A0DB7...11E56` 和前一版 PLAN `D574B8...1D742`。它得到精确 `CONTRACT_RED scanner_missing`，随后以未修改合同完成八组 `BOOTSTRAP_SCANNER_CONTRACT_PASS` 和全部十一个 helper。附加 tracked+staged 自扫描因为合同保存了赋值 fixture 而以 exit 2 失败；最终 PLAN `E96C...` 已要求在运行时拼接 fixture，并精确得到 `CREDENTIAL_SCAN_PASS files=4`。当前哈希的双评审已通过，但同类型 Codex 占位不能关闭正式 G-03。
 
-**学生需要执行：** 不要再把密钥粘贴到聊天。按 [`docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md`](docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md) 重跑本地执行器；模型列表出现时直接回车，使用新的默认 `claude-sonnet-4-6`。执行器只有在四个预期文件存在时才会显示正常完成；否则会明确显示 `COLD_START_INCOMPLETE`。完成后仍需核对原始问题、误解、diff、红测/绿测/自扫描收据。
+**学生需要执行：** 不要再把密钥粘贴到聊天。当前不建议继续盲目重试同一网关；下一步需要你明确选择是否授权一次更高成本的 `claude-opus-4-6` 重试，或改用更稳定的 Claude/Anthropic-compatible 端点，或接受本次正式异类失败收据继续讨论课程门禁风险。无论哪种，执行器只有在四个预期文件存在时才会显示正常完成；否则会明确失败。
 
 ## G-04：批准进入实现阶段
 

@@ -1,6 +1,6 @@
 # G-03 异类智能体冷启动操作手册与 G-03P 收据
 
-> **状态：** 当前 `SR-08 PASS / G-03P 修订完成 / 正式 G-03 首次模型尝试不完整待重跑`
+> **状态：** 当前 `SR-08 PASS / G-03P 修订完成 / 正式 G-03 两次模型尝试均不完整`
 > **用途：** 仅供学生操作。此文件属于过程证据，不能作为第三份上下文交给冷启动智能体。
 > **语言约定：** 学生需要阅读或操作的后续文档默认使用中文；命令、文件名、哈希、任务编号和工具原始输出保持原样。
 
@@ -13,7 +13,7 @@
 - 本地启动器：`tmp/toolchains/claude-code/node_modules/.bin/claude.cmd`
 - Git for Windows Bash：`C:\Program Files\Git\bin\bash.exe`
 
-2026-07-29 的旧端点尝试 `a7671467-4cdb-4473-a9ab-587c336ef68d` 因 `401 authentication_failed` 停止。正确端点会话 `71a50d25-4cd7-48b1-9472-8107e82779ed` 随后成功调用 `claude-sonnet-5`，但模型只创建空目录便以空 `end_turn` 结束，没有 F-01S 文件或测试收据。执行器已经增加产物后置条件，避免再把 CLI exit 0 误报为任务完成。不要向聊天或仓库提供账号密码、会话令牌或真实项目 API Key。
+2026-07-29 的旧端点尝试 `a7671467-4cdb-4473-a9ab-587c336ef68d` 因 `401 authentication_failed` 停止。正确端点会话 `71a50d25-4cd7-48b1-9472-8107e82779ed` 成功调用 `claude-sonnet-5`，但模型只创建空目录便以空 `end_turn` 结束。第二次正确端点会话 `32b62490-7817-4d3d-8452-7a29a4de94ea` 使用 `claude-sonnet-4-6`，在哈希验证后收到 `504 Gateway Time-out`。两次都没有 F-01S 文件或测试收据。执行器已经增加产物后置条件，避免再把 CLI exit 0 误报为任务完成。不要向聊天或仓库提供账号密码、会话令牌或真实项目 API Key。
 
 ## 冻结输入
 
@@ -54,7 +54,7 @@ Get-FileHash .\PLAN.md -Algorithm SHA256
 powershell -NoProfile -ExecutionPolicy Bypass -File 'E:\Personal_Documentary\ResearchProjects\ProjectB\tmp\run-g03-claude.ps1'
 ```
 
-当前执行器固定端点为 `https://ai2.1343263.xyz`，使用该端点公开声明支持的 Bearer 认证。输入隐藏凭据后，它先请求 `/v1/models`，只列出名称中包含 `claude` 的模型；若有多个模型，由学生在终端选择。下一次受控重试默认使用 `claude-sonnet-4-6`，用于区分 Sonnet 5 单模型异常与中转兼容性问题；仍可手动选择其他序号。没有 Claude 模型或模型查询失败时会立即停止，不猜模型名。
+当前执行器固定端点为 `https://ai2.1343263.xyz`，使用该端点公开声明支持的 Bearer 认证。输入隐藏凭据后，它先请求 `/v1/models`，只列出名称中包含 `claude` 的模型；若有多个模型，由学生在终端选择。`claude-sonnet-5` 与 `claude-sonnet-4-6` 已分别暴露空结果和 504；继续尝试前应明确接受可能产生的额外费用，并优先确认网关稳定性。没有 Claude 模型或模型查询失败时会立即停止，不猜模型名。
 
 隔离参数含义：
 
@@ -124,6 +124,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File 'E:\Personal_Documentary\Res
 - 会话未提出问题，未报告 SPEC/PLAN 歧义，未执行精确红测、绿测或 tracked+staged 自扫描，也没有 diff。最终结果是空 `end_turn`、CLI exit 0；记录费用约 `$0.4712`。
 - 主智能体独立检查隔离目录，实际文件仍只有两份冻结输入。新后置条件测试先因实现缺失而失败，最小实现后通过，并能把该目录判为 `required_artifact_missing`。本次是有效的正式异类失败收据，但不满足 PLAN 的 G-03 完成标准。
 
+## 正式 G-03 第二次模型尝试
+
+- 会话 `32b62490-7817-4d3d-8452-7a29a4de94ea` 使用 Claude Code `2.1.220`、端点 `ai2.1343263.xyz` 和模型 `claude-sonnet-4-6`；冻结哈希正确，初始目录精确只有 `SPEC.md`、`PLAN.md`。
+- 智能体先尝试一个不存在的 Linux 路径，随后确认 Windows 临时目录中只有两份文件，读取 SPEC/PLAN 并使用 `certutil` 得到正确 SHA-256。由于 Read 工具按错误编码显示中文，日志中出现 mojibake，但 PLAN 的英文任务协议仍可读。
+- 第 6 turn 后网关返回 `API Error: 504 Gateway Time-out`。Claude Code 记录 `subtype=success`、`is_error=true`、`stop_reason=stop_sequence`，runner 因此写 `CLAUDE_FAILED`、exit 1。费用约 `$0.1818`；隔离目录没有新增文件。
+- 这是第二份正式异类失败收据。它把问题从单个 Sonnet 5 alias 扩展为当前网关对长 Claude Code agent run 的稳定性/兼容性风险，仍不能关闭 G-03。
+
 ## 当前阻塞
 
-Claude Code `2.1.220`、正确端点认证和模型发现均已实际运行，但首次 `claude-sonnet-5` 尝试没有产出 F-01S。下一次默认改用 `claude-sonnet-4-6`，并由后置条件拒绝空产物。正式 G-03 只有在 Claude Code 或其他非 Codex 编码智能体按最终哈希产出问题、diff、红/绿和自扫描证据后才关闭；本次不完整收据、G-03P 或旧端点 401 收据都不能批准实现，也不能关闭 G-04。
+Claude Code `2.1.220`、正确端点认证和模型发现均已实际运行，但 `claude-sonnet-5` 与 `claude-sonnet-4-6` 都没有产出 F-01S。正式 G-03 只有在 Claude Code 或其他非 Codex 编码智能体按最终哈希产出问题、diff、红/绿和自扫描证据后才关闭；两次不完整收据、G-03P 或旧端点 401 收据都不能批准实现，也不能关闭 G-04。

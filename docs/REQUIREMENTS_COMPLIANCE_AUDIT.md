@@ -1,11 +1,11 @@
 # AI4SE Project B Requirements Compliance Matrix
 
-**Snapshot:** `2026-07-29T20:54:24+08:00`
+**Snapshot:** `2026-07-29T23:31:20+08:00`
 
 **SPEC:** `6A0DB7CAD19533FE9A31EA81A6B30ED493C01BE59D4C98DEB6EC04A89BD11E56`
 
 **PLAN current:** `E96C415AD716B002AD9B1EB3C2AFD7C78F693486CB83A795110B99B6755972C1`
-**Stage:** `SR-08 PASS / FORMAL G-03 INCOMPLETE + G-04 BLOCKED / NOT DISPATCHABLE`. Current hashes passed course/SPEC review with `0/0/0` and quality/security/license review with `0 Critical / 0 Major / 1 existing Minor`. A different-type attempt reached Claude, but its F-01S output was empty; a completed G-03 and student G-04 remain mandatory.
+**Stage:** `SR-08 PASS / FORMAL G-03 INCOMPLETE + G-04 BLOCKED / NOT DISPATCHABLE`. Current hashes passed course/SPEC review with `0/0/0` and quality/security/license review with `0 Critical / 0 Major / 1 existing Minor`. Two different-type Claude attempts reached the gateway, but neither produced F-01S output; a completed G-03 and student G-04 remain mandatory.
 
 `verified` means current local evidence exists; `planned` means a named active task owns it; `blocked` means a named human/external gate remains; `not-started` means no product evidence exists. This is the only active course matrix. Archived plans are recovery evidence, never PASS evidence.
 
@@ -44,7 +44,7 @@
 | Required Superpowers order | brainstorming -> plan -> worktree -> TDD -> reviews -> finish | brainstorming/writing-plans evidenced; later stages gated | G-03/G-04 then task protocol |
 | `SPEC.md` required sections | 14 sections, 8 stories, 24 AC, risks/deferred scope | verified student-confirmed document | SR-08 same-hash review |
 | `PLAN.md` exact task fields | exactly 35 tasks; dependency/parallel/files/red/green/done in each | mechanical PASS and same-hash dual review PASS | formal G-03 then G-04 |
-| Stranger cold start with only SPEC/PLAN | different-type agent attempts complete F-01S | formal Claude session `71a50d25...` used final hashes and reported the correct two-file view, but ended after creating only an empty directory; no scripts or test receipts | rerun non-Codex G-03 on final hashes with artifact postcondition |
+| Stranger cold start with only SPEC/PLAN | different-type agent attempts complete F-01S | formal Claude sessions `71a50d25...` and `32b62490...` used final hashes; first ended with empty output, second hit gateway 504; no scripts or test receipts | complete non-Codex G-03 on final hashes with stable endpoint/model |
 | Cold-start repair then implementation approval | separate post-repair student gate | repair reviewed; blocked on formal G-03 and student approval | G-03 receipt then explicit G-04; current SPEC confirmation does not substitute |
 | `SPEC_PROCESS.md` process and cold-start diff | sections 1--2 contain >3 real question/answer/revision rounds; sections 8--9 contain G-03P/review diffs | partial: first formal G-03 failure recorded; successful diff/red/green absent | rerun and record completed formal G-03 truthfully |
 | `AGENT_LOG.md` timestamp/task/skill/context/output/hash/human edits/lesson | historical and current entries exist | partial | coordinator evidence commit after every task |
@@ -61,6 +61,7 @@
 - Failed reviews: the first pair returned `Critical=0, Major=3, Minor=2` and `Critical=1, Major=10, Minor=1` against SPEC `600395...ED71` / PLAN `8A4BE...AFD`. The second pair returned `Critical=0, Major=3, Minor=0` and `Critical=0, Major=6, Minor=2` against SPEC `69A534...855E` / PLAN `47624A...225A`. Findings were repaired but verdicts are not reused.
 - Current G-03P remediation: fresh projectless task `019fa331-3da1-7f80-a37c-ac7abb135a46` used SPEC `6A0DB7...11E56` / predecessor PLAN `D574B8...1D742`, produced exact missing-scanner red and eight-group green with eleven helpers, then its optional self-scan found `credential_assignment` in both contract sources. Final PLAN `E96C...` makes exact `files=4` self-scan cleanliness mandatory; focused dual review passed. This remains same-family evidence and does not close G-03.
 - Formal G-03 incomplete attempt: Claude Code session `71a50d25-4cd7-48b1-9472-8107e82779ed` used `claude-sonnet-5`, final SPEC/PLAN hashes, and an initial two-file directory. It reported those hashes, then created only an empty `scripts/tests` directory and returned an empty `end_turn`; CLI exit 0, no permission denials, about `$0.4712`, no scripts/diff/red/green/self-scan. Runner postconditions now reject this as `required_artifact_missing`; G-03 remains open.
+- Formal G-03 gateway timeout: Claude Code session `32b62490-7817-4d3d-8452-7a29a4de94ea` used `claude-sonnet-4-6`, final hashes, and an initial two-file directory. It verified the hashes, then the gateway returned `504 Gateway Time-out`; CLI exit 1, about `$0.1818`, no scripts/diff/red/green/self-scan. G-03 remains open.
 - Bootstrap licenses: official GitHub Contents/Refs API resolved five immutable texts; task ownership correction changed evidence SHA-256 to `FD65C5D2F8421F7B99AE4D540B80A8BBED1C28C78EF45851F7C6E5051034F310`. The standard verifier binds this raw hash and all five immutable row identities; the stale-hash red and corrected green were both observed while the standard receipt stayed at 63 rows.
 - Standard: `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`.
 - Linux supplement: `LINUX_EVIDENCE_PASS ci_packages=41 demo_packages=14 license_rows=41`.

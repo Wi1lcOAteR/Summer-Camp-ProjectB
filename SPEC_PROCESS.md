@@ -628,3 +628,10 @@
 - **结束差距：** 最终 API 结果为 `subtype=success`、`stop_reason=end_turn`、空 result、CLI exit 0、permission denial 0；模型用量记录 output 1168 token、费用约 `$0.4712`。隔离目录独立复查仍只有 SPEC/PLAN 两个文件。该结果说明 CLI 传输成功不等于 task 完成，也说明本次智能体没有遵守“遇到不确定处提问并停止”的输出协议。
 - **修订 diff：** SPEC/PLAN 没有发现可归因于文本歧义的缺陷，因此保持字节和 SR-08 评审不变。Git 忽略的 runner 新增产物后置条件：最终必须恰好存在两份冻结输入与两份非空 F-01S 脚本，否则记录 `COLD_START_INCOMPLETE`。对应本地测试先因函数缺失失败，最小实现后输出 `G03_POSTCONDITION_TEST_PASS`；对本次隔离目录返回 `required_artifact_missing`。下一次只改变默认模型为端点已列出的 `claude-sonnet-4-6`，用于区分单模型异常与中转兼容性问题。
 - **门禁结论：** 这是正式不同类型智能体在最终哈希上的真实失败收据，补足了“异类工具可访问并实际尝试”的事实，但没有 PLAN 要求的 diff/红/绿/自扫描，不能关闭 G-03。F-01S ledger 仍为 `not started`，G-04 和产品实现继续阻塞。
+
+## 14. 2026-07-29 正式 G-03 第二次模型执行与网关超时
+
+- **冻结输入与模型**：会话 `32b62490-7817-4d3d-8452-7a29a4de94ea` 使用 Claude Code `2.1.220`、端点 `ai2.1343263.xyz`、模型 `claude-sonnet-4-6`。metadata 记录 SPEC `6A0DB7...11E56`、PLAN `E96C415A...972C1`，初始文件仍精确为两份。
+- **实际执行路径**：Claude 先尝试不存在的 `/mnt/data/...plugin-gateway-stack`，随后列出正确 Windows 临时目录的 `PLAN.md` 与 `SPEC.md`，读取两份文件，并用 `certutil` 重新计算出正确 SHA-256。Read 工具把中文按错误编码显示为 mojibake，但未读取仓库其他文件、远程仓库或凭据。
+- **失败原因**：第 6 turn 后日志出现 `API Error: 504 Gateway Time-out`，提示检查 inference gateway `ai2.1343263.xyz`。Claude Code 结果为 `is_error=true`、`stop_reason=stop_sequence`、费用约 `$0.1818`；runner 写入 `CLAUDE_FAILED`、exit 1。隔离目录仍只有 SPEC/PLAN，没有问题、diff、脚本、红测、绿测或 self-scan。
+- **门禁影响**：该尝试证明 `claude-sonnet-4-6` 也未能完成长 Claude Code agent run，问题更像当前网关稳定性/兼容性风险，而不是仅 Sonnet 5 alias 异常。SPEC/PLAN 不因网关 504 改字节；G-03 和 G-04 仍开放。继续付费重试前需要学生明确接受模型/端点选择和费用风险。
