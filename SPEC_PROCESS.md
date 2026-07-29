@@ -620,3 +620,11 @@
 - **暴露的执行器问题与修订：** 首次 runner 的内联 MCP JSON 经 Windows `.cmd` 后丢失引号，已删除；用户级 Claude `env` 会重新注入旧认证，已改为 `--setting-sources project` 并显式配置当前中转；增加 `--allowedTools`、API 120 秒超时和 2 次重试上限。PowerShell 5.1 对无 BOM UTF-8 的中文解析问题通过 UTF-8 BOM 修复并完成文件级语法复验。
 - **门禁结论：** 这是同期、可核验的失败 transport/auth 收据，但没有执行冷启动 task，不能闭合 G-03。下一次运行前必须由学生确认凭据所属 API base URL、认证头类型和模型名；不得凭猜测反复发送。
 - **学生端点修正：** 学生随后确认凭据对应 `https://ai2.1343263.xyz` 的直接 Claude 分组，并表示后续预计继续使用该服务。无凭据 Node TLS 探针得到根路径 200；`/v1/models` 无认证时返回 `API_KEY_REQUIRED`，明确接受 Bearer、`x-api-key` 或 `x-goog-api-key`；`/v1/messages` 对两种假凭据均返回结构化 `INVALID_API_KEY`。runner 因此改用该端点和 Bearer token，并在隐藏输入后先查询真实模型列表，不再硬编码旧服务的 `deepseek-v4-pro`。
+
+## 13. 2026-07-29 正式 G-03 首次模型执行与空产物差距
+
+- **冻结输入与陌生性：** 会话 `71a50d25-4cd7-48b1-9472-8107e82779ed` 使用 Claude Code `2.1.220` 与 `claude-sonnet-5`。runner 只复制最终 SPEC `6A0DB7...11E56` 和 PLAN `E96C415A...972C1`；metadata 的初始文件精确为两份。Claude 自行计算并报告了相同哈希与完整文件列表，没有访问仓库历史、第三份项目文档、远程仓库或产品凭据。
+- **实际尝试：** Claude 读取两份文件和 F-01S 卡片，检查 Git、PowerShell 5.1 与目录状态，并创建空的 `scripts/tests` 目录。可用工具为 Bash、Edit、Read，但日志中没有 Edit 调用。它没有提出问题、没有声明歧义、没有写入两份脚本，也没有运行规定的 `CONTRACT_RED scanner_missing`、八组绿测或 `CREDENTIAL_SCAN_PASS files=4`。
+- **结束差距：** 最终 API 结果为 `subtype=success`、`stop_reason=end_turn`、空 result、CLI exit 0、permission denial 0；模型用量记录 output 1168 token、费用约 `$0.4712`。隔离目录独立复查仍只有 SPEC/PLAN 两个文件。该结果说明 CLI 传输成功不等于 task 完成，也说明本次智能体没有遵守“遇到不确定处提问并停止”的输出协议。
+- **修订 diff：** SPEC/PLAN 没有发现可归因于文本歧义的缺陷，因此保持字节和 SR-08 评审不变。Git 忽略的 runner 新增产物后置条件：最终必须恰好存在两份冻结输入与两份非空 F-01S 脚本，否则记录 `COLD_START_INCOMPLETE`。对应本地测试先因函数缺失失败，最小实现后输出 `G03_POSTCONDITION_TEST_PASS`；对本次隔离目录返回 `required_artifact_missing`。下一次只改变默认模型为端点已列出的 `claude-sonnet-4-6`，用于区分单模型异常与中转兼容性问题。
+- **门禁结论：** 这是正式不同类型智能体在最终哈希上的真实失败收据，补足了“异类工具可访问并实际尝试”的事实，但没有 PLAN 要求的 diff/红/绿/自扫描，不能关闭 G-03。F-01S ledger 仍为 `not started`，G-04 和产品实现继续阻塞。

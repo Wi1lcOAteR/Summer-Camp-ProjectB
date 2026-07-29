@@ -1004,3 +1004,14 @@
 - **人工修改及原因**：只修改 Git 忽略的本地 runner 和中文过程文档，不改 SPEC/PLAN、产品 provider 设计、源码、远程资源或 `REFLECTION.md`。
 - **subagent 输出或 commit hash**：没有派发 subagent；runner 的 PowerShell 语法、静态安全约束和假凭据失败路径已在本地复验，正式 Claude turn 仍未发生。端点修订收据为 `5af19473006c0a6628554f5b3358e4a5278b71cd`；G-03 与 G-04 仍开放。
 - **经验教训**：自定义端点的网页首页可访问不代表 API 配置正确；必须分别验证协议路径、认证头和服务实际返回的模型 ID。模型发现应优先于硬编码别名，尤其是第三方 Anthropic-compatible gateway。
+
+## 2026-07-29T20:54:24+08:00 - G-03-003 正式 Claude 模型执行不完整
+
+- **Task 编号**：G-03-003（最终哈希上的正式异类冷启动 F-01S 尝试；结果不完整）。
+- **触发的 Superpowers skill**：使用 `using-superpowers`、`verification-before-completion`；发现 CLI exit 0 与空产物不一致后使用 `systematic-debugging`，runner 修复使用 `test-driven-development`。未触发产品 worktree、正式 F-01S、subagent implementation 或 finishing。
+- **关键 prompt / context**：Claude Code 只得到 SPEC `6A0DB7...11E56`、PLAN `E96C415A...972C1` 和要求完整尝试 F-01S 的初始 prompt。会话 `71a50d25-4cd7-48b1-9472-8107e82779ed` 使用 `claude-sonnet-5`，初始文件精确为两份。
+- **模型输出与费用**：Claude 报告正确哈希/文件列表并读取 F-01S，检查 Git/PowerShell 后只创建空 `scripts/tests`。可用 Bash/Edit/Read，实际没有 Edit；没有问题、diff、红测、绿测或自扫描。结果为空 `end_turn`，CLI exit 0、permission denial 0、费用约 `$0.4712`。独立文件检查确认仍只有 SPEC/PLAN。
+- **故障根因与 TDD 修订**：runner 错把 CLI exit 0 视为任务完成，没有验证 task 产物。先新增本地后置条件测试并观察实现文件缺失红；最小 helper 后测试输出 `G03_POSTCONDITION_TEST_PASS`。runner 现要求隔离目录恰好包含两份冻结输入和两份非空脚本，否则写 `COLD_START_INCOMPLETE`；本次目录被精确判为 `required_artifact_missing`。下一次默认模型单变量改为端点列出的 `claude-sonnet-4-6`。
+- **人工修改及原因**：只修改 Git 忽略的 runner/helper/test 和过程文档；SPEC/PLAN、产品源码、远程资源、用户研究草稿与 `REFLECTION.md` 均未修改。
+- **subagent 输出或 commit hash**：没有派发 Codex subagent；异类智能体即上述隔离 Claude Code session。过程文档提交哈希待提交。G-03、G-04 仍开放。
+- **经验教训**：进程成功只证明 CLI 正常结束。冷启动门禁必须同时验证冻结上下文、实际产物和测试收据；第三方兼容端点返回空 `end_turn` 时必须按不完整失败处理，不能靠 exit code 制造 PASS。
