@@ -24,10 +24,11 @@ $ErrorActionPreference = 'Stop'
 if ([string]::IsNullOrWhiteSpace($ProjectRoot)) {
     $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 }
+. (Join-Path $PSScriptRoot 'g03_runner_core.ps1')
 if ([string]::IsNullOrWhiteSpace($ClaudeCli)) {
     $ClaudeCli = Join-Path $ProjectRoot 'tmp\toolchains\claude-code\node_modules\@anthropic-ai\claude-code\bin\claude.exe'
 }
-. (Join-Path $PSScriptRoot 'g03_runner_core.ps1')
+$ClaudeCli = Resolve-G03ClaudeCliPath -ProjectRoot $ProjectRoot -ClaudeCli $ClaudeCli
 
 $intakeBudgetUsd = [decimal]0.20
 $executionBudgetUsd = [decimal]0.80

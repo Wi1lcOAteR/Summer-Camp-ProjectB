@@ -107,6 +107,14 @@ try {
     }
     'sandbox_runtime_mounts'
 
+    $cliRoot = Join-Path $root 'cli-root'
+    New-Item -ItemType Directory -Path (Join-Path $cliRoot 'tmp/toolchains') -Force | Out-Null
+    $cliFixture = Join-Path $cliRoot 'tmp/toolchains/claude'
+    Write-Utf8NoBom $cliFixture 'cli'
+    Assert-Equal (Resolve-G03ClaudeCliPath -ProjectRoot $cliRoot -ClaudeCli './tmp/toolchains/claude') $cliFixture 'Relative Claude CLI paths must resolve against ProjectRoot.'
+    Assert-Equal (Resolve-G03ClaudeCliPath -ProjectRoot $cliRoot -ClaudeCli $cliFixture) $cliFixture 'Absolute Claude CLI paths must remain stable.'
+    'cli_path_resolution'
+
     Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 1 -TimedOut:$false -Stdout '' -Stderr 'Invalid MCP configuration') 'cli_mcp_config' 'MCP failures must be classified without persisting raw stderr.'
     Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 1 -TimedOut:$false -Stdout '' -Stderr '401 authentication_failed') 'provider_auth' 'Authentication failures must be classified.'
     Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 1 -TimedOut:$false -Stdout '' -Stderr '504 Gateway Time-out') 'gateway_504' 'Gateway failures must be classified.'

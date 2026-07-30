@@ -135,6 +135,16 @@ function Get-G03ProcessDiagnosticCode {
     return 'child_output_protocol'
 }
 
+function Resolve-G03ClaudeCliPath {
+    param(
+        [Parameter(Mandatory = $true)][string]$ProjectRoot,
+        [Parameter(Mandatory = $true)][string]$ClaudeCli
+    )
+    $candidate = if ([IO.Path]::IsPathRooted($ClaudeCli)) { $ClaudeCli } else { Join-Path $ProjectRoot $ClaudeCli }
+    if (Test-Path -LiteralPath $candidate -PathType Leaf) { return (Resolve-Path -LiteralPath $candidate).Path }
+    return $candidate
+}
+
 function Test-G03ColdStartArtifacts {
     param([Parameter(Mandatory = $true)][string]$ColdRoot)
 

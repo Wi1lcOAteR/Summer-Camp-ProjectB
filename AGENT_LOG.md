@@ -1087,3 +1087,10 @@
 - **修订**：新增 `Get-G03ProcessDiagnosticCode`，只根据固定关键词输出 `cli_mcp_config`、`provider_auth`、`gateway_504`、`cli_startup`、`wall_timeout`、`child_nonzero`、`child_empty_output` 或 `child_output_protocol`；runner 写 `process-diagnostic.json`，字段仅为 `stage`、`exit_code`、`timed_out`、`code`，不保存 stderr、prompt、路径或凭据。
 - **TDD 与验证**：先以 helper 缺失实际失败；实现后 `G03_RUNNER_CONTRACT_PASS cases=13`、`G03_RUNNER_ENTRYPOINT_PASS cases=5`、`AGENT_CAPSULE_CONTRACT_PASS cases=9` 全部通过。真实 API key 未再次输入，模型未再次调用。
 - **人工边界**：下一次 WSL2 运行若仍失败，请只提供 `process-diagnostic.json`、`status.log` 和 `completion.json`；G-03 仍未闭合。
+
+## 2026-07-31T02:20:00+08:00 - G-03-011 WSL CLI 相对路径解析修复
+
+- **Task 编号**：G-03-011（修复真实 WSL2 intake 的 CLI 启动失败；不重试模型）。
+- **事实证据**：最新会话 `65422312-9090-4692-ae95-09d09adf7fed` 的 `process-diagnostic.json` 为 `stage=intake`、`exit_code=127`、`code=cli_startup`。runner 将子进程工作目录切换到 disposable `/tmp/projectb-g03-*`，而学生传入的 `./tmp/toolchains/.../claude` 是项目根相对路径，因此在子进程中解析失败。
+- **TDD 与修订**：新增相对/绝对 CLI 路径合同；`Resolve-G03ClaudeCliPath` 将相对路径按 `ProjectRoot` 解析为绝对路径，再交给 timeout 子进程。回归输出 `G03_RUNNER_CONTRACT_PASS cases=13`、`G03_RUNNER_ENTRYPOINT_PASS cases=5`、`AGENT_CAPSULE_CONTRACT_PASS cases=9`。
+- **人工边界**：没有重新输入或读取 key，没有调用模型；下一次正式运行仍需学生在隐藏输入框输入临时 key，G-03 尚未闭合。
