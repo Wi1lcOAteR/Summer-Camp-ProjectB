@@ -368,14 +368,16 @@ try {
         Write-G03ProcessDiagnostic -Run $intakeRun -Stage 'intake'
         Stop-G03 'INTAKE_FAILED' 43
     }
-    try { $intakeEnvelope = $intakeRun.Stdout | ConvertFrom-Json } catch {
+    $intakeJson = Get-G03ClaudeJsonPayload -Text $intakeRun.Stdout
+    if ($null -eq $intakeJson) {
         Write-G03ProcessDiagnostic -Run $intakeRun -Stage 'intake'
         Stop-G03 'INTAKE_FAILED' 44
     }
+    $intakeEnvelope = $intakeJson | ConvertFrom-Json
     if ((Test-G03IntakeEnvelope -Envelope $intakeEnvelope -MaxCostUsd $intakeBudgetUsd) -ne 'ok') {
         Stop-G03 'INTAKE_FAILED' 52
     }
-    $intakeReceipt = Get-G03ResultObject $intakeRun.Stdout
+    $intakeReceipt = Get-G03ResultObject $intakeJson
     if ($null -eq $intakeReceipt) {
         Write-G03ProcessDiagnostic -Run $intakeRun -Stage 'intake'
         Stop-G03 'INTAKE_FAILED' 44

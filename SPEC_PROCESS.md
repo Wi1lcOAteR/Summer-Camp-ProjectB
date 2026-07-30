@@ -661,3 +661,11 @@
 - **安全语义补强：** PLAN capsule、中文 G-03 手册同步记录候选 contract/scanner 原始 SHA-256 在每次重放和直接扫描前后核对；coordinator oracle 覆盖全部规则前缀、长度下限/上限/超限、标点与阻断邻接、严格解码、排序与 JSON 键序。没有改变 SPEC/PLAN 的产品范围或 G-04 门禁。
 - **当前字节：** SPEC `14C03D688A09451DCA06F66507CE4510510A8A3BC550057376B0A1EF95270713`；PLAN `95FF14D23DB92692BA005C3AA42598ABB5DDCFEE2DEFC28B950B00617C3EC663`。本地合同和入口测试均重新通过；同哈希双评审、学生确认、Linux/WSL2 正式 G-03 和 G-04 仍未关闭。
 - **最终同哈希双评审：** SPEC/课程合规 reviewer 与质量/安全/许可证 reviewer 均对上述精确字节返回 `PASS; Critical=0, Major=0, Minor=0`。这只闭合当前 SR-08 文档审查，不等于正式非 Codex G-03、学生确认或 G-04。
+
+## 18. 2026-07-31 正式 G-03 intake 提示行差距与 runner 修订
+
+- **正式失败收据：** 会话 `f195336c-e5fc-4366-9ad5-3c90fb106811` 在 WSL2 中通过 capsule、冻结输入、平台和 bubblewrap preflight；intake 运行 59 秒后 Claude Code exit 0，但 runner 以 `child_output_protocol`、exit 44 结束。没有产生 F-01S1 产物，因此不计为 G-03 完成。
+- **根因证据：** 三份早期脱敏 Claude Code 日志的首个非空行均为固定 `Permission mode forced to default` 安全提示，后续才是合法 JSON/stream-json。当前失败发生在本地 stdout 解析边界；它不同于已记录的 401 鉴权失败和 504 网关超时，不能据此认定新 key 或 API 本身失效。
+- **修订 diff：** intake 先剥离至多一次、精确枚举且大小写敏感的 Unicode/历史 mojibake 提示，再解析完整 JSON；execution 采用相同首行规则，任何其他非 JSON 行或重复提示均返回 `stream_output_protocol`。任意前缀、分隔符、ASCII 变体、大小写变化和重复 BOM 均失败关闭。
+- **真实红绿与评审：** 合同先因 helper 缺失失败；第一版宽正则又被未观测 ASCII 变体负例击中。最小严格实现后 core `cases=13`、entrypoint `cases=5`、capsule `cases=9`、历史首行回放和标准 63 行证据校验均通过。首轮规约/质量评审分别为 Major 2/Major 1；修复后的只读复核为 `PASS Critical=0 Major=0 Minor=0`。
+- **哈希与门禁：** SPEC/PLAN 仍为 `14C03D688A09451DCA06F66507CE4510510A8A3BC550057376B0A1EF95270713` / `95FF14D23DB92692BA005C3AA42598ABB5DDCFEE2DEFC28B950B00617C3EC663`。G-03、G-04、产品实现、远程授权、部署和学生本人反思仍未闭合；下一次正式运行必须重新产生完整证据，不能继承本次失败收据为 PASS。

@@ -1102,3 +1102,14 @@
 - **修订**：协议解析失败和空结果现在也写 `process-diagnostic.json`，使用固定 `child_empty_output` 或 `child_output_protocol` 枚举；入口合同新增两条诊断调用断言，core 合同新增 malformed-output 负例。
 - **验证**：`G03_RUNNER_CONTRACT_PASS cases=13`、`G03_RUNNER_ENTRYPOINT_PASS cases=5`、`AGENT_CAPSULE_CONTRACT_PASS cases=9` 全绿。没有再次输入或读取真实 key。
 - **人工边界**：下一次只需查看最新 `process-diagnostic.json` 确定 provider/CLI 输出类型；G-03 仍未闭合。
+
+## 2026-07-31T02:27:19+08:00 - G-03-013 Claude 提示行协议兼容修复
+
+- **Task 编号**：G-03-013（修复正式 WSL2 intake 的 Claude Code stdout 协议兼容；不重试模型）。
+- **触发的 Superpowers skill**：`using-superpowers`、`systematic-debugging`、`test-driven-development`、`requesting-code-review`、`receiving-code-review`、`verification-before-completion`。
+- **事实证据**：会话 `f195336c-e5fc-4366-9ad5-3c90fb106811` 通过 capsule、哈希、平台和 preflight；intake 运行 59 秒，Claude Code 子进程 exit 0，但 runner 记录 `child_output_protocol` 并以 44 结束。三份既有脱敏日志均显示 stdout 首行是固定的 `Permission mode forced to default` 安全提示，后续行才是合法 JSON/stream-json；因此本次证据不支持“API 鉴权失败”，根因是 runner 把提示行和 JSON 整体交给 `ConvertFrom-Json`。
+- **TDD 红—绿**：首次合同因 `Get-G03ClaudeJsonPayload` 缺失准确失败；宽正则实现后，新增的未观测 ASCII 变体负例又按预期失败。最小最终实现仅大小写敏感地接受正常 Unicode 提示和历史日志中的 mojibake 提示各一次；任意前言、任意分隔符、大小写变化、重复提示和重复 BOM 均拒绝。execution 同步改为只允许首行一次固定提示，其他非 JSON 行返回 `stream_output_protocol`。
+- **验证证据**：core 合同 `G03_RUNNER_CONTRACT_PASS cases=13`，入口合同 `cases=5`，capsule 合同 `cases=9`，历史真实首行回放 `G03_OBSERVED_NOTICE_COMPAT_PASS`，课程证据 `rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`。
+- **双评审**：首轮规约复核为 `FAIL Critical=0 Major=2 Minor=0`，质量/安全复核为 `FAIL Critical=0 Major=1 Minor=0`，共同指出 intake 正则过宽；规约复核另指出 execution 会跳过任意坏行。修复后只读复核为 `PASS Critical=0 Major=0 Minor=0`，独立确认变造提示与任意 execution 前言均失败关闭。
+- **人工修改及原因**：只修改 G-03 runner、core、合同和中文过程记录；SPEC/PLAN 哈希保持 `14C03D...0713` / `95FF14D...C663`。未读取或写入真实 key，未再次调用模型，未修改产品源码、远程状态、学生研究文档或 `REFLECTION.md`。
+- **门禁结论**：本次只修复 runner，不能关闭 G-03。学生仍需用相同命令重新隐藏输入临时 key；只有得到正式 `G03_EVIDENCE_READY` 并完成证据复验后，才可处理 G-04 实现批准。

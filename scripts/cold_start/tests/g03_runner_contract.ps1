@@ -125,6 +125,23 @@ try {
     Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 124 -TimedOut:$true -Stdout '' -Stderr '') 'wall_timeout' 'Timeouts must be classified.'
     'process_diagnostics'
 
+    $intakeJson = '{"subtype":"success","is_error":false,"total_cost_usd":0.10,"result":"{}"}'
+    $permissionNoticeTail = 'Permission mode forced to default '
+    $permissionNoticeSuffix = 'CLAUDE_CODE_SUBPROCESS_ENV_SCRUB is set (allowed_non_write_users hardening). Declare allowedTools explicitly, or set CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=0 to opt out.'
+    $unicodePermissionNotice = ([string][char]0x26A0) + $permissionNoticeTail + ([string][char]0x2014) + $permissionNoticeSuffix
+    $mojibakePermissionNotice = ([string][char]0x923F) + '?' + $permissionNoticeTail + ([string][char]0x9225) + '?' + $permissionNoticeSuffix
+    Assert-Equal (Get-G03ClaudeJsonPayload -Text $intakeJson) $intakeJson 'Plain Claude JSON output must remain unchanged.'
+    Assert-Equal (Get-G03ClaudeJsonPayload -Text ($unicodePermissionNotice + "`n" + $intakeJson)) $intakeJson 'The exact Unicode Claude permission notice may precede intake JSON.'
+    Assert-Equal (Get-G03ClaudeJsonPayload -Text ($unicodePermissionNotice + "`r`n" + $intakeJson)) $intakeJson 'The exact Unicode notice must work with CRLF output.'
+    Assert-Equal (Get-G03ClaudeJsonPayload -Text ($mojibakePermissionNotice + "`n" + $intakeJson)) $intakeJson 'The exact observed mojibake permission notice may precede intake JSON.'
+    Assert-Equal (Get-G03ClaudeJsonPayload -Text (([string][char]0xFEFF) + ([string][char]0xFEFF) + $mojibakePermissionNotice + "`n" + $intakeJson)) $null 'Repeated BOMs must fail closed.'
+    Assert-Equal (Get-G03ClaudeJsonPayload -Text ('Permission mode forced to default - ' + $permissionNoticeSuffix + "`n" + $intakeJson)) $null 'An unobserved ASCII notice variant must fail closed.'
+    Assert-Equal (Get-G03ClaudeJsonPayload -Text ('ABCDEFGPermission mode forced to default!!!!' + $permissionNoticeSuffix + "`n" + $intakeJson)) $null 'Arbitrary notice prefixes and separators must fail closed.'
+    Assert-Equal (Get-G03ClaudeJsonPayload -Text ($unicodePermissionNotice.Replace('Permission', 'permission') + "`n" + $intakeJson)) $null 'Notice matching must remain case-sensitive.'
+    Assert-Equal (Get-G03ClaudeJsonPayload -Text ('arbitrary provider text' + "`n" + $intakeJson)) $null 'Arbitrary stdout preambles must fail closed.'
+    Assert-Equal (Get-G03ClaudeJsonPayload -Text ($unicodePermissionNotice + "`n" + $unicodePermissionNotice + "`n" + $intakeJson)) $null 'Repeated permission notices must fail closed.'
+    'claude_json_payload'
+
     $heartbeatStartInfo = [Diagnostics.ProcessStartInfo]::new()
     $heartbeatStartInfo.FileName = (Get-Process -Id $PID).Path
     $heartbeatStartInfo.UseShellExecute = $false
@@ -319,6 +336,12 @@ if([string]::IsNullOrWhiteSpace($Path)){ 'CREDENTIAL_SCAN_ERROR {"code":"usage_m
         $streamEvidence.TddReceipt[0].output[0] -cne 'CONTRACT_RED scanner_missing') {
         throw 'The persisted red receipt must normalize the Claude wrapper to exit code 1 and the single allowed contract line.'
     }
+    $noticeStream = Get-G03ExecutionEvidence -StreamText ($unicodePermissionNotice + "`n" + $stream) -MaxCostUsd ([decimal]0.80)
+    if (-not $noticeStream.Valid) { throw "The exact Unicode permission notice may precede execution stream JSON: $($noticeStream.Code)" }
+    $arbitraryPreambleStream = Get-G03ExecutionEvidence -StreamText ('ARBITRARY PREAMBLE' + "`n" + $stream) -MaxCostUsd ([decimal]0.80)
+    if ($arbitraryPreambleStream.Valid -or $arbitraryPreambleStream.Code -ne 'stream_output_protocol') { throw 'Arbitrary execution stdout preambles must fail closed.' }
+    $repeatedNoticeStream = Get-G03ExecutionEvidence -StreamText ($unicodePermissionNotice + "`n" + $unicodePermissionNotice + "`n" + $stream) -MaxCostUsd ([decimal]0.80)
+    if ($repeatedNoticeStream.Valid -or $repeatedNoticeStream.Code -ne 'stream_output_protocol') { throw 'Repeated execution permission notices must fail closed.' }
     $missingToolResult = Get-G03ExecutionEvidence -StreamText (($stream -split "`n" | Where-Object { -not ($_ -match $greenId -and $_ -match '"type":"tool_result"') }) -join "`n") -MaxCostUsd ([decimal]0.80)
     if ($missingToolResult.Valid -or $missingToolResult.Code -ne 'tdd_evidence_missing') { throw "Self-reported red/green commands without matching tool results must fail: $($missingToolResult.Code)" }
     $nullAmbiguitiesResult = ($executionResult | ConvertFrom-Json); $nullAmbiguitiesResult.ambiguities = $null

@@ -135,6 +135,48 @@ function Get-G03ProcessDiagnosticCode {
     return 'child_output_protocol'
 }
 
+function Test-G03ClaudePermissionNotice {
+    param([Parameter(Mandatory = $true)][AllowEmptyString()][string]$Text)
+
+    $candidate = $Text
+    if ($candidate.Length -gt 0 -and $candidate[0] -eq [char]0xFEFF) {
+        $candidate = $candidate.Substring(1)
+        if ($candidate.Length -gt 0 -and $candidate[0] -eq [char]0xFEFF) { return $false }
+    }
+    $tail = 'Permission mode forced to default '
+    $suffix = 'CLAUDE_CODE_SUBPROCESS_ENV_SCRUB is set (allowed_non_write_users hardening). Declare allowedTools explicitly, or set CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=0 to opt out.'
+    $unicodeNotice = ([string][char]0x26A0) + $tail + ([string][char]0x2014) + $suffix
+    $mojibakeNotice = ([string][char]0x923F) + '?' + $tail + ([string][char]0x9225) + '?' + $suffix
+    return $candidate -ceq $unicodeNotice -or $candidate -ceq $mojibakeNotice
+}
+
+function Get-G03ClaudeJsonPayload {
+    param([Parameter(Mandatory = $true)][AllowEmptyString()][string]$Text)
+
+    if ([string]::IsNullOrWhiteSpace($Text)) { return $null }
+    $candidate = $Text.TrimEnd()
+    if ($candidate.Length -gt 0 -and $candidate[0] -eq [char]0xFEFF) {
+        $candidate = $candidate.Substring(1)
+        if ($candidate.Length -gt 0 -and $candidate[0] -eq [char]0xFEFF) { return $null }
+    }
+    try {
+        $null = $candidate | ConvertFrom-Json -ErrorAction Stop
+        return $candidate
+    } catch { }
+
+    $lines = @($candidate -split "`r?`n")
+    if ($lines.Count -lt 2) { return $null }
+    if (-not (Test-G03ClaudePermissionNotice -Text $lines[0])) { return $null }
+
+    $payload = (($lines | Select-Object -Skip 1) -join "`n").Trim()
+    try {
+        $null = $payload | ConvertFrom-Json -ErrorAction Stop
+        return $payload
+    } catch {
+        return $null
+    }
+}
+
 function Resolve-G03ClaudeCliPath {
     param(
         [Parameter(Mandatory = $true)][string]$ProjectRoot,
@@ -571,9 +613,15 @@ function Get-G03ExecutionEvidence {
     $resultObject = $null
     $cost = $null
     $resultSucceeded = $false
-    foreach ($line in @($StreamText -split "`r?`n" | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })) {
+    $streamLines = @($StreamText.TrimEnd() -split "`r?`n")
+    if ($streamLines.Count -gt 0 -and (Test-G03ClaudePermissionNotice -Text $streamLines[0])) {
+        $streamLines = @($streamLines | Select-Object -Skip 1)
+    }
+    foreach ($line in $streamLines) {
         $eventIndex++
-        try { $event = $line | ConvertFrom-Json } catch { continue }
+        try { $event = $line | ConvertFrom-Json -ErrorAction Stop } catch {
+            return [pscustomobject]@{ Valid=$false; Code='stream_output_protocol'; BashCalls=$bashCalls; EditCalls=$editCalls; CostUsd=$cost }
+        }
         if ($event.PSObject.Properties.Name -contains 'message' -and $event.message.PSObject.Properties.Name -contains 'content') {
             foreach ($item in @($event.message.content)) {
                 if ($item.type -eq 'tool_use') {
