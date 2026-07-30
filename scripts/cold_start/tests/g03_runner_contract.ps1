@@ -101,6 +101,12 @@ try {
     if (-not (Test-G03SandboxPlatform -Platform WSL2)) { throw 'WSL2 must be eligible for Claude sandbox startup.' }
     'sandbox_platform'
 
+    $coreText = Get-Content -Raw -Encoding UTF8 $core
+    if ($coreText -notlike "*@('/etc','/usr','/bin','/lib','/lib64'*") {
+        throw 'Bubblewrap preflight must expose /etc read-only for PowerShell initialization.'
+    }
+    'sandbox_runtime_mounts'
+
     $heartbeatStartInfo = [Diagnostics.ProcessStartInfo]::new()
     $heartbeatStartInfo.FileName = (Get-Process -Id $PID).Path
     $heartbeatStartInfo.UseShellExecute = $false
@@ -316,7 +322,7 @@ if([string]::IsNullOrWhiteSpace($Path)){ 'CREDENTIAL_SCAN_ERROR {"code":"usage_m
     if ($empty.Valid -or $empty.Code -ne 'empty_end_turn') { throw 'Empty result must fail.' }
     'execution_evidence'
 
-    'G03_RUNNER_CONTRACT_PASS cases=11'
+    'G03_RUNNER_CONTRACT_PASS cases=12'
 } finally {
     if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
 }

@@ -239,7 +239,7 @@ function Invoke-G03BwrapCommand {
     foreach ($value in @('--unshare-all','--die-with-parent','--new-session','--clearenv','--proc','/proc','--dev','/dev','--tmpfs','/tmp','--dir','/home','--dir','/root')) {
         $arguments.Add($value)
     }
-    foreach ($runtimePath in @('/usr','/bin','/lib','/lib64','/opt/microsoft/powershell/7')) {
+    foreach ($runtimePath in @('/etc','/usr','/bin','/lib','/lib64','/opt/microsoft/powershell/7')) {
         if (Test-Path -LiteralPath $runtimePath) {
             $arguments.Add('--ro-bind')
             $arguments.Add($runtimePath)

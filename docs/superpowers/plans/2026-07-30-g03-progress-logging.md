@@ -64,4 +64,6 @@ git commit -m "fix(g03): add observable runner progress"
 
 Implementation checkpoint: `39f323d3791d78b6de0d0adb4d47bf3b5263ba5e`.
 
+WSL2 preflight fix checkpoint pending commit: expose `/etc` read-only so PowerShell/.NET can initialize inside bubblewrap. Local contract now expects `G03_RUNNER_CONTRACT_PASS cases=12`; formal WSL2 evidence is still required.
+
 Do not stage the student's existing `docs/research/*` or `docs/engineering/SUPERPOWERS_VALIDATION.md` changes.

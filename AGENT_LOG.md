@@ -1070,3 +1070,12 @@
 - **最终复验**：修复后同一差异完整运行得到入口 `cases=5`、core `cases=11`、capsule `cases=9`，严格 UTF-8 `files=8`、PowerShell AST `files=4`、作用域凭据形状扫描 `files=8`；三份标准证据与 SPEC/PLAN 哈希均保持不变。Linux/WSL2 正式进程树与 bubblewrap 仍需在目标环境现场验证，未用 Windows 单进程合同冒充正式证据。
 - **subagent 输出或 commit hash**：质量/安全 reviewer 为上述第一轮 FAIL；主智能体完成精确回归与修复闭环。实现检查点为 `39f323d3791d78b6de0d0adb4d47bf3b5263ba5e`（`fix(g03): add observable runner progress`）。正式 Linux/WSL2 live preflight、Claude 双 session、G-03 证据闭合和 G-04 仍开放。
 - **经验教训**：长时 runner 的“无输出”不能区分正常等待、网关阻塞和异常退出；可观察日志必须与敏感原始输出分离，并由受控状态码而非异常字符串提供诊断。冻结输入按原始字节绑定时，Git 行尾策略也是安全与可复现性合同的一部分。
+
+## 2026-07-31T02:00:00+08:00 - G-03-009 WSL2 bubblewrap PowerShell 初始化修复
+
+- **Task 编号**：G-03-009（修复正式 WSL2 预检，不执行 Claude 模型调用）。
+- **触发的 Superpowers skill**：`using-superpowers`、`systematic-debugging`、`test-driven-development`、`verification-before-completion`。
+- **故障证据**：用户 WSL2 会话已通过 capsule、输入哈希和平台识别，但 `preflight` 以退出码 55 失败。独立诊断中 `bwrap` 返回 PowerShell 初始化错误 `No such file or directory` 和 exit 70；用户在相同挂载参数增加只读 `--ro-bind /etc /etc` 后得到 `G03_DIAG_OK` exit 0。该差异没有输入凭据或调用网络。
+- **TDD 红—绿**：先新增 `sandbox_runtime_mounts` 合同，旧代码实际失败 `Bubblewrap preflight must expose /etc read-only for PowerShell initialization.`；最小修订把 `/etc` 加入只读 runtime mounts。随后本地合同输出 `G03_RUNNER_CONTRACT_PASS cases=12`、`G03_RUNNER_ENTRYPOINT_PASS cases=5`、`AGENT_CAPSULE_CONTRACT_PASS cases=9`。
+- **安全边界**：`/etc` 仅通过 `--ro-bind` 暴露，未增加 `/mnt`、项目目录外写权限或网络；已有 preflight 仍检查凭据环境、宿主挂载、DNS 和进程树终止。
+- **人工边界**：正式 WSL2 bubblewrap preflight 尚待学生重新运行；在用户提供新 `status.log` 前，不标记 G-03 完成，不请求或接收 API key。

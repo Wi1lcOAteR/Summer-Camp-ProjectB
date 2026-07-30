@@ -29,7 +29,7 @@ command -v socat
 node --version
 ```
 
-runner 会传入以下失败关闭策略：sandbox 必须可用、网络域名全部拒绝、禁止 unsandboxed escape、权限模式 `dontAsk`、禁用 WebFetch/WebSearch。缺少 `bwrap`、`socat`、`pwsh` 或 `timeout` 时不会询问 key，也不会调用模型。询问 key 前还会真实启动一次 bubblewrap 预检，验证凭据环境变量不可见、宿主 `/mnt` 不可见、外网不可达、写入只落在一次性目录内，并用超时样例验证进程树能够终止；任何一项失败都不会调用模型。
+runner 会传入以下失败关闭策略：sandbox 必须可用、网络域名全部拒绝、禁止 unsandboxed escape、权限模式 `dontAsk`、禁用 WebFetch/WebSearch。缺少 `bwrap`、`socat`、`pwsh` 或 `timeout` 时不会询问 key，也不会调用模型。sandbox 只读挂载 `/etc`、`/usr`、`/bin`、`/lib`、`/lib64` 和 PowerShell 运行时；其中 `/etc` 只为 PowerShell/.NET 初始化提供系统配置，不开放写入。询问 key 前还会真实启动一次 bubblewrap 预检，验证凭据环境变量不可见、宿主 `/mnt` 不可见、外网不可达、写入只落在一次性目录内，并用超时样例验证进程树能够终止；任何一项失败都不会调用模型。
 
 ## 运行时反馈日志合同
 
