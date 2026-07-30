@@ -81,6 +81,16 @@ function Write-G03Completion {
     Write-G03JsonNoBom (Join-Path $EvidenceRoot 'completion.json') $receipt
 }
 
+function Write-G03ProcessDiagnostic {
+    param([Parameter(Mandatory = $true)]$Run, [Parameter(Mandatory = $true)][ValidateSet('intake','execution')][string]$Stage)
+    Write-G03JsonNoBom (Join-Path $EvidenceRoot 'process-diagnostic.json') ([ordered]@{
+        stage = $Stage
+        exit_code = [int]$Run.ExitCode
+        timed_out = [bool]$Run.TimedOut
+        code = Get-G03ProcessDiagnosticCode -Stage $Stage -ExitCode $Run.ExitCode -TimedOut $Run.TimedOut -Stdout $Run.Stdout -Stderr $Run.Stderr
+    })
+}
+
 function Stop-G03 {
     param([string]$Status, [int]$ExitCode)
     Write-G03Progress -Stage 'completion' -Event $Status
@@ -354,6 +364,7 @@ try {
     )
     $intakeRun = Invoke-G03Claude -Arguments $intakeArgs -WallSeconds $intakeWallSeconds -SecretValue $plainKey -Stage 'intake'
     if ($intakeRun.TimedOut -or $intakeRun.ExitCode -ne 0 -or $intakeRun.Stdout -match '504 Gateway Time-out') {
+        Write-G03ProcessDiagnostic -Run $intakeRun -Stage 'intake'
         Stop-G03 'INTAKE_FAILED' 43
     }
     try { $intakeEnvelope = $intakeRun.Stdout | ConvertFrom-Json } catch { Stop-G03 'INTAKE_FAILED' 44 }
@@ -403,7 +414,10 @@ Execute only complete task F-01S1. Create exactly scripts/tests/bootstrap_scanne
         $executionPrompt
     )
     $executionRun = Invoke-G03Claude -Arguments $executionArgs -WallSeconds $executionWallSeconds -SecretValue $plainKey -Stage 'execution'
-    if ($executionRun.TimedOut -or $executionRun.ExitCode -ne 0) { Stop-G03 'EXECUTION_FAILED' 47 }
+    if ($executionRun.TimedOut -or $executionRun.ExitCode -ne 0) {
+        Write-G03ProcessDiagnostic -Run $executionRun -Stage 'execution'
+        Stop-G03 'EXECUTION_FAILED' 47
+    }
     $executionEvidence = Get-G03ExecutionEvidence -StreamText $executionRun.Stdout -MaxCostUsd $executionBudgetUsd
     if (-not $executionEvidence.Valid) { Stop-G03 'EXECUTION_FAILED' 53 }
 

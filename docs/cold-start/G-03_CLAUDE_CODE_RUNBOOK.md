@@ -101,7 +101,7 @@ pwsh -NoProfile -File ./scripts/cold_start/run_g03_claude.ps1 `
   -ClaudeCli ./tmp/toolchains/claude-code/node_modules/@anthropic-ai/claude-code/bin/claude
 ```
 
-API key 只在隐藏输入框输入。runner 不把子进程原始 stdout/stderr 写入磁盘；只保存白名单结构化字段、费用、工具调用计数、问题、产物哈希和独立重放结果。认证环境变量在 `finally` 中清除，Claude 子进程凭据继承 scrub 保持启用。
+API key 只在隐藏输入框输入。runner 不把子进程原始 stdout/stderr 写入磁盘；只保存白名单结构化字段、费用、工具调用计数、问题、产物哈希、独立重放结果和必要的脱敏 `process-diagnostic.json`。诊断文件只包含阶段、退出码、超时标志和固定枚举码，不包含原始错误、prompt、路径或凭据。认证环境变量在 `finally` 中清除，Claude 子进程凭据继承 scrub 保持启用。
 
 ## 两段执行
 

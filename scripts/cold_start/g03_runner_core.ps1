@@ -116,6 +116,25 @@ function Test-G03IntakeEnvelope {
     return 'ok'
 }
 
+function Get-G03ProcessDiagnosticCode {
+    param(
+        [Parameter(Mandatory = $true)][ValidateSet('intake','execution')][string]$Stage,
+        [Parameter(Mandatory = $true)][int]$ExitCode,
+        [Parameter(Mandatory = $true)][bool]$TimedOut,
+        [AllowEmptyString()][string]$Stdout = '',
+        [AllowEmptyString()][string]$Stderr = ''
+    )
+    if ($TimedOut -or $ExitCode -eq 124) { return 'wall_timeout' }
+    $text = (($Stdout + "`n" + $Stderr).Trim())
+    if ($text -match '(?i)504\s+Gateway\s+Time[- ]out|gateway\s+504') { return 'gateway_504' }
+    if ($text -match '(?i)401\s+authentication_failed|invalid[_ ]api[_ ]key|authentication') { return 'provider_auth' }
+    if ($text -match '(?i)invalid\s+mcp\s+configuration|mcp\s+configuration') { return 'cli_mcp_config' }
+    if ($text -match '(?i)the shell cannot be started|no such file or directory|failed during initialization') { return 'cli_startup' }
+    if ($ExitCode -ne 0) { return 'child_nonzero' }
+    if ([string]::IsNullOrWhiteSpace($text)) { return 'child_empty_output' }
+    return 'child_output_protocol'
+}
+
 function Test-G03ColdStartArtifacts {
     param([Parameter(Mandatory = $true)][string]$ColdRoot)
 

@@ -1079,3 +1079,11 @@
 - **TDD 红—绿**：先新增 `sandbox_runtime_mounts` 合同，旧代码实际失败 `Bubblewrap preflight must expose /etc read-only for PowerShell initialization.`；最小修订把 `/etc` 加入只读 runtime mounts。随后本地合同输出 `G03_RUNNER_CONTRACT_PASS cases=12`、`G03_RUNNER_ENTRYPOINT_PASS cases=5`、`AGENT_CAPSULE_CONTRACT_PASS cases=9`。
 - **安全边界**：`/etc` 仅通过 `--ro-bind` 暴露，未增加 `/mnt`、项目目录外写权限或网络；已有 preflight 仍检查凭据环境、宿主挂载、DNS 和进程树终止。
 - **人工边界**：正式 WSL2 bubblewrap preflight 尚待学生重新运行；在用户提供新 `status.log` 前，不标记 G-03 完成，不请求或接收 API key。
+
+## 2026-07-31T02:10:00+08:00 - G-03-010 intake 失败分类收据
+
+- **Task 编号**：G-03-010（为真实 WSL2 intake 失败增加脱敏诊断分类；不重试模型）。
+- **事实证据**：会话 `a323a48b-e1de-4b1a-a334-451a05608767` 已通过 preflight 并在隐藏 key 后启动 intake；`process_finished elapsed_seconds=0`，退出码 43，证据目录没有原始 stdout/stderr。该收据只能证明 intake 非零失败，不能安全推断认证或 MCP 根因。
+- **修订**：新增 `Get-G03ProcessDiagnosticCode`，只根据固定关键词输出 `cli_mcp_config`、`provider_auth`、`gateway_504`、`cli_startup`、`wall_timeout`、`child_nonzero`、`child_empty_output` 或 `child_output_protocol`；runner 写 `process-diagnostic.json`，字段仅为 `stage`、`exit_code`、`timed_out`、`code`，不保存 stderr、prompt、路径或凭据。
+- **TDD 与验证**：先以 helper 缺失实际失败；实现后 `G03_RUNNER_CONTRACT_PASS cases=13`、`G03_RUNNER_ENTRYPOINT_PASS cases=5`、`AGENT_CAPSULE_CONTRACT_PASS cases=9` 全部通过。真实 API key 未再次输入，模型未再次调用。
+- **人工边界**：下一次 WSL2 运行若仍失败，请只提供 `process-diagnostic.json`、`status.log` 和 `completion.json`；G-03 仍未闭合。

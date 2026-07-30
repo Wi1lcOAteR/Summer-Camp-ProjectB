@@ -107,6 +107,15 @@ try {
     }
     'sandbox_runtime_mounts'
 
+    Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 1 -TimedOut:$false -Stdout '' -Stderr 'Invalid MCP configuration') 'cli_mcp_config' 'MCP failures must be classified without persisting raw stderr.'
+    Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 1 -TimedOut:$false -Stdout '' -Stderr '401 authentication_failed') 'provider_auth' 'Authentication failures must be classified.'
+    Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 1 -TimedOut:$false -Stdout '' -Stderr '504 Gateway Time-out') 'gateway_504' 'Gateway failures must be classified.'
+    Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 1 -TimedOut:$false -Stdout '' -Stderr 'The shell cannot be started: No such file or directory') 'cli_startup' 'CLI startup failures must be classified.'
+    Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 1 -TimedOut:$false -Stdout '' -Stderr 'opaque failure') 'child_nonzero' 'Unknown failures must use a bounded diagnostic code.'
+    Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 0 -TimedOut:$false -Stdout '' -Stderr '') 'child_empty_output' 'Empty successful output must be classified.'
+    Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 124 -TimedOut:$true -Stdout '' -Stderr '') 'wall_timeout' 'Timeouts must be classified.'
+    'process_diagnostics'
+
     $heartbeatStartInfo = [Diagnostics.ProcessStartInfo]::new()
     $heartbeatStartInfo.FileName = (Get-Process -Id $PID).Path
     $heartbeatStartInfo.UseShellExecute = $false
@@ -322,7 +331,7 @@ if([string]::IsNullOrWhiteSpace($Path)){ 'CREDENTIAL_SCAN_ERROR {"code":"usage_m
     if ($empty.Valid -or $empty.Code -ne 'empty_end_turn') { throw 'Empty result must fail.' }
     'execution_evidence'
 
-    'G03_RUNNER_CONTRACT_PASS cases=12'
+    'G03_RUNNER_CONTRACT_PASS cases=13'
 } finally {
     if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
 }
