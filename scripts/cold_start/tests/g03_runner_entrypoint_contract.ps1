@@ -34,6 +34,11 @@ foreach ($literal in @(
     "Remove-Item Env:ANTHROPIC_AUTH_TOKEN",
     "Test-G03BwrapPreflight",
     "descendant-marker.txt",
+    "status.log",
+    "G03_EVIDENCE_ROOT",
+    "`$heartbeatSeconds = 15",
+    "'heartbeat'",
+    "'unsupported_platform'",
     "tdd_receipt = `$executionEvidence.TddReceipt",
     "'CAPSULE_INVALID'",
     "'UTF8_INVALID'",
@@ -69,13 +74,17 @@ try {
         IntakeAmbiguous = 'TEST_ONLY_INTAKE_AMBIGUOUS'
         Gateway504 = 'TEST_ONLY_EXECUTION_FAILED'
         MissingArtifacts = 'TEST_ONLY_COLD_START_INCOMPLETE'
+        UnhandledError = 'UNHANDLED_ERROR'
         Ready = 'TEST_ONLY_READY'
     }
     foreach ($scenario in $cases.Keys) {
         $evidence = Join-Path $root $scenario
+        $ErrorActionPreference = 'Continue'
         $output = @(& powershell -NoProfile -ExecutionPolicy Bypass -File $runner -AgentLanguage Auto -Model claude-sonnet-4-6 -MaxTotalBudgetUsd 1.00 -ExpectedSpecSha256 $specHash -ExpectedPlanSha256 $planHash -EvidenceRoot $evidence -TestScenario $scenario 2>&1)
-        if ($LASTEXITCODE -eq 0 -and $scenario -ne 'Ready') { throw "$scenario unexpectedly exited 0." }
-        if ($LASTEXITCODE -ne 0 -and $scenario -eq 'Ready') { throw "Ready failed: $($output -join ' ')" }
+        $scenarioExit = $LASTEXITCODE
+        $ErrorActionPreference = 'Stop'
+        if ($scenarioExit -eq 0 -and $scenario -ne 'Ready') { throw "$scenario unexpectedly exited 0." }
+        if ($scenarioExit -ne 0 -and $scenario -eq 'Ready') { throw "Ready failed: $($output -join ' ')" }
         $completion = Get-Content -Raw -LiteralPath (Join-Path $evidence 'completion.json') -Encoding UTF8 | ConvertFrom-Json
         if ($completion.status -cne $cases[$scenario]) {
             throw "$scenario expected $($cases[$scenario]) got $($completion.status)"
@@ -83,8 +92,43 @@ try {
         if ($completion.schema -cne 'projectb.g03.test.v1' -or $completion.formal -ne $false) {
             throw "$scenario test receipt is not unambiguously non-formal."
         }
+        if ($completion.status_log -cne 'status.log') {
+            throw "$scenario completion receipt must identify status.log."
+        }
+        $statusPath = Join-Path $evidence 'status.log'
+        if (-not (Test-Path -LiteralPath $statusPath -PathType Leaf)) {
+            throw "$scenario did not create status.log."
+        }
+        $statusBytes = [IO.File]::ReadAllBytes($statusPath)
+        if ($statusBytes.Length -ge 3 -and $statusBytes[0] -eq 0xEF -and $statusBytes[1] -eq 0xBB -and $statusBytes[2] -eq 0xBF) {
+            throw "$scenario status.log must be UTF-8 without BOM."
+        }
+        $statusText = (New-Object Text.UTF8Encoding($false, $true)).GetString($statusBytes)
+        if ($statusText.Contains([char]0xFFFD)) { throw "$scenario status.log contains U+FFFD." }
+        foreach ($forbiddenText in @($specHash,$planHash,'Agent spec capsule','test_only_unhandled_error')) {
+            if ($statusText.Contains($forbiddenText)) {
+                throw "$scenario status.log contains non-progress input or error text."
+            }
+        }
+        $records = @($statusText -split "`r?`n" | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_ | ConvertFrom-Json })
+        if ($records.Count -lt 3) { throw "$scenario status.log must contain observable stage transitions." }
+        $allowedKeys = @('timestamp','stage','event','elapsed_seconds')
+        foreach ($record in $records) {
+            $keys = @($record.PSObject.Properties.Name)
+            if (@($keys | Where-Object { $allowedKeys -notcontains $_ }).Count -ne 0 -or
+                $keys -notcontains 'timestamp' -or $keys -notcontains 'stage' -or $keys -notcontains 'event') {
+                throw "$scenario status.log contains a non-allowlisted or missing field."
+            }
+            if ($keys -contains 'elapsed_seconds' -and ([int]$record.elapsed_seconds -lt 0)) {
+                throw "$scenario status.log contains a negative elapsed time."
+            }
+        }
+        if ($records[0].stage -cne 'runner' -or $records[0].event -cne 'started' -or
+            $records[-1].stage -cne 'runner' -or $records[-1].event -cne 'finished') {
+            throw "$scenario status.log must start and finish with runner lifecycle events."
+        }
     }
-    'G03_RUNNER_ENTRYPOINT_PASS cases=4'
+    'G03_RUNNER_ENTRYPOINT_PASS cases=5'
 } finally {
     if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
 }

@@ -2,3 +2,11 @@
 docs/superpowers/plans/archive/** -text
 # Superseded drafts may contain historical CRLF and are checked by blob hash instead of a text diff.
 docs/superpowers/plans/archive/superseded-2026-07-23/** -diff
+
+# Active cold-start inputs and scripts are byte-hashed and executed on Linux/WSL2.
+SPEC.md text eol=lf
+PLAN.md text eol=lf
+docs/cold-start/*.md text eol=lf
+docs/cold-start/*.json text eol=lf
+scripts/cold_start/*.ps1 text eol=lf
+scripts/cold_start/tests/*.ps1 text eol=lf

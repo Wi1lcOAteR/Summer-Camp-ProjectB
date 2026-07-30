@@ -178,6 +178,45 @@ function Test-G03SandboxPlatform {
     return $Platform -in @('Linux','WSL2')
 }
 
+function Wait-G03ProcessWithHeartbeat {
+    param(
+        [Parameter(Mandatory = $true)][Diagnostics.Process]$Process,
+        [Parameter(Mandatory = $true)][ValidateRange(1, 86400)][int]$HostWallSeconds,
+        [Parameter(Mandatory = $true)][ValidateRange(1, 3600)][int]$HeartbeatSeconds,
+        [Parameter(Mandatory = $true)][ValidatePattern('^[a-z0-9_]+$')][string]$Stage,
+        [Parameter(Mandatory = $true)][scriptblock]$ProgressWriter
+    )
+
+    $startedAt = [DateTimeOffset]::UtcNow
+    $nextHeartbeat = $HeartbeatSeconds
+    $exited = $false
+    $terminated = $false
+    try {
+        while (-not $exited) {
+            $elapsed = [int][Math]::Floor(([DateTimeOffset]::UtcNow - $startedAt).TotalSeconds)
+            $remainingMilliseconds = [int][Math]::Max(0, ($HostWallSeconds - $elapsed) * 1000)
+            if ($remainingMilliseconds -le 0) { break }
+            $exited = $Process.WaitForExit([Math]::Min(1000, $remainingMilliseconds))
+            $elapsed = [int][Math]::Floor(([DateTimeOffset]::UtcNow - $startedAt).TotalSeconds)
+            if (-not $exited -and $elapsed -ge $nextHeartbeat) {
+                $null = & $ProgressWriter $Stage 'heartbeat' $elapsed
+                while ($nextHeartbeat -le $elapsed) { $nextHeartbeat += $HeartbeatSeconds }
+            }
+        }
+    } finally {
+        if (-not $exited -and -not $Process.HasExited) {
+            try { $Process.Kill($true) } catch { try { $Process.Kill() } catch { } }
+            if (-not $Process.WaitForExit(5000)) { throw 'process_tree_termination_failed' }
+            $terminated = $true
+        }
+    }
+    [pscustomobject]@{
+        Exited = $exited
+        Terminated = $terminated
+        ElapsedSeconds = [int][Math]::Floor(([DateTimeOffset]::UtcNow - $startedAt).TotalSeconds)
+    }
+}
+
 function Invoke-G03BwrapCommand {
     param(
         [Parameter(Mandatory = $true)][string]$WorkingDirectory,

@@ -101,6 +101,68 @@ try {
     if (-not (Test-G03SandboxPlatform -Platform WSL2)) { throw 'WSL2 must be eligible for Claude sandbox startup.' }
     'sandbox_platform'
 
+    $heartbeatStartInfo = [Diagnostics.ProcessStartInfo]::new()
+    $heartbeatStartInfo.FileName = (Get-Process -Id $PID).Path
+    $heartbeatStartInfo.UseShellExecute = $false
+    $heartbeatStartInfo.CreateNoWindow = $true
+    $heartbeatStartInfo.Arguments = '-NoProfile -Command "Start-Sleep -Seconds 3"'
+    $heartbeatProcess = [Diagnostics.Process]::new()
+    $heartbeatProcess.StartInfo = $heartbeatStartInfo
+    if (-not $heartbeatProcess.Start()) { throw 'Heartbeat fixture process did not start.' }
+    $heartbeatRecords = [Collections.Generic.List[object]]::new()
+    $heartbeatWriter = {
+        param([string]$Stage,[string]$Event,[int]$ElapsedSeconds)
+        $heartbeatRecords.Add([pscustomobject]@{ Stage=$Stage; Event=$Event; ElapsedSeconds=$ElapsedSeconds })
+    }
+    $waitReceipt = Wait-G03ProcessWithHeartbeat -Process $heartbeatProcess -HostWallSeconds 5 -HeartbeatSeconds 1 -Stage 'intake' -ProgressWriter $heartbeatWriter
+    if (-not $waitReceipt.Exited -or $waitReceipt.ElapsedSeconds -lt 2 -or $heartbeatRecords.Count -lt 1) {
+        throw 'A running child process must produce heartbeat evidence before it exits.'
+    }
+    foreach ($record in $heartbeatRecords) {
+        if ($record.Stage -cne 'intake' -or $record.Event -cne 'heartbeat' -or $record.ElapsedSeconds -lt 1) {
+            throw 'Heartbeat evidence must use the requested stage and non-negative elapsed seconds.'
+        }
+    }
+    'process_heartbeat'
+
+    $writerFailureStartInfo = [Diagnostics.ProcessStartInfo]::new()
+    $writerFailureStartInfo.FileName = (Get-Process -Id $PID).Path
+    $writerFailureStartInfo.UseShellExecute = $false
+    $writerFailureStartInfo.CreateNoWindow = $true
+    $writerFailureStartInfo.Arguments = '-NoProfile -Command "Start-Sleep -Seconds 10"'
+    $writerFailureProcess = [Diagnostics.Process]::new()
+    $writerFailureProcess.StartInfo = $writerFailureStartInfo
+    if (-not $writerFailureProcess.Start()) { throw 'Writer-failure fixture process did not start.' }
+    $writerFailureCaught = $false
+    try {
+        $null = Wait-G03ProcessWithHeartbeat -Process $writerFailureProcess -HostWallSeconds 5 -HeartbeatSeconds 1 -Stage 'execution' -ProgressWriter { throw 'progress_write_failed' }
+    } catch {
+        $writerFailureCaught = $_.Exception.Message -match 'progress_write_failed'
+    }
+    if (-not $writerFailureCaught -or -not $writerFailureProcess.HasExited) {
+        try { $writerFailureProcess.Kill() } catch { }
+        throw 'A progress-writer failure must propagate only after terminating the child process.'
+    }
+    'process_writer_failure_cleanup'
+
+    $timeoutMarker = Join-Path $root 'timeout-survivor.txt'
+    $timeoutStartInfo = [Diagnostics.ProcessStartInfo]::new()
+    $timeoutStartInfo.FileName = (Get-Process -Id $PID).Path
+    $timeoutStartInfo.UseShellExecute = $false
+    $timeoutStartInfo.CreateNoWindow = $true
+    $escapedTimeoutMarker = $timeoutMarker.Replace("'", "''")
+    $timeoutStartInfo.Arguments = '-NoProfile -Command "Start-Sleep -Seconds 3; Set-Content -LiteralPath ''' + $escapedTimeoutMarker + ''' -Value survived"'
+    $timeoutProcess = [Diagnostics.Process]::new()
+    $timeoutProcess.StartInfo = $timeoutStartInfo
+    if (-not $timeoutProcess.Start()) { throw 'Timeout fixture process did not start.' }
+    $timeoutReceipt = Wait-G03ProcessWithHeartbeat -Process $timeoutProcess -HostWallSeconds 1 -HeartbeatSeconds 1 -Stage 'execution' -ProgressWriter { param($Stage,$Event,$ElapsedSeconds) }
+    Start-Sleep -Seconds 3
+    if ($timeoutReceipt.Exited -or -not $timeoutReceipt.Terminated -or -not $timeoutProcess.HasExited -or (Test-Path -LiteralPath $timeoutMarker)) {
+        try { $timeoutProcess.Kill() } catch { }
+        throw 'A host-wall timeout must terminate the process before its delayed marker can be written.'
+    }
+    'process_timeout_cleanup'
+
     $candidateRoot = Join-Path $root 'candidate'
     New-Item -ItemType Directory -Path (Join-Path $candidateRoot 'scripts\tests') -Force | Out-Null
     Write-Utf8NoBom (Join-Path $candidateRoot 'SPEC.md') 'spec-input'
@@ -254,7 +316,7 @@ if([string]::IsNullOrWhiteSpace($Path)){ 'CREDENTIAL_SCAN_ERROR {"code":"usage_m
     if ($empty.Valid -or $empty.Code -ne 'empty_end_turn') { throw 'Empty result must fail.' }
     'execution_evidence'
 
-    'G03_RUNNER_CONTRACT_PASS cases=8'
+    'G03_RUNNER_CONTRACT_PASS cases=11'
 } finally {
     if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
 }

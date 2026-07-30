@@ -16,7 +16,7 @@ param(
     [ValidateSet('https://ai2.1343263.xyz')]
     [string]$BaseUrl = 'https://ai2.1343263.xyz',
     [string]$EvidenceRoot,
-    [ValidateSet('None','IntakeAmbiguous','Gateway504','MissingArtifacts','Ready')]
+    [ValidateSet('None','IntakeAmbiguous','Gateway504','MissingArtifacts','UnhandledError','Ready')]
     [string]$TestScenario = 'None'
 )
 
@@ -38,6 +38,26 @@ $coldRoot = Join-Path $env:TEMP ("projectb-g03-$sessionId")
 if ([string]::IsNullOrWhiteSpace($EvidenceRoot)) {
     $EvidenceRoot = Join-Path $ProjectRoot ("tmp\g03-evidence\$sessionId")
 }
+$script:G03StatusLogPath = Join-Path $EvidenceRoot 'status.log'
+$heartbeatSeconds = 15
+
+function Write-G03Progress {
+    param(
+        [Parameter(Mandatory = $true)][ValidatePattern('^[a-z0-9_]+$')][string]$Stage,
+        [Parameter(Mandatory = $true)][ValidatePattern('^[A-Za-z0-9_]+$')][string]$Event,
+        [int]$ElapsedSeconds = -1
+    )
+    $record = [ordered]@{
+        timestamp = (Get-Date).ToUniversalTime().ToString('o')
+        stage = $Stage
+        event = $Event
+    }
+    if ($ElapsedSeconds -ge 0) { $record.elapsed_seconds = $ElapsedSeconds }
+    $line = ($record | ConvertTo-Json -Compress) + "`n"
+    [IO.File]::AppendAllText($script:G03StatusLogPath, $line, (New-Object Text.UTF8Encoding($false, $true)))
+    $elapsedSuffix = if ($ElapsedSeconds -ge 0) { " elapsed_seconds=$ElapsedSeconds" } else { '' }
+    [Console]::Out.WriteLine("G03_PROGRESS stage=$Stage event=$Event$elapsedSuffix")
+}
 
 function Write-G03JsonNoBom {
     param([string]$Path, $Value)
@@ -56,12 +76,15 @@ function Write-G03Completion {
         completed_at = (Get-Date).ToString('o')
         cold_root = $coldRoot
         evidence_root = $EvidenceRoot
+        status_log = 'status.log'
     }
     Write-G03JsonNoBom (Join-Path $EvidenceRoot 'completion.json') $receipt
 }
 
 function Stop-G03 {
     param([string]$Status, [int]$ExitCode)
+    Write-G03Progress -Stage 'completion' -Event $Status
+    Write-G03Progress -Stage 'runner' -Event 'finished'
     Write-G03Completion $Status $ExitCode
     Write-Output "G03_RUNNER_STATE $Status"
     exit $ExitCode
@@ -71,7 +94,8 @@ function Invoke-G03Claude {
     param(
         [string[]]$Arguments,
         [int]$WallSeconds,
-        [string]$SecretValue
+        [string]$SecretValue,
+        [ValidateSet('intake','execution')][string]$Stage
     )
     $timeoutCommand = Get-Command timeout -ErrorAction Stop
     $startInfo = [Diagnostics.ProcessStartInfo]::new()
@@ -88,20 +112,33 @@ function Invoke-G03Claude {
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $startInfo
     if (-not $process.Start()) { throw 'process_start_failed' }
-    $stdoutTask = $process.StandardOutput.ReadToEndAsync()
-    $stderrTask = $process.StandardError.ReadToEndAsync()
-    $boundedExit = $process.WaitForExit(($WallSeconds + 10) * 1000)
-    if (-not $boundedExit) {
-        try { $process.Kill($true) } catch { try { $process.Kill() } catch { } }
-        if (-not $process.WaitForExit(5000)) { throw 'process_tree_termination_failed' }
-    }
-    $outText = $stdoutTask.GetAwaiter().GetResult()
-    $errText = $stderrTask.GetAwaiter().GetResult()
-    [pscustomobject]@{
-        ExitCode = $process.ExitCode
-        TimedOut = (-not $boundedExit) -or $process.ExitCode -eq 124
-        Stdout = if ([string]::IsNullOrEmpty($SecretValue)) { $outText } else { $outText.Replace($SecretValue, '[REDACTED]') }
-        Stderr = if ([string]::IsNullOrEmpty($SecretValue)) { $errText } else { $errText.Replace($SecretValue, '[REDACTED]') }
+    try {
+        Write-G03Progress -Stage $Stage -Event 'process_started'
+        $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+        $stderrTask = $process.StandardError.ReadToEndAsync()
+        $hostWallSeconds = $WallSeconds + 10
+        $progressWriter = { param($ProgressStage,$ProgressEvent,$ProgressElapsed) Write-G03Progress -Stage $ProgressStage -Event $ProgressEvent -ElapsedSeconds $ProgressElapsed }
+        $waitReceipt = Wait-G03ProcessWithHeartbeat -Process $process -HostWallSeconds $hostWallSeconds -HeartbeatSeconds $heartbeatSeconds -Stage $Stage -ProgressWriter $progressWriter
+        $boundedExit = $waitReceipt.Exited
+        if (-not $boundedExit -and -not $waitReceipt.Terminated -and -not $process.HasExited) {
+            throw 'process_tree_termination_failed'
+        }
+        $outText = $stdoutTask.GetAwaiter().GetResult()
+        $errText = $stderrTask.GetAwaiter().GetResult()
+        $elapsed = $waitReceipt.ElapsedSeconds
+        $timedOut = (-not $boundedExit) -or $process.ExitCode -eq 124
+        Write-G03Progress -Stage $Stage -Event $(if ($timedOut) { 'timed_out' } else { 'process_finished' }) -ElapsedSeconds $elapsed
+        [pscustomobject]@{
+            ExitCode = $process.ExitCode
+            TimedOut = $timedOut
+            Stdout = if ([string]::IsNullOrEmpty($SecretValue)) { $outText } else { $outText.Replace($SecretValue, '[REDACTED]') }
+            Stderr = if ([string]::IsNullOrEmpty($SecretValue)) { $errText } else { $errText.Replace($SecretValue, '[REDACTED]') }
+        }
+    } finally {
+        if (-not $process.HasExited) {
+            try { $process.Kill($true) } catch { try { $process.Kill() } catch { } }
+            if (-not $process.WaitForExit(5000)) { throw 'process_tree_termination_failed' }
+        }
     }
 }
 
@@ -129,12 +166,24 @@ function Protect-G03EvidenceText {
 
 New-Item -ItemType Directory -Path $coldRoot -Force | Out-Null
 New-Item -ItemType Directory -Path $EvidenceRoot -Force | Out-Null
+[Console]::Out.WriteLine("G03_EVIDENCE_ROOT $EvidenceRoot")
+Write-G03Progress -Stage 'runner' -Event 'started'
+trap {
+    $ErrorActionPreference = 'Continue'
+    try { Write-G03Progress -Stage 'completion' -Event 'UNHANDLED_ERROR' } catch { }
+    try { Write-G03Progress -Stage 'runner' -Event 'finished' } catch { }
+    try { Write-G03Completion 'UNHANDLED_ERROR' 99 } catch { }
+    [Console]::Error.WriteLine('G03_RUNNER_STATE UNHANDLED_ERROR')
+    exit 99
+}
 
 $currentPowerShell = (Get-Process -Id $PID).Path
+Write-G03Progress -Stage 'capsule' -Event 'started'
 $capsuleCheck = @(& $currentPowerShell -NoProfile -File (Join-Path $PSScriptRoot 'update_agent_capsules.ps1') -Mode Check -Root $ProjectRoot 2>&1)
 if ($LASTEXITCODE -ne 0 -or ($capsuleCheck -join "`n") -notmatch '^AGENT_CAPSULE_PASS documents=2$') {
     Stop-G03 'CAPSULE_INVALID' 30
 }
+Write-G03Progress -Stage 'capsule' -Event 'passed'
 
 $sourceSpec = Join-Path $ProjectRoot 'SPEC.md'
 $sourcePlan = Join-Path $ProjectRoot 'PLAN.md'
@@ -156,6 +205,7 @@ $initialFiles = @(Get-ChildItem -LiteralPath $coldRoot -File -Force | Select-Obj
 if ($initialFiles.Count -ne 2 -or $initialFiles[0] -cne 'PLAN.md' -or $initialFiles[1] -cne 'SPEC.md') {
     Stop-G03 'INTAKE_FAILED' 33
 }
+Write-G03Progress -Stage 'input' -Event 'validated'
 
 $metadata = [ordered]@{
     started_at = (Get-Date).ToString('o')
@@ -207,11 +257,13 @@ $sandboxSettingsPath = Join-Path $EvidenceRoot 'claude-sandbox-settings.json'
 Write-G03JsonNoBom $sandboxSettingsPath $sandboxSettings
 
 if ($TestScenario -ne 'None') {
+    Write-G03Progress -Stage 'test_scenario' -Event 'started'
     $resolvedTemp = (Resolve-Path -LiteralPath $env:TEMP).Path.TrimEnd('\','/')
     $resolvedEvidence = (Resolve-Path -LiteralPath $EvidenceRoot).Path
     if (-not $resolvedEvidence.StartsWith($resolvedTemp + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
         Stop-G03 'TEST_ONLY_ROOT_INVALID' 49
     }
+    if ($TestScenario -eq 'UnhandledError') { throw 'test_only_unhandled_error' }
     if ($TestScenario -eq 'IntakeAmbiguous') { Stop-G03 'TEST_ONLY_INTAKE_AMBIGUOUS' 40 }
     $testIntake = [ordered]@{
         spec_sha256 = $specHash; plan_sha256 = $planHash; files = $initialFiles
@@ -242,16 +294,22 @@ $platform = if ($env:OS -eq 'Windows_NT') {
     'Unknown'
 }
 if (-not (Test-G03SandboxPlatform -Platform $platform)) {
+    Write-G03Progress -Stage 'platform' -Event 'unsupported_platform'
     Stop-G03 'EXECUTION_FAILED' 37
 }
+Write-G03Progress -Stage 'platform' -Event 'supported'
 foreach ($requiredCommand in @('pwsh','timeout','bwrap','socat')) {
     if ($null -eq (Get-Command $requiredCommand -ErrorAction SilentlyContinue)) {
+        Write-G03Progress -Stage 'preflight' -Event 'missing_command'
         Stop-G03 'EXECUTION_FAILED' 38
     }
 }
+Write-G03Progress -Stage 'preflight' -Event 'started'
 if (-not (Test-G03BwrapPreflight -SandboxRoot $coldRoot)) {
+    Write-G03Progress -Stage 'preflight' -Event 'failed'
     Stop-G03 'EXECUTION_FAILED' 55
 }
+Write-G03Progress -Stage 'preflight' -Event 'passed'
 
 if (-not (Test-Path -LiteralPath $ClaudeCli -PathType Leaf)) {
     Stop-G03 'INTAKE_FAILED' 35
@@ -269,6 +327,7 @@ Read the generated capsule in each file, then return one JSON object only with k
 "@
 [IO.File]::WriteAllText((Join-Path $EvidenceRoot 'intake-prompt.txt'), $intakePrompt, (New-Object Text.UTF8Encoding($false, $true)))
 
+Write-G03Progress -Stage 'credential' -Event 'waiting_hidden_input'
 $secureKey = Read-Host 'Paste a new temporary Claude API key (hidden input)' -AsSecureString
 $keyPointer = [IntPtr]::Zero
 $plainKey = $null
@@ -293,7 +352,7 @@ try {
         '--max-budget-usd', $intakeBudgetUsd.ToString([Globalization.CultureInfo]::InvariantCulture),
         $intakePrompt
     )
-    $intakeRun = Invoke-G03Claude -Arguments $intakeArgs -WallSeconds $intakeWallSeconds -SecretValue $plainKey
+    $intakeRun = Invoke-G03Claude -Arguments $intakeArgs -WallSeconds $intakeWallSeconds -SecretValue $plainKey -Stage 'intake'
     if ($intakeRun.TimedOut -or $intakeRun.ExitCode -ne 0 -or $intakeRun.Stdout -match '504 Gateway Time-out') {
         Stop-G03 'INTAKE_FAILED' 43
     }
@@ -326,6 +385,7 @@ try {
         cost_usd = [decimal]$intakeEnvelope.total_cost_usd
     }
     Write-G03JsonNoBom (Join-Path $EvidenceRoot 'intake-receipt.json') $safeIntakeReceipt
+    Write-G03Progress -Stage 'intake' -Event 'validated'
 
     $executionPrompt = @"
 You are the separate execution session for ProjectB G-03. You have exactly SPEC.md and PLAN.md. $strictReadInstruction
@@ -342,7 +402,7 @@ Execute only complete task F-01S1. Create exactly scripts/tests/bootstrap_scanne
         '--max-budget-usd', $executionBudgetUsd.ToString([Globalization.CultureInfo]::InvariantCulture),
         $executionPrompt
     )
-    $executionRun = Invoke-G03Claude -Arguments $executionArgs -WallSeconds $executionWallSeconds -SecretValue $plainKey
+    $executionRun = Invoke-G03Claude -Arguments $executionArgs -WallSeconds $executionWallSeconds -SecretValue $plainKey -Stage 'execution'
     if ($executionRun.TimedOut -or $executionRun.ExitCode -ne 0) { Stop-G03 'EXECUTION_FAILED' 47 }
     $executionEvidence = Get-G03ExecutionEvidence -StreamText $executionRun.Stdout -MaxCostUsd $executionBudgetUsd
     if (-not $executionEvidence.Valid) { Stop-G03 'EXECUTION_FAILED' 53 }
@@ -358,8 +418,10 @@ Execute only complete task F-01S1. Create exactly scripts/tests/bootstrap_scanne
         param([string]$WorkingDirectory,[string[]]$CommandArguments,[int]$WallSeconds)
         Invoke-G03BwrapCommand -WorkingDirectory $WorkingDirectory -CommandArguments $CommandArguments -WallSeconds $WallSeconds
     }
+    Write-G03Progress -Stage 'replay' -Event 'started'
     $candidate = Test-G03CandidateEvidence -ColdRoot $coldRoot -EvidenceRoot $EvidenceRoot -ExpectedSpecSha256 $specHash -ExpectedPlanSha256 $planHash -CommandInvoker $candidateInvoker
     if (-not $candidate.Valid) { Stop-G03 'COLD_START_INCOMPLETE' 51 }
+    Write-G03Progress -Stage 'replay' -Event 'passed'
     Write-G03JsonNoBom (Join-Path $EvidenceRoot 'execution-summary.json') ([ordered]@{
         task = 'F-01S1'
         acceptance_id = 'F01S1_RED_GREEN_ARTIFACT_SAFETY_V1'

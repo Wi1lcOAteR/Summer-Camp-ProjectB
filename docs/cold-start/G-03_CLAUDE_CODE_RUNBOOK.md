@@ -78,7 +78,18 @@ npm install --prefix tmp/toolchains/claude-code @anthropic-ai/claude-code@2.1.22
 
 ## 正式命令
 
-在 Linux/WSL2 的项目根目录运行，路径按该环境实际路径调整：
+不要在提示符为 `(base) PS E:\...>` 的原生 Windows PowerShell 中直接执行下一段 `pwsh` 命令。先从 Windows 进入 WSL2，再切到 WSL 映射后的项目目录：
+
+```powershell
+wsl
+```
+
+```bash
+cd /mnt/e/Personal_Documentary/ResearchProjects/ProjectB
+command -v pwsh timeout bwrap socat node
+```
+
+只有上一条同时列出五个可执行文件后，才在同一个 WSL2 终端运行：
 
 ```powershell
 pwsh -NoProfile -File ./scripts/cold_start/run_g03_claude.ps1 `

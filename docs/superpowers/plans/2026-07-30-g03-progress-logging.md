@@ -13,17 +13,19 @@
 ### Task 1: Add fail-closed progress logging and heartbeat evidence
 
 **Files:**
+- Modify: `.gitattributes`
 - Modify: `scripts/cold_start/tests/g03_runner_entrypoint_contract.ps1`
+- Modify: `scripts/cold_start/tests/g03_runner_contract.ps1`
 - Modify: `scripts/cold_start/g03_runner_core.ps1`
 - Modify: `scripts/cold_start/run_g03_claude.ps1`
 - Modify: `docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md`
 - Modify: `AGENT_LOG.md`
 
-- [ ] **Step 1: Write the failing entrypoint contract**
+- [x] **Step 1: Write the failing entrypoint contract**
 
 Extend every test scenario to require a UTF-8 `status.log`. Parse each non-empty line as JSON and reject any key outside `timestamp`, `stage`, `event`, and `elapsed_seconds`. Require ordered `runner/started`, scenario-stage activity, and `runner/finished` events; require `completion.json.status_log` to identify the same file. Add static assertions for a 15-second heartbeat interval and the controlled `unsupported_platform` event.
 
-- [ ] **Step 2: Run the contract and observe the expected red**
+- [x] **Step 2: Run the contract and observe the expected red**
 
 Run:
 
@@ -33,11 +35,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/cold_start/tests/g03
 
 Expected: exit 1 because `status.log` and `completion.json.status_log` do not exist.
 
-- [ ] **Step 3: Implement the minimum logger and heartbeats**
+- [x] **Step 3: Implement the minimum logger and heartbeats**
 
 Add `Write-G03Progress` using UTF-8 without BOM and fixed fields only. Print `G03_EVIDENCE_ROOT <path>` at startup. Record controlled stage transitions around capsule, input, platform, preflight, hidden credential wait, intake, execution, replay, and completion. Change `Invoke-G03Claude` to wait in bounded intervals and emit `heartbeat` every 15 seconds without writing child output. Add `status_log` to completion receipts. Do not log exception text, process arguments, prompt text, paths other than the initial evidence-root terminal line, or secret-bearing values.
 
-- [ ] **Step 4: Run focused and regression contracts**
+- [x] **Step 4: Run focused and regression contracts**
 
 Run:
 
@@ -47,16 +49,16 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/cold_start/tests/g03
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/cold_start/tests/agent_capsules_contract.ps1
 ```
 
-Expected: `G03_RUNNER_ENTRYPOINT_PASS cases=4`, `G03_RUNNER_CONTRACT_PASS cases=8`, and `AGENT_CAPSULE_CONTRACT_PASS cases=9`.
+Expected: `G03_RUNNER_ENTRYPOINT_PASS cases=5`, `G03_RUNNER_CONTRACT_PASS cases=11`, and `AGENT_CAPSULE_CONTRACT_PASS cases=9`.
 
-- [ ] **Step 5: Verify safety and record the process change**
+- [x] **Step 5: Verify safety and record the process change**
 
 Run PowerShell AST parsing, strict UTF-8 checks, scoped credential-shape scanning, and `git diff --check`. Record the actual red/green outputs and the native-Windows limitation in `AGENT_LOG.md`. Request a quality/security review before committing.
 
-- [ ] **Step 6: Commit only the owned files**
+- [x] **Step 6: Commit only the owned files**
 
 ```powershell
-git add -- scripts/cold_start/g03_runner_core.ps1 scripts/cold_start/run_g03_claude.ps1 scripts/cold_start/tests/g03_runner_entrypoint_contract.ps1 docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md docs/superpowers/plans/2026-07-30-g03-progress-logging.md AGENT_LOG.md
+git add -- .gitattributes scripts/cold_start/g03_runner_core.ps1 scripts/cold_start/run_g03_claude.ps1 scripts/cold_start/tests/g03_runner_contract.ps1 scripts/cold_start/tests/g03_runner_entrypoint_contract.ps1 docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md docs/superpowers/plans/2026-07-30-g03-progress-logging.md AGENT_LOG.md
 git commit -m "fix(g03): add observable runner progress"
 ```
 
