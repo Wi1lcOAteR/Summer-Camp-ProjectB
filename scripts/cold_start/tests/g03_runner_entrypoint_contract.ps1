@@ -39,6 +39,8 @@ foreach ($literal in @(
     "`$heartbeatSeconds = 15",
     "'heartbeat'",
     "'unsupported_platform'",
+    "Write-G03ProcessDiagnostic -Run `$intakeRun -Stage 'intake'",
+    "Write-G03ProcessDiagnostic -Run `$executionRun -Stage 'execution'",
     "tdd_receipt = `$executionEvidence.TddReceipt",
     "'CAPSULE_INVALID'",
     "'UTF8_INVALID'",

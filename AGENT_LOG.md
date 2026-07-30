@@ -1094,3 +1094,11 @@
 - **事实证据**：最新会话 `65422312-9090-4692-ae95-09d09adf7fed` 的 `process-diagnostic.json` 为 `stage=intake`、`exit_code=127`、`code=cli_startup`。runner 将子进程工作目录切换到 disposable `/tmp/projectb-g03-*`，而学生传入的 `./tmp/toolchains/.../claude` 是项目根相对路径，因此在子进程中解析失败。
 - **TDD 与修订**：新增相对/绝对 CLI 路径合同；`Resolve-G03ClaudeCliPath` 将相对路径按 `ProjectRoot` 解析为绝对路径，再交给 timeout 子进程。回归输出 `G03_RUNNER_CONTRACT_PASS cases=13`、`G03_RUNNER_ENTRYPOINT_PASS cases=5`、`AGENT_CAPSULE_CONTRACT_PASS cases=9`。
 - **人工边界**：没有重新输入或读取 key，没有调用模型；下一次正式运行仍需学生在隐藏输入框输入临时 key，G-03 尚未闭合。
+
+## 2026-07-31T02:30:00+08:00 - G-03-012 intake JSON 协议失败诊断
+
+- **Task 编号**：G-03-012（记录真实 intake 退出码 44 的安全诊断；不重试模型）。
+- **事实证据**：会话 `0b18ae59-9b31-4b84-b42f-e2786c8a68c5` 已通过 preflight，intake 运行 36 秒并产生 15/30 秒 heartbeat，随后退出码 0；runner 在 `ConvertFrom-Json` 阶段失败并以 44 结束。该事实说明路径和子进程启动已修复，但输出不是单一合法 JSON envelope；原始 stdout 未落盘。
+- **修订**：协议解析失败和空结果现在也写 `process-diagnostic.json`，使用固定 `child_empty_output` 或 `child_output_protocol` 枚举；入口合同新增两条诊断调用断言，core 合同新增 malformed-output 负例。
+- **验证**：`G03_RUNNER_CONTRACT_PASS cases=13`、`G03_RUNNER_ENTRYPOINT_PASS cases=5`、`AGENT_CAPSULE_CONTRACT_PASS cases=9` 全绿。没有再次输入或读取真实 key。
+- **人工边界**：下一次只需查看最新 `process-diagnostic.json` 确定 provider/CLI 输出类型；G-03 仍未闭合。

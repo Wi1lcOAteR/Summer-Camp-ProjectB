@@ -368,12 +368,18 @@ try {
         Write-G03ProcessDiagnostic -Run $intakeRun -Stage 'intake'
         Stop-G03 'INTAKE_FAILED' 43
     }
-    try { $intakeEnvelope = $intakeRun.Stdout | ConvertFrom-Json } catch { Stop-G03 'INTAKE_FAILED' 44 }
+    try { $intakeEnvelope = $intakeRun.Stdout | ConvertFrom-Json } catch {
+        Write-G03ProcessDiagnostic -Run $intakeRun -Stage 'intake'
+        Stop-G03 'INTAKE_FAILED' 44
+    }
     if ((Test-G03IntakeEnvelope -Envelope $intakeEnvelope -MaxCostUsd $intakeBudgetUsd) -ne 'ok') {
         Stop-G03 'INTAKE_FAILED' 52
     }
     $intakeReceipt = Get-G03ResultObject $intakeRun.Stdout
-    if ($null -eq $intakeReceipt) { Stop-G03 'INTAKE_FAILED' 44 }
+    if ($null -eq $intakeReceipt) {
+        Write-G03ProcessDiagnostic -Run $intakeRun -Stage 'intake'
+        Stop-G03 'INTAKE_FAILED' 44
+    }
     $afterIntakeFiles = @(Get-ChildItem -LiteralPath $coldRoot -File -Recurse -Force | ForEach-Object { $_.FullName.Substring($coldRoot.Length).TrimStart('\','/').Replace('\','/') } | Sort-Object)
     $afterIntakeDirectories = @(Get-ChildItem -LiteralPath $coldRoot -Directory -Recurse -Force)
     if ((Get-FileHash -LiteralPath (Join-Path $coldRoot 'SPEC.md') -Algorithm SHA256).Hash -cne $specHash -or

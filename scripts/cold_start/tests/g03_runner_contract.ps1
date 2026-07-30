@@ -121,6 +121,7 @@ try {
     Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 1 -TimedOut:$false -Stdout '' -Stderr 'The shell cannot be started: No such file or directory') 'cli_startup' 'CLI startup failures must be classified.'
     Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 1 -TimedOut:$false -Stdout '' -Stderr 'opaque failure') 'child_nonzero' 'Unknown failures must use a bounded diagnostic code.'
     Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 0 -TimedOut:$false -Stdout '' -Stderr '') 'child_empty_output' 'Empty successful output must be classified.'
+    Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 0 -TimedOut:$false -Stdout '{not-json' -Stderr '') 'child_output_protocol' 'Malformed successful output must be classified.'
     Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 124 -TimedOut:$true -Stdout '' -Stderr '') 'wall_timeout' 'Timeouts must be classified.'
     'process_diagnostics'
 
