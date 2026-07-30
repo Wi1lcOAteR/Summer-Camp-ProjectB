@@ -1025,3 +1025,33 @@
 - **人工修改及原因**：记录第二次正式异类失败事实；不修改 SPEC/PLAN、产品源码、远程资源、用户研究草稿或 `REFLECTION.md`。
 - **subagent 输出或 commit hash**：没有派发 Codex subagent；异类智能体即上述隔离 Claude Code session。过程文档收据为 `0047d3efba1e35afa27d1e96421973924afbbf9c`。G-03、G-04 仍开放。
 - **经验教训**：在同一中转上换用 Sonnet 4.6 后仍失败，继续盲目重试会消耗费用但不能增加工程确定性。下一步必须明确模型/端点策略，而不是把 504 当成可忽略的偶发输出。
+
+## 2026-07-30T20:16:54+08:00 - G-03-005 多语言 capsule、F-01S1 拆分与 runner 失败关闭修订
+
+- **Task 编号**：G-03-005（执行学生批准的冷启动可执行性修订；不包含正式 G-03 付费复测或产品实现）。
+- **触发的 Superpowers skill**：使用 `using-superpowers`、`executing-plans`、`writing-plans`、`test-driven-development`、`systematic-debugging`、`requesting-code-review` 和 `verification-before-completion`。正式 worktree/subagent implementation/finishing 仍由 G-03/G-04 阻塞。
+- **关键 prompt / context**：学生提供完整修订计划，要求中文 SPEC/学生文档、英文 capsule、F-01S1--4 串行拆分、两段式 Claude 冷启动、总预算 `$1`、不跳过 G-03/G-04。恢复时 SPEC/PLAN 和 capsule 脚本已有未提交半成品；学生原有研究文档保持未暂存且未修改。
+- **TDD 与验证输出**：core missing、runner missing、candidate verifier missing、execution evidence parser missing 四个要求形红灯均实际运行；修订后 capsule 合同 `cases=9`、core `cases=8`、entrypoint `cases=4`。标准 evidence 保持 `rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；strict UTF-8 与相关文件凭据形状扫描通过。机械审计为 38/38、5 fields、24 AC、0 placeholder、unknown/self/cycle 0。
+- **review 输出**：第一名只读 reviewer 对 predecessor PLAN 返回 Critical=2/Major=1；第二名返回 Critical=2/Major=5。没有把失败 verdict 写成 PASS。修复 capsule 规则、自包含 `-Path` CLI、test-only schema、内存捕获、固定模型/端点、Linux/WSL2 sandbox、结构化费用/工具/歧义和独立红绿/直接扫描重放后，当前新哈希仍待重新双评审。
+- **安全与环境**：未调用模型、未输入或读取真实 key、未把子进程原始输出落盘。官方 Claude 文档确认原生 Windows 无 OS sandbox；本机 WSL 枚举返回 `E_ACCESSDENIED`。正式 runner 在原生 Windows 会在隐藏输入前失败关闭，学生需提供可用 WSL2/Linux 环境。
+- **当前哈希 / 人工边界**：SPEC `BE32CA...EFFF`，PLAN `35D989...F48F`。当前字节等待同哈希双评审和学生重新确认；G-03、G-04、D-025、远程授权、产品实现与学生反思均保持开放。commit hash 尚未产生。
+
+## 2026-07-30 - G-03-006 第二轮审查修复与安全重放
+
+- **Task 编号**：G-03-006（修复 G-03-005 第二轮审查问题；不执行付费模型复测或产品实现）。
+- **触发的 Superpowers skill**：`using-superpowers`、`executing-plans`、`systematic-debugging`、`test-driven-development`、`requesting-code-review`、`verification-before-completion`。
+- **关键 prompt / context**：继续学生批准的 G-03 修订计划；输入包括两名只读 reviewer 的失败 verdict。只修改 SPEC/PLAN/capsule、G-03 runner/合同和过程文档；学生已有 `docs/research/*` 与 `docs/engineering/SUPERPOWERS_VALIDATION.md` 修改不纳入。
+- **真实 red/green**：合同先因缺少 `CommandInvoker` 与入口仍授权 `Edit` 失败；空实现和错误 JSON 键顺序候选分别被新增断言证明旧 oracle 可欺骗。修订后 `G03_RUNNER_CONTRACT_PASS cases=8` 与 `G03_RUNNER_ENTRYPOINT_PASS cases=4`。候选重放改为 coordinator 自有行为 oracle，stream parser 要求真实有序红绿 tool result；正式路径使用无凭据、断网、限挂载 bubblewrap 和进程树 timeout。
+- **review 输出**：第二轮 SPEC review 为 `Critical=1, Major=1`；第二轮质量/安全/许可证 review 为 `Critical=2, Major=4, Minor=2`。当前修订不继承旧 verdict，必须在最终同一哈希重新双评审。
+- **当前哈希 / 人工边界**：SPEC `14C03D68...0713`，PLAN `D6A0C79B...879D`。正式 Linux bubblewrap 预检、同哈希双评审、学生重新确认、G-03、G-04、D-025、远程授权和学生本人反思仍开放。commit hash 尚未产生。
+
+## 2026-07-30 - G-03-007 Claude stream 包装格式与 oracle 证据修复
+
+- **Task 编号**：G-03-007（只修复 runner 解析与过程文档；不执行付费模型复测或产品实现）。
+- **触发的 Superpowers skill**：`using-superpowers`、`executing-plans`、`systematic-debugging`、`test-driven-development`、`requesting-code-review`、`verification-before-completion`。
+- **关键 prompt / context**：根据历史 Claude Code stream-json 收据定位失败 `tool_result.content` 的真实 `Exit code 1` 包装；保持独立 bubblewrap 重放只接受裸 `CONTRACT_RED scanner_missing`，避免放宽候选验证。
+- **TDD 红—绿证据**：先将真实包装格式加入合同样例，旧 parser 实际返回 `tdd_evidence_missing`；最小 parser 白名单修订后 `G03_RUNNER_CONTRACT_PASS cases=8`，并新增错误退出码/额外行拒绝与 `exit_code=1` TDD receipt 断言；入口合同 `G03_RUNNER_ENTRYPOINT_PASS cases=4`。
+- **文档与哈希**：PLAN capsule、中文 G-03 手册、合规矩阵、SPEC_PROCESS、DECISIONS_NEEDED 同步更新。当前 SPEC `14C03D688A09451DCA06F66507CE4510510A8A3BC550057376B0A1EF95270713`；PLAN `95FF14D23DB92692BA005C3AA42598ABB5DDCFEE2DEFC28B950B00617C3EC663`。
+- **人工修改及原因**：只修改 G-03 runner、其合同和过程文档；保留用户的 `docs/research/*` 与 `docs/engineering/SUPERPOWERS_VALIDATION.md` 修改，不创建产品源码、REFLECTION、远程状态或真实凭据。
+- **经验教训**：外部 CLI 的结构化事件包装必须以真实收据为依据，并在规范化后保留退出码；候选重放与模型事件解析是两个不同的信任边界，不能用一个宽松规则覆盖两者。
+- **最终同哈希复核**：SPEC/课程合规 reviewer 与质量/安全/许可证 reviewer 均返回 `PASS Critical=0 Major=0 Minor=0`；两者核对的当前哈希为 SPEC `14C03D688A09451DCA06F66507CE4510510A8A3BC550057376B0A1EF95270713`、PLAN `95FF14D23DB92692BA005C3AA42598ABB5DDCFEE2DEFC28B950B00617C3EC663`。正式 Linux/WSL2 bubblewrap、非 Codex Claude 双 session、学生确认和 G-04 仍未执行。

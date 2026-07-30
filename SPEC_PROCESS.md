@@ -1,6 +1,6 @@
 # SPEC_PROCESS
 
-> **当前状态（2026-07-27）：** 精简 v1 产品方向仍来自学生确认的 `C6231816...9AD6`。多轮 G-03P/双评审暴露并修复 staged-index、任务粒度、CI/远程闭环、材料版本、许可证、反思顺序和 scanner 自扫描等缺口。最终 Stage-B 候选为 SPEC `6A0DB7CA...11E56`、PLAN `E96C415A...972C1`，含 35 个单-session task 和固定 2--5 分钟步骤；当前哈希 SR-08 双评审已 PASS。阶段仍为 `NOT DISPATCHABLE`：正式不同类型 G-03 和学生 G-04 未完成。D-025 仍只阻塞 host-specific 发布与公网 URL。
+> **当前状态（2026-07-30）：** 精简 v1 产品方向仍来自学生确认的 `C6231816...9AD6`。当前 Stage-B 再验证候选为 SPEC `14C03D68...0713`、PLAN `95FF14D2...C663`，含 38 个单-session task、ASCII capsule 和失败关闭的两段式 G-03 runner。两轮审查问题已修订，runner-only 修订已通过本地合同测试，但当前哈希仍待同哈希双评审和学生重新确认。阶段为 `NOT DISPATCHABLE`：正式不同类型 G-03、学生 G-04、D-025 和远程授权均未关闭。
 
 ## 0. 启动审计（2026-07-17）
 
@@ -635,3 +635,29 @@
 - **实际执行路径**：Claude 先尝试不存在的 `/mnt/data/...plugin-gateway-stack`，随后列出正确 Windows 临时目录的 `PLAN.md` 与 `SPEC.md`，读取两份文件，并用 `certutil` 重新计算出正确 SHA-256。Read 工具把中文按错误编码显示为 mojibake，但未读取仓库其他文件、远程仓库或凭据。
 - **失败原因**：第 6 turn 后日志出现 `API Error: 504 Gateway Time-out`，提示检查 inference gateway `ai2.1343263.xyz`。Claude Code 结果为 `is_error=true`、`stop_reason=stop_sequence`、费用约 `$0.1818`；runner 写入 `CLAUDE_FAILED`、exit 1。隔离目录仍只有 SPEC/PLAN，没有问题、diff、脚本、红测、绿测或 self-scan。
 - **门禁影响**：该尝试证明 `claude-sonnet-4-6` 也未能完成长 Claude Code agent run，问题更像当前网关稳定性/兼容性风险，而不是仅 Sonnet 5 alias 异常。SPEC/PLAN 不因网关 504 改字节；G-03 和 G-04 仍开放。继续付费重试前需要学生明确接受模型/端点选择和费用风险。
+
+## 15. 2026-07-30 G-03 可执行性、英文 capsule 与 F-01S1 拆分修订
+
+- **学生输入：** 学生提供并要求继续执行《G-03 冷启动可执行性与多语言摄取修订计划》。该计划保留精简 v1 产品范围，把旧 F-01S 拆为 F-01S1--F-01S4，正式 G-03 只尝试 F-01S1；SPEC 保持中文正文，SPEC/PLAN 内生成 ASCII 英文 capsule；旧两次 Claude 失败保留为历史证据。
+- **中断恢复：** 起始工作树已有未提交 SPEC/PLAN 拆分稿和 `scripts/cold_start/` 半成品；11 份学生研究文档保持原样、未纳入本轮。首次 capsule 合同为 `cases=7`，但主仓库缺 manifest。审查发现三处旧 F-01S 引用及拆分卡片使用“formerly specified”而不自包含，先补回精确 token、assignment、encoded、source 和 format 合同。
+- **真实 TDD：** runner core 首次以 `G03_RUNNER_CONTRACT_RED core_missing`、exit 1 失败，最小 core 后通过；入口首次以 `G03_RUNNER_ENTRYPOINT_RED runner_missing` 失败，跟踪版入口后通过；候选独立复验首次因 `Test-G03CandidateEvidence` 不存在失败，最小实现后通过；execution stream 证据首次因 `Get-G03ExecutionEvidence` 不存在失败，最小实现后通过。当前本地合同输出为 capsule `cases=9`、runner core `cases=8`、entrypoint `cases=4`。
+- **第一轮同哈希前评审失败：** 课程/SPEC reviewer 对 SPEC `BE32CA...EFFF` / predecessor PLAN `D9AE82...7016` 返回 Critical=2、Major=1；质量/安全/许可证 reviewer 返回 Critical=2、Major=5。共同问题是英文 capsule 缺 F-01S1 精确规则、READY 只检查四个非空文件、测试路径可伪造正式 READY、原始子进程输出先落盘、Bash 网络/读取边界未强制、超时不杀进程树、模型可改、矩阵仍为旧哈希/35 tasks。
+- **关键修订 diff：** PLAN capsule 现内含六类直接规则、边界、精确 contract 命令和 `-Path <file>` 直接扫描命令；intake 使用固定 acceptance ID。测试收据改为 `projectb.g03.test.v1` 和 `TEST_ONLY_*`，只能写系统临时目录。正式 runner 固定 Sonnet 4.6/既定端点，不持久化原始 stdout/stderr；只在 Linux/WSL2 启动，并要求 Claude sandbox、全域拒绝网络、禁止 unsandboxed escape、`pwsh/timeout/bwrap/socat`。正式 READY 前重新核对输入哈希/普通文件/严格 UTF-8/三个函数，在新目录重放红测、绿测和两次产物直接扫描，并解析实际费用、Bash/Edit 调用与 execution 歧义。
+- **环境事实：** Claude 官方文档说明 OS sandbox 仅支持 macOS、Linux 和 WSL2；本机 `wsl.exe --list --verbose` 被环境策略以 `Wsl/EnumerateDistros/Service/E_ACCESSDENIED` 拒绝。故原生 Windows 只运行无网络合同，不会询问 key 或付费；正式 G-03 需要学生提供可用 WSL2/Linux 环境。
+- **当前候选与门禁：** SPEC `BE32CA48386363412785BA2766B73997FAFAAD32C186640C47C14B38FABEEFFF`；PLAN `35D989931B276C5DC474E715DB42DD49E576228FB2C6A81E956FBC6221CDF48F`。机械审计为 `Tasks=38 Ledger=38 Fields=5 AcRows=24 Placeholders=0 Unknown=0 Self=0 Cycle=0`。第一轮失败 verdict 不转移；当前哈希仍需重新双评审和学生整体确认。没有执行正式复测、G-04、产品实现、远程操作、部署或 `REFLECTION.md`。
+
+## 16. 2026-07-30 第二轮审查与 G-03 安全重放修订
+
+- **第二轮审查事实：** SPEC reviewer 对 SPEC `BE32CA...EFFF` / PLAN `35D989...F48F` 返回 `Critical=1, Major=1`：SPEC capsule 使用“acceptance summary”，而 PLAN/runner 使用固定 `acceptance_id`；重放收据没有保存实际绿测/直接扫描输出和新增文件 diff。质量 reviewer 对同哈希返回 `Critical=2, Major=4, Minor=2`：候选脚本在 sandbox 外且父进程仍有 key 时执行，空实现可用固定 PASS 欺骗验证器；另有 Linux `powershell` 命令不成立、原生 Edit 不受文件沙箱控制、未证明真实红绿 tool result、缺少真实 Linux 预检和条款记录等问题。两名 reviewer 均只读，没有修改文件。
+- **真实红灯与修订：** 新合同先因缺少 `CommandInvoker` 和 runner 仍授权 Edit 失败；增加空实现候选后，旧验证器错误接受，合同按预期红；增加错误 JSON 键顺序候选后再次按预期红。最小修订后，coordinator 自有 oracle 会检查六类直接规则、token 边界、严格 UTF-8、稳定键顺序、脱敏、缺参和产物字节；execution stream 必须含顺序正确且有对应 result 的精确红/绿 Bash 调用。
+- **隔离修订：** execution 只允许 Bash，原生 Read/Edit 均禁用；精确命令统一为 Linux/Windows PowerShell 7 可执行的 `pwsh -NoProfile -File ...`。正式运行在询问 key 前真实执行 bubblewrap 预检；模型结束后先清除认证环境变量，再在 `--unshare-all`、最小只读 runtime mount、一次性可写目录和双层 timeout 下重放。bubblewrap 子进程环境由 coordinator 清空，不继承 key。
+- **条款边界：** 本地安装包为 `@anthropic-ai/claude-code@2.1.220`，`package.json` 声明 `SEE LICENSE IN README.md`；README 指向 Anthropic Commercial Terms 与 Privacy Policy，而不是普通开源许可证。它仅是 G-03 过程工具，不进入产品分发；正式运行前新增学生接受条款门禁。
+- **当时候选与门禁（历史）：** SPEC `14C03D688A09451DCA06F66507CE4510510A8A3BC550057376B0A1EF95270713`；PLAN `D6A0C79B6E891993B91DD25C8C1121859BB0BE3065F3668FBCA09C8C7A45879D`。本地 core/entrypoint 合同已重新变绿，但真实 bubblewrap 预检只能在 WSL2/Linux 执行；随后 runner-only 文档修订改变了 PLAN capsule，故该哈希不再代表当前输入。正式 G-03、G-04、产品实现、远程操作、部署或 `REFLECTION.md` 当时均未执行。
+
+## 17. 2026-07-30 runner-only 兼容性与质量修复
+
+- **根因证据：** 读取既有 Claude Code stream-json 失败收据后确认，Bash 失败 `tool_result.content` 的真实格式为 `Exit code 1` 加换行后的命令输出；这不是候选脚本的独立重放格式。旧解析器只接受裸 `CONTRACT_RED scanner_missing`，会把真实 Claude 红测误判为缺失。
+- **TDD 修订：** 先把真实包装格式写入合同样例并观察 `tdd_evidence_missing` 红灯；随后最小修改 parser，仅白名单接受裸单行或 `Exit code 1` 加该单行，拒绝 `Exit code 2` 和任何额外行。绿色合同现额外断言规范化 `exit_code=1` 与单行输出持久化到有序 TDD receipt。
+- **安全语义补强：** PLAN capsule、中文 G-03 手册同步记录候选 contract/scanner 原始 SHA-256 在每次重放和直接扫描前后核对；coordinator oracle 覆盖全部规则前缀、长度下限/上限/超限、标点与阻断邻接、严格解码、排序与 JSON 键序。没有改变 SPEC/PLAN 的产品范围或 G-04 门禁。
+- **当前字节：** SPEC `14C03D688A09451DCA06F66507CE4510510A8A3BC550057376B0A1EF95270713`；PLAN `95FF14D23DB92692BA005C3AA42598ABB5DDCFEE2DEFC28B950B00617C3EC663`。本地合同和入口测试均重新通过；同哈希双评审、学生确认、Linux/WSL2 正式 G-03 和 G-04 仍未关闭。
+- **最终同哈希双评审：** SPEC/课程合规 reviewer 与质量/安全/许可证 reviewer 均对上述精确字节返回 `PASS; Critical=0, Major=0, Minor=0`。这只闭合当前 SR-08 文档审查，不等于正式非 Codex G-03、学生确认或 G-04。

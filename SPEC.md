@@ -1,6 +1,35 @@
 # ProjectB 精简 v1 规约
 
-> **状态：学生已于 2026-07-25T19:13:57+08:00 整体确认。** 被确认的内容快照 SHA-256 为 `C6231816A62C807D205FC7A3E6142C5636DE18FD8A2C580B48E63B106F959AD6`。确认范围是：精简纵向切片、模型范围 `L+P`、数字 PDF + UTF-8 文本/Markdown、通用知识点模型并以互斥/竞态/死锁三个概念验收、使用 Claude Code 做后续冷启动。本文取代 2026-07-20 的旧 v1 文本。
+<!-- AGENT_CAPSULE:SPEC:BEGIN -->
+# Agent Execution Capsule (generated; do not edit)
+
+Version: 1. This ASCII capsule is a normative execution projection of the cited sections in the Chinese specification. The Chinese body remains authoritative for the complete product. Any conflict between this capsule and the body invalidates the document and must be reported as an ambiguity; do not choose a silent precedence.
+
+## Product and users
+ProjectB is a local-first study workbench for a student who needs traceable ingestion, deterministic practice, and repeatable review planning. It must remain explainable as three useful modules, not a single-turn chat wrapper.
+
+M1 imports incremental digital PDF and UTF-8 TXT/Markdown. Preserve original-byte SHA-256, immutable material versions, PDF page or text-line source locators, and explicit user confirmation or rejection of knowledge-concept mappings. OCR, images, scanned documents, bulk ingestion, past-exam intelligence, and automatic mapping are deferred.
+
+M2 uses a general knowledge-concept model. V1 acceptance covers mutex, race condition, and deadlock. Explanations and exercises bind to confirmed sources. Deterministic local evaluators produce append-only learning evidence; explanation-only concepts must not create mastery evidence. A real LLM may improve explanation text but must not own scoring, evidence, mastery, or plan state.
+
+M3 derives deterministic mastery state and continuous/finals review plan revisions from the full append-only evidence history. Repeated identical inputs produce identical task order and plan hash. Completed tasks are not rewritten; new evidence or settings produce an auditable revision diff.
+
+## Data and provider boundary
+The default L profile is local and offline. Optional P mode has one built-in OpenAI adapter plus mock. Each remote request requires user preview and one-time consent bound to exact locator, material hash/version, provider port/profile, and budget. Send only the confirmed page or text fragment; never upload a whole file, use hosted file/tool behavior, or set store true. Provider failure must not mutate coverage, evidence, mastery, or plan state. The temporary Claude-compatible G-03 gateway is a process tool and is not a product provider.
+
+## Security and credentials
+Treat uploaded bytes, filenames, URLs, model output, and tool arguments as untrusted. Enforce magic/type and size/page/line limits, strict decoding, path containment, timeouts, output schema validation, safe Markdown rendering, loopback Host/Origin/CSRF controls, stable redacted errors, and an audit-field allowlist. Never log student answers, material text, consent previews, credentials, decoded secret payloads, or blob OIDs.
+
+Credentials use Windows Credential Manager in local profile. First run provides hidden entry and status/update/clear operations; status never echoes a value. No real secret may be stored in SQLite, config, browser storage, Git, logs, fixtures, snapshots, process arguments, or committed environment files. Runtime test fixtures assemble secret-shaped positives from non-matching fragments. Every implementation/evidence commit is scanned. Third-party code and assets require source and license records.
+
+## Agent and delivery boundary
+V1 contains no autonomous multi-round agent. If later added, its loop, tool dispatch, guards, and deterministic mock tests require a new student-approved specification. The shipped application must provide a React WebUI, Windows x64 single-file distribution, an OCI mock demo, GitLab CI with a job named unit-test, GitHub CI evidence, one-command tests, and a final public HTTPS WebUI URL. D-025 remains the human hosting choice. Remote push, PR, deployment, paid resource creation, G-04 implementation approval, and student reflection remain human gates. REFLECTION.md must be written by the student; AI may only polish a supplied draft and declare assistance.
+
+## Baseline acceptance used by G-03
+Before product implementation, a fresh non-Codex intake session and a separate execution session receive only final SPEC.md and PLAN.md. Intake must report both full-file SHA-256 hashes, the complete two-file listing, effective language, target F-01S1, fixed acceptance ID F01S1_RED_GREEN_ARTIFACT_SAFETY_V1, and ambiguities. Execution starts only when ambiguities are empty. It may create only scripts/tests/bootstrap_scanner_contract.ps1 and scripts/bootstrap_scan_credentials.ps1 in a disposable copy, must demonstrate the exact missing-scanner red result and unchanged-command green result, and must not commit or integrate output. Formal implementation still repeats F-01S1 after G-04.
+<!-- AGENT_CAPSULE:SPEC:END -->
+
+> **状态：2026-07-30 冷启动可执行性修订，等待学生重新整体确认。** 学生于 2026-07-25T19:13:57+08:00 确认的产品方向仍是本次修订基础：精简纵向切片、模型范围 `L+P`、数字 PDF + UTF-8 文本/Markdown、通用知识点模型并以互斥/竞态/死锁三个概念验收。由于本次新增英文 agent capsule 并改变 G-03/F-01S1 执行语义，旧字节确认、旧 SR-08 和旧 G-03 收据不转移到当前文件；当前完整 SPEC/PLAN 必须重新哈希、评审并由学生签字。
 
 > **2026-07-27 过程修订：** Claude Code、Gemini CLI 与 GitHub Copilot CLI 当前均因访问或账号条件不可用。学生明确授权先用全新 Codex 任务做同类型占位预审 `G-03P`，待可访问非 Codex 类型后补做正式 `G-03`。这项修订不改变产品功能范围；`G-03P` 不满足“不同类型智能体”要求，也不解除实现门禁。
 >
@@ -259,7 +288,7 @@ React/Vite WebUI
 | AC-21 | 最终提供可访问 HTTPS WebUI URL，README 记录部署架构和 CI/CD；D-025 有学生选择证据 |
 | AC-22 | 每个实现 task 有红/绿/回归、两阶段评审、凭据扫描、commit hash 和 AGENT_LOG 记录 |
 | AC-23 | 不含真实凭据或未记录许可证；第三方来源与许可证在 README/清单中可追溯 |
-| AC-24 | 不同类型的新鲜编码智能体只凭最终 SPEC/PLAN 尝试 1--2 个 task，问题和修订 diff 写入 SPEC_PROCESS；同类型 Codex 只能记为 G-03P 占位预审 |
+| AC-24 | 不同类型的新鲜编码智能体只凭最终 SPEC/PLAN 完成只读 intake，并在无歧义时由第二个全新 session 尝试 F-01S1；问题、误解、diff、费用和独立红绿复验写入 SPEC_PROCESS；同类型 Codex 只能记为 G-03P 占位预审 |
 
 ## 12. 延期功能与恢复规则
 
@@ -278,7 +307,7 @@ React/Vite WebUI
 | --- | --- |
 | 已确认 SPEC 后发生范围漂移 | 任何产品条款变化必须形成明确 diff 并重新由学生确认；状态/证据元数据不得静默改变验收合同 |
 | D-025 公网托管 | 保持开放，仅阻塞 host-specific 发布和最终 URL；不阻塞本地实现 |
-| 当前非 Codex 冷启动工具均不可访问 | 允许 G-03P 先暴露问题但不得越过门禁；正式 G-03 等待学生可访问的不同类型工具 |
+| 当前 Claude 冷启动曾空结束和网关 504 | 保留两次真实失败；用英文 capsule、严格 UTF-8、两段式 session、预算/超时和产物后置条件失败关闭，再做一次受控复测 |
 | 真实课件许可未知 | 只允许本地私人使用；仓库、CI、分发和 demo 只能使用合成或明确许可 fixture |
 | Provider 能力/政策/价格会变化 | 每次实现/运行前刷新 allowlisted snapshot；无法证明时失败关闭 |
 | Windows/OCI 打包兼容性未证明 | 保留为 DIST task，必须用当次干净环境证据闭合 |
@@ -287,10 +316,10 @@ React/Vite WebUI
 
 ## 14. 阶段门禁
 
-1. 学生确认本精简 `SPEC.md`。**已于 2026-07-25 完成。**
-2. 正式调用 `writing-plans` 生成单一、可派发且经双评审的 `PLAN.md`。
-3. 先记录同类型 Codex 的 G-03P 占位结果；随后使用可访问的不同类型全新 session、仅凭最终 SPEC/PLAN 完成正式 G-03 并记录修订。
-4. 学生确认冷启动修订并明确批准实现。
+1. 学生确认产品方向。**已于 2026-07-25 完成；本次规范字节修订仍需重新整体确认。**
+2. 用 `writing-plans` 修订单一 PLAN，生成两份文档内的英文 capsule，并在同一最终哈希上完成机械审计和双评审。
+3. 学生确认修订后的完整 SPEC/PLAN，然后使用不同类型的两个全新 session、仅凭最终 SPEC/PLAN 完成 G-03 intake 与 F-01S1 execution，并记录修订和独立复验。
+4. 学生阅读冷启动结果并明确批准 G-04 实现门禁。
 5. 才可使用 worktree、subagent、TDD 和两阶段评审编写正式代码。
 
-当前已完成第 1 步并进入第 2 步；不得从本次 SPEC 签字推断第 4 步的实现授权。
+当前产品方向已确认，规范修订处于第 2 步；旧签字不覆盖当前最终字节，也不得推断第 4 步的实现授权。

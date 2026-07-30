@@ -1,11 +1,11 @@
 # AI4SE Project B Requirements Compliance Matrix
 
-**Snapshot:** `2026-07-29T23:31:20+08:00`
+**Snapshot:** `2026-07-30`
 
-**SPEC:** `6A0DB7CAD19533FE9A31EA81A6B30ED493C01BE59D4C98DEB6EC04A89BD11E56`
+**SPEC:** `14C03D688A09451DCA06F66507CE4510510A8A3BC550057376B0A1EF95270713`
 
-**PLAN current:** `E96C415AD716B002AD9B1EB3C2AFD7C78F693486CB83A795110B99B6755972C1`
-**Stage:** `SR-08 PASS / FORMAL G-03 INCOMPLETE + G-04 BLOCKED / NOT DISPATCHABLE`. Current hashes passed course/SPEC review with `0/0/0` and quality/security/license review with `0 Critical / 0 Major / 1 existing Minor`. Two different-type Claude attempts reached the gateway, but neither produced F-01S output; a completed G-03 and student G-04 remain mandatory.
+**PLAN current:** `95FF14D23DB92692BA005C3AA42598ABB5DDCFEE2DEFC28B950B00617C3EC663`
+**Stage:** `COLD-START REMEDIATION / SR-08 REVIEWED / NOT DISPATCHABLE`. The 2026-07-30 candidate has 38 tasks, generated English capsules, and a two-session F-01S1 cold-start runner. The current SPEC/课程合规 review and quality/security/license review both return `PASS Critical=0 Major=0 Minor=0`; the latest repairs add a live Linux sandbox preflight, Bash-only execution, ordered tool-result evidence, credential-free bubblewrap replay, and a coordinator-owned behavior oracle. Historical SR-08 and both failed Claude attempts do not transfer to these bytes. G-03 and G-04 remain open.
 
 `verified` means current local evidence exists; `planned` means a named active task owns it; `blocked` means a named human/external gate remains; `not-started` means no product evidence exists. This is the only active course matrix. Archived plans are recovery evidence, never PASS evidence.
 
@@ -13,7 +13,7 @@
 | --- | --- | --- | --- |
 | Real useful problem explainable in 30 seconds | SPEC 1.1--1.3 | verified document | implementation evidence after G-04 |
 | At least three clear modules | M1 materials, M2 learning, M3 review | verified specification; not implemented | M1-01--03, M2-01--04, M3-01--02 |
-| At least five INVEST stories | US-01--US-08 | verified document; current-hash SR-08 PASS | implementation evidence after G-04 |
+| At least five INVEST stories | US-01--US-08 | verified document; current-hash SR-08 revalidation pending | implementation evidence after G-04 |
 | Module contracts and objective acceptance | SPEC 3 and AC-01--24 | planned; each AC mapped in PLAN 12 | named task/gate per AC |
 | Architecture/data flow/data model | SPEC 6--7 | planned | F-02/03, feature repositories, API-01--03 |
 | Performance/reliability/errors/observability | SPEC 5 | planned | F-04, API-03, QA-RELEASE, DIST-01 |
@@ -37,15 +37,15 @@
 | GitHub repository visibility/access | public repo or private with TA collaborator | blocked on remote authorization | EXT-REMOTE-PREP visibility/collaborator receipt |
 | GitHub Actions and PR evidence | workflow plus full-SHA actions | not-started | CI-01, EXT-REMOTE-PREP, EXT-REMOTE-FINAL |
 | Final course CI PASS | authoritative NJU GitLab plus mirror evidence on final docs commit | blocked on remote authorization | EXT-REMOTE-FINAL |
-| Incremental commits and PR/MR history | 35 task commits, scanned coordinator evidence commits, 9 stacked worktree branches | planned | per-task protocol and EXT-REMOTE-PREP/FINAL sequential retarget-and-merge closure |
+| Incremental commits and PR/MR history | 38 task commits, scanned coordinator evidence commits, 9 stacked worktree branches | planned | per-task protocol and EXT-REMOTE-PREP/FINAL sequential retarget-and-merge closure |
 | Fresh subagent per PLAN task | one clean session/task | planned | after G-04 |
-| TDD red-green-refactor | exact red/green command in all 35 cards; shared assertion-level 2--5 minute step expansion | not-started | every behavior task after G-04 |
+| TDD red-green-refactor | exact red/green command in all 38 cards; shared assertion-level 2--5 minute step expansion | not-started | every behavior task after G-04 |
 | SPEC review then quality/security/license review | terminal hash-bound review loop | planned | every task protocol; Critical stops sequence |
 | Required Superpowers order | brainstorming -> plan -> worktree -> TDD -> reviews -> finish | brainstorming/writing-plans evidenced; later stages gated | G-03/G-04 then task protocol |
-| `SPEC.md` required sections | 14 sections, 8 stories, 24 AC, risks/deferred scope | verified student-confirmed document | SR-08 same-hash review |
-| `PLAN.md` exact task fields | exactly 35 tasks; dependency/parallel/files/red/green/done in each | mechanical PASS and same-hash dual review PASS | formal G-03 then G-04 |
-| Stranger cold start with only SPEC/PLAN | different-type agent attempts complete F-01S | formal Claude sessions `71a50d25...` and `32b62490...` used final hashes; first ended with empty output, second hit gateway 504; no scripts or test receipts | complete non-Codex G-03 on final hashes with stable endpoint/model |
-| Cold-start repair then implementation approval | separate post-repair student gate | repair reviewed; blocked on formal G-03 and student approval | G-03 receipt then explicit G-04; current SPEC confirmation does not substitute |
+| `SPEC.md` required sections | 14 sections, 8 stories, 24 AC, risks/deferred scope | structure verified; current bytes await student confirmation | SR-08 same-hash review |
+| `PLAN.md` exact task fields | exactly 38 tasks; dependency/parallel/files/red/green/done in each | mechanical PASS; current-hash dual review pending | close SR-08, then formal G-03 and G-04 |
+| Stranger cold start with only SPEC/PLAN | two fresh non-Codex sessions intake then F-01S1 | old Claude sessions remain failed history; local runner contracts cover behavior and protocol, but live bubblewrap preflight cannot execute on native Windows | confirm final bytes and Claude terms; run once in WSL2/Linux where preflight passes |
+| Cold-start repair then implementation approval | separate post-repair student gate | current repair not yet re-confirmed; G-03/G-04 blocked | student confirms current SPEC/PLAN, G-03 receipt, then explicit G-04 |
 | `SPEC_PROCESS.md` process and cold-start diff | sections 1--2 contain >3 real question/answer/revision rounds; sections 8--9 contain G-03P/review diffs | partial: first formal G-03 failure recorded; successful diff/red/green absent | rerun and record completed formal G-03 truthfully |
 | `AGENT_LOG.md` timestamp/task/skill/context/output/hash/human edits/lesson | historical and current entries exist | partial | coordinator evidence commit after every task |
 | Student-written code declaration | conditional top-of-file/function comment plus trailer/log | planned; no product code exists | per-task protocol step 5 |
@@ -55,8 +55,8 @@
 
 ## Evidence Receipts
 
-- Current mechanical: `PLAN_MECHANICAL Tasks=35 Ledger=35 Fields=5 AcRows=24 Placeholders=0` against PLAN `E96C415A...972C1`.
-- Current SR-08: projectless read-only course/SPEC review returned `PASS; Critical=0, Major=0, Minor=0`; quality/security/license review returned `PASS; Critical=0, Major=0, Minor=1` against SPEC `6A0DB7...11E56`, PLAN `E96C41...972C1`, and bootstrap evidence `FD65C5...4F310`. The Minor is the still-unexplained Pillow direct dependency and remains an F-01A minimization check.
+- Current mechanical: `PLAN_MECHANICAL_PASS Tasks=38 Ledger=38 Fields=5 AcRows=24 Placeholders=0 Unknown=0 Self=0 Cycle=0 DependencyEdges=37` against SPEC `14C03D...0713` / PLAN `95FF14D...C663`; rerun on the final bytes before the current review.
+- Current SR-08 revalidation: the first course/SPEC review on predecessor PLAN `D9AE82...7016` returned `Critical=2, Major=1`; the first quality/security/license review returned `Critical=2, Major=5`. A second SPEC review on SPEC `BE32CA...EFFF` / PLAN `35D989...F48F` returned `Critical=1, Major=1`; the second quality review returned `Critical=2, Major=4, Minor=2`. The second-round Critical findings were an acceptance-ID conflict, sandbox-external candidate execution while credentials remained in the environment, and a forgeable fixed-PASS candidate. The current candidate uses the fixed acceptance ID, Bash-only execution, exact ordered tool-use/tool-result evidence, pre-key live bubblewrap checks, environment-cleared offline replay, and a coordinator behavior oracle. New same-hash reviews are pending; no PASS is inherited.
 - Historical Stage B reviews: `/root/plan_spec_review` and `/root/plan_quality_review` both returned `PASS; Critical=0, Major=0, Minor=0` against SPEC `79579162...7862` and PLAN `6FDD69...A05D`; these verdicts do not transfer to current bytes.
 - Failed reviews: the first pair returned `Critical=0, Major=3, Minor=2` and `Critical=1, Major=10, Minor=1` against SPEC `600395...ED71` / PLAN `8A4BE...AFD`. The second pair returned `Critical=0, Major=3, Minor=0` and `Critical=0, Major=6, Minor=2` against SPEC `69A534...855E` / PLAN `47624A...225A`. Findings were repaired but verdicts are not reused.
 - Current G-03P remediation: fresh projectless task `019fa331-3da1-7f80-a37c-ac7abb135a46` used SPEC `6A0DB7...11E56` / predecessor PLAN `D574B8...1D742`, produced exact missing-scanner red and eight-group green with eleven helpers, then its optional self-scan found `credential_assignment` in both contract sources. Final PLAN `E96C...` makes exact `files=4` self-scan cleanliness mandatory; focused dual review passed. This remains same-family evidence and does not close G-03.
