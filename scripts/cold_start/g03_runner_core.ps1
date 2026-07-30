@@ -177,6 +177,96 @@ function Get-G03ClaudeJsonPayload {
     }
 }
 
+function Get-G03ClaudeOutputShape {
+    param(
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$Stdout,
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$Stderr
+    )
+
+    $wholeJson = $false
+    if (-not [string]::IsNullOrWhiteSpace($Stdout)) {
+        try { $null = $Stdout | ConvertFrom-Json -ErrorAction Stop; $wholeJson = $true } catch { }
+    }
+    $lines = @($Stdout -split "`r?`n" | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    $jsonLines = 0
+    $knownNotices = 0
+    $anchorLines = 0
+    $ansiLines = 0
+    $htmlLines = 0
+    $otherLines = 0
+    $prefixVariants = [Collections.Generic.List[string]]::new()
+    $separatorVariants = [Collections.Generic.List[string]]::new()
+    $exactSuffixLines = 0
+    $permissionText = 'Permission mode forced to default'
+    $environmentText = 'CLAUDE_CODE_SUBPROCESS_ENV_SCRUB'
+    $exactSuffix = 'CLAUDE_CODE_SUBPROCESS_ENV_SCRUB is set (allowed_non_write_users hardening). Declare allowedTools explicitly, or set CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=0 to opt out.'
+
+    foreach ($line in $lines) {
+        try { $null = $line | ConvertFrom-Json -ErrorAction Stop; $jsonLines++; continue } catch { }
+        if ($line.Contains([char]0x1B)) { $ansiLines++ }
+        $permissionIndex = $line.IndexOf($permissionText, [StringComparison]::Ordinal)
+        $environmentIndex = $line.IndexOf($environmentText, [StringComparison]::Ordinal)
+        if ($permissionIndex -ge 0 -and $environmentIndex -gt $permissionIndex) {
+            $anchorLines++
+            if (Test-G03ClaudePermissionNotice -Text $line) { $knownNotices++ }
+            $prefix = $line.Substring(0, $permissionIndex)
+            if ($prefix.Length -gt 0 -and $prefix[0] -eq [char]0xFEFF) { $prefix = $prefix.Substring(1) }
+            $unicode = [string][char]0x26A0
+            $unicodeVs16 = $unicode + [string][char]0xFE0F
+            $mojibake = ([string][char]0x923F) + '?'
+            $prefixVariant = if ($prefix -ceq $unicode) { 'unicode_compact' }
+                elseif ($prefix -ceq ($unicode + ' ')) { 'unicode_space' }
+                elseif ($prefix -ceq $unicodeVs16) { 'unicode_vs16_compact' }
+                elseif ($prefix -ceq ($unicodeVs16 + ' ')) { 'unicode_vs16_space' }
+                elseif ($prefix -ceq $mojibake) { 'mojibake_compact' }
+                elseif ($prefix -ceq ($mojibake + ' ')) { 'mojibake_space' }
+                elseif ($prefix.Contains([char]0x1B)) { 'ansi' }
+                elseif ($prefix.Length -eq 0) { 'none' }
+                else { 'other' }
+            $prefixVariants.Add($prefixVariant)
+
+            $defaultEnd = $line.IndexOf('default', $permissionIndex, [StringComparison]::Ordinal)
+            if ($defaultEnd -ge 0) {
+                $defaultEnd += 'default'.Length
+                $separator = $line.Substring($defaultEnd, $environmentIndex - $defaultEnd)
+                $emDash = [string][char]0x2014
+                $mojibakeDash = ([string][char]0x9225) + '?'
+                $separatorVariant = if ($separator -ceq (' ' + $emDash)) { 'unicode_compact' }
+                    elseif ($separator -ceq (' ' + $emDash + ' ')) { 'unicode_spaced' }
+                    elseif ($separator -ceq $emDash) { 'unicode_unspaced' }
+                    elseif ($separator -ceq (' ' + $mojibakeDash)) { 'mojibake_compact' }
+                    elseif ($separator -ceq (' ' + $mojibakeDash + ' ')) { 'mojibake_spaced' }
+                    elseif ($separator -ceq ' - ') { 'ascii_hyphen' }
+                    elseif ($separator.Contains([char]0x1B)) { 'ansi' }
+                    else { 'other' }
+                $separatorVariants.Add($separatorVariant)
+            } else {
+                $separatorVariants.Add('other')
+            }
+            if ($line.Substring($environmentIndex) -ceq $exactSuffix) { $exactSuffixLines++ }
+            continue
+        }
+        if ($line -match '(?i)<!doctype|<html') { $htmlLines++ } else { $otherLines++ }
+    }
+
+    $prefixSummary = if ($anchorLines -eq 0) { 'none' } elseif ($anchorLines -eq 1) { $prefixVariants[0] } else { 'multiple' }
+    $separatorSummary = if ($anchorLines -eq 0) { 'none' } elseif ($anchorLines -eq 1) { $separatorVariants[0] } else { 'multiple' }
+    return [ordered]@{
+        whole_json = $wholeJson
+        nonempty_lines = $lines.Count
+        json_lines = $jsonLines
+        known_permission_notices = $knownNotices
+        permission_anchor_lines = $anchorLines
+        permission_prefix_variant = $prefixSummary
+        permission_separator_variant = $separatorSummary
+        permission_exact_suffix_lines = $exactSuffixLines
+        ansi_lines = $ansiLines
+        html_lines = $htmlLines
+        other_text_lines = $otherLines
+        stderr_present = -not [string]::IsNullOrWhiteSpace($Stderr)
+    }
+}
+
 function Resolve-G03ClaudeCliPath {
     param(
         [Parameter(Mandatory = $true)][string]$ProjectRoot,

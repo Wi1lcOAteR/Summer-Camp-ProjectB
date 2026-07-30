@@ -142,6 +142,29 @@ try {
     Assert-Equal (Get-G03ClaudeJsonPayload -Text ($unicodePermissionNotice + "`n" + $unicodePermissionNotice + "`n" + $intakeJson)) $null 'Repeated permission notices must fail closed.'
     'claude_json_payload'
 
+    $plainShape = Get-G03ClaudeOutputShape -Stdout $intakeJson -Stderr ''
+    if (-not $plainShape.whole_json -or $plainShape.nonempty_lines -ne 1 -or $plainShape.json_lines -ne 1 -or $plainShape.other_text_lines -ne 0) {
+        throw 'A plain JSON envelope must have a bounded all-JSON output shape.'
+    }
+    $knownShape = Get-G03ClaudeOutputShape -Stdout ($unicodePermissionNotice + "`n" + $intakeJson) -Stderr ''
+    if ($knownShape.known_permission_notices -ne 1 -or $knownShape.permission_anchor_lines -ne 1 -or
+        $knownShape.permission_prefix_variant -cne 'unicode_compact' -or $knownShape.permission_separator_variant -cne 'unicode_compact') {
+        throw 'The exact Unicode permission notice must have a stable structural classification.'
+    }
+    $spacedNotice = ([string][char]0x26A0) + ' ' + $permissionNoticeTail + ([string][char]0x2014) + ' ' + $permissionNoticeSuffix
+    $spacedShape = Get-G03ClaudeOutputShape -Stdout ($spacedNotice + "`n" + $intakeJson) -Stderr 'opaque stderr'
+    if ($spacedShape.known_permission_notices -ne 0 -or $spacedShape.permission_anchor_lines -ne 1 -or
+        $spacedShape.permission_prefix_variant -cne 'unicode_space' -or $spacedShape.permission_separator_variant -cne 'unicode_spaced' -or
+        -not $spacedShape.stderr_present) {
+        throw 'An unrecognized anchored notice must be classified without recording its text.'
+    }
+    $secretFixture = 's' + 'k-' + ('A' * 24)
+    $secretShapeJson = (Get-G03ClaudeOutputShape -Stdout ($secretFixture + "`n" + $intakeJson) -Stderr $secretFixture) | ConvertTo-Json -Compress
+    if ($secretShapeJson.Contains($secretFixture) -or $secretShapeJson -match 'A{12}') {
+        throw 'Output-shape diagnostics must not persist arbitrary stdout or stderr content.'
+    }
+    'claude_output_shape'
+
     $heartbeatStartInfo = [Diagnostics.ProcessStartInfo]::new()
     $heartbeatStartInfo.FileName = (Get-Process -Id $PID).Path
     $heartbeatStartInfo.UseShellExecute = $false

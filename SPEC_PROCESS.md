@@ -669,3 +669,5 @@
 - **修订 diff：** intake 先剥离至多一次、精确枚举且大小写敏感的 Unicode/历史 mojibake 提示，再解析完整 JSON；execution 采用相同首行规则，任何其他非 JSON 行或重复提示均返回 `stream_output_protocol`。任意前缀、分隔符、ASCII 变体、大小写变化和重复 BOM 均失败关闭。
 - **真实红绿与评审：** 合同先因 helper 缺失失败；第一版宽正则又被未观测 ASCII 变体负例击中。最小严格实现后 core `cases=13`、entrypoint `cases=5`、capsule `cases=9`、历史首行回放和标准 63 行证据校验均通过。首轮规约/质量评审分别为 Major 2/Major 1；修复后的只读复核为 `PASS Critical=0 Major=0 Minor=0`。
 - **哈希与门禁：** SPEC/PLAN 仍为 `14C03D688A09451DCA06F66507CE4510510A8A3BC550057376B0A1EF95270713` / `95FF14D23DB92692BA005C3AA42598ABB5DDCFEE2DEFC28B950B00617C3EC663`。G-03、G-04、产品实现、远程授权、部署和学生本人反思仍未闭合；下一次正式运行必须重新产生完整证据，不能继承本次失败收据为 PASS。
+- **第二次正式失败：** 会话 `49fa60fb-85ea-4728-bf86-b68b2a532423` 的 intake 在 25 秒后仍以 Claude 子进程 exit 0、`child_output_protocol` 结束，说明第一轮精确提示白名单没有覆盖实际 stdout 结构；没有保存原始输出，因此不猜测或继续扩大白名单。
+- **安全诊断修订：** runner 仅在协议失败时记录 `output_shape`，内容限于 JSON/提示/ANSI/HTML/其他文本行计数、固定提示前缀和分隔符枚举、完整 JSON 布尔值及 stderr 是否存在。测试以运行时拼接的伪 key 证明诊断 JSON 不含任意原文。该修订不改变冻结 SPEC/PLAN、intake 验收、任务产物或 G-03/G-04 门禁。

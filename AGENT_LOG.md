@@ -1113,3 +1113,12 @@
 - **双评审**：首轮规约复核为 `FAIL Critical=0 Major=2 Minor=0`，质量/安全复核为 `FAIL Critical=0 Major=1 Minor=0`，共同指出 intake 正则过宽；规约复核另指出 execution 会跳过任意坏行。修复后只读复核为 `PASS Critical=0 Major=0 Minor=0`，独立确认变造提示与任意 execution 前言均失败关闭。
 - **人工修改及原因**：只修改 G-03 runner、core、合同和中文过程记录；SPEC/PLAN 哈希保持 `14C03D...0713` / `95FF14D...C663`。未读取或写入真实 key，未再次调用模型，未修改产品源码、远程状态、学生研究文档或 `REFLECTION.md`。
 - **门禁结论**：本次只修复 runner，不能关闭 G-03。学生仍需用相同命令重新隐藏输入临时 key；只有得到正式 `G03_EVIDENCE_READY` 并完成证据复验后，才可处理 G-04 实现批准。
+
+## 2026-07-31T02:39:37+08:00 - G-03-014 第二次协议失败与脱敏形状诊断
+
+- **Task 编号**：G-03-014（为无法从安全日志区分的 stdout 协议失败增加结构诊断；不重试模型）。
+- **触发的 Superpowers skill**：`using-superpowers`、`systematic-debugging`、`test-driven-development`、`verification-before-completion`。
+- **事实证据**：会话 `49fa60fb-85ea-4728-bf86-b68b2a532423` 在 WSL2 中再次通过 capsule、冻结哈希、平台和 preflight；intake 运行 25 秒，Claude Code 子进程 exit 0，仍以 `child_output_protocol`、runner exit 44 结束。没有 `intake-receipt.json` 或候选产物。本次仍不是 401、504、超时或 CLI 启动失败，但原始 stdout 按安全设计未落盘，现有证据不足以区分提示变体、ANSI、重复行或 JSON 行协议。
+- **TDD 红—绿**：先新增纯 JSON、精确提示、未识别但带安全锚点的提示和伪 key 原文泄露负例，旧代码因 `Get-G03ClaudeOutputShape` 缺失准确失败。最小实现后 core 合同输出 `claude_output_shape` 和 `G03_RUNNER_CONTRACT_PASS cases=13`，入口合同 `cases=5`。
+- **诊断边界**：仅在 `child_output_protocol` 时向 `process-diagnostic.json` 增加 `output_shape`；字段只有 JSON/非空行/固定提示/ANSI/HTML/其他文本计数、固定前缀/分隔符枚举和 stderr 是否存在。不得保存 stdout/stderr 原文、哈希可逆片段、prompt、模型结果、路径或凭据。
+- **评审结论**：规约审查确认未改变 G-03 成功条件、费用、产物或人工门禁；质量/安全审查确认序列化诊断不包含测试中的伪 key 或任意文本。正式 G-03 仍开放，必须以新 runner 再产生一次结构证据，不能把本次失败计为 PASS。

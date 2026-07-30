@@ -41,6 +41,7 @@ foreach ($literal in @(
     "'unsupported_platform'",
     "Write-G03ProcessDiagnostic -Run `$intakeRun -Stage 'intake'",
     "Write-G03ProcessDiagnostic -Run `$executionRun -Stage 'execution'",
+    "output_shape = Get-G03ClaudeOutputShape",
     "tdd_receipt = `$executionEvidence.TddReceipt",
     "'CAPSULE_INVALID'",
     "'UTF8_INVALID'",

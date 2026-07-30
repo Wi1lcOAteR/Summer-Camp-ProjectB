@@ -84,12 +84,17 @@ function Write-G03Completion {
 
 function Write-G03ProcessDiagnostic {
     param([Parameter(Mandatory = $true)]$Run, [Parameter(Mandatory = $true)][ValidateSet('intake','execution')][string]$Stage)
-    Write-G03JsonNoBom (Join-Path $EvidenceRoot 'process-diagnostic.json') ([ordered]@{
+    $code = Get-G03ProcessDiagnosticCode -Stage $Stage -ExitCode $Run.ExitCode -TimedOut $Run.TimedOut -Stdout $Run.Stdout -Stderr $Run.Stderr
+    $diagnostic = [ordered]@{
         stage = $Stage
         exit_code = [int]$Run.ExitCode
         timed_out = [bool]$Run.TimedOut
-        code = Get-G03ProcessDiagnosticCode -Stage $Stage -ExitCode $Run.ExitCode -TimedOut $Run.TimedOut -Stdout $Run.Stdout -Stderr $Run.Stderr
-    })
+        code = $code
+    }
+    if ($code -eq 'child_output_protocol') {
+        $diagnostic.output_shape = Get-G03ClaudeOutputShape -Stdout $Run.Stdout -Stderr $Run.Stderr
+    }
+    Write-G03JsonNoBom (Join-Path $EvidenceRoot 'process-diagnostic.json') $diagnostic
 }
 
 function Stop-G03 {
