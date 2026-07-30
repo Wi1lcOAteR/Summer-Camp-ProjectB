@@ -17,6 +17,8 @@ G-03 尚未完成，产品实现仍被 G-04 门禁阻塞。当前候选输入为
 
 Claude Code 的 `--safe-mode` 只关闭自定义配置，不提供网络隔离。Claude 官方 sandbox 在 macOS、Linux 和 WSL2 上使用操作系统机制；原生 Windows 不支持该强制隔离。本次 execution 必须允许 Bash，又明确禁止网络，所以跟踪版 runner 在原生 Windows 会在询问 API key 前以 `EXECUTION_FAILED` 停止。
 
+这里的限制来自正式 G-03 的隔离合同，而不是 Claude CLI 本身：Claude CLI 可以在 Windows 运行，但当前 runner 使用 Linux namespace 和 `bubblewrap` 实现只暴露一次性目录、断网、清空凭据环境以及有界终止整个候选进程树。原生 Windows 没有可直接等价替换的 `bwrap`/namespace 机制；仅安装 PowerShell 7 的 `pwsh` 仍不能把原生 Windows 运行算作该合同的正式证据。
+
 正式运行环境必须是 Linux 或 WSL2，并同时提供：
 
 ```bash
@@ -28,6 +30,24 @@ node --version
 ```
 
 runner 会传入以下失败关闭策略：sandbox 必须可用、网络域名全部拒绝、禁止 unsandboxed escape、权限模式 `dontAsk`、禁用 WebFetch/WebSearch。缺少 `bwrap`、`socat`、`pwsh` 或 `timeout` 时不会询问 key，也不会调用模型。询问 key 前还会真实启动一次 bubblewrap 预检，验证凭据环境变量不可见、宿主 `/mnt` 不可见、外网不可达、写入只落在一次性目录内，并用超时样例验证进程树能够终止；任何一项失败都不会调用模型。
+
+## 运行时反馈日志合同
+
+runner 必须在创建本次证据目录后立即向终端输出该目录，并在其中创建 UTF-8 无 BOM 的 `status.log`。该文件采用每行一个固定字段 JSON 对象，字段仅允许 `timestamp`、`stage`、`event` 和可选的非负 `elapsed_seconds`；不得记录 API key、认证头、prompt、模型原始输出、材料正文、文件内容或任意异常文本。
+
+至少记录以下阶段：runner 启动、capsule 校验、输入哈希校验、平台检查、bubblewrap 预检、等待隐藏凭据、intake、execution、独立 replay 和最终状态。intake 与 execution 运行期间每 15 秒追加一次 `heartbeat`，包含累计秒数；阶段完成记录受控结果码，不复制子进程 stdout/stderr。所有受控退出都必须同时写最终状态到 `status.log` 和 `completion.json`。原生 Windows、缺少命令或预检失败必须给出明确的受控事件，不得只留下静默非零退出。
+
+观察运行状态：
+
+```powershell
+# Windows 侧查看映射目录时
+Get-Content -Wait <evidence-root>\status.log
+```
+
+```bash
+# WSL2/Linux 内
+tail -f <evidence-root>/status.log
+```
 
 ## 运行前必须完成
 
