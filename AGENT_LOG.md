@@ -1,5 +1,13 @@
 # AGENT_LOG
 
+## 2026-08-01T18:41:26+08:00 - G-03-015 Snapshot Binding Repair
+- **Task ID:** G-03-015
+- **Skills:** `systematic-debugging`, `test-driven-development`, `verification-before-completion`
+- **Evidence:** Fresh non-Codex intake returned the correct two-file listing and actual hashes, then stopped on the stale PLAN-to-SPEC binding. No execution session ran.
+- **Red/green:** The new snapshot contract first failed with `snapshot_hash_mismatch binding=plan_spec`; after synchronizing PLAN, capsule manifest, compliance matrix, and runbook it passed with SPEC `01E9A154...1D030` and PLAN `11EB0111...9964C`. Capsule check passed and capsule regression reported `cases=9`.
+- **Commit:** `ebfad01` (`fix(g03): synchronize snapshot hash bindings`).
+- **Human changes:** The student supplied the real intake JSON and requested that repaired files replace the current intake copies. No product code, remote state, or credential was changed.
+
 ## 2026-08-01 - MAINT-002 Directory Layout Refactor
 - **Task ID:** MAINT-002
 - **Skills:** `verification-before-completion`

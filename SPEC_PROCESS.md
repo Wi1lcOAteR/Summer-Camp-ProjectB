@@ -1,5 +1,13 @@
 # SPEC_PROCESS
 
+## 2026-08-01 G-03 New-Snapshot Intake and Hash-Binding Repair
+
+- A fresh Claude intake received only `SPEC.md` and `PLAN.md`. It correctly computed SPEC `01E9A154...1D030` and PLAN `D835D542...73D9E6`; the file listing, language, task, and acceptance ID were correct.
+- Intake reported one valid ambiguity: the PLAN body still bound the pre-layout SPEC hash `14C03D68...0713`. It correctly stopped before execution.
+- Root cause: the documentation-layout commit changed the normative SPEC/PLAN bodies without running the capsule and cross-document snapshot contracts. The manifest, PLAN binding, compliance matrix, and G-03 runbook retained old hashes.
+- The repair does not change product scope. It synchronizes the PLAN binding, capsule body hashes, matrix, and runbook, and adds `g03_snapshot_contract.ps1` to prevent recurrence.
+- Repaired snapshot: SPEC `01E9A154B8FE9585997871B23571B079264BE038082D1CC4C239412CCEF1D030`; PLAN `11EB0111B74EA7320B9A881575AE3C0606FE625A3410F092611F88D86BA9964C`. Execution has not run; G-03 and G-04 remain open.
+
 > **当前状态（2026-07-30）：** 精简 v1 产品方向仍来自学生确认的 `C6231816...9AD6`。当前 Stage-B 再验证候选为 SPEC `14C03D68...0713`、PLAN `95FF14D2...C663`，含 38 个单-session task、ASCII capsule 和失败关闭的两段式 G-03 runner。两轮审查问题已修订，runner-only 修订已通过本地合同测试，但当前哈希仍待同哈希双评审和学生重新确认。阶段为 `NOT DISPATCHABLE`：正式不同类型 G-03、学生 G-04、D-025 和远程授权均未关闭。
 
 ## 0. 启动审计（2026-07-17）
