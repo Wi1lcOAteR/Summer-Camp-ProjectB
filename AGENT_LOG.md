@@ -1,5 +1,15 @@
 # AGENT_LOG
 
+## 2026-08-01T17:30:00+08:00 — MAINT-001 目录结构约束与临时文件清理
+
+- **Task 编号**：MAINT-001
+- **触发 skills**：`systematic-debugging`、`verification-before-completion`
+- **关键 context**：用户要求为 `AGENTS.md` 增加目录结构约束，并清理评测后不再使用的工具链、缓存、安装包和临时脚本。
+- **保留范围**：`tmp/stage-b-archive-20260725/`、`tmp/g03-evidence/`、`tmp/pdfs/` 以及两个存在未提交改动的 `.worktrees/` 未删除。
+- **已移除范围**：项目根目录 Claude/Node 工具链、npm/uv 缓存、旧 G-03 preflight/许可证/测试临时目录、空临时脚本、Open Design 安装包和根目录 Python/Ruff/Codex 临时缓存；`.pytest_cache/` 因访问被拒绝而尚未删除。
+- **验证**：清理前后执行 `git status --short --untracked-files=all` 和 `git worktree list`；根目录用户修改未被覆盖，`AGENTS.md` 新增第 11 节目录结构规则。
+- **经验**：删除前必须区分课程归档、过程证据、活跃 worktree 与一次性运行物；工具链和缓存不得回到项目根目录或长期混入 `tmp/`。
+
 > 本文件只记录实际发生的过程。未执行的步骤明确标为“尚未执行”。
 
 ## 2026-07-17T18:14:41+08:00 — PRE-001 启动审计
