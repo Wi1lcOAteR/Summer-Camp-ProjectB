@@ -4,8 +4,8 @@
 
 G-03 尚未完成，产品实现仍被 G-04 门禁阻塞。当前候选输入为：
 
-- SPEC SHA-256：`14C03D688A09451DCA06F66507CE4510510A8A3BC550057376B0A1EF95270713`
-- PLAN SHA-256：`95FF14D23DB92692BA005C3AA42598ABB5DDCFEE2DEFC28B950B00617C3EC663`
+- SPEC SHA-256：`01E9A154B8FE9585997871B23571B079264BE038082D1CC4C239412CCEF1D030`
+- PLAN SHA-256：`11EB0111B74EA7320B9A881575AE3C0606FE625A3410F092611F88D86BA9964C`
 - 目标任务：`F-01S1`
 - 固定模型：`claude-sonnet-4-6`
 - 固定过程端点：`https://ai2.1343263.xyz`
@@ -63,6 +63,7 @@ Get-FileHash SPEC.md,PLAN.md -Algorithm SHA256
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/cold_start/update_agent_capsules.ps1 -Mode Check
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/cold_start/tests/agent_capsules_contract.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/cold_start/tests/g03_snapshot_contract.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/cold_start/tests/g03_runner_contract.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/cold_start/tests/g03_runner_entrypoint_contract.ps1
 ```
@@ -96,8 +97,8 @@ pwsh -NoProfile -File ./scripts/cold_start/run_g03_claude.ps1 `
   -AgentLanguage Auto `
   -Model claude-sonnet-4-6 `
   -MaxTotalBudgetUsd 1.00 `
-  -ExpectedSpecSha256 14C03D688A09451DCA06F66507CE4510510A8A3BC550057376B0A1EF95270713 `
-  -ExpectedPlanSha256 95FF14D23DB92692BA005C3AA42598ABB5DDCFEE2DEFC28B950B00617C3EC663 `
+  -ExpectedSpecSha256 01E9A154B8FE9585997871B23571B079264BE038082D1CC4C239412CCEF1D030 `
+  -ExpectedPlanSha256 11EB0111B74EA7320B9A881575AE3C0606FE625A3410F092611F88D86BA9964C `
   -ClaudeCli ./tmp/toolchains/claude-code/node_modules/@anthropic-ai/claude-code/bin/claude
 ```
 

@@ -4,7 +4,7 @@
                       "SPEC":  {
                                    "path":  "SPEC.md",
                                    "max_words":  1500,
-                                   "source_sha256":  "6110AB138EA845CC6984DC8E90C9709E0FF79384E521CB54AB00703EDA8A5A01",
+                                   "source_sha256":  "6BB986C1F5B6093013907B60D3A6697061EBF7707A1C703C222FC856EA4A8889",
                                    "source_anchors":  [
                                                           "## 1. 问题陈述",
                                                           "## 3. 功能规约",
@@ -17,7 +17,7 @@
                       "PLAN":  {
                                    "path":  "PLAN.md",
                                    "max_words":  1200,
-                                   "source_sha256":  "13A12C57EC334B6CDD614CCE88CE81FC00BA5BFCAF46D95DA66808EC7818DD9E",
+                                   "source_sha256":  "D629EA185F353FC3B2B9513506B486FD405AC32EFA63068EE25C5546F8FCA79F",
                                    "source_anchors":  [
                                                           "## 1. Dispatch Gates",
                                                           "## 3. Per-Task Protocol",

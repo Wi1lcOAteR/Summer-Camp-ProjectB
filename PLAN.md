@@ -33,7 +33,7 @@ A candidate execution has exactly the two input documents and two allowed artifa
 
 **Status:** `COLD-START REMEDIATION / NOT DISPATCHABLE`
 
-**SPEC binding:** the 2026-07-25 product direction remains the design basis, but the 2026-07-30 cold-start revision changes normative bytes. Current SPEC SHA-256 is `14C03D688A09451DCA06F66507CE4510510A8A3BC550057376B0A1EF95270713`; the prior `6A0DB7...11E56` review does not transfer.
+**SPEC binding:** the 2026-07-25 product direction remains the design basis, but the 2026-08-01 documentation-layout revision changes normative bytes. Current SPEC SHA-256 is `01E9A154B8FE9585997871B23571B079264BE038082D1CC4C239412CCEF1D030`; prior reviews do not transfer to these bytes.
 
 **Goal:** Build the reduced v1 local study workbench: source-grounded material import and mapping, deterministic learning evidence for mutex/race/deadlock, and continuous/finals review planning, with an optional consent-bound OpenAI P adapter and a mock-only public demo.
 

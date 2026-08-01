@@ -2,10 +2,10 @@
 
 **Snapshot:** `2026-07-30`
 
-**SPEC:** `14C03D688A09451DCA06F66507CE4510510A8A3BC550057376B0A1EF95270713`
+**SPEC:** `01E9A154B8FE9585997871B23571B079264BE038082D1CC4C239412CCEF1D030`
 
-**PLAN current:** `95FF14D23DB92692BA005C3AA42598ABB5DDCFEE2DEFC28B950B00617C3EC663`
-**Stage:** `COLD-START REMEDIATION / SR-08 REVIEWED / NOT DISPATCHABLE`. The 2026-07-30 candidate has 38 tasks, generated English capsules, and a two-session F-01S1 cold-start runner. The current SPEC/课程合规 review and quality/security/license review both return `PASS Critical=0 Major=0 Minor=0`; the latest repairs add a live Linux sandbox preflight, Bash-only execution, ordered tool-result evidence, credential-free bubblewrap replay, and a coordinator-owned behavior oracle. Historical SR-08 and both failed Claude attempts do not transfer to these bytes. G-03 and G-04 remain open.
+**PLAN current:** `11EB0111B74EA7320B9A881575AE3C0606FE625A3410F092611F88D86BA9964C`
+**Stage:** `COLD-START REMEDIATION / SNAPSHOT REVALIDATION REQUIRED / NOT DISPATCHABLE`. The 2026-08-01 documentation-layout revision changed the normative SPEC/PLAN bytes without changing product scope. Prior SR-08 reviews do not transfer to these hashes. The first new Claude intake correctly stopped on the stale PLAN-to-SPEC hash binding; the binding and capsule manifest are now being repaired before intake is repeated. G-03 and G-04 remain open.
 
 `verified` means current local evidence exists; `planned` means a named active task owns it; `blocked` means a named human/external gate remains; `not-started` means no product evidence exists. This is the only active course matrix. Archived plans are recovery evidence, never PASS evidence.
 
