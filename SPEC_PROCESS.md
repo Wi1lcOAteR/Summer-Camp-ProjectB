@@ -1,5 +1,12 @@
 # SPEC_PROCESS
 
+## 2026-08-01 G-03 Intake Passed on Repaired Snapshot
+
+- A new fresh Claude intake received exactly `PLAN.md` and `SPEC.md` and returned SPEC `01E9A154...1D030`, PLAN `11EB0111...9964C`, English, task `F-01S1`, acceptance ID `F01S1_RED_GREEN_ARTIFACT_SAFETY_V1`, and an empty ambiguity list.
+- This closes the read-only intake portion only. No execution result, red/green evidence, independent replay, or G-03 PASS is claimed.
+- The concurrently started execution directory was found to contain PLAN `D835D542...73D9E6`, not the intake-approved PLAN. Its apparent stall may be model/gateway/network-side; no root cause is asserted. Regardless of transport outcome, that session is not same-snapshot formal evidence.
+- A separate `tmp/g03-manual/20260801-183327/execution-v2` was prepared with exactly the repaired SPEC/PLAN pair for a later fresh execution session.
+
 ## 2026-08-01 G-03 New-Snapshot Intake and Hash-Binding Repair
 
 - A fresh Claude intake received only `SPEC.md` and `PLAN.md`. It correctly computed SPEC `01E9A154...1D030` and PLAN `D835D542...73D9E6`; the file listing, language, task, and acceptance ID were correct.

@@ -1,5 +1,12 @@
 # AGENT_LOG
 
+## 2026-08-01T20:58:13+08:00 - G-03-016 Intake Pass and Execution Snapshot Check
+- **Task ID:** G-03-016
+- **Skills:** `systematic-debugging`, `verification-before-completion`
+- **Context/output:** The student supplied a fresh non-Codex intake JSON with the repaired hashes, exact two-file listing, correct language/task/acceptance ID, and `ambiguities=[]`. Intake is accepted; execution and G-03 remain open.
+- **Inspection:** The running execution copy contained the repaired SPEC but pre-repair PLAN `D835D542...73D9E6`. The observed stall may be external model/gateway/network latency and is not diagnosed from available evidence, but the stale PLAN independently prevents formal same-snapshot acceptance.
+- **Human boundary:** The student continues observing the current external session. It was not terminated or overwritten. A new two-file `execution-v2` directory was prepared without credentials for an optional fresh rerun.
+
 ## 2026-08-01T18:41:26+08:00 - G-03-015 Snapshot Binding Repair
 - **Task ID:** G-03-015
 - **Skills:** `systematic-debugging`, `test-driven-development`, `verification-before-completion`
