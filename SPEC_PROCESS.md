@@ -1,5 +1,11 @@
 # SPEC_PROCESS
 
+## 2026-08-01 G-03 Execution Output-Risk Finding
+
+- Two manual Claude execution attempts remained in extended thinking and created no candidate files. The student observed no visible session-termination control and raised output-limit exhaustion as an additional hypothesis.
+- The available evidence does not prove gateway latency, internal planning, or output ceiling as the root cause. The captured thinking does prove that the worker guessed an unspecified `source=path` contract and was attempting to design the full six-rule test matrix before writing.
+- The accepted remediation direction is to split F-01S1 into an atomic cold-start task and a serialized extension, lock field/signature semantics, and impose artifact/final-summary output budgets. The proposed bytes are documented in `docs/specs/2026-08-01-g03-atomic-execution-design.md`; SPEC/PLAN are unchanged until student review.
+
 ## 2026-08-01 G-03 Intake Passed on Repaired Snapshot
 
 - A new fresh Claude intake received exactly `PLAN.md` and `SPEC.md` and returned SPEC `01E9A154...1D030`, PLAN `11EB0111...9964C`, English, task `F-01S1`, acceptance ID `F01S1_RED_GREEN_ARTIFACT_SAFETY_V1`, and an empty ambiguity list.

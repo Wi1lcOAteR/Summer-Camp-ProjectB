@@ -1,5 +1,12 @@
 # AGENT_LOG
 
+## 2026-08-01 - G-03-017 Execution Planning Loop and Output-Risk Design
+- **Task ID:** G-03-017
+- **Skills:** `brainstorming`, `systematic-debugging`, `verification-before-completion`
+- **Context/output:** The student supplied recent Claude thinking from two stalled execution attempts. Both disposable directories still contained only SPEC/PLAN. Thinking showed an explicit guess that single-path `source` was likely `path` and repeated pre-write design expansion.
+- **Assessment:** Network/gateway latency and output-limit exhaustion remain unproven hypotheses. Independently, F-01S1 is under-specified and too large for its single-session/output budget, so neither stalled attempt can close execution.
+- **Human direction:** The student approved revision. A concise Chinese design proposes F-01S1A/F-01S1B, exact field/function semantics, line limits, and a 300-word final-summary cap. Normative SPEC/PLAN changes wait for the required design review gate.
+
 ## 2026-08-01T20:58:13+08:00 - G-03-016 Intake Pass and Execution Snapshot Check
 - **Task ID:** G-03-016
 - **Skills:** `systematic-debugging`, `verification-before-completion`
