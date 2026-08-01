@@ -1,5 +1,8 @@
 # Stage B 旧计划归档索引
 
+> 目录整理记录：本归档原位于 `docs/superpowers/plans/archive/`，现统一横向迁移到
+> `docs/archive/`。下方“原路径”列保留历史来源，不是当前应创建的目录。
+
 Status: ARCHIVED / NOT DISPATCHABLE
 
 ## 使用边界
@@ -12,18 +15,18 @@ Status: ARCHIVED / NOT DISPATCHABLE
 
 | ID | 原路径 | 当前归档路径 | 字节数 | SHA-256 |
 | --- | --- | --- | ---: | --- |
-| A01 | `PLAN.md` | `docs/superpowers/plans/archive/superseded-2026-07-23/PLAN.not-pass.md` | 463731 | `D55007B1C6E0A56E5F3C342439BC53E4C2867F98643CAE27A34507854770E127` |
-| A02 | `docs/superpowers/plans/2026-07-22-foundation-scaffold.md` | `docs/superpowers/plans/archive/superseded-2026-07-23/2026-07-22-foundation-scaffold.md` | 234078 | `27BB653A8D5FFFBED37C0DDA3724524EFE1CC1264C869E3CDE15FC7E78E00E09` |
-| A03 | `docs/superpowers/plans/2026-07-22-domain-primitives-source.md` | `docs/superpowers/plans/archive/superseded-2026-07-23/2026-07-22-domain-primitives-source.md` | 137520 | `40C48BB62A87F17BFCFB635871F51C350EA2EC9F1AAFEE5ED2D9B7A7C7629C0B` |
-| A04 | `docs/superpowers/plans/2026-07-23-persistence-repositories.md` | `docs/superpowers/plans/archive/superseded-2026-07-23/2026-07-23-persistence-repositories.md` | 349782 | `DCF8868850B8A65FCB952F4FFB916C8DA219825CC9D5FB29C7FD234CEFA69C28` |
-| A05 | `docs/superpowers/plans/2026-07-23-local-trust-and-provider-control-plane.md` | `docs/superpowers/plans/archive/superseded-2026-07-23/2026-07-23-local-trust-and-provider-control-plane.md` | 221763 | `46E56C37E63AE900638C38DD85C5E7A06C94094C676CE91B606F1DBD3A28F115` |
-| A06 | `docs/superpowers/plans/2026-07-23-ci-docs-and-release-preparation.md` | `docs/superpowers/plans/archive/superseded-2026-07-23/2026-07-23-ci-docs-and-release-preparation.md` | 83989 | `8267AC954EE5A667B8816A87E06F37E13452EAAB1F20A20885EC14D7AD1AE17B` |
-| A07 | `docs/superpowers/plans/2026-07-23-windows-oci-distribution.md` | `docs/superpowers/plans/archive/superseded-2026-07-23/2026-07-23-windows-oci-distribution.md` | 157042 | `AB0920689358F616E189FB7C4DC0C03598BAC8EB89584A0248FFC37504566C0A` |
-| A08 | `docs/engineering/DETAILED_PLAN_AUTHORING_CONTRACT.md` | `docs/superpowers/plans/archive/superseded-2026-07-23/engineering/DETAILED_PLAN_AUTHORING_CONTRACT.md` | 9322 | `B93F949DE36CD89C7101160F237D4FEBCD7305F411C55B20429D62A282DBBFEF` |
-| A09 | `docs/engineering/PLAN_SUBSYSTEM_PARTITION.md` | `docs/superpowers/plans/archive/superseded-2026-07-23/engineering/PLAN_SUBSYSTEM_PARTITION.md` | 5958 | `BF3D971765486031E8CB54353B4B366BFB2146861B03540EE57D41A385A2D7F8` |
-| A10 | `docs/engineering/plan_fragments/M2-01.md` | `docs/superpowers/plans/archive/superseded-2026-07-23/plan_fragments/M2-01.md` | 60180 | `30D3744A1929F254DAEFFF4ED643CAF556B518026EFC0EC3EA7DF532C54944BA` |
-| A11 | `docs/engineering/plan_fragments/T-01.md` | `docs/superpowers/plans/archive/superseded-2026-07-23/plan_fragments/T-01.md` | 86843 | `33D67D3BE30528B0174BC43C5593D003228A980164A44379191790681C8468BB` |
-| A12 | `docs/engineering/plan_fragments/T-02.md` | `docs/superpowers/plans/archive/superseded-2026-07-23/plan_fragments/T-02.md` | 72076 | `889AA9C9FDF24C6B376A15529D8C7510BEA7C674DA0744E9908CDC6D0D3C6D94` |
+| A01 | `PLAN.md` | `docs/archive/superseded-2026-07-23/PLAN.not-pass.md` | 463731 | `D55007B1C6E0A56E5F3C342439BC53E4C2867F98643CAE27A34507854770E127` |
+| A02 | `docs/superpowers/plans/2026-07-22-foundation-scaffold.md` | `docs/archive/superseded-2026-07-23/2026-07-22-foundation-scaffold.md` | 234078 | `27BB653A8D5FFFBED37C0DDA3724524EFE1CC1264C869E3CDE15FC7E78E00E09` |
+| A03 | `docs/superpowers/plans/2026-07-22-domain-primitives-source.md` | `docs/archive/superseded-2026-07-23/2026-07-22-domain-primitives-source.md` | 137520 | `40C48BB62A87F17BFCFB635871F51C350EA2EC9F1AAFEE5ED2D9B7A7C7629C0B` |
+| A04 | `docs/superpowers/plans/2026-07-23-persistence-repositories.md` | `docs/archive/superseded-2026-07-23/2026-07-23-persistence-repositories.md` | 349782 | `DCF8868850B8A65FCB952F4FFB916C8DA219825CC9D5FB29C7FD234CEFA69C28` |
+| A05 | `docs/superpowers/plans/2026-07-23-local-trust-and-provider-control-plane.md` | `docs/archive/superseded-2026-07-23/2026-07-23-local-trust-and-provider-control-plane.md` | 221763 | `46E56C37E63AE900638C38DD85C5E7A06C94094C676CE91B606F1DBD3A28F115` |
+| A06 | `docs/superpowers/plans/2026-07-23-ci-docs-and-release-preparation.md` | `docs/archive/superseded-2026-07-23/2026-07-23-ci-docs-and-release-preparation.md` | 83989 | `8267AC954EE5A667B8816A87E06F37E13452EAAB1F20A20885EC14D7AD1AE17B` |
+| A07 | `docs/superpowers/plans/2026-07-23-windows-oci-distribution.md` | `docs/archive/superseded-2026-07-23/2026-07-23-windows-oci-distribution.md` | 157042 | `AB0920689358F616E189FB7C4DC0C03598BAC8EB89584A0248FFC37504566C0A` |
+| A08 | `docs/engineering/DETAILED_PLAN_AUTHORING_CONTRACT.md` | `docs/archive/superseded-2026-07-23/engineering-DETAILED_PLAN_AUTHORING_CONTRACT.md` | 9322 | `B93F949DE36CD89C7101160F237D4FEBCD7305F411C55B20429D62A282DBBFEF` |
+| A09 | `docs/engineering/PLAN_SUBSYSTEM_PARTITION.md` | `docs/archive/superseded-2026-07-23/engineering-PLAN_SUBSYSTEM_PARTITION.md` | 5958 | `BF3D971765486031E8CB54353B4B366BFB2146861B03540EE57D41A385A2D7F8` |
+| A10 | `docs/engineering/plan_fragments/M2-01.md` | `docs/archive/superseded-2026-07-23/fragment-M2-01.md` | 60180 | `30D3744A1929F254DAEFFF4ED643CAF556B518026EFC0EC3EA7DF532C54944BA` |
+| A11 | `docs/engineering/plan_fragments/T-01.md` | `docs/archive/superseded-2026-07-23/fragment-T-01.md` | 86843 | `33D67D3BE30528B0174BC43C5593D003228A980164A44379191790681C8468BB` |
+| A12 | `docs/engineering/plan_fragments/T-02.md` | `docs/archive/superseded-2026-07-23/fragment-T-02.md` | 72076 | `889AA9C9FDF24C6B376A15529D8C7510BEA7C674DA0744E9908CDC6D0D3C6D94` |
 
 ## 文件结论与恢复条件
 

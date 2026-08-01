@@ -17,7 +17,7 @@
 2. `PLAN.md`：当前阶段门禁和下一步顺序。
 3. `docs/REQUIREMENTS_COMPLIANCE_AUDIT.md`：课程硬要求唯一追踪矩阵。
 4. `DECISIONS_NEEDED.md`：当前人工门禁；顶部事项优先。
-5. `docs/superpowers/plans/archive/README.md`：旧计划和延期功能的恢复索引。
+5. `docs/archive/README.md`：旧计划和延期功能的恢复索引。
 
 只有在恢复历史问题或延期功能时，才按归档索引选择性读取旧草稿；不要默认加载全部历史计划。
 
@@ -30,8 +30,8 @@
 
 ## 存档边界
 
-- 被取代的根计划、六份详细计划、三个片段和两份工程合同保存在 `docs/superpowers/plans/archive/superseded-2026-07-23/`。
-- 四份可恢复延期计划保存在 `docs/superpowers/plans/archive/deferred-v2/`。
+- 被取代的根计划、六份详细计划、三个片段和两份工程合同保存在 `docs/archive/superseded-2026-07-23/`。
+- 四份可恢复延期计划保存在 `docs/archive/deferred-v2/`。
 - `.r5-verify-final-20260723` 只保存在被忽略的 `tmp/stage-b-archive-20260725/`，是计划代码重建物，不是产品源码。
 - 旧 local-trust 计划中的两个模拟凭据字面量已在可提交副本中安全替换；原始字节只保存在被忽略的本地存档，归档索引同时记录原始和可提交哈希。
 

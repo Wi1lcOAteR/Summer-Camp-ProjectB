@@ -549,9 +549,9 @@ The authoritative course matrix is `docs/REQUIREMENTS_COMPLIANCE_AUDIT.md`; befo
 
 The active tasks do not implement OCR/image/scanned PDF/bulk ingestion, whole-file F or durable remote jobs, past-exam/teacher-focus intelligence, or rubrics beyond mutex/race/deadlock. Their only plans are:
 
-- `docs/superpowers/plans/archive/deferred-v2/advanced-material-ingestion.md`
-- `docs/superpowers/plans/archive/deferred-v2/remote-f-and-durable-jobs.md`
-- `docs/superpowers/plans/archive/deferred-v2/exam-material-intelligence.md`
-- `docs/superpowers/plans/archive/deferred-v2/extended-concept-rubrics.md`
+- `docs/archive/deferred-v2/advanced-material-ingestion.md`
+- `docs/archive/deferred-v2/remote-f-and-durable-jobs.md`
+- `docs/archive/deferred-v2/exam-material-intelligence.md`
+- `docs/archive/deferred-v2/extended-concept-rubrics.md`
 
 They remain `ARCHIVED / NOT DISPATCHABLE`. Recovery requires `brainstorming -> SPEC confirmation -> writing-plans`; no active task may silently absorb them.

@@ -58,7 +58,7 @@ Run PowerShell AST parsing, strict UTF-8 checks, scoped credential-shape scannin
 - [x] **Step 6: Commit only the owned files**
 
 ```powershell
-git add -- .gitattributes scripts/cold_start/g03_runner_core.ps1 scripts/cold_start/run_g03_claude.ps1 scripts/cold_start/tests/g03_runner_contract.ps1 scripts/cold_start/tests/g03_runner_entrypoint_contract.ps1 docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md docs/superpowers/plans/2026-07-30-g03-progress-logging.md AGENT_LOG.md
+git add -- .gitattributes scripts/cold_start/g03_runner_core.ps1 scripts/cold_start/run_g03_claude.ps1 scripts/cold_start/tests/g03_runner_contract.ps1 scripts/cold_start/tests/g03_runner_entrypoint_contract.ps1 docs/cold-start/G-03_CLAUDE_CODE_RUNBOOK.md docs/plans/2026-07-30-g03-progress-logging.md AGENT_LOG.md
 git commit -m "fix(g03): add observable runner progress"
 ```
 

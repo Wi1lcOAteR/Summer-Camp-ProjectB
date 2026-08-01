@@ -4,7 +4,7 @@
 
 **Gate:** `PLAN.md` has not passed the formal `superpowers:writing-plans` gate. G-03 cold-start execution and all formal implementation tasks remain prohibited.
 
-> **2026-07-25 scope-reset note:** All review records below apply to superseded plan bytes now indexed under `docs/superpowers/plans/archive/`. The current root `PLAN.md` is intentionally a non-dispatchable stage ledger while the reduced `SPEC.md` awaits student confirmation. No old subsystem PASS carries into the reduced scope. After signature, a new formal `writing-plans` invocation and same-snapshot reviews must create the only active implementation-plan evidence.
+> **2026-07-25 scope-reset note:** All review records below apply to superseded plan bytes now indexed under `docs/archive/`. The current root `PLAN.md` is intentionally a non-dispatchable stage ledger while the reduced `SPEC.md` awaits student confirmation. No old subsystem PASS carries into the reduced scope. After signature, a new formal `writing-plans` invocation and same-snapshot reviews must create the only active implementation-plan evidence.
 
 ## Invocation and audit baseline
 
@@ -101,7 +101,7 @@ The remaining plan work is tracked by responsibility rather than by raw line cou
 | Demo and delivery | DEMO-01A, DEMO-01B, DEMO-01C, DIST-01, DIST-02 | Skeleton/partial examples only; host-specific work remains gated by D-025 |
 | Verification and release | QA-01A, QA-01B, QA-01C, QA-02A, QA-02B, QA-02C, CI-01, DOC-01, INT-01, FIN-01 | Skeleton/partial examples only; incomplete |
 
-The scope check will be closed by keeping root `PLAN.md` as the course-required dependency/status entry point and moving complete executable task bodies into linked subsystem plans under `docs/superpowers/plans/`. A linked plan is not normative until its own required header, complete-code review, placeholder scan, path/type consistency review, and hash are recorded here. Temporary drafting fragments under `docs/engineering/plan_fragments/` are review inputs only and must not be dispatched.
+The scope check will be closed by keeping root `PLAN.md` as the course-required dependency/status entry point and moving complete executable task bodies into linked subsystem plans under `docs/plans/`. A linked plan is not normative until its own required header, complete-code review, placeholder scan, path/type consistency review, and hash are recorded here. Temporary drafting fragments are archived under `docs/archive/` and must not be dispatched.
 
 ### Stable-snapshot dispatch audit
 
@@ -167,7 +167,7 @@ Blocking findings on the frozen hashes:
 - On the Windows target, the displayed Python subprocess registry passes bare `npm`; the mechanical reviewer reproduced `FileNotFoundError` where `npm.cmd` resolution is required. The deferred browser gate also calls an absent `e2e` package script, and G-02C does not own its declared ready marker.
 - T-02 does not strictly validate catalog container/member types, can split a string into image IDs or leak `AttributeError`, and reports 21/72 expected tests where mechanical reconstruction actually produces 23/74.
 
-The coordinator therefore rejected further in-place patching. The old fragments remain immutable failure evidence and are never dispatch inputs. The active repair is to create formal subsystem plans under `docs/superpowers/plans/` and atomically split root tasks as follows:
+The coordinator therefore rejected further in-place patching. The old fragments remain immutable failure evidence and are never dispatch inputs. The active repair is to create formal subsystem plans under `docs/plans/` and atomically split root tasks as follows:
 
 - T-01A through T-01F: toolchain/raw lock, backend health, frontend/lock materialization, scanner, runner contracts, and gate registry/canonical entry.
 - T-02A through T-02C: common errors/IDs/material primitives, source hashing/locator/catalog, and proof/public facade.
@@ -291,8 +291,8 @@ The pre-repair snapshot remains immutable failure evidence:
 The replacement snapshot frozen for this validation is:
 
 - Root `PLAN.md`: `83B9A69272CBF7E831BB386E69AE5376968C931F4188DD23DC2988D8782D6787`
-- `docs/superpowers/plans/2026-07-22-foundation-scaffold.md`: `D00496FAAC456AA4CB0E69DE9104BF085C54621D76A199AC456A06601D73E87E`
-- `docs/superpowers/plans/2026-07-22-domain-primitives-source.md`: `E01303C74E2EA22C26CCF3C43D6E118C00C3311850D3E321EA781A92DB61BEA5`
+- `docs/archive/superseded-2026-07-23/2026-07-22-foundation-scaffold.md`: `D00496FAAC456AA4CB0E69DE9104BF085C54621D76A199AC456A06601D73E87E`
+- `docs/archive/superseded-2026-07-23/2026-07-22-domain-primitives-source.md`: `E01303C74E2EA22C26CCF3C43D6E118C00C3311850D3E321EA781A92DB61BEA5`
 
 Fresh mechanical evidence on those exact hashes:
 

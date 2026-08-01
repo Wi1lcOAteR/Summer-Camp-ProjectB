@@ -1,5 +1,12 @@
 # AGENT_LOG
 
+## 2026-08-01 - MAINT-002 Directory Layout Refactor
+- **Task ID:** MAINT-002
+- **Skills:** `verification-before-completion`
+- **Actions:** Moved active detailed plans to `docs/plans/`, design records to `docs/specs/`, and historical material to `docs/archive/`. Flattened archive engineering/fragments with filename prefixes. Added the Chinese `docs/INDEX.md` entry point and updated current links in SPEC, PLAN, handoff, and writing-plan audit documents.
+- **Preservation:** Archive files were moved, not deleted. `docs/archive/README.md` preserves original paths, byte counts, and SHA-256 values. Dirty worktrees and the standalone checkout were retained.
+- **Verification:** Pending old-tree/path scan, `git diff --check`, file-set check, and worktree/tmp nesting check.
+
 ## 2026-08-01T17:30:00+08:00 — MAINT-001 目录结构约束与临时文件清理
 
 - **Task 编号**：MAINT-001

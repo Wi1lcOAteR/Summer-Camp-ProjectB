@@ -294,10 +294,10 @@ React/Vite WebUI
 
 以下能力不属于精简 v1 验收，但以 `ARCHIVED / NOT DISPATCHABLE` 计划保存：
 
-- [`advanced-material-ingestion.md`](docs/superpowers/plans/archive/deferred-v2/advanced-material-ingestion.md)：OCR、图片、扫描件和大批量导入。
-- [`remote-f-and-durable-jobs.md`](docs/superpowers/plans/archive/deferred-v2/remote-f-and-durable-jobs.md)：整文件模式 F、远端对象、durable job 和清理恢复。
-- [`exam-material-intelligence.md`](docs/superpowers/plans/archive/deferred-v2/exam-material-intelligence.md)：往年卷、老师重点和自动知识点映射。
-- [`extended-concept-rubrics.md`](docs/superpowers/plans/archive/deferred-v2/extended-concept-rubrics.md)：更多知识点的确定性 rubric。
+- [`advanced-material-ingestion.md`](docs/archive/deferred-v2/advanced-material-ingestion.md)：OCR、图片、扫描件和大批量导入。
+- [`remote-f-and-durable-jobs.md`](docs/archive/deferred-v2/remote-f-and-durable-jobs.md)：整文件模式 F、远端对象、durable job 和清理恢复。
+- [`exam-material-intelligence.md`](docs/archive/deferred-v2/exam-material-intelligence.md)：往年卷、老师重点和自动知识点映射。
+- [`extended-concept-rubrics.md`](docs/archive/deferred-v2/extended-concept-rubrics.md)：更多知识点的确定性 rubric。
 
 恢复任何延期能力前必须重新执行 `brainstorming`、形成明确 SPEC diff、由学生确认、再调用 `writing-plans`。归档草稿和旧实现片段不能直接派发。自主 agent、多用户、共享和任意 provider plugin 不只是延期项；它们需要新的产品提案和学生决策。
 
