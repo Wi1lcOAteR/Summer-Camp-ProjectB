@@ -7,7 +7,7 @@
 - **删除范围**：当前分支精确删除 `scripts/cold_start/g03_runner_core.ps1`、`run_g03_claude.ps1`、`update_agent_capsules.ps1` 以及 `tests/agent_capsules_contract.ps1`、`g03_runner_contract.ps1`、`g03_runner_entrypoint_contract.ps1`、`g03_snapshot_contract.ps1`。这些文件只服务于已停用的 runner 诊断流程。
 - **保留范围**：SPEC/PLAN、`docs/cold-start/agent-capsules.json`、过程文档、历史计划和 `tmp/g03-manual/` 两文件快照均保留；中文手册已改为直接使用 Claude Code 插件的 intake/execution 提示词。
 - **安全检查**：删除前主仓库状态与 `git worktree list` 已记录；两个旧 worktree 均有脏修改或未跟踪文件，按规则保留。进程命令行检查被 Windows 权限拒绝，现有进程列表未发现 Claude/runner 进程。删除后 `scripts/cold_start/` 不再存在；未执行递归删除、clean、reset 或历史重写。
-- **Commit**：待本条文档与删除一起提交。
+- **Commit**：`6c5508e`（`chore(g03): remove retired runner diagnostics`）。
 
 ## 2026-08-03T18:17:11+08:00 - G-03-020 同字节双评审与冻结验证
 
