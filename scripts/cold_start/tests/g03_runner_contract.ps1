@@ -51,8 +51,8 @@ try {
     try { Read-G03StrictUtf8 $replacementPath | Out-Null; throw 'U+FFFD unexpectedly passed.' } catch { Assert-Equal $_.Exception.Message 'UTF8_INVALID' 'U+FFFD must fail closed.' }
     'strict_utf8'
 
-    $expected = [ordered]@{ spec_sha256 = 'SPEC-HASH'; plan_sha256 = 'PLAN-HASH'; files = @('PLAN.md','SPEC.md'); language = 'English'; task = 'F-01S1'; acceptance_id = 'F01S1_RED_GREEN_ARTIFACT_SAFETY_V1' }
-    $goodReceipt = [pscustomobject]@{ spec_sha256 = 'SPEC-HASH'; plan_sha256 = 'PLAN-HASH'; files = @('PLAN.md','SPEC.md'); language = 'English'; task = 'F-01S1'; acceptance_id = 'F01S1_RED_GREEN_ARTIFACT_SAFETY_V1'; ambiguities = @() }
+    $expected = [ordered]@{ spec_sha256 = 'SPEC-HASH'; plan_sha256 = 'PLAN-HASH'; files = @('PLAN.md','SPEC.md'); language = 'English'; task = 'F-01S1A'; acceptance_id = 'F01S1A_SINGLE_RULE_SCANNER_V2' }
+    $goodReceipt = [pscustomobject]@{ spec_sha256 = 'SPEC-HASH'; plan_sha256 = 'PLAN-HASH'; files = @('PLAN.md','SPEC.md'); language = 'English'; task = 'F-01S1A'; acceptance_id = 'F01S1A_SINGLE_RULE_SCANNER_V2'; ambiguities = @() }
     Assert-Equal (Test-G03IntakeReceipt -Receipt $goodReceipt -Expected $expected) 'INTAKE_READY' 'Valid intake must be ready.'
     $ambiguous = $goodReceipt.PSObject.Copy(); $ambiguous.ambiguities = @('question')
     Assert-Equal (Test-G03IntakeReceipt -Receipt $ambiguous -Expected $expected) 'INTAKE_AMBIGUOUS' 'Ambiguity must block execution.'
@@ -124,6 +124,18 @@ try {
     Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 0 -TimedOut:$false -Stdout '{not-json' -Stderr '') 'child_output_protocol' 'Malformed successful output must be classified.'
     Assert-Equal (Get-G03ProcessDiagnosticCode -Stage 'intake' -ExitCode 124 -TimedOut:$true -Stdout '' -Stderr '') 'wall_timeout' 'Timeouts must be classified.'
     'process_diagnostics'
+
+    $childStartInfo = [pscustomobject]@{ Environment = @{} }
+    foreach ($sentinelName in @('OPENAI_API_KEY','AWS_SECRET_ACCESS_KEY','GITHUB_TOKEN')) {
+        $childStartInfo.Environment[$sentinelName] = 'sentinel-value'
+    }
+    Set-G03ClaudeChildEnvironment -StartInfo $childStartInfo -SecretValue 'temporary-auth' -BaseUrl 'https://example.invalid' -Model 'test-model' -CliHome '/tmp/g03-test-home'
+    foreach ($sentinelName in @('OPENAI_API_KEY','AWS_SECRET_ACCESS_KEY','GITHUB_TOKEN')) {
+        if ($childStartInfo.Environment.ContainsKey($sentinelName)) { throw "Child environment leaked $sentinelName." }
+    }
+    $allowedChildEnvironment = @('PATH','HOME','XDG_CONFIG_HOME','XDG_CACHE_HOME','TMPDIR','TEMP','TMP','LANG','LC_ALL','ANTHROPIC_AUTH_TOKEN','ANTHROPIC_BASE_URL','ANTHROPIC_MODEL','CLAUDE_CODE_SUBPROCESS_ENV_SCRUB','CLAUDE_CODE_MAX_RETRIES','API_TIMEOUT_MS','G03_CLAUDE_OUTPUT_MAX_BYTES')
+    if (@($childStartInfo.Environment.Keys | Where-Object { $allowedChildEnvironment -notcontains $_ }).Count -ne 0) { throw 'Child environment contains a non-allowlisted key.' }
+    'child_environment_allowlist'
 
     $intakeJson = '{"subtype":"success","is_error":false,"total_cost_usd":0.10,"result":"{}"}'
     $permissionNoticeTail = 'Permission mode forced to default '
@@ -234,37 +246,43 @@ try {
     $contractText = @'
 $scanner = Join-Path (Split-Path -Parent $PSScriptRoot) 'bootstrap_scan_credentials.ps1'
 if (-not (Test-Path -LiteralPath $scanner -PathType Leaf)) { 'CONTRACT_RED scanner_missing'; exit 1 }
-'usage_and_output'
-'token_rules'
-'artifact_direct_safety'
-'BOOTSTRAP_SCANNER_CORE_PASS'
+$fixture = Join-Path $PSScriptRoot 'g03-contract-fixture.txt'
+try {
+    $usage = @(& (Get-Process -Id $PID).Path -NoProfile -File $scanner 2>&1)
+    if ($LASTEXITCODE -ne 3 -or ($usage -join "`n").Trim() -cne 'CREDENTIAL_SCAN_ERROR {"code":"usage_missing_scope"}') { throw 'usage' }
+    'usage_and_output'
+    $fragmentA = 's' + 'k-' + ('A' * 10)
+    $fragmentB = 'B' * 10
+    [IO.File]::WriteAllText($fixture, ($fragmentA + $fragmentB), (New-Object Text.UTF8Encoding($false,$true)))
+    $positive = @(& (Get-Process -Id $PID).Path -NoProfile -File $scanner -Path 'scripts/tests/g03-contract-fixture.txt' 2>&1)
+    $expected = 'CREDENTIAL_SCAN_FINDING {"source":"path","path":"scripts/tests/g03-contract-fixture.txt","rule":"provider_api_key"}'
+    if ($LASTEXITCODE -ne 2 -or ($positive -join "`n").Trim() -cne $expected) { throw 'provider' }
+    [IO.File]::WriteAllText($fixture, ('X' + $fragmentA + $fragmentB), (New-Object Text.UTF8Encoding($false,$true)))
+    $blocked = @(& (Get-Process -Id $PID).Path -NoProfile -File $scanner -Path 'scripts/tests/g03-contract-fixture.txt' 2>&1)
+    if ($LASTEXITCODE -ne 0 -or ($blocked -join "`n").Trim() -cne 'CREDENTIAL_SCAN_PASS files=1') { throw 'boundary' }
+    'provider_rule'
+    'BOOTSTRAP_SCANNER_PATH_PASS'
+} finally {
+    Remove-Item -LiteralPath $fixture -Force -ErrorAction SilentlyContinue
+}
 '@
     $scannerText = @'
 param([string]$Path)
 $utf8 = New-Object Text.UTF8Encoding($false,$true)
 function Write-ScanRecord { param([string]$Source,[string]$Path,[string]$Rule) 'CREDENTIAL_SCAN_FINDING ' + ([ordered]@{source=$Source;path=$Path;rule=$Rule}|ConvertTo-Json -Compress) }
-function Convert-SourceText { param([byte[]]$Bytes) $utf8.GetString($Bytes) }
+function Convert-SourceText { param([byte[]]$Bytes) if($Bytes.Length-ge3-and$Bytes[0]-eq239-and$Bytes[1]-eq187-and$Bytes[2]-eq191){throw 'decode'};$text=$utf8.GetString($Bytes);if($text.Contains([char]0xFFFD)){throw 'decode'};$text }
 function Find-DirectSecret {
     param([string]$Text)
-    $alpha='[A-Za-z0-9_-]';$alnum='[A-Za-z0-9]';$upper='[A-Z0-9]';$hyphen='[A-Za-z0-9-]'
-    $rules=[ordered]@{
-        provider_api_key='s'+'k-'+$alpha+'{20,200}'
-        github_token='(?:ghp_|gho_|ghu_|ghs_|ghr_)'+$alnum+'{20,255}'
-        aws_access_key='(?:AKIA|ASIA)'+$upper+'{16}'
-        google_api_key='AI'+'za'+$alpha+'{35}'
-        slack_token='(?:xoxb-|xoxp-|xoxa-|xoxr-|xoxs-)'+$hyphen+'{10,200}'
-        private_key='-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----'
-    }
-    foreach($entry in $rules.GetEnumerator()) {
-        $pattern=if($entry.Key -eq 'private_key'){$entry.Value}else{'(?<![A-Za-z0-9_-])(?:'+$entry.Value+')(?![A-Za-z0-9_-])'}
-        if([regex]::IsMatch($Text,$pattern)){ $entry.Key }
-    }
+    $pattern='(?<![A-Za-z0-9_-])(?:s'+'k-[A-Za-z0-9_-]{20,200})(?![A-Za-z0-9_-])'
+    if([regex]::IsMatch($Text,$pattern)){ 'provider_api_key' }
 }
 if([string]::IsNullOrWhiteSpace($Path)){ 'CREDENTIAL_SCAN_ERROR {"code":"usage_missing_scope"}';exit 3 }
-try{$text=Convert-SourceText ([IO.File]::ReadAllBytes($Path))}catch{'CREDENTIAL_SCAN_ERROR {"code":"read_failed"}';exit 3}
+try{$bytes=[IO.File]::ReadAllBytes($Path)}catch{'CREDENTIAL_SCAN_ERROR {"code":"read_failed","source":"path","path":"'+$Path.Replace('\','/').TrimStart('./')+'"}';exit 3}
+try{$text=Convert-SourceText $bytes}catch{'CREDENTIAL_SCAN_ERROR {"code":"decode_failed","source":"path","path":"'+$Path.Replace('\','/').TrimStart('./')+'"}';exit 3}
 $rules=@(Find-DirectSecret $text|Sort-Object -Unique)
 if($rules.Count-eq0){'CREDENTIAL_SCAN_PASS files=1';exit 0}
-foreach($rule in $rules){Write-ScanRecord -Source 'path' -Path $Path -Rule $rule}
+$receiptPath=$Path.Replace('\','/');if($receiptPath.StartsWith('./')){$receiptPath=$receiptPath.Substring(2)}
+foreach($rule in $rules){Write-ScanRecord -Source 'path' -Path $receiptPath -Rule $rule}
 exit 2
 '@
     Write-Utf8NoBom (Join-Path $candidateRoot 'scripts\tests\bootstrap_scanner_contract.ps1') $contractText
@@ -275,13 +293,40 @@ exit 2
     $localInvoker = {
         param([string]$WorkingDirectory,[string[]]$CommandArguments,[int]$WallSeconds)
         Push-Location $WorkingDirectory
+        $priorPreference = $ErrorActionPreference
         try {
+            $ErrorActionPreference = 'Continue'
             $output = @(& (Get-Process -Id $PID).Path @CommandArguments 2>&1)
-            [pscustomobject]@{ ExitCode=$LASTEXITCODE; TimedOut=$false; Stdout=($output -join "`n"); Stderr='' }
-        } finally { Pop-Location }
+            $childExitCode = $LASTEXITCODE
+            [pscustomobject]@{ ExitCode=$childExitCode; TimedOut=$false; Stdout=($output -join "`n"); Stderr='' }
+        } finally {
+            $ErrorActionPreference = $priorPreference
+            Pop-Location
+        }
     }
     $verifiedCandidate = Test-G03CandidateEvidence -ColdRoot $candidateRoot -EvidenceRoot $candidateEvidence -ExpectedSpecSha256 $candidateSpecHash -ExpectedPlanSha256 $candidatePlanHash -CommandInvoker $localInvoker
     if (-not $verifiedCandidate.Valid -or $verifiedCandidate.Code -ne 'ok') { throw "Valid candidate replay failed: $($verifiedCandidate.Code) detail=$($verifiedCandidate.Detail)" }
+    $forgedContract = @'
+$scanner = Join-Path (Split-Path -Parent $PSScriptRoot) 'bootstrap_scan_credentials.ps1'
+if (-not (Test-Path -LiteralPath $scanner -PathType Leaf)) { 'CONTRACT_RED scanner_missing'; exit 1 }
+'usage_and_output'
+'provider_rule'
+'BOOTSTRAP_SCANNER_PATH_PASS'
+'@
+    Write-Utf8NoBom (Join-Path $candidateRoot 'scripts\tests\bootstrap_scanner_contract.ps1') $forgedContract
+    $forgedContractCandidate = Test-G03CandidateEvidence -ColdRoot $candidateRoot -EvidenceRoot $candidateEvidence -ExpectedSpecSha256 $candidateSpecHash -ExpectedPlanSha256 $candidatePlanHash -CommandInvoker $localInvoker
+    if ($forgedContractCandidate.Valid -or $forgedContractCandidate.Code -ne 'contract_mutation_survived') { throw 'A contract that only prints PASS must fail mutation replay.' }
+    Write-Utf8NoBom (Join-Path $candidateRoot 'scripts\tests\bootstrap_scanner_contract.ps1') $contractText
+    $overlongContract = $contractText + ((1..180 | ForEach-Object { "`n# pad$_" }) -join '')
+    Write-Utf8NoBom (Join-Path $candidateRoot 'scripts\tests\bootstrap_scanner_contract.ps1') $overlongContract
+    $overlongCandidate = Test-G03CandidateEvidence -ColdRoot $candidateRoot -EvidenceRoot $candidateEvidence -ExpectedSpecSha256 $candidateSpecHash -ExpectedPlanSha256 $candidatePlanHash -CommandInvoker $localInvoker
+    if ($overlongCandidate.Valid -or $overlongCandidate.Code -ne 'artifact_line_budget') { throw 'A contract over 180 lines must fail the artifact budget.' }
+    Write-Utf8NoBom (Join-Path $candidateRoot 'scripts\tests\bootstrap_scanner_contract.ps1') $contractText
+    $overlongScanner = $scannerText + ((1..140 | ForEach-Object { "`n# pad$_" }) -join '')
+    Write-Utf8NoBom (Join-Path $candidateRoot 'scripts\bootstrap_scan_credentials.ps1') $overlongScanner
+    $overlongScannerCandidate = Test-G03CandidateEvidence -ColdRoot $candidateRoot -EvidenceRoot $candidateEvidence -ExpectedSpecSha256 $candidateSpecHash -ExpectedPlanSha256 $candidatePlanHash -CommandInvoker $localInvoker
+    if ($overlongScannerCandidate.Valid -or $overlongScannerCandidate.Code -ne 'artifact_line_budget') { throw 'A scanner over 140 lines must fail the artifact budget.' }
+    Write-Utf8NoBom (Join-Path $candidateRoot 'scripts\bootstrap_scan_credentials.ps1') $scannerText
     $encodedValidScanner = [Convert]::ToBase64String((New-Object Text.UTF8Encoding($false,$true)).GetBytes($scannerText))
     $swapContract = @"
 `$scanner = Join-Path (Split-Path -Parent `$PSScriptRoot) 'bootstrap_scan_credentials.ps1'
@@ -289,9 +334,8 @@ if (-not (Test-Path -LiteralPath `$scanner -PathType Leaf)) { 'CONTRACT_RED scan
 `$bytes=[Convert]::FromBase64String('$encodedValidScanner')
 [IO.File]::WriteAllBytes(`$scanner,`$bytes)
 'usage_and_output'
-'token_rules'
-'artifact_direct_safety'
-'BOOTSTRAP_SCANNER_CORE_PASS'
+'provider_rule'
+'BOOTSTRAP_SCANNER_PATH_PASS'
 "@
     $fixedPassScanner = @'
 param([string]$Path)
@@ -316,15 +360,24 @@ if([string]::IsNullOrWhiteSpace($Path)){ 'CREDENTIAL_SCAN_ERROR {"code":"usage_m
 '@
     Write-Utf8NoBom (Join-Path $candidateRoot 'scripts\bootstrap_scan_credentials.ps1') $emptyScanner
     $forgedCandidate = Test-G03CandidateEvidence -ColdRoot $candidateRoot -EvidenceRoot $candidateEvidence -ExpectedSpecSha256 $candidateSpecHash -ExpectedPlanSha256 $candidatePlanHash -CommandInvoker $localInvoker
-    if ($forgedCandidate.Valid -or $forgedCandidate.Code -ne 'behavior_oracle_failed') { throw 'A fixed-PASS empty implementation must fail the coordinator behavior oracle.' }
+    if ($forgedCandidate.Valid -or $forgedCandidate.Code -ne 'green_replay_failed') { throw 'A fixed-PASS empty implementation must fail the candidate contract.' }
     $wrongOrderScanner = $scannerText.Replace('[ordered]@{source=$Source;path=$Path;rule=$Rule}','[ordered]@{rule=$Rule;path=$Path;source=$Source}')
     Write-Utf8NoBom (Join-Path $candidateRoot 'scripts\bootstrap_scan_credentials.ps1') $wrongOrderScanner
     $wrongOrderCandidate = Test-G03CandidateEvidence -ColdRoot $candidateRoot -EvidenceRoot $candidateEvidence -ExpectedSpecSha256 $candidateSpecHash -ExpectedPlanSha256 $candidatePlanHash -CommandInvoker $localInvoker
-    if ($wrongOrderCandidate.Valid -or $wrongOrderCandidate.Code -ne 'behavior_oracle_failed') { throw 'A finding with non-contract JSON key order must fail the coordinator behavior oracle.' }
-    $lineAnchoredScanner = $scannerText.Replace("'(?<![A-Za-z0-9_-])(?:'+`$entry.Value+')(?![A-Za-z0-9_-])'","'(?m)^(?:'+`$entry.Value+')$'")
+    if ($wrongOrderCandidate.Valid -or $wrongOrderCandidate.Code -ne 'green_replay_failed') { throw 'A finding with non-contract JSON key order must fail the candidate contract.' }
+    $lineAnchoredScanner = $scannerText.Replace("'(?<![A-Za-z0-9_-])(?:s'+'k-[A-Za-z0-9_-]{20,200})(?![A-Za-z0-9_-])'","'(?m)^(?:s'+'k-[A-Za-z0-9_-]{20,200})$'")
     Write-Utf8NoBom (Join-Path $candidateRoot 'scripts\bootstrap_scan_credentials.ps1') $lineAnchoredScanner
     $lineAnchoredCandidate = Test-G03CandidateEvidence -ColdRoot $candidateRoot -EvidenceRoot $candidateEvidence -ExpectedSpecSha256 $candidateSpecHash -ExpectedPlanSha256 $candidatePlanHash -CommandInvoker $localInvoker
     if ($lineAnchoredCandidate.Valid -or $lineAnchoredCandidate.Code -ne 'behavior_oracle_failed') { throw 'A line-anchored scanner that rejects valid punctuation neighbors must fail the coordinator behavior oracle.' }
+    $wrongReadCodeScanner = $scannerText.Replace('"code":"read_failed"','"code":"decode_failed"')
+    Write-Utf8NoBom (Join-Path $candidateRoot 'scripts\bootstrap_scan_credentials.ps1') $wrongReadCodeScanner
+    $wrongReadCodeCandidate = Test-G03CandidateEvidence -ColdRoot $candidateRoot -EvidenceRoot $candidateEvidence -ExpectedSpecSha256 $candidateSpecHash -ExpectedPlanSha256 $candidatePlanHash -CommandInvoker $localInvoker
+    if ($wrongReadCodeCandidate.Valid -or $wrongReadCodeCandidate.Code -ne 'behavior_oracle_failed') { throw 'A scanner that misclassifies a missing file must fail the coordinator behavior oracle.' }
+    $bomGuard = "if(`$Bytes.Length-ge3-and`$Bytes[0]-eq239-and`$Bytes[1]-eq187-and`$Bytes[2]-eq191){throw 'decode'};"
+    $bomBlindScanner = $scannerText.Replace($bomGuard,'')
+    Write-Utf8NoBom (Join-Path $candidateRoot 'scripts\bootstrap_scan_credentials.ps1') $bomBlindScanner
+    $bomBlindCandidate = Test-G03CandidateEvidence -ColdRoot $candidateRoot -EvidenceRoot $candidateEvidence -ExpectedSpecSha256 $candidateSpecHash -ExpectedPlanSha256 $candidatePlanHash -CommandInvoker $localInvoker
+    if ($bomBlindCandidate.Valid -or $bomBlindCandidate.Code -ne 'behavior_oracle_failed') { throw 'A scanner that accepts UTF-8 BOM must fail the coordinator behavior oracle.' }
     Write-Utf8NoBom (Join-Path $candidateRoot 'scripts\bootstrap_scan_credentials.ps1') $scannerText
     Write-Utf8NoBom (Join-Path $candidateRoot 'SPEC.md') 'mutated-input'
     $mutatedCandidate = Test-G03CandidateEvidence -ColdRoot $candidateRoot -EvidenceRoot $candidateEvidence -ExpectedSpecSha256 $candidateSpecHash -ExpectedPlanSha256 $candidatePlanHash -CommandInvoker $localInvoker
@@ -332,19 +385,20 @@ if([string]::IsNullOrWhiteSpace($Path)){ 'CREDENTIAL_SCAN_ERROR {"code":"usage_m
     'candidate_replay'
 
     $executionResult = [ordered]@{
-        task = 'F-01S1'
-        acceptance_id = 'F01S1_RED_GREEN_ARTIFACT_SAFETY_V1'
+        task = 'F-01S1A'
+        acceptance_id = 'F01S1A_SINGLE_RULE_SCANNER_V2'
         ambiguities = @()
         questions = @()
         red_command = 'pwsh -NoProfile -File scripts/tests/bootstrap_scanner_contract.ps1'
         green_command = 'pwsh -NoProfile -File scripts/tests/bootstrap_scanner_contract.ps1'
+        summary = 'Implemented and verified the atomic single-path provider rule.'
     } | ConvertTo-Json -Compress
     $redId = 'red-1'; $greenId = 'green-1'
     $stream = @(
         ([ordered]@{ type='assistant'; message=[ordered]@{ content=@([ordered]@{ type='tool_use'; id=$redId; name='Bash'; input=[ordered]@{command='pwsh -NoProfile -File scripts/tests/bootstrap_scanner_contract.ps1'} }) } } | ConvertTo-Json -Compress -Depth 8),
         ([ordered]@{ type='user'; message=[ordered]@{ content=@([ordered]@{ type='tool_result'; tool_use_id=$redId; is_error=$true; content="Exit code 1`nCONTRACT_RED scanner_missing" }) } } | ConvertTo-Json -Compress -Depth 8),
         ([ordered]@{ type='assistant'; message=[ordered]@{ content=@([ordered]@{ type='tool_use'; id=$greenId; name='Bash'; input=[ordered]@{command='pwsh -NoProfile -File scripts/tests/bootstrap_scanner_contract.ps1'} }) } } | ConvertTo-Json -Compress -Depth 8),
-        ([ordered]@{ type='user'; message=[ordered]@{ content=@([ordered]@{ type='tool_result'; tool_use_id=$greenId; is_error=$false; content="usage_and_output`ntoken_rules`nartifact_direct_safety`nBOOTSTRAP_SCANNER_CORE_PASS" }) } } | ConvertTo-Json -Compress -Depth 8),
+        ([ordered]@{ type='user'; message=[ordered]@{ content=@([ordered]@{ type='tool_result'; tool_use_id=$greenId; is_error=$false; content="usage_and_output`nprovider_rule`nBOOTSTRAP_SCANNER_PATH_PASS" }) } } | ConvertTo-Json -Compress -Depth 8),
         ([ordered]@{ type='result'; subtype='success'; is_error=$false; total_cost_usd=0.50; result=$executionResult } | ConvertTo-Json -Compress -Depth 8)
     ) -join "`n"
     $streamEvidence = Get-G03ExecutionEvidence -StreamText $stream -MaxCostUsd ([decimal]0.80)
@@ -382,6 +436,32 @@ if([string]::IsNullOrWhiteSpace($Path)){ 'CREDENTIAL_SCAN_ERROR {"code":"usage_m
     if ($extraRed.Valid -or $extraRed.Code -ne 'tdd_evidence_missing') { throw 'Red tool output with any extra line must fail exact evidence validation.' }
     $overBudget = Get-G03ExecutionEvidence -StreamText $stream.Replace('0.5','0.9') -MaxCostUsd ([decimal]0.80)
     if ($overBudget.Valid -or $overBudget.Code -ne 'budget_exceeded') { throw 'Over-budget stream must fail.' }
+    $longSummaryObject = $executionResult | ConvertFrom-Json
+    $longSummaryObject.summary = ((1..301 | ForEach-Object { 'word' }) -join ' ')
+    $longSummaryLines = @($stream -split "`n")
+    $longSummaryLines[-1] = ([ordered]@{ type='result'; subtype='success'; is_error=$false; total_cost_usd=0.50; result=($longSummaryObject | ConvertTo-Json -Compress) } | ConvertTo-Json -Compress -Depth 8)
+    $longSummaryEvidence = Get-G03ExecutionEvidence -StreamText ($longSummaryLines -join "`n") -MaxCostUsd ([decimal]0.80)
+    if ($longSummaryEvidence.Valid -or $longSummaryEvidence.Code -ne 'summary_word_budget') { throw 'A final summary over 300 words must fail closed.' }
+    $punctuationObject = $executionResult | ConvertFrom-Json
+    $punctuationObject.summary = '!!!'
+    $punctuationLines = @($stream -split "`n")
+    $punctuationLines[-1] = ([ordered]@{ type='result'; subtype='success'; is_error=$false; total_cost_usd=0.50; result=($punctuationObject | ConvertTo-Json -Compress) } | ConvertTo-Json -Compress -Depth 8)
+    $punctuationEvidence = Get-G03ExecutionEvidence -StreamText ($punctuationLines -join "`n") -MaxCostUsd ([decimal]0.80)
+    if ($punctuationEvidence.Valid -or $punctuationEvidence.Code -ne 'protocol_mismatch') { throw 'A summary with no English word must fail closed.' }
+    $streamLines = @($stream -split "`n")
+    $duplicateToolStream = (@($streamLines[0],$streamLines[0]) + @($streamLines | Select-Object -Skip 1)) -join "`n"
+    $duplicateToolEvidence = Get-G03ExecutionEvidence -StreamText $duplicateToolStream -MaxCostUsd ([decimal]0.80)
+    if ($duplicateToolEvidence.Valid -or $duplicateToolEvidence.Code -ne 'stream_output_protocol') { throw 'Duplicate tool-use ids must fail closed.' }
+    $postResultStream = $stream + "`n" + ([ordered]@{type='assistant';message=[ordered]@{content=@()}} | ConvertTo-Json -Compress -Depth 5)
+    $postResultEvidence = Get-G03ExecutionEvidence -StreamText $postResultStream -MaxCostUsd ([decimal]0.80)
+    if ($postResultEvidence.Valid -or $postResultEvidence.Code -ne 'stream_output_protocol') { throw 'An event after the terminal result must fail closed.' }
+    $duplicateResultEvidence = Get-G03ExecutionEvidence -StreamText ($stream + "`n" + $streamLines[-1]) -MaxCostUsd ([decimal]0.80)
+    if ($duplicateResultEvidence.Valid -or $duplicateResultEvidence.Code -ne 'stream_output_protocol') { throw 'A duplicate result event must fail closed.' }
+    $truncatedResult = $streamLines[-1] | ConvertFrom-Json
+    $truncatedResult | Add-Member -NotePropertyName is_truncated -NotePropertyValue $true
+    $truncatedStream = (@($streamLines | Select-Object -SkipLast 1) + ($truncatedResult | ConvertTo-Json -Compress -Depth 8)) -join "`n"
+    $truncatedEvidence = Get-G03ExecutionEvidence -StreamText $truncatedStream -MaxCostUsd ([decimal]0.80)
+    if ($truncatedEvidence.Valid -or $truncatedEvidence.Code -ne 'stream_output_protocol') { throw 'Explicit truncation metadata must fail closed.' }
     $empty = Get-G03ExecutionEvidence -StreamText '{"type":"result","total_cost_usd":0.1,"result":""}' -MaxCostUsd ([decimal]0.80)
     if ($empty.Valid -or $empty.Code -ne 'empty_end_turn') { throw 'Empty result must fail.' }
     'execution_evidence'

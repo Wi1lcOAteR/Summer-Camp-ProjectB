@@ -6,7 +6,7 @@
 Version: 1. This ASCII capsule is a normative execution projection of the cited PLAN sections. The full PLAN remains required. Any conflict with the body invalidates the document and must be returned as an ambiguity; do not guess or choose precedence.
 
 ## Gates
-The plan is NOT DISPATCHABLE. Product implementation is forbidden until same-byte mechanical and dual reviews pass, formal non-Codex G-03 completes, repairs are reviewed, and the student explicitly grants G-04. G-03 is the sole disposable pre-dispatch exception. Its artifacts are evidence only: do not commit, merge, update the task ledger, edit the real repository, contact a provider, or treat its output as formal F-01S1 implementation.
+The plan is NOT DISPATCHABLE. Product implementation is forbidden until same-byte mechanical and dual reviews pass, formal non-Codex G-03 completes, repairs are reviewed, and the student explicitly grants G-04. G-03 is the sole disposable pre-dispatch exception. Its artifacts are evidence only: do not commit, merge, update the task ledger, edit the real repository, contact a product provider, or treat its output as formal F-01S1A implementation.
 
 ## TDD and review protocol
 For every behavior, first add the smallest requirement-shaped assertion, run the exact target command, and observe the expected failure for the missing behavior. Add only the smallest named implementation that makes the unchanged command pass. Then refactor under green tests, run targeted and regression gates, scan owned paths, obtain SPEC compliance review before quality/security/license review, and commit only after both reviews have no Critical issue. Preserve original candidate contract/scanner SHA-256 before and after every replay and direct scan, and persist the normalized ordered TDD receipt. Never weaken, skip, delete, or rewrite an assertion to manufacture green. Stop and report any ambiguity, missing dependency, unexpected failure, or step that cannot fit the task card.
@@ -14,26 +14,26 @@ For every behavior, first add the smallest requirement-shaped assertion, run the
 ## Formal G-03 protocol
 Use two fresh non-Codex sessions with only final SPEC.md and PLAN.md in the initial directory. Both files must pass strict UTF-8 validation with no BOM, invalid bytes, or U+FFFD. Auto and English use this generated English capsule. Chinese mode is diagnostic only. Native Read is unavailable; use only the runner-provided strict UTF-8 extraction command.
 
-Intake is read-only, Bash-only, has a USD 0.20 and five-minute limit, and must return structured data containing exact hashes of both files, the complete file listing, requested/effective language, target task F-01S1, acceptance ID F01S1_RED_GREEN_ARTIFACT_SAFETY_V1, and an ambiguity list. Execution must not start unless hashes, listing, task ID, acceptance ID, and empty ambiguity list are independently validated.
+Intake is read-only, Bash-only, has a USD 0.20 and five-minute limit, and must return structured data containing exact hashes of both files, the complete file listing, requested/effective language, target task F-01S1A, acceptance ID F01S1A_SINGLE_RULE_SCANNER_V2, and an ambiguity list. Execution must not start unless hashes, listing, task ID, acceptance ID, and empty ambiguity list are independently validated.
 
 Execution is a second fresh session, has a USD 0.80 and twenty-minute limit, permits only sandboxed Bash, and may not use native Read/Edit, network, commit, or a third project context file. Before any key is requested, a live bubblewrap preflight must prove fail-closed startup, credential-environment scrubbing, host-mount exclusion, network isolation, bounded process-tree termination, and writes confined to the disposable root. Both sessions request claude-sonnet-4-6 with zero API retries and no fallback model. Empty end_turn, 504, timeout, budget breach, protocol mismatch, missing artifact, or extra artifact fails closed. CLI exit 0 alone never means completion.
 
-## Target task F-01S1
-Initial files are exactly SPEC.md and PLAN.md. Create exactly two non-empty files: scripts/tests/bootstrap_scanner_contract.ps1 and scripts/bootstrap_scan_credentials.ps1. Do not modify either input document. Implement only Write-ScanRecord, Convert-SourceText, Find-DirectSecret, and minimal single-path wiring. Positive fixtures must be assembled at runtime from fragments that do not match independently. Neither artifact may match the implemented direct-secret rules.
+## Target task F-01S1A
+Initial files are exactly SPEC.md and PLAN.md. Create exactly two non-empty files: scripts/tests/bootstrap_scanner_contract.ps1 and scripts/bootstrap_scan_credentials.ps1. Do not modify either input document. The contract is at most 180 lines and the scanner is at most 140 lines. Implement only Write-ScanRecord, Convert-SourceText, Find-DirectSecret, and minimal single-path wiring. Positive fixtures are assembled at runtime from two fragments that do not match independently.
 
-Direct rules are exact. provider_api_key is literal sk- plus 20--200 characters from [A-Za-z0-9_-]. github_token is one literal prefix ghp_, gho_, ghu_, ghs_, or ghr_ plus 20--255 [A-Za-z0-9]. aws_access_key is AKIA or ASIA plus exactly 16 [A-Z0-9]. google_api_key is AIza plus exactly 35 [A-Za-z0-9_-]. slack_token is xoxb-, xoxp-, xoxa-, xoxr-, or xoxs- plus 10--200 [A-Za-z0-9-]. private_key is five hyphens, BEGIN, one ASCII space, optional RSA/EC/DSA/OPENSSH plus one space, PRIVATE KEY, then five hyphens. The first five token families require start/end or a neighboring character outside [A-Za-z0-9_-].
+The only rule is provider_api_key: literal sk- plus 20--200 characters from [A-Za-z0-9_-], bounded at both ends by start/end or a character outside [A-Za-z0-9_-]. Source is always the literal path. Stable output path is the caller's -Path text with backslashes changed to forward slashes and one leading ./ removed; an absolute path used for reading never replaces this receipt path. Missing scope, read failure, and strict-UTF-8 failure use usage_missing_scope, read_failed, and decode_failed respectively.
 
-The unchanged contract command is pwsh -NoProfile -File scripts/tests/bootstrap_scanner_contract.ps1. Before the scanner exists, require exit 1 with exactly CONTRACT_RED scanner_missing. After minimum implementation, require usage_and_output, token_rules, artifact_direct_safety, then BOOTSTRAP_SCANNER_CORE_PASS. The direct artifact command is pwsh -NoProfile -File scripts/bootstrap_scan_credentials.ps1 -Path FILE; each owned artifact must return exit 0 and exactly CREDENTIAL_SCAN_PASS files=1. Clean scanner exit is 0; findings exit 2; operational failure exit 3. Output may contain stable code/source/path/rule metadata only, never secret values, content, line data, decoded payloads, exceptions, or blob OIDs.
+The unchanged contract command is pwsh -NoProfile -File scripts/tests/bootstrap_scanner_contract.ps1. Before the scanner exists, require exit 1 with exactly CONTRACT_RED scanner_missing. After minimum implementation, require usage_and_output, provider_rule, then BOOTSTRAP_SCANNER_PATH_PASS. The direct artifact command is pwsh -NoProfile -File scripts/bootstrap_scan_credentials.ps1 -Path FILE. Clean is exit 0 with exactly CREDENTIAL_SCAN_PASS files=1; findings are exit 2 with exact key order source,path,rule; operational failure is exit 3 with stable code and optional source then path. Output never contains values, content, line data, decoded payloads, exceptions, or blob OIDs.
 
 ## Completion evidence
-A candidate execution has exactly the two input documents and two allowed artifacts, unchanged input hashes, recorded and ordered Bash tool-use/tool-result evidence for the exact red and green commands, clean direct scans, artifact SHA-256 hashes, an added-files diff, questions/ambiguities, and actual cost within budget. After removing authentication variables, the coordinator independently replays the red and green conditions inside a new credential-free, network-unshared, mount-limited bubblewrap with a process-tree timeout. A coordinator-owned behavior oracle separately exercises every listed direct-rule family and prefix variant, lower/max/overmax lengths, punctuation and blocked-neighbor boundaries, strict decoding, deterministic sorted findings and JSON key order, value redaction, usage errors, and exact artifact bytes; candidate-authored PASS text is never an oracle. Test-only paths use a distinct status and cannot emit formal readiness. G-03 passes only after replay and process documentation; the disposable files are never integrated.
+A candidate execution has exactly the two input documents and two allowed artifacts, unchanged input hashes, recorded and ordered Bash tool-use/tool-result evidence for the exact red and green commands, artifact SHA-256 and line counts, an added-files diff, questions/ambiguities, actual cost, and a final English summary of at most 300 words. After removing authentication variables, the coordinator independently replays the red and green conditions inside a new credential-free, network-unshared, mount-limited bubblewrap with a process-tree timeout. Its own oracle checks the provider rule lower/max/overmax lengths, punctuation and blocked-neighbor boundaries, strict UTF-8, path/source/error semantics, redaction, exact artifact bytes, and both line limits. No tool write, truncation, timeout, budget breach, or missing terminal result is incomplete, never PASS. Candidate-authored PASS text is not an oracle. Test-only paths cannot emit formal readiness. G-03 passes only after replay and process documentation; disposable files are never integrated.
 <!-- AGENT_CAPSULE:PLAN:END -->
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` or `superpowers:executing-plans` to execute one task at a time. Every behavior task uses `superpowers:test-driven-development`; unexpected failures use `superpowers:systematic-debugging`; reviews use `superpowers:requesting-code-review` and `superpowers:receiving-code-review`; completion claims use `superpowers:verification-before-completion`; each worktree group closes with `superpowers:finishing-a-development-branch`.
 
-**Status:** `COLD-START REMEDIATION / NOT DISPATCHABLE`
+**Status:** `G-03 ATOMIC PLAN CANDIDATE / NOT DISPATCHABLE`
 
-**SPEC binding:** the 2026-07-25 product direction remains the design basis, but the 2026-08-01 documentation-layout revision changes normative bytes. Current SPEC SHA-256 is `01E9A154B8FE9585997871B23571B079264BE038082D1CC4C239412CCEF1D030`; prior reviews do not transfer to these bytes.
+**SPEC binding:** the student confirmed the complete G-03 atomic SPEC on 2026-08-03. Current SPEC SHA-256 is `AEA67BB5544AD22932DC4304964F7FD266FE8A5DE7AA396EA8974D30867E8381`; prior reviews and intake do not transfer to these bytes.
 
 **Goal:** Build the reduced v1 local study workbench: source-grounded material import and mapping, deterministic learning evidence for mutex/race/deadlock, and continuous/finals review planning, with an optional consent-bound OpenAI P adapter and a mock-only public demo.
 
@@ -43,10 +43,10 @@ A candidate execution has exactly the two input documents and two allowed artifa
 
 ## 1. Dispatch Gates
 
-No formal task dispatch, task-status change, implementation commit, or integration may start until all of these are true on the same final SPEC/PLAN bytes. G-03 is the only pre-dispatch exception: two fresh sessions of one different-type coding agent work in a disposable copy containing only `SPEC.md` and `PLAN.md`. The read-only intake session validates hashes, the generated English capsules, task identity, fixed acceptance ID `F01S1_RED_GREEN_ARTIFACT_SAFETY_V1`, and ambiguity status. Only a clean intake may start the execution session, which attempts complete task `F-01S1`. Neither session may commit, integrate, edit the real repository, or change the ledger. Its disposable attempt leaves formal F-01S1 `not started`; only questions, misunderstandings, output gaps, receipts, and resulting documentation diffs become evidence. `G-03P` is the same procedure run by a fresh Codex task when no different-type service is accessible; it is remediation input but never closes G-03 or authorizes implementation.
+No formal task dispatch, task-status change, implementation commit, or integration may start until all of these are true on the same final SPEC/PLAN bytes. G-03 is the only pre-dispatch exception: two fresh sessions of one different-type coding agent work in a disposable copy containing only `SPEC.md` and `PLAN.md`. The read-only intake validates hashes, English capsules, target `F-01S1A`, acceptance ID `F01S1A_SINGLE_RULE_SCANNER_V2`, and ambiguity status. Only a clean intake may start execution. Neither session may commit, integrate, edit the real repository, or change the ledger. The disposable attempt leaves formal F-01S1A `not started`; only questions, misunderstandings, output gaps, receipts, and resulting documentation diffs become evidence. `G-03P` is remediation input but never closes G-03 or authorizes implementation.
 
 1. `SR-08`: mechanical audit, SPEC-compliance review, and quality/security/license review all report no Critical or Major issue and record both hashes externally.
-2. `G-03`: fresh non-Codex intake and execution sessions, with only final `SPEC.md` and `PLAN.md`, validate the English capsules and attempt complete `F-01S1`. Record every question, misunderstanding, output gap, red/green output, independent replay, cost, and repair in `SPEC_PROCESS.md`. A Codex `G-03P` receipt cannot satisfy this item.
+2. `G-03`: fresh non-Codex intake and execution sessions, with only final `SPEC.md` and `PLAN.md`, validate the English capsules and attempt complete `F-01S1A`. Record every question, misunderstanding, output gap, red/green output, independent replay, cost, and repair in `SPEC_PROCESS.md`. A Codex `G-03P` receipt cannot satisfy this item.
 3. The repaired SPEC/PLAN snapshot is re-reviewed if either file changes.
 4. `G-04`: after reading the cold-start record and repairs, the student explicitly approves implementation. The earlier SPEC confirmation is not G-04.
 
@@ -58,7 +58,7 @@ After G-04, the coordinator creates these worktrees in order. `codex/foundation-
 
 | Worktree branch | Tasks, strictly in order | Closure |
 | --- | --- | --- |
-| `codex/foundation-v1` | F-01S1 -> F-01S2 -> F-01S3 -> F-01S4 -> F-01A -> F-01B -> F-01C -> F-01D -> F-01E -> F-02 -> F-03 -> F-04 -> F-05 | next branch starts only at its reviewed terminal tip |
+| `codex/foundation-v1` | F-01S1A -> F-01S1B -> F-01S2 -> F-01S3 -> F-01S4 -> F-01A -> F-01B -> F-01C -> F-01D -> F-01E -> F-02 -> F-03 -> F-04 -> F-05 | next branch starts only at its reviewed terminal tip |
 | `codex/m1-materials-v1` | M1-01 -> M1-02 -> M1-03 | next branch starts only at its reviewed terminal tip |
 | `codex/m2-learning-v1` | M2-01 -> M2-02 -> M2-03 -> M2-04 | next branch starts only at its reviewed terminal tip |
 | `codex/m3-api-v1` | P-01 -> M3-01 -> M3-02 -> API-01 -> API-02 -> API-03 | next branch starts only at its reviewed terminal tip |
@@ -72,11 +72,11 @@ Only the root coordinator edits `PLAN.md`, `AGENT_LOG.md`, `SPEC_PROCESS.md`, or
 
 ## 3. Per-Task Protocol
 
-Each task is one fresh subagent session with only its task card, confirmed SPEC, predecessor interfaces, exact commands, and owned paths. The following ordered checklist is already part of every card; it is not deferred to the dispatch prompt: `S0` run preflight; then, for each comma/slash-separated failure named in that card's Red field from left to right, `R1` add exactly one assertion and its smallest fixture to the first applicable owned test path, `R2` run the card's exact Red command and record the requirement-shaped failure, `G1` add or change exactly one named production function/schema object/configuration stanza in the listed Goal path that owns that assertion, and `G2` rerun the same targeted command. Each `R1`, `R2`, `G1`, and `G2` is a separate 2--5 minute checkbox; the next named failure cannot start before the current one is green. After the last assertion, `X1` refactor one symbol, `X2` rerun targeted green, `X3` run each listed regression/gate command separately, `X4` stage only owned paths and scan, `X5` request SPEC review, `X6` request quality/security/license review, `X7` commit, and `X8` record coordinator evidence. If any one step exceeds five minutes, stop as a plan defect. F-01S1 through F-01S4 are a serialized contract-first exception because they share two files: each task adds only its named groups and helpers, must leave the accumulated contract green, and may not weaken predecessor assertions.
+Each task is one fresh subagent session with only its task card, confirmed SPEC, predecessor interfaces, exact commands, and owned paths. The following ordered checklist is already part of every card; it is not deferred to the dispatch prompt: `S0` run preflight; then, for each comma/slash-separated failure named in that card's Red field from left to right, `R1` add exactly one assertion and its smallest fixture to the first applicable owned test path, `R2` run the card's exact Red command and record the requirement-shaped failure, `G1` add or change exactly one named production function/schema object/configuration stanza in the listed Goal path that owns that assertion, and `G2` rerun the same targeted command. Each `R1`, `R2`, `G1`, and `G2` is a separate 2--5 minute checkbox; the next named failure cannot start before the current one is green. After the last assertion, `X1` refactor one symbol, `X2` rerun targeted green, `X3` run each listed regression/gate command separately, `X4` stage only owned paths and scan, `X5` request SPEC review, `X6` request quality/security/license review, `X7` commit, and `X8` record coordinator evidence. If any one step exceeds five minutes, stop as a plan defect. F-01S1A through F-01S4 are a serialized contract-first exception because they share two files: each task adds only its named groups and helpers, must leave the accumulated contract green, and may not weaken predecessor assertions.
 
 Path aliases are exact: `domain/`, `services/`, `repositories/`, `storage/`, `security/`, `observability/`, `api/`, `providers/`, and `profiles/` mean the corresponding path below `backend/projectb/`; `evaluators/` means `backend/projectb/domain/learning/evaluators/`; `views/` and `styles/` mean the corresponding path below `frontend/src/`. No other abbreviation is allowed. A directory path ending `/` grants ownership only of the explicitly named descendants in that card, never an open glob.
 
-`F-01S1` through `F-01S4` use only Git and PowerShell because no committed project runtime exists yet. The cross-platform F-01S1 contract and direct commands use PowerShell 7 as exact `pwsh -NoProfile -File ...` commands; later Windows-only bootstrap commands retain their explicitly written Windows PowerShell form. G-03/G-03P attempts complete F-01S1 in a disposable directory and must run a real red then green without dependency downloads, commits, or original-repository edits. Formal F-01S1 after G-04 repeats the task in the implementation worktree; F-01S2/S3/S4 then extend the same two files serially. F-01A creates the project-local toolchain only after F-01S4. Before F-01S4 exists, each scanner task scans its owned artifacts using all rules implemented so far and records the scoped clean receipt; after F-01S4, every implementation, review-fix, and coordinator evidence commit runs `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/bootstrap_scan_credentials.ps1 -Tracked -Staged`. Any Git/index/read/decode/scan error fails closed and no matching value is printed.
+`F-01S1A` through `F-01S4` use only Git and PowerShell because no committed project runtime exists yet. Their cross-platform contract and direct commands use PowerShell 7 as exact `pwsh -NoProfile -File ...` commands; later Windows-only bootstrap commands retain their explicitly written Windows PowerShell form. G-03/G-03P attempts only F-01S1A in a disposable directory and must run a real red then green without dependency downloads, commits, or original-repository edits. Formal F-01S1A after G-04 repeats that task; F-01S1B/S2/S3/S4 extend the same two files serially. F-01A creates the project-local toolchain only after F-01S4. Before F-01S4 exists, each scanner task scans its owned artifacts using all rules implemented so far and records the scoped clean receipt; after F-01S4, every implementation, review-fix, and coordinator evidence commit runs `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/bootstrap_scan_credentials.ps1 -Tracked -Staged`. Any Git/index/read/decode/scan error fails closed and no matching value is printed.
 
 1. Run the worktree preflight and bind `$TaskId`, `$AgentId`, `$HumanChanges`, base commit, clean index, and predecessor hashes. Run the committed `scripts/bootstrap.ps1`, which provisions checksum-verified uv 0.11.14, CPython 3.14.6, and Node 24.18.0 under ignored project-local paths; it must never alter system PATH. Use its resolved `$Uv`, `$Py`, `$Node`, and `$Npm` paths. UI tasks additionally run `& $Npm --prefix frontend exec -- playwright install chromium`.
 2. Write the named minimum failing test first. Run the exact red command and record its exit code plus the requirement-shaped failure. A missing test, import typo, or environment failure is not a valid red.
@@ -134,59 +134,68 @@ git diff --check
 
 | # | Task | Depends on | Parallel | Worktree | Status | Terminal commit |
 | ---: | --- | --- | --- | --- | --- | --- |
-| 1 | F-01S1 | G-04 | no: scanner core starts the chain | foundation | not started | none |
-| 2 | F-01S2 | F-01S1 | no: extends shared scanner files | foundation | not started | none |
-| 3 | F-01S3 | F-01S2 | no: extends shared scanner files | foundation | not started | none |
-| 4 | F-01S4 | F-01S3 | no: closes full scanner gate | foundation | not started | none |
-| 5 | F-01A | F-01S4 | no: materializes runtimes and locks | foundation | not started | none |
-| 6 | F-01B | F-01A + BOOTSTRAP-LICENSE-EVIDENCE | no: closes bootstrap licenses | foundation | not started | none |
-| 7 | F-01C | F-01B | no: creates frontend harness | foundation | not started | none |
-| 8 | F-01D | F-01C | no: seeds push CI before feature branches | foundation | not started | none |
-| 9 | F-01E | F-01D | no: creates shared quality gates | foundation | not started | none |
-| 10 | F-02 | F-01E | no: migration order | foundation | not started | none |
-| 11 | F-03 | F-02 | no: migration order | foundation | not started | none |
-| 12 | F-04 | F-03 | no: security base | foundation | not started | none |
-| 13 | F-05 | F-04 | no: security base | foundation | not started | none |
-| 14 | M1-01 | F-05 | no: material contracts | m1-materials | not started | none |
-| 15 | M1-02 | M1-01 | no: consumes extraction | m1-materials | not started | none |
-| 16 | M1-03 | M1-02 | no: consumes material repo | m1-materials | not started | none |
-| 17 | M2-01 | M1-03 | no: evaluator base | m2-learning | not started | none |
-| 18 | M2-02 | M2-01 | no: registry assembly | m2-learning | not started | none |
-| 19 | M2-03 | M2-02 | no: evidence authority | m2-learning | not started | none |
-| 20 | M2-04 | M2-03 | no: mastery consumes evidence | m2-learning | not started | none |
-| 21 | P-01 | M2-04 | no: provider port and mock | m3-api | not started | none |
-| 22 | M3-01 | P-01 | no: planner contract | m3-api | not started | none |
-| 23 | M3-02 | M3-01 | no: revision persistence | m3-api | not started | none |
-| 24 | API-01 | M3-02 | no: creates app registry | m3-api | not started | none |
-| 25 | API-02 | API-01 | no: modifies app registry | m3-api | not started | none |
-| 26 | API-03 | API-02 | no: closes local API | m3-api | not started | none |
-| 27 | UI-01 | API-03 | no: creates route registry | webui | not started | none |
-| 28 | UI-02 | UI-01 | no: modifies route registry | webui | not started | none |
-| 29 | UI-03 | UI-02 | no: modifies route registry | webui | not started | none |
-| 30 | UI-04 | UI-03 | no: modifies route registry | webui | not started | none |
-| 31 | UI-05 | UI-04 | no: modifies route registry | webui | not started | none |
-| 32 | UI-06 | UI-05 | no: modifies route registry | webui | not started | none |
-| 33 | DEMO-01 | UI-06 | no: profile assembly | demo | not started | none |
-| 34 | P-02 | DEMO-01 + P-EVIDENCE | no: real adapter is isolated last | provider-openai | not started | none |
-| 35 | DIST-01 | P-02 + QA-RELEASE | no: Windows release | distribution | not started | none |
-| 36 | DIST-02 | DIST-01 | no: consumes frozen frontend/runtime | distribution | not started | none |
-| 37 | CI-01 | DIST-02 | no: consumes all commands | release | not started | none |
-| 38 | DOC-01 | CI-01 + EXT-REMOTE-PREP + D-025-HOST-CLOSE + DIST-01-VM-CLOSE | no: final verified guide | release | not started | none |
+| 1 | F-01S1A | G-04 | no: atomic scanner starts the chain | foundation | not started | none |
+| 2 | F-01S1B | F-01S1A | no: extends shared direct-rule files | foundation | not started | none |
+| 3 | F-01S2 | F-01S1B | no: extends shared scanner files | foundation | not started | none |
+| 4 | F-01S3 | F-01S2 | no: extends shared scanner files | foundation | not started | none |
+| 5 | F-01S4 | F-01S3 | no: closes full scanner gate | foundation | not started | none |
+| 6 | F-01A | F-01S4 | no: materializes runtimes and locks | foundation | not started | none |
+| 7 | F-01B | F-01A + BOOTSTRAP-LICENSE-EVIDENCE | no: closes bootstrap licenses | foundation | not started | none |
+| 8 | F-01C | F-01B | no: creates frontend harness | foundation | not started | none |
+| 9 | F-01D | F-01C | no: seeds push CI before feature branches | foundation | not started | none |
+| 10 | F-01E | F-01D | no: creates shared quality gates | foundation | not started | none |
+| 11 | F-02 | F-01E | no: migration order | foundation | not started | none |
+| 12 | F-03 | F-02 | no: migration order | foundation | not started | none |
+| 13 | F-04 | F-03 | no: security base | foundation | not started | none |
+| 14 | F-05 | F-04 | no: security base | foundation | not started | none |
+| 15 | M1-01 | F-05 | no: material contracts | m1-materials | not started | none |
+| 16 | M1-02 | M1-01 | no: consumes extraction | m1-materials | not started | none |
+| 17 | M1-03 | M1-02 | no: consumes material repo | m1-materials | not started | none |
+| 18 | M2-01 | M1-03 | no: evaluator base | m2-learning | not started | none |
+| 19 | M2-02 | M2-01 | no: registry assembly | m2-learning | not started | none |
+| 20 | M2-03 | M2-02 | no: evidence authority | m2-learning | not started | none |
+| 21 | M2-04 | M2-03 | no: mastery consumes evidence | m2-learning | not started | none |
+| 22 | P-01 | M2-04 | no: provider port and mock | m3-api | not started | none |
+| 23 | M3-01 | P-01 | no: planner contract | m3-api | not started | none |
+| 24 | M3-02 | M3-01 | no: revision persistence | m3-api | not started | none |
+| 25 | API-01 | M3-02 | no: creates app registry | m3-api | not started | none |
+| 26 | API-02 | API-01 | no: modifies app registry | m3-api | not started | none |
+| 27 | API-03 | API-02 | no: closes local API | m3-api | not started | none |
+| 28 | UI-01 | API-03 | no: creates route registry | webui | not started | none |
+| 29 | UI-02 | UI-01 | no: modifies route registry | webui | not started | none |
+| 30 | UI-03 | UI-02 | no: modifies route registry | webui | not started | none |
+| 31 | UI-04 | UI-03 | no: modifies route registry | webui | not started | none |
+| 32 | UI-05 | UI-04 | no: modifies route registry | webui | not started | none |
+| 33 | UI-06 | UI-05 | no: modifies route registry | webui | not started | none |
+| 34 | DEMO-01 | UI-06 | no: profile assembly | demo | not started | none |
+| 35 | P-02 | DEMO-01 + P-EVIDENCE | no: real adapter is isolated last | provider-openai | not started | none |
+| 36 | DIST-01 | P-02 + QA-RELEASE | no: Windows release | distribution | not started | none |
+| 37 | DIST-02 | DIST-01 | no: consumes frozen frontend/runtime | distribution | not started | none |
+| 38 | CI-01 | DIST-02 | no: consumes all commands | release | not started | none |
+| 39 | DOC-01 | CI-01 + EXT-REMOTE-PREP + D-025-HOST-CLOSE + DIST-01-VM-CLOSE | no: final verified guide | release | not started | none |
 
 ## 5. Foundation Tasks
 
-### F-01S1: Dependency-free scanner output and direct-secret core
+### F-01S1A: Single-path scanner protocol and provider rule
 
-- **Dependencies / parallelism:** G-04 for formal implementation; G-03/G-03P may attempt this complete task before dispatch. No parallel work because F-01S1 through F-01S4 share exactly two files.
-- **Goal / files:** Create only `scripts/tests/bootstrap_scanner_contract.ps1` and `scripts/bootstrap_scan_credentials.ps1`. Implement `Write-ScanRecord`, `Convert-SourceText`, and `Find-DirectSecret`. The scanner command in this phase is exactly `pwsh -NoProfile -File scripts/bootstrap_scan_credentials.ps1 -Path <file>`; one `-Path` is mandatory, and missing scope is `usage_missing_scope`. It strictly decodes UTF-8 and never prints values, content, line data, or decoded payloads. Direct rule IDs and literal shapes are exact: `provider_api_key` is literal `sk-` plus 20--200 `[A-Za-z0-9_-]`; `github_token` is one literal prefix from `ghp_,gho_,ghu_,ghs_,ghr_` plus 20--255 `[A-Za-z0-9]`; `aws_access_key` is literal `AKIA` or `ASIA` plus exactly 16 `[A-Z0-9]`; `google_api_key` is literal `AIza` plus exactly 35 `[A-Za-z0-9_-]`; `slack_token` is one literal prefix from `xoxb-,xoxp-,xoxa-,xoxr-,xoxs-` plus 10--200 `[A-Za-z0-9-]`; `private_key` is `-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----`. The first five token matches require start/end or a neighbor outside `[A-Za-z0-9_-]`; the PEM expression uses the shown single ASCII spaces and five hyphens. Assemble every positive fixture from non-matching runtime fragments.
-- **Red:** add groups `usage_and_output`, `token_rules`, and `artifact_direct_safety`, then run exactly `pwsh -NoProfile -File scripts/tests/bootstrap_scanner_contract.ps1`; expect exit 1 and exactly `CONTRACT_RED scanner_missing`. The artifact safety group scans exact bytes of both owned files using the direct rules and fails if either file matches.
-- **Green/refactor:** implement only the three named helpers and top-level single-path wiring required to exercise them; rerun the unchanged command and require the three group names followed by `BOOTSTRAP_SCANNER_CORE_PASS`. Clean is exit 0 with exactly `CREDENTIAL_SCAN_PASS files=N`. Findings are exit 2 with one line per unique result, sorted by `source,path,rule`, using exact key order `CREDENTIAL_SCAN_FINDING {"source":SOURCE_JSON_STRING,"path":PATH_JSON_STRING,"rule":RULE_JSON_STRING}`. Operational failures are exit 3 with `CREDENTIAL_SCAN_ERROR {"code":CODE_JSON_STRING}` and optional `source` then `path`. JSON strings use standard escaping; values, content, line data, decoded payloads, and blob OIDs are forbidden.
-- **Done / commit:** G-03 records the diff, exact red/green outputs, artifact scan, file hashes, questions, and cost, then stops without integration. Formal post-G-04 execution repeats the task, obtains both reviews, and commits `build(F-01S1): add direct-secret scanner core [agent: worker]`.
+- **Dependencies / parallelism:** G-04 for formal implementation; G-03/G-03P may attempt this complete task before dispatch. No parallel work because F-01S1A through F-01S4 share exactly two files.
+- **Goal / files:** Create only `scripts/tests/bootstrap_scanner_contract.ps1` and `scripts/bootstrap_scan_credentials.ps1`. Implement `Write-ScanRecord`, `Convert-SourceText`, `Find-DirectSecret`, and minimal `-Path` wiring. The only rule is `provider_api_key`: literal `sk-` plus 20--200 `[A-Za-z0-9_-]`, bounded at each end by start/end or a character outside `[A-Za-z0-9_-]`. `source` is always literal `path`; receipt `path` is the caller's argument with `\` changed to `/` and one leading `./` removed. Reading may resolve an absolute path but must not replace receipt text. Decode strict UTF-8 without BOM or `U+FFFD`. Missing scope, non-file/read failure, and decode failure are `usage_missing_scope`, `read_failed`, and `decode_failed`. Runtime positive fixtures join two independently non-matching fragments.
+- **Red:** create only the contract file with groups `usage_and_output` and `provider_rule`; run exactly `pwsh -NoProfile -File scripts/tests/bootstrap_scanner_contract.ps1`; expect exit 1 and the sole output `CONTRACT_RED scanner_missing`.
+- **Green/refactor:** create the scanner and rerun the unchanged command; require both group names followed by `BOOTSTRAP_SCANNER_PATH_PASS`. Clean is exit 0 with exactly `CREDENTIAL_SCAN_PASS files=1`. Findings are exit 2, one per unique result, with exact JSON key order `source,path,rule`; operational failure is exit 3 with exact `code` and optional `source,path`. Never print values/content/line data/decoded payloads/exceptions/OIDs. The contract is at most 180 lines and scanner at most 140 lines; exceeding either is a plan defect, not completion.
+- **Done / commit:** G-03 records exact hashes, line counts, red/green tool results, direct provider-rule oracle, stable source/path/error checks, <=300-word final English summary, questions, and cost, then stops without integration. Formal post-G-04 execution repeats the task, obtains both reviews, and commits `build(F-01S1A): add single-path scanner core [agent: worker]`.
+
+### F-01S1B: Remaining direct rules and artifact safety
+
+- **Dependencies / parallelism:** F-01S1A; no, because this task extends the same contract and scanner and may not weaken its two predecessor groups.
+- **Goal / files:** Modify only the two F-01S1A files. Add exact rules: `github_token` uses `ghp_,gho_,ghu_,ghs_,ghr_` plus 20--255 `[A-Za-z0-9]`; `aws_access_key` uses `AKIA|ASIA` plus exactly 16 `[A-Z0-9]`; `google_api_key` uses `AIza` plus exactly 35 `[A-Za-z0-9_-]`; `slack_token` uses `xoxb-,xoxp-,xoxa-,xoxr-,xoxs-` plus 10--200 `[A-Za-z0-9-]`; `private_key` is `-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----`. The first four use the same neighbor boundary as F-01S1A. Add stable dedupe/sort by `source,path,rule` and artifact byte safety.
+- **Red:** add `direct_rules_and_order` and `artifact_direct_safety`, run the unchanged contract, and observe the first missing rule/order/safety behavior while the two F-01S1A groups remain green.
+- **Green/refactor:** implement only the five rules, dedupe/sort, and self-safety needed by those groups. Require `usage_and_output`, `provider_rule`, `direct_rules_and_order`, `artifact_direct_safety`, then `BOOTSTRAP_SCANNER_CORE_PASS`; directly scan both owned files and require exit 0 with exactly `CREDENTIAL_SCAN_PASS files=1` each.
+- **Done / commit:** all six direct shapes, boundaries, stable order, redaction, and both artifact scans pass; both reviews pass. Commit `build(F-01S1B): complete direct scanner rules [agent: worker]`.
 
 ### F-01S2: Assignment and encoded-secret rules
 
-- **Dependencies / parallelism:** F-01S1; no, because this task extends the same contract and scanner and may not weaken the three predecessor groups.
-- **Goal / files:** Modify only the two F-01S1 files. Add `Find-AssignmentSecret` and `Find-EncodedSecret`. Assignment names are case-insensitive `api_key|api-key|apikey|access_token|auth_token|client_secret|password|passwd|secret|token`, bounded on the left by start or non-`[A-Za-z0-9_-]`, then optional horizontal whitespace, `:` or `=`, and optional horizontal whitespace. A quoted value uses the same opening/closing single or double quote, forbids CR/LF, permits backslash only before that matching quote or backslash, and contains 8--512 decoded characters; an unquoted value is the maximal 8--512 run of `[A-Za-z0-9_./+=:@-]`. Safe whole values after ASCII trim and case-fold are exactly `example,placeholder,changeme,not-set,none,null,redacted`, one nonempty angle-bracket pair, `\$(?:[A-Za-z_][A-Za-z0-9_]*|\{[A-Za-z_][A-Za-z0-9_]*\})`, or `\[[^\]\r\n]*redacted[^\]\r\n]*\]`.
+- **Dependencies / parallelism:** F-01S1B; no, because this task extends the same contract and scanner and may not weaken the four predecessor groups.
+- **Goal / files:** Modify only the two F-01S1A files. Add `Find-AssignmentSecret` and `Find-EncodedSecret`. Assignment names are case-insensitive `api_key|api-key|apikey|access_token|auth_token|client_secret|password|passwd|secret|token`, bounded on the left by start or non-`[A-Za-z0-9_-]`, then optional horizontal whitespace, `:` or `=`, and optional horizontal whitespace. A quoted value uses the same opening/closing single or double quote, forbids CR/LF, permits backslash only before that matching quote or backslash, and contains 8--512 decoded characters; an unquoted value is the maximal 8--512 run of `[A-Za-z0-9_./+=:@-]`. Safe whole values after ASCII trim and case-fold are exactly `example,placeholder,changeme,not-set,none,null,redacted`, one nonempty angle-bracket pair, `\$(?:[A-Za-z_][A-Za-z0-9_]*|\{[A-Za-z_][A-Za-z0-9_]*\})`, or `\[[^\]\r\n]*redacted[^\]\r\n]*\]`.
 - **Encoded contract:** `encoded_secret` decodes exactly one layer and then applies only the six direct rules, never assignment matching. Standard Base64 candidate `[A-Za-z0-9+/]{16,4096}={0,2}` is bounded by start/end or non-`[A-Za-z0-9+/=]`; Base64URL candidate `[A-Za-z0-9_-]{16,4096}={0,2}` is bounded by start/end or non-`[A-Za-z0-9_=-]`. Both require legal padding, total length divisible by four, strict byte decoding, and strict decoded UTF-8. Hex candidate `[0-9A-Fa-f]{32,8192}` is even-length and bounded by start/end or non-hex. Tests name every rule ID and assert boundary negatives for every candidate family.
 - **Red:** add `assignment_quotes_boundaries` and the encoded cases within `encodings_and_types`, run the unchanged contract, and observe the first missing named rule without changing predecessor assertions.
 - **Green/refactor:** implement only the two named helpers; run the unchanged contract and require predecessor groups plus the two new groups and `BOOTSTRAP_SCANNER_RULES_PASS`. Re-run direct artifact safety against exact bytes of both files.
@@ -205,8 +214,8 @@ git diff --check
 - **Dependencies / parallelism:** F-01S3; no, because this task closes the scanner used by every later task.
 - **Goal / files:** Modify only the two scanner files. Add `Invoke-BootstrapScan`, UTF-8 with/without BOM, BOM-declared UTF-16LE/BE, unmarked-NUL rejection, dedupe/sort by source/path/rule, and constant top-level `scan_failed`. The text allowlist is `.md,.txt,.json,.jsonl,.toml,.yaml,.yml,.ini,.cfg,.conf,.env,.example,.py,.pyi,.js,.mjs,.cjs,.ts,.tsx,.jsx,.html,.css,.scss,.sql,.ps1,.psm1,.psd1,.sh,.bash,.cmd,.bat,.lock,.in` plus extensionless `.gitignore,.gitattributes,.dockerignore,Dockerfile,Makefile,LICENSE,NOTICE`. The binary skip list is `.png,.jpg,.jpeg,.gif,.webp,.pdf,.ico,.zip,.gz,.7z,.exe,.dll,.pyd,.so,.woff,.woff2,.ttf,.mp3,.mp4,.sqlite,.db`; everything else fails. Stable remaining errors are `decode_failed`, `nul_unmarked`, `unsupported_file_type`, and `scan_failed`. Finding and error JSON property order remains source/path/rule or code/source/path and never includes value/content/OID.
 - **Red:** complete `encodings_and_types`, `path_safety_and_errors`, and `redaction`; use the PowerShell AST parser to prove the top-level catch is constant and contains no exception/value/content interpolation. Run the unchanged contract and observe the first missing F-01S4 behavior.
-- **Green/refactor:** implement only `Invoke-BootstrapScan` and final wiring. Require exactly `usage_and_output`, `token_rules`, `assignment_quotes_boundaries`, `encodings_and_types`, `staged_vs_worktree`, `index_modes_and_rename`, `path_safety_and_errors`, `redaction`, then `BOOTSTRAP_SCANNER_CONTRACT_PASS`. In a fresh Git repository containing exact copies of only the two files, stage both and require exactly `CREDENTIAL_SCAN_PASS files=4`.
-- **Done / commit:** the complete fail-closed scanner, exact eight-group contract, AST redaction proof, and tracked+staged self-scan pass with both reviews. Commit `build(F-01S4): close bootstrap scanner gate [agent: worker]`.
+- **Green/refactor:** implement only `Invoke-BootstrapScan` and final wiring. Require exactly `usage_and_output`, `provider_rule`, `direct_rules_and_order`, `artifact_direct_safety`, `assignment_quotes_boundaries`, `encodings_and_types`, `staged_vs_worktree`, `index_modes_and_rename`, `path_safety_and_errors`, `redaction`, then `BOOTSTRAP_SCANNER_CONTRACT_PASS`. In a fresh Git repository containing exact copies of only the two files, stage both and require exactly `CREDENTIAL_SCAN_PASS files=4`.
+- **Done / commit:** the complete fail-closed scanner, exact ten-group contract, AST redaction proof, and tracked+staged self-scan pass with both reviews. Commit `build(F-01S4): close bootstrap scanner gate [agent: worker]`.
 
 ### F-01A: Reproducible runtimes, manifests, and reviewed locks
 
@@ -540,7 +549,7 @@ No gate permits paid resources, real-key disclosure, history rewrite, force-push
 | AC-20 | DIST-02, CI-01, EXT-REMOTE-PREP, and EXT-REMOTE-FINAL |
 | AC-21 | D-025-HOST-CLOSE and DOC-01 |
 | AC-22 | per-task protocol and coordinator evidence commits |
-| AC-23 | F-01S1--F-01S4/F-01A/F-01B/F-01E, all scans/reviews, DIST-01/02, DOC-01 |
+| AC-23 | F-01S1A--F-01S4/F-01A/F-01B/F-01E, all scans/reviews, DIST-01/02, DOC-01 |
 | AC-24 | G-03 and `SPEC_PROCESS.md` |
 
 The authoritative course matrix is `docs/REQUIREMENTS_COMPLIANCE_AUDIT.md`; before G-03 it must bind the final SPEC/PLAN hashes and map every hard row to these task IDs or named gates.

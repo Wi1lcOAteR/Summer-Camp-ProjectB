@@ -26,14 +26,14 @@ Credentials use Windows Credential Manager in local profile. First run provides 
 V1 contains no autonomous multi-round agent. If later added, its loop, tool dispatch, guards, and deterministic mock tests require a new student-approved specification. The shipped application must provide a React WebUI, Windows x64 single-file distribution, an OCI mock demo, GitLab CI with a job named unit-test, GitHub CI evidence, one-command tests, and a final public HTTPS WebUI URL. D-025 remains the human hosting choice. Remote push, PR, deployment, paid resource creation, G-04 implementation approval, and student reflection remain human gates. REFLECTION.md must be written by the student; AI may only polish a supplied draft and declare assistance.
 
 ## Baseline acceptance used by G-03
-Before product implementation, a fresh non-Codex intake session and a separate execution session receive only final SPEC.md and PLAN.md. Intake must report both full-file SHA-256 hashes, the complete two-file listing, effective language, target F-01S1, fixed acceptance ID F01S1_RED_GREEN_ARTIFACT_SAFETY_V1, and ambiguities. Execution starts only when ambiguities are empty. It may create only scripts/tests/bootstrap_scanner_contract.ps1 and scripts/bootstrap_scan_credentials.ps1 in a disposable copy, must demonstrate the exact missing-scanner red result and unchanged-command green result, and must not commit or integrate output. Formal implementation still repeats F-01S1 after G-04.
+Before product implementation, a fresh non-Codex intake session and a separate execution session receive only final SPEC.md and PLAN.md. Intake must report both full-file SHA-256 hashes, the complete two-file listing, effective language, target F-01S1A, acceptance ID F01S1A_SINGLE_RULE_SCANNER_V2, and ambiguities. Execution starts only when ambiguities are empty. It creates only scripts/tests/bootstrap_scanner_contract.ps1 and scripts/bootstrap_scan_credentials.ps1, implements the locked single-path protocol plus provider_api_key rule, demonstrates the exact missing-scanner red and unchanged-command green, stays within the artifact and final-summary budgets, and never commits or integrates output. Formal implementation repeats F-01S1A after G-04; F-01S1B serially adds the remaining direct rules.
 <!-- AGENT_CAPSULE:SPEC:END -->
 
-> **状态：2026-07-30 冷启动可执行性修订，等待学生重新整体确认。** 学生于 2026-07-25T19:13:57+08:00 确认的产品方向仍是本次修订基础：精简纵向切片、模型范围 `L+P`、数字 PDF + UTF-8 文本/Markdown、通用知识点模型并以互斥/竞态/死锁三个概念验收。由于本次新增英文 agent capsule 并改变 G-03/F-01S1 执行语义，旧字节确认、旧 SR-08 和旧 G-03 收据不转移到当前文件；当前完整 SPEC/PLAN 必须重新哈希、评审并由学生签字。
+> **状态：2026-08-03 G-03 原子执行规约已由学生确认。** 学生于 2026-07-25 确认的产品方向和 2026-08-01 确认的原子执行设计是本次修订基础，并于 2026-08-03 明确确认本次完整 SPEC。两次 execution 长时间 thinking、无候选文件及一次 `source` 猜测作为真实失败证据保留；网关延迟、内部规划循环和输出上限均未被冒充为已确认根因。旧 SPEC/PLAN 哈希、评审和 intake 不转移到当前字节。
 
 > **2026-07-27 过程修订：** Claude Code、Gemini CLI 与 GitHub Copilot CLI 当前均因访问或账号条件不可用。学生明确授权先用全新 Codex 任务做同类型占位预审 `G-03P`，待可访问非 Codex 类型后补做正式 `G-03`。这项修订不改变产品功能范围；`G-03P` 不满足“不同类型智能体”要求，也不解除实现门禁。
 >
-> **实现门禁：** 当前可以用 `superpowers:writing-plans` 重写 `PLAN.md`。完整计划双评审、不同类型智能体冷启动、缺陷修订和学生再次明确批准实现完成前，禁止创建正式实现源码。
+> **实现门禁：** 本次完整 SPEC 已确认，`superpowers:writing-plans` 已用于重写 `PLAN.md`。完整计划双评审、不同类型智能体冷启动、缺陷修订和学生再次明确批准实现完成前，禁止创建正式实现源码。
 
 ## 1. 问题陈述
 
@@ -263,6 +263,12 @@ React/Vite WebUI
 
 ## 11. 验收标准
 
+### 11.1 G-03 原子冷启动合同
+
+G-03 intake 的目标固定为 `F-01S1A`，acceptance ID 固定为 `F01S1A_SINGLE_RULE_SCANNER_V2`。Execution 只实现单文件 `-Path` 入口、严格 UTF-8、`Write-ScanRecord`、`Convert-SourceText`、`Find-DirectSecret` 和 `provider_api_key` 规则；`source` 固定为 `path`，输出 path 使用调用参数将 `\` 替换为 `/` 并去掉一个开头的 `./`。缺 scope、读取失败和解码失败分别使用 `usage_missing_scope`、`read_failed`、`decode_failed`，不得输出内容或秘密值。
+
+合同文件最多 180 行、scanner 最多 140 行、最终英文摘要最多 300 词；超过任一上限必须报告 plan defect。红灯必须为 exit 1 且唯一输出 `CONTRACT_RED scanner_missing`；绿灯必须覆盖 `usage_and_output`、`provider_rule` 并以 `BOOTSTRAP_SCANNER_PATH_PASS` 结束。20 分钟、预算超限、输出截断、无工具写入或无终止结果均为 execution incomplete。`F-01S1B` 串行增加其余五类直接规则、去重排序和 `artifact_direct_safety`，不属于本轮冷启动。
+
 | ID | 客观判定 |
 | --- | --- |
 | AC-01 | 可创建课程并增量导入合法 PDF/TXT/MD；超限、伪装和无文本 PDF 在写入前失败 |
@@ -288,7 +294,7 @@ React/Vite WebUI
 | AC-21 | 最终提供可访问 HTTPS WebUI URL，README 记录部署架构和 CI/CD；D-025 有学生选择证据 |
 | AC-22 | 每个实现 task 有红/绿/回归、两阶段评审、凭据扫描、commit hash 和 AGENT_LOG 记录 |
 | AC-23 | 不含真实凭据或未记录许可证；第三方来源与许可证在 README/清单中可追溯 |
-| AC-24 | 不同类型的新鲜编码智能体只凭最终 SPEC/PLAN 完成只读 intake，并在无歧义时由第二个全新 session 尝试 F-01S1；问题、误解、diff、费用和独立红绿复验写入 SPEC_PROCESS；同类型 Codex 只能记为 G-03P 占位预审 |
+| AC-24 | 不同类型的新鲜编码智能体只凭最终 SPEC/PLAN 完成只读 intake，并在无歧义时由第二个全新 session 尝试原子任务 F-01S1A；字段语义、产物/摘要预算、问题、误解、diff、费用和独立红绿复验写入 SPEC_PROCESS；同类型 Codex 只能记为 G-03P 占位预审 |
 
 ## 12. 延期功能与恢复规则
 
@@ -307,7 +313,7 @@ React/Vite WebUI
 | --- | --- |
 | 已确认 SPEC 后发生范围漂移 | 任何产品条款变化必须形成明确 diff 并重新由学生确认；状态/证据元数据不得静默改变验收合同 |
 | D-025 公网托管 | 保持开放，仅阻塞 host-specific 发布和最终 URL；不阻塞本地实现 |
-| 当前 Claude 冷启动曾空结束和网关 504 | 保留两次真实失败；用英文 capsule、严格 UTF-8、两段式 session、预算/超时和产物后置条件失败关闭，再做一次受控复测 |
+| Claude 冷启动曾空结束、504 及长时间 thinking | 保留真实失败；不猜测传输根因。用英文 capsule、原子 F-01S1A、锁定字段、产物/摘要预算、超时和产物后置条件失败关闭，再做一次受控复测 |
 | 真实课件许可未知 | 只允许本地私人使用；仓库、CI、分发和 demo 只能使用合成或明确许可 fixture |
 | Provider 能力/政策/价格会变化 | 每次实现/运行前刷新 allowlisted snapshot；无法证明时失败关闭 |
 | Windows/OCI 打包兼容性未证明 | 保留为 DIST task，必须用当次干净环境证据闭合 |
@@ -316,10 +322,11 @@ React/Vite WebUI
 
 ## 14. 阶段门禁
 
-1. 学生确认产品方向。**已于 2026-07-25 完成；本次规范字节修订仍需重新整体确认。**
-2. 用 `writing-plans` 修订单一 PLAN，生成两份文档内的英文 capsule，并在同一最终哈希上完成机械审计和双评审。
-3. 学生确认修订后的完整 SPEC/PLAN，然后使用不同类型的两个全新 session、仅凭最终 SPEC/PLAN 完成 G-03 intake 与 F-01S1 execution，并记录修订和独立复验。
-4. 学生阅读冷启动结果并明确批准 G-04 实现门禁。
-5. 才可使用 worktree、subagent、TDD 和两阶段评审编写正式代码。
+1. 学生确认产品方向和 G-03 原子执行设计。**已分别于 2026-07-25 和 2026-08-01 完成。**
+2. 学生确认本次完整 SPEC 候选。**已于 2026-08-03 完成。**
+3. 用 `writing-plans` 修订单一 PLAN，生成两份文档内的英文 capsule，并在同一最终哈希上完成机械审计和双评审。
+4. 学生确认修订后的完整 SPEC/PLAN，然后使用不同类型的两个全新 session、仅凭最终 SPEC/PLAN 完成 G-03 intake 与 F-01S1A execution，并记录修订和独立复验。
+5. 学生阅读冷启动结果并明确批准 G-04 实现门禁。
+6. 才可使用 worktree、subagent、TDD 和两阶段评审编写正式代码。
 
-当前产品方向已确认，规范修订处于第 2 步；旧签字不覆盖当前最终字节，也不得推断第 4 步的实现授权。
+当前处于第 3 步；旧签字和旧 intake 不覆盖当前字节，也不得推断第 5 步的实现授权。

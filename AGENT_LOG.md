@@ -1,5 +1,29 @@
 # AGENT_LOG
 
+## 2026-08-03T18:17:11+08:00 - G-03-020 同字节双评审与冻结验证
+
+- **Task 编号**：G-03-020。
+- **触发的 Superpowers skill**：`verification-before-completion`、`requesting-code-review`、`receiving-code-review`。
+- **冻结输入**：SPEC `AEA67BB5544AD22932DC4304964F7FD266FE8A5DE7AA396EA8974D30867E8381`；PLAN `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`。评审期间未修改 SPEC/PLAN。
+- **评审输出**：规约合规 PASS（Critical=0, Major=0, Minor=0）；质量/安全/许可证 PASS（Critical=0, Major=0）。质量评审提出的三个 Minor 已记录为非阻塞后续加固，不伪装成当前缺陷已修复。
+- **验证输出**：`PLAN_MECHANICAL_PASS Tasks=39 Ledger=39 Fields=5 AcRows=24 Placeholders=0 Unknown=0 Self=0 Cycle=0 DependencyEdges=38`；胶囊、快照、runner core 和 entrypoint 合约均通过；课程证据仍为 `rows=63 explicitly_blocked=2`。正式非 Codex G-03 intake/execution 和学生 G-04 批准仍未发生。
+- **人工边界与经验**：本条只冻结和记录证据，不把本地合约通过误报为正式 G-03 PASS，也未进入产品实现。
+
+## 2026-08-03T17:29:12+08:00 - G-03-019 原子计划与执行预言机修订
+
+- **Task 编号**：G-03-019。
+- **触发的 Superpowers skill**：`using-superpowers`、`brainstorming`、`writing-plans`、`test-driven-development`、`systematic-debugging`、`requesting-code-review`、`verification-before-completion`。
+- **关键 context/output**：学生确认精简后的完整 SPEC。PLAN 将冷启动实现拆为 `F-01S1A` 和 `F-01S1B`，当前冷启动只实现单路径、单 provider 规则，并限制脚本行数与最终摘要长度。SPEC/PLAN 冻结哈希为 `AEA67BB5...E8381` / `910A3AEC...9E923`。
+- **TDD 与评审证据**：规约评审发现状态文字和执行预言机覆盖缺口。新增错误码变异测试先失败；补齐缺文件、严格 UTF-8 BOM、`U+FFFD`、反斜杠路径和可选错误字段探针后，核心 runner 合约通过 `cases=13`。最终同字节双评审、完整验证和提交哈希待本条后续补记。
+- **人工边界与经验**：学生只确认 SPEC 和本轮修订方向，尚未提供新的非 Codex execution 结果，也未批准 G-04。变动中的文件不能接受哈希绑定评审；以后先冻结 SPEC/PLAN，再派发只读评审。
+
+## 2026-08-01T22:09:11+08:00 - G-03-018 原子任务 SPEC 候选
+- **Task 编号**：G-03-018。
+- **触发的 Superpowers skill**：`using-superpowers`、`brainstorming`、`verification-before-completion`。
+- **关键 context/output**：学生确认原子执行设计，并确认新字节必须重新执行 SPEC/PLAN intake 与 execution。`SPEC.md` 现将冷启动收束到单路径、单规则 `F-01S1A`，其余规则归入串行 `F-01S1B`；英文 capsule 清单已机械同步。
+- **验证证据**：`AGENT_CAPSULE_PASS documents=2`、`STRICT_UTF8_PASS files=2`、`PLACEHOLDER_PASS files=1`、`git diff --check` exit 0；SPEC SHA-256 为 `5ABC65A4...C598A`。
+- **人工边界与经验**：PLAN 未修改，等待学生确认完整 SPEC 后才调用 `writing-plans`。不把旧 intake、长时间 thinking、网络/输出上限假说或本次文档检查冒充 G-03 PASS；原子任务需要同时锁定语义和输出预算，不能只缩短提示词。
+
 ## 2026-08-01 - G-03-017 Execution Planning Loop and Output-Risk Design
 - **Task ID:** G-03-017
 - **Skills:** `brainstorming`, `systematic-debugging`, `verification-before-completion`

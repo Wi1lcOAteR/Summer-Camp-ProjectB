@@ -1,5 +1,36 @@
 $script:G03Utf8 = New-Object Text.UTF8Encoding($false, $true)
 
+function Set-G03ClaudeChildEnvironment {
+    param(
+        [Parameter(Mandatory = $true)]$StartInfo,
+        [Parameter(Mandatory = $true)][string]$SecretValue,
+        [Parameter(Mandatory = $true)][string]$BaseUrl,
+        [Parameter(Mandatory = $true)][string]$Model,
+        [Parameter(Mandatory = $true)][string]$CliHome
+    )
+
+    $childEnvironment = $StartInfo.Environment
+    if ($null -eq $childEnvironment) { $childEnvironment = $StartInfo.EnvironmentVariables }
+    if ($null -eq $childEnvironment) { throw 'process_environment_api_unavailable' }
+    $childEnvironment.Clear()
+    $childEnvironment['PATH'] = [string]$env:PATH
+    $childEnvironment['HOME'] = $CliHome
+    $childEnvironment['XDG_CONFIG_HOME'] = $CliHome
+    $childEnvironment['XDG_CACHE_HOME'] = $CliHome
+    $childEnvironment['TMPDIR'] = '/tmp'
+    $childEnvironment['TEMP'] = '/tmp'
+    $childEnvironment['TMP'] = '/tmp'
+    $childEnvironment['LANG'] = 'C.UTF-8'
+    $childEnvironment['LC_ALL'] = 'C.UTF-8'
+    $childEnvironment['ANTHROPIC_AUTH_TOKEN'] = $SecretValue
+    $childEnvironment['ANTHROPIC_BASE_URL'] = $BaseUrl
+    $childEnvironment['ANTHROPIC_MODEL'] = $Model
+    $childEnvironment['CLAUDE_CODE_SUBPROCESS_ENV_SCRUB'] = '1'
+    $childEnvironment['CLAUDE_CODE_MAX_RETRIES'] = '0'
+    $childEnvironment['API_TIMEOUT_MS'] = '120000'
+    $childEnvironment['G03_CLAUDE_OUTPUT_MAX_BYTES'] = '1048576'
+}
+
 function Read-G03StrictUtf8 {
     param([Parameter(Mandatory = $true)][string]$Path)
 
@@ -499,87 +530,99 @@ function Test-G03ScannerBehavior {
     New-Item -ItemType Directory -Path $oracleRoot -Force | Out-Null
     $cases = [ordered]@{
         provider_api_key = ('s' + 'k-' + ('A' * 20))
-        github_token = ('gh' + 'p_' + ('B' * 20))
-        aws_access_key = ('AK' + 'IA' + ('C' * 16))
-        google_api_key = ('AI' + 'za' + ('D' * 35))
-        slack_token = ('xo' + 'xb-' + ('e' * 10))
-        private_key = ('-----BEGIN ' + 'PRIVATE ' + 'KEY-----')
     }
     $runOracleCase = {
         param([string]$Name,[string]$Text,[string]$ExpectedRule)
         $fixturePath = Join-Path $oracleRoot ($Name + '.txt')
         [IO.File]::WriteAllText($fixturePath, $Text, (New-Object Text.UTF8Encoding($false, $true)))
-        $sandboxPath = 'oracle/' + $Name + '.txt'
+        $sandboxPath = './oracle/' + $Name + '.txt'
+        $receiptPath = 'oracle/' + $Name + '.txt'
         $run = Invoke-G03CandidateChecked -CommandInvoker $CommandInvoker -WorkingDirectory $ReplayRoot -Arguments @('-NoProfile','-File',$scanner,'-Path',$sandboxPath)
         if ([string]::IsNullOrEmpty($ExpectedRule)) {
             $valid = -not $run.TimedOut -and $run.ExitCode -eq 0 -and $run.Stdout.Trim() -ceq 'CREDENTIAL_SCAN_PASS files=1'
             if (-not $valid) { $script:G03LastOracleCase = $Name }
             return $valid
         }
-        $expected = 'CREDENTIAL_SCAN_FINDING ' + ([ordered]@{source='path';path=$sandboxPath;rule=$ExpectedRule} | ConvertTo-Json -Compress)
+        $expected = 'CREDENTIAL_SCAN_FINDING ' + ([ordered]@{source='path';path=$receiptPath;rule=$ExpectedRule} | ConvertTo-Json -Compress)
         $valid = -not $run.TimedOut -and $run.ExitCode -eq 2 -and $run.Stdout.Trim() -ceq $expected -and -not $run.Stdout.Contains($Text)
         if (-not $valid) { $script:G03LastOracleCase = $Name }
         return $valid
+    }
+    $isExpectedError = {
+        param($Run,[string]$Code,[string]$ReceiptPath)
+        if ($Run.TimedOut -or $Run.ExitCode -ne 3) { return $false }
+        $codeOnly = 'CREDENTIAL_SCAN_ERROR ' + ([ordered]@{code=$Code} | ConvertTo-Json -Compress)
+        $withSource = 'CREDENTIAL_SCAN_ERROR ' + ([ordered]@{code=$Code;source='path';path=$ReceiptPath} | ConvertTo-Json -Compress)
+        return $Run.Stdout.Trim() -ceq $codeOnly -or $Run.Stdout.Trim() -ceq $withSource
     }
     foreach ($entry in $cases.GetEnumerator()) {
         $script:G03LastOracleCase = $entry.Key + '-base'
         $fixturePath = Join-Path $oracleRoot ($entry.Key + '.txt')
         [IO.File]::WriteAllText($fixturePath, [string]$entry.Value, (New-Object Text.UTF8Encoding($false, $true)))
-        $sandboxPath = 'oracle/' + $entry.Key + '.txt'
+        $sandboxPath = './oracle/' + $entry.Key + '.txt'
+        $receiptPath = 'oracle/' + $entry.Key + '.txt'
         $finding = Invoke-G03CandidateChecked -CommandInvoker $CommandInvoker -WorkingDirectory $ReplayRoot -Arguments @('-NoProfile','-File',$scanner,'-Path',$sandboxPath)
         $lines = @($finding.Stdout -split "`r?`n" | Where-Object { $_ -ne '' })
         if ($finding.TimedOut -or $finding.ExitCode -ne 2 -or $lines.Count -ne 1 -or -not $lines[0].StartsWith('CREDENTIAL_SCAN_FINDING ')) { $script:G03LastOracleCase += '-shape'; return $false }
-        $expectedRecordText = 'CREDENTIAL_SCAN_FINDING ' + ([ordered]@{source='path';path=$sandboxPath;rule=$entry.Key} | ConvertTo-Json -Compress)
+        $expectedRecordText = 'CREDENTIAL_SCAN_FINDING ' + ([ordered]@{source='path';path=$receiptPath;rule=$entry.Key} | ConvertTo-Json -Compress)
         if ($lines[0] -cne $expectedRecordText) { $script:G03LastOracleCase += '-record'; return $false }
         try { $record = $lines[0].Substring(24) | ConvertFrom-Json } catch { $script:G03LastOracleCase += '-json'; return $false }
-        if ($record.PSObject.Properties.Name.Count -ne 3 -or $record.source -cne 'path' -or $record.path -cne $sandboxPath -or $record.rule -cne $entry.Key) { $script:G03LastOracleCase += '-fields'; return $false }
+        if ($record.PSObject.Properties.Name.Count -ne 3 -or $record.source -cne 'path' -or $record.path -cne $receiptPath -or $record.rule -cne $entry.Key) { $script:G03LastOracleCase += '-fields'; return $false }
         if ($finding.Stdout.Contains([string]$entry.Value)) { $script:G03LastOracleCase += '-leak'; return $false }
-        if ($entry.Key -ne 'private_key') {
-            [IO.File]::WriteAllText($fixturePath, ('X' + [string]$entry.Value + 'Y'), (New-Object Text.UTF8Encoding($false, $true)))
-            $boundary = Invoke-G03CandidateChecked -CommandInvoker $CommandInvoker -WorkingDirectory $ReplayRoot -Arguments @('-NoProfile','-File',$scanner,'-Path',$sandboxPath)
-            if ($boundary.TimedOut -or $boundary.ExitCode -ne 0 -or $boundary.Stdout.Trim() -cne 'CREDENTIAL_SCAN_PASS files=1') { $script:G03LastOracleCase += '-double-boundary'; return $false }
-            if (-not (& $runOracleCase ($entry.Key + '-punct-left') ('.' + [string]$entry.Value) $entry.Key)) { return $false }
-            if (-not (& $runOracleCase ($entry.Key + '-punct-right') ([string]$entry.Value + ':') $entry.Key)) { return $false }
-            if (-not (& $runOracleCase ($entry.Key + '-punct-both') ('.' + [string]$entry.Value + ':') $entry.Key)) { return $false }
-            $rightBoundaryValue = switch ($entry.Key) {
-                'provider_api_key' { 's' + 'k-' + ('A' * 200) }
-                'github_token' { 'gh' + 'p_' + ('B' * 255) }
-                'slack_token' { 'xo' + 'xb-' + ('e' * 200) }
-                default { [string]$entry.Value }
-            }
-            foreach ($neighbor in @('A','7','_','-')) {
-                if (-not (& $runOracleCase ($entry.Key + '-blocked-left-' + [int][char]$neighbor) ($neighbor + [string]$entry.Value) '')) { return $false }
-                if (-not (& $runOracleCase ($entry.Key + '-blocked-right-' + [int][char]$neighbor) ($rightBoundaryValue + $neighbor) '')) { return $false }
-            }
+        [IO.File]::WriteAllText($fixturePath, ('X' + [string]$entry.Value + 'Y'), (New-Object Text.UTF8Encoding($false, $true)))
+        $boundary = Invoke-G03CandidateChecked -CommandInvoker $CommandInvoker -WorkingDirectory $ReplayRoot -Arguments @('-NoProfile','-File',$scanner,'-Path',$sandboxPath)
+        if ($boundary.TimedOut -or $boundary.ExitCode -ne 0 -or $boundary.Stdout.Trim() -cne 'CREDENTIAL_SCAN_PASS files=1') { $script:G03LastOracleCase += '-double-boundary'; return $false }
+        if (-not (& $runOracleCase ($entry.Key + '-punct-left') ('.' + [string]$entry.Value) $entry.Key)) { return $false }
+        if (-not (& $runOracleCase ($entry.Key + '-punct-right') ([string]$entry.Value + ':') $entry.Key)) { return $false }
+        if (-not (& $runOracleCase ($entry.Key + '-punct-both') ('.' + [string]$entry.Value + ':') $entry.Key)) { return $false }
+        $rightBoundaryValue = 's' + 'k-' + ('A' * 200)
+        foreach ($neighbor in @('A','7','_','-')) {
+            if (-not (& $runOracleCase ($entry.Key + '-blocked-left-' + [int][char]$neighbor) ($neighbor + [string]$entry.Value) '')) { return $false }
+            if (-not (& $runOracleCase ($entry.Key + '-blocked-right-' + [int][char]$neighbor) ($rightBoundaryValue + $neighbor) '')) { return $false }
         }
     }
     $lengthCases = @(
-        @('provider-short',('s'+'k-'+('A'*19)),'') , @('provider-max',('s'+'k-'+('A'*200)),'provider_api_key'), @('provider-long',('s'+'k-'+('A'*201)),''),
-        @('github-short',('gh'+'p_'+('B'*19)),''), @('github-max',('gh'+'p_'+('B'*255)),'github_token'), @('github-long',('gh'+'p_'+('B'*256)),''),
-        @('aws-short',('AK'+'IA'+('C'*15)),''), @('aws-long',('AK'+'IA'+('C'*17)),''),
-        @('google-short',('AI'+'za'+('D'*34)),''), @('google-long',('AI'+'za'+('D'*36)),''),
-        @('slack-short',('xo'+'xb-'+('e'*9)),''), @('slack-max',('xo'+'xb-'+('e'*200)),'slack_token'), @('slack-long',('xo'+'xb-'+('e'*201)),'')
+        @('provider-short',('s'+'k-'+('A'*19)),''),
+        @('provider-max',('s'+'k-'+('A'*200)),'provider_api_key'),
+        @('provider-long',('s'+'k-'+('A'*201)),'')
     )
     foreach ($case in $lengthCases) { if (-not (& $runOracleCase $case[0] $case[1] $case[2])) { return $false } }
-    foreach ($prefix in @('ghp_','gho_','ghu_','ghs_','ghr_')) { if (-not (& $runOracleCase ('github-prefix-' + $prefix.TrimEnd('_')) ($prefix + ('F'*20)) 'github_token')) { return $false } }
-    foreach ($prefix in @('AKIA','ASIA')) { if (-not (& $runOracleCase ('aws-prefix-' + $prefix) ($prefix + ('G'*16)) 'aws_access_key')) { return $false } }
-    foreach ($prefix in @('xoxb-','xoxp-','xoxa-','xoxr-','xoxs-')) { if (-not (& $runOracleCase ('slack-prefix-' + $prefix.TrimEnd('-')) ($prefix + ('h'*10)) 'slack_token')) { return $false } }
-    foreach ($kind in @('','RSA ','EC ','DSA ','OPENSSH ')) { if (-not (& $runOracleCase ('private-' + ($kind.Trim() -replace '^$','plain')) ('-----BEGIN ' + $kind + 'PRIVATE KEY-----') 'private_key')) { return $false } }
     $cleanPath = Join-Path $oracleRoot 'clean.txt'
     [IO.File]::WriteAllText($cleanPath, 'ordinary course notes', (New-Object Text.UTF8Encoding($false, $true)))
     $clean = Invoke-G03CandidateChecked -CommandInvoker $CommandInvoker -WorkingDirectory $ReplayRoot -Arguments @('-NoProfile','-File',$scanner,'-Path','oracle/clean.txt')
     if ($clean.TimedOut -or $clean.ExitCode -ne 0 -or $clean.Stdout.Trim() -cne 'CREDENTIAL_SCAN_PASS files=1') { return $false }
 
-    [IO.File]::WriteAllBytes((Join-Path $oracleRoot 'invalid-utf8.txt'), [byte[]](0xC3,0x28))
-    $invalidUtf8 = Invoke-G03CandidateChecked -CommandInvoker $CommandInvoker -WorkingDirectory $ReplayRoot -Arguments @('-NoProfile','-File',$scanner,'-Path','oracle/invalid-utf8.txt')
-    if ($invalidUtf8.TimedOut -or $invalidUtf8.ExitCode -ne 3 -or $invalidUtf8.Stdout.Trim() -cne 'CREDENTIAL_SCAN_ERROR {"code":"read_failed"}') { return $false }
+    $script:G03LastOracleCase = 'missing-file'
+    $missing = Invoke-G03CandidateChecked -CommandInvoker $CommandInvoker -WorkingDirectory $ReplayRoot -Arguments @('-NoProfile','-File',$scanner,'-Path','./oracle/missing.txt')
+    if (-not (& $isExpectedError $missing 'read_failed' 'oracle/missing.txt')) { return $false }
 
-    $sortedPath = Join-Path $oracleRoot 'sorted.txt'
-    $sortedText = $cases.provider_api_key + "`n" + $cases.aws_access_key + "`n" + $cases.provider_api_key
-    [IO.File]::WriteAllText($sortedPath, $sortedText, (New-Object Text.UTF8Encoding($false, $true)))
-    $sorted = Invoke-G03CandidateChecked -CommandInvoker $CommandInvoker -WorkingDirectory $ReplayRoot -Arguments @('-NoProfile','-File',$scanner,'-Path','oracle/sorted.txt')
-    $sortedRules = @($sorted.Stdout -split "`r?`n" | Where-Object { $_ -ne '' } | ForEach-Object { ($_.Substring(24) | ConvertFrom-Json).rule })
-    if ($sorted.TimedOut -or $sorted.ExitCode -ne 2 -or ($sortedRules -join ',') -cne 'aws_access_key,provider_api_key') { return $false }
+    $script:G03LastOracleCase = 'backslash-receipt'
+    $slashValue = 's' + 'k-' + ('Q' * 20)
+    $slashArgument = '.\oracle\slash.txt'
+    $slashHostPath = if ($IsWindows -or $env:OS -eq 'Windows_NT') {
+        Join-Path $oracleRoot 'slash.txt'
+    } else {
+        Join-Path $ReplayRoot 'oracle\slash.txt'
+    }
+    [IO.File]::WriteAllText($slashHostPath, $slashValue, (New-Object Text.UTF8Encoding($false, $true)))
+    $slashRun = Invoke-G03CandidateChecked -CommandInvoker $CommandInvoker -WorkingDirectory $ReplayRoot -Arguments @('-NoProfile','-File',$scanner,'-Path',$slashArgument)
+    $slashExpected = 'CREDENTIAL_SCAN_FINDING ' + ([ordered]@{source='path';path='oracle/slash.txt';rule='provider_api_key'} | ConvertTo-Json -Compress)
+    if ($slashRun.TimedOut -or $slashRun.ExitCode -ne 2 -or $slashRun.Stdout.Trim() -cne $slashExpected -or $slashRun.Stdout.Contains($slashValue)) { return $false }
+
+    [IO.File]::WriteAllBytes((Join-Path $oracleRoot 'invalid-utf8.txt'), [byte[]](0xC3,0x28))
+    $script:G03LastOracleCase = 'invalid-utf8'
+    $invalidUtf8 = Invoke-G03CandidateChecked -CommandInvoker $CommandInvoker -WorkingDirectory $ReplayRoot -Arguments @('-NoProfile','-File',$scanner,'-Path','oracle/invalid-utf8.txt')
+    if (-not (& $isExpectedError $invalidUtf8 'decode_failed' 'oracle/invalid-utf8.txt')) { return $false }
+
+    $script:G03LastOracleCase = 'utf8-bom'
+    [IO.File]::WriteAllBytes((Join-Path $oracleRoot 'bom.txt'), [byte[]](0xEF,0xBB,0xBF,0x63,0x6C,0x65,0x61,0x6E))
+    $bom = Invoke-G03CandidateChecked -CommandInvoker $CommandInvoker -WorkingDirectory $ReplayRoot -Arguments @('-NoProfile','-File',$scanner,'-Path','oracle/bom.txt')
+    if (-not (& $isExpectedError $bom 'decode_failed' 'oracle/bom.txt')) { return $false }
+
+    $script:G03LastOracleCase = 'replacement-character'
+    [IO.File]::WriteAllText((Join-Path $oracleRoot 'replacement.txt'), ([string][char]0xFFFD), (New-Object Text.UTF8Encoding($false, $true)))
+    $replacement = Invoke-G03CandidateChecked -CommandInvoker $CommandInvoker -WorkingDirectory $ReplayRoot -Arguments @('-NoProfile','-File',$scanner,'-Path','oracle/replacement.txt')
+    if (-not (& $isExpectedError $replacement 'decode_failed' 'oracle/replacement.txt')) { return $false }
     return $true
 }
 
@@ -602,13 +645,22 @@ function Test-G03CandidateEvidence {
     }
     $scannerPath = Join-Path $ColdRoot 'scripts\bootstrap_scan_credentials.ps1'
     $contractPath = Join-Path $ColdRoot 'scripts\tests\bootstrap_scanner_contract.ps1'
+    if ((Get-Item -LiteralPath $scannerPath).Length -gt 131072 -or (Get-Item -LiteralPath $contractPath).Length -gt 131072) {
+        return [pscustomobject]@{ Valid = $false; Code = 'artifact_byte_budget' }
+    }
     $expectedScannerHash = (Get-FileHash -LiteralPath $scannerPath -Algorithm SHA256).Hash
     $expectedContractHash = (Get-FileHash -LiteralPath $contractPath -Algorithm SHA256).Hash
+    $expectedScannerBytes = [IO.File]::ReadAllBytes($scannerPath)
     try {
-        Read-G03StrictUtf8 $scannerPath | Out-Null
-        Read-G03StrictUtf8 $contractPath | Out-Null
+        $scannerText = Read-G03StrictUtf8 $scannerPath
+        $contractText = Read-G03StrictUtf8 $contractPath
     } catch {
         return [pscustomobject]@{ Valid = $false; Code = 'artifact_utf8_invalid' }
+    }
+    $scannerLineCount = [regex]::Matches($scannerText, "`n").Count + 1
+    $contractLineCount = [regex]::Matches($contractText, "`n").Count + 1
+    if ($scannerLineCount -gt 140 -or $contractLineCount -gt 180) {
+        return [pscustomobject]@{ Valid = $false; Code = 'artifact_line_budget'; Detail = "scanner=$scannerLineCount contract=$contractLineCount" }
     }
     $tokens = $null
     $parseErrors = $null
@@ -634,9 +686,30 @@ function Test-G03CandidateEvidence {
         Copy-Item -LiteralPath $scannerPath -Destination (Join-Path $replayRoot 'scripts\bootstrap_scan_credentials.ps1')
         $greenRun = Invoke-G03CandidateChecked -CommandInvoker $CommandInvoker -WorkingDirectory $replayRoot -Arguments @('-NoProfile','-File','scripts/tests/bootstrap_scanner_contract.ps1')
         $greenLines = @($greenRun.Stdout -split "`r?`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' })
-        $expectedGreen = @('usage_and_output','token_rules','artifact_direct_safety','BOOTSTRAP_SCANNER_CORE_PASS')
+        $expectedGreen = @('usage_and_output','provider_rule','BOOTSTRAP_SCANNER_PATH_PASS')
         if ($greenRun.TimedOut -or $greenRun.ExitCode -ne 0 -or $greenLines.Count -ne $expectedGreen.Count -or @(Compare-Object $greenLines $expectedGreen -SyncWindow 0).Count -ne 0) {
             return [pscustomobject]@{ Valid = $false; Code = 'green_replay_failed' }
+        }
+        if ((Get-FileHash -LiteralPath (Join-Path $replayRoot 'scripts\tests\bootstrap_scanner_contract.ps1') -Algorithm SHA256).Hash -cne $expectedContractHash -or
+            (Get-FileHash -LiteralPath (Join-Path $replayRoot 'scripts\bootstrap_scan_credentials.ps1') -Algorithm SHA256).Hash -cne $expectedScannerHash) {
+            return [pscustomobject]@{ Valid = $false; Code = 'artifact_mutated' }
+        }
+        $fixedPassMutation = @'
+param([string]$Path)
+function Write-ScanRecord { }
+function Convert-SourceText { }
+function Find-DirectSecret { }
+'CREDENTIAL_SCAN_PASS files=1'
+exit 0
+'@
+        try {
+            [IO.File]::WriteAllText((Join-Path $replayRoot 'scripts\bootstrap_scan_credentials.ps1'), $fixedPassMutation, (New-Object Text.UTF8Encoding($false, $true)))
+            $mutationRun = Invoke-G03CandidateChecked -CommandInvoker $CommandInvoker -WorkingDirectory $replayRoot -Arguments @('-NoProfile','-File','scripts/tests/bootstrap_scanner_contract.ps1')
+        } finally {
+            [IO.File]::WriteAllBytes((Join-Path $replayRoot 'scripts\bootstrap_scan_credentials.ps1'), $expectedScannerBytes)
+        }
+        if (-not $mutationRun.TimedOut -and $mutationRun.ExitCode -eq 0) {
+            return [pscustomobject]@{ Valid = $false; Code = 'contract_mutation_survived' }
         }
         if ((Get-FileHash -LiteralPath (Join-Path $replayRoot 'scripts\tests\bootstrap_scanner_contract.ps1') -Algorithm SHA256).Hash -cne $expectedContractHash -or
             (Get-FileHash -LiteralPath (Join-Path $replayRoot 'scripts\bootstrap_scan_credentials.ps1') -Algorithm SHA256).Hash -cne $expectedScannerHash) {
@@ -676,6 +749,8 @@ function Test-G03CandidateEvidence {
             added_files = @('scripts/bootstrap_scan_credentials.ps1','scripts/tests/bootstrap_scanner_contract.ps1')
             scanner_sha256 = (Get-FileHash -LiteralPath $scannerPath -Algorithm SHA256).Hash
             contract_sha256 = (Get-FileHash -LiteralPath $contractPath -Algorithm SHA256).Hash
+            scanner_lines = $scannerLineCount
+            contract_lines = $contractLineCount
         }
         [IO.File]::WriteAllText((Join-Path $EvidenceRoot 'candidate-replay.json'), ($receipt | ConvertTo-Json -Depth 6), (New-Object Text.UTF8Encoding($false, $true)))
         $diff = @(
@@ -703,11 +778,20 @@ function Get-G03ExecutionEvidence {
     $resultObject = $null
     $cost = $null
     $resultSucceeded = $false
+    $seenTerminalResult = $false
+    $seenToolUseIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $seenToolResultIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    if ((New-Object Text.UTF8Encoding($false, $true)).GetByteCount($StreamText) -gt 1048576) {
+        return [pscustomobject]@{ Valid=$false; Code='stream_output_limit'; BashCalls=0; EditCalls=0; CostUsd=$null }
+    }
     $streamLines = @($StreamText.TrimEnd() -split "`r?`n")
     if ($streamLines.Count -gt 0 -and (Test-G03ClaudePermissionNotice -Text $streamLines[0])) {
         $streamLines = @($streamLines | Select-Object -Skip 1)
     }
     foreach ($line in $streamLines) {
+        if ($seenTerminalResult) {
+            return [pscustomobject]@{ Valid=$false; Code='stream_output_protocol'; BashCalls=$bashCalls; EditCalls=$editCalls; CostUsd=$cost }
+        }
         $eventIndex++
         try { $event = $line | ConvertFrom-Json -ErrorAction Stop } catch {
             return [pscustomobject]@{ Valid=$false; Code='stream_output_protocol'; BashCalls=$bashCalls; EditCalls=$editCalls; CostUsd=$cost }
@@ -717,16 +801,22 @@ function Get-G03ExecutionEvidence {
                 if ($item.type -eq 'tool_use') {
                     if ($item.name -eq 'Bash') { $bashCalls++ }
                     if ($item.name -eq 'Edit') { $editCalls++ }
-                    if ($item.PSObject.Properties.Name -contains 'id') {
-                        $commandText = if ($item.PSObject.Properties.Name -contains 'input' -and $item.input.PSObject.Properties.Name -contains 'command') { [string]$item.input.command } else { '' }
-                        $toolUses[[string]$item.id] = [pscustomobject]@{ Name=[string]$item.name; Command=$commandText; Index=$eventIndex }
+                    $toolId = if ($item.PSObject.Properties.Name -contains 'id') { [string]$item.id } else { '' }
+                    if ([string]::IsNullOrWhiteSpace($toolId) -or -not $seenToolUseIds.Add($toolId)) {
+                        return [pscustomobject]@{ Valid=$false; Code='stream_output_protocol'; BashCalls=$bashCalls; EditCalls=$editCalls; CostUsd=$cost }
                     }
+                    $commandText = if ($item.PSObject.Properties.Name -contains 'input' -and $item.input.PSObject.Properties.Name -contains 'command') { [string]$item.input.command } else { '' }
+                    $toolUses[$toolId] = [pscustomobject]@{ Name=[string]$item.name; Command=$commandText; Index=$eventIndex }
                 }
                 if ($item.type -eq 'tool_result' -and $item.PSObject.Properties.Name -contains 'tool_use_id') {
+                    $resultId = [string]$item.tool_use_id
+                    if ([string]::IsNullOrWhiteSpace($resultId) -or -not $seenToolResultIds.Add($resultId)) {
+                        return [pscustomobject]@{ Valid=$false; Code='stream_output_protocol'; BashCalls=$bashCalls; EditCalls=$editCalls; CostUsd=$cost }
+                    }
                     $contentText = if ($item.content -is [string]) { [string]$item.content } else {
                         (@($item.content) | ForEach-Object { if ($_ -is [string]) { $_ } elseif ($_.PSObject.Properties.Name -contains 'text') { [string]$_.text } }) -join "`n"
                     }
-                    $toolResults[[string]$item.tool_use_id] = [pscustomobject]@{
+                    $toolResults[$resultId] = [pscustomobject]@{
                         IsError = ($item.PSObject.Properties.Name -contains 'is_error' -and $item.is_error -eq $true)
                         Content = $contentText
                         Index = $eventIndex
@@ -735,6 +825,11 @@ function Get-G03ExecutionEvidence {
             }
         }
         if ($event.type -eq 'result') {
+            if (($event.PSObject.Properties.Name -contains 'is_truncated' -and $event.is_truncated -eq $true) -or
+                ($event.PSObject.Properties.Name -contains 'truncated' -and $event.truncated -eq $true)) {
+                return [pscustomobject]@{ Valid=$false; Code='stream_output_protocol'; BashCalls=$bashCalls; EditCalls=$editCalls; CostUsd=$cost }
+            }
+            $seenTerminalResult = $true
             $resultSucceeded = ($event.PSObject.Properties.Name -contains 'subtype' -and $event.subtype -ceq 'success' -and
                 $event.PSObject.Properties.Name -contains 'is_error' -and $event.is_error -eq $false)
             if ($event.PSObject.Properties.Name -contains 'total_cost_usd') {
@@ -745,11 +840,11 @@ function Get-G03ExecutionEvidence {
             }
         }
     }
-    if ($null -eq $resultObject) { return [pscustomobject]@{ Valid=$false; Code='empty_end_turn'; BashCalls=$bashCalls; EditCalls=$editCalls; CostUsd=$cost } }
+    if (-not $seenTerminalResult -or $null -eq $resultObject) { return [pscustomobject]@{ Valid=$false; Code='empty_end_turn'; BashCalls=$bashCalls; EditCalls=$editCalls; CostUsd=$cost } }
     if (-not $resultSucceeded) { return [pscustomobject]@{ Valid=$false; Code='protocol_mismatch'; BashCalls=$bashCalls; EditCalls=$editCalls; CostUsd=$cost } }
     if ($null -eq $cost -or $cost -lt 0) { return [pscustomobject]@{ Valid=$false; Code='cost_missing'; BashCalls=$bashCalls; EditCalls=$editCalls; CostUsd=$cost } }
     if ($cost -gt $MaxCostUsd) { return [pscustomobject]@{ Valid=$false; Code='budget_exceeded'; BashCalls=$bashCalls; EditCalls=$editCalls; CostUsd=$cost } }
-    foreach ($property in @('task','acceptance_id','ambiguities','questions','red_command','green_command')) {
+    foreach ($property in @('task','acceptance_id','ambiguities','questions','red_command','green_command','summary')) {
         if ($resultObject.PSObject.Properties.Name -notcontains $property) {
             return [pscustomobject]@{ Valid=$false; Code='protocol_mismatch'; BashCalls=$bashCalls; EditCalls=$editCalls; CostUsd=$cost }
         }
@@ -765,7 +860,7 @@ function Get-G03ExecutionEvidence {
         $redResult = $toolResults[$contractUses[0].Id]
         $greenResult = $toolResults[$contractUses[1].Id]
         $greenLines = if ($null -eq $greenResult) { @() } else { @($greenResult.Content -split "`r?`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' }) }
-        $expectedGreen = @('usage_and_output','token_rules','artifact_direct_safety','BOOTSTRAP_SCANNER_CORE_PASS')
+        $expectedGreen = @('usage_and_output','provider_rule','BOOTSTRAP_SCANNER_PATH_PASS')
         $redContent = if ($null -eq $redResult) { '' } else { ([string]$redResult.Content).Replace("`r`n", "`n") }
         $redNormalized = if ($redContent -ceq 'CONTRACT_RED scanner_missing' -or $redContent -ceq "Exit code 1`nCONTRACT_RED scanner_missing") { 'CONTRACT_RED scanner_missing' } else { $null }
         $tddEvidenceValid = $contractUses[0].Id -match '^[A-Za-z0-9_-]{1,128}$' -and $contractUses[1].Id -match '^[A-Za-z0-9_-]{1,128}$' -and
@@ -777,8 +872,18 @@ function Get-G03ExecutionEvidence {
     if (-not $tddEvidenceValid) {
         return [pscustomobject]@{ Valid=$false; Code='tdd_evidence_missing'; BashCalls=$bashCalls; EditCalls=$editCalls; CostUsd=$cost }
     }
-    if ($resultObject.task -cne 'F-01S1' -or
-        $resultObject.acceptance_id -cne 'F01S1_RED_GREEN_ARTIFACT_SAFETY_V1' -or
+    $summary = [string]$resultObject.summary
+    $summaryWordCount = @([regex]::Matches($summary, '[A-Za-z0-9]+(?:[-''][A-Za-z0-9]+)*')).Count
+    if ([string]::IsNullOrWhiteSpace($summary) -or
+        @($summary.ToCharArray() | Where-Object { [int]$_ -gt 127 -or [int]$_ -lt 32 }).Count -ne 0 -or
+        $summaryWordCount -lt 1) {
+        return [pscustomobject]@{ Valid=$false; Code='protocol_mismatch'; BashCalls=$bashCalls; EditCalls=$editCalls; CostUsd=$cost }
+    }
+    if ($summaryWordCount -gt 300) {
+        return [pscustomobject]@{ Valid=$false; Code='summary_word_budget'; BashCalls=$bashCalls; EditCalls=$editCalls; CostUsd=$cost }
+    }
+    if ($resultObject.task -cne 'F-01S1A' -or
+        $resultObject.acceptance_id -cne 'F01S1A_SINGLE_RULE_SCANNER_V2' -or
         $resultObject.ambiguities -isnot [Array] -or @($resultObject.ambiguities).Count -ne 0 -or
         $resultObject.questions -isnot [Array] -or
         $resultObject.red_command -cne $command -or
@@ -793,6 +898,7 @@ function Get-G03ExecutionEvidence {
         EditCalls = $editCalls
         CostUsd = $cost
         Questions = @($resultObject.questions)
+        SummaryWordCount = $summaryWordCount
         TddReceipt = @(
             [ordered]@{ phase='red'; tool_use_id=$contractUses[0].Id; tool_use_event=$contractUses[0].Index; tool_result_event=$redResult.Index; command=$command; exit_code=1; is_error=$true; output=@('CONTRACT_RED scanner_missing') },
             [ordered]@{ phase='green'; tool_use_id=$contractUses[1].Id; tool_use_event=$contractUses[1].Index; tool_result_event=$greenResult.Index; command=$command; is_error=$false; output=$expectedGreen }

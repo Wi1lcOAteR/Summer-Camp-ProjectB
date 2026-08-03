@@ -22,7 +22,11 @@ $contractText = $text + "`n" + $coreText
 foreach ($literal in @(
     "[decimal]0.20",
     "[decimal]0.80",
-    "CLAUDE_CODE_MAX_RETRIES = '0'",
+    "['CLAUDE_CODE_MAX_RETRIES'] = '0'",
+    '$childEnvironment.Clear()',
+    'Set-G03ClaudeChildEnvironment',
+    'G03_CLAUDE_OUTPUT_MAX_BYTES',
+    'head -c',
     '''failIfUnavailable'' = $true',
     '''allowUnsandboxedCommands'' = $false',
     "'deniedDomains' = @('*')",
@@ -31,7 +35,6 @@ foreach ($literal in @(
     "'--tools', 'Bash'",
     "'--tools', 'Bash'",
     "'--allowedTools', 'Bash'",
-    "Remove-Item Env:ANTHROPIC_AUTH_TOKEN",
     "Test-G03BwrapPreflight",
     "descendant-marker.txt",
     "status.log",
@@ -52,6 +55,19 @@ foreach ($literal in @(
     "'G03_EVIDENCE_READY'"
 )) {
     if (-not $contractText.Contains($literal)) { throw "Runner contract literal missing: $literal" }
+}
+if ($text -match '\$env:ANTHROPIC_' -or $text -match 'Remove-Item\s+Env:ANTHROPIC_') {
+    throw 'Runner must pass provider credentials only through the cleared child environment.'
+}
+foreach ($runnerLiteral in @(
+    'task must be F-01S1A',
+    'acceptance_id must be F01S1A_SINGLE_RULE_SCANNER_V2',
+    'usage_and_output, provider_rule, and BOOTSTRAP_SCANNER_PATH_PASS',
+    'contract must be at most 180 lines',
+    'scanner must be at most 140 lines',
+    'summary must be non-empty ASCII English of at most 300 words'
+)) {
+    if (-not $text.Contains($runnerLiteral)) { throw "Runner atomic prompt literal missing: $runnerLiteral" }
 }
 if ($text -match "'--tools',\s*'[^']*Read" -or $text -match "'--allowedTools',\s*'[^']*Read") {
     throw 'Runner must not grant the Claude native Read tool.'

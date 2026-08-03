@@ -1,5 +1,24 @@
 # SPEC_PROCESS
 
+## 2026-08-03 G-03 同字节双评审完成
+
+- 冻结字节：SPEC `AEA67BB5544AD22932DC4304964F7FD266FE8A5DE7AA396EA8974D30867E8381`；PLAN `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`。
+- 规约合规评审：`PASS`，Critical=0、Major=0、Minor=0。确认 39 个可派发 task；`QA-RELEASE` 明确为非派发验证门禁，不计入台账。
+- 质量/安全/许可证评审：`PASS`，Critical=0、Major=0。非阻塞 Minor：CR-only 行计数、未知 tool 事件负例、1 MiB 输出上限的直接运行级测试；当前不阻塞 G-03 资料冻结。
+- 机械与运行证据：`PLAN_MECHANICAL_PASS Tasks=39 Ledger=39 Fields=5 AcRows=24 Placeholders=0 Unknown=0 Self=0 Cycle=0 DependencyEdges=38`；`AGENT_CAPSULE_PASS documents=2`；`AGENT_CAPSULE_CONTRACT_PASS cases=9`；`G03_SNAPSHOT_CONTRACT_PASS`；`G03_RUNNER_CONTRACT_PASS cases=13`；`G03_RUNNER_ENTRYPOINT_PASS cases=5`。正式非 Codex intake/execution 尚未重跑，G-03 仍为 NOT PASS。
+
+## 2026-08-03 G-03 原子计划确认与评审修订
+
+- 学生明确确认原子化 SPEC，并要求尽快完成冷启动后进入实际实现。随后使用 `writing-plans` 将原 F-01S1 拆为 `F-01S1A` 与串行 `F-01S1B`；当前权威文件为 SPEC `AEA67BB5...E8381`、PLAN `910A3AEC...9E923`，先前 `5ABC65A4...C598A` / `D111B729...C5706` 仅保留为被取代的候选历史。
+- 同字节规约评审指出两处 Major：SPEC 状态仍写成“等待确认”，以及协调器预言机未覆盖 `read_failed`、BOM、`U+FFFD`、反斜杠回执路径，且把 PLAN 允许省略的错误 `source/path` 当成必填。状态文字已更正；预言机新增对应探针，并接受 `code` 单字段或按序 `code,source,path` 两种合法错误记录。
+- TDD 证据：新增“缺文件误报错误码”变异后，`g03_runner_contract.ps1` 首次在该断言失败；修订预言机后同一命令通过并输出 `G03_RUNNER_CONTRACT_PASS cases=13`。正式非 Codex intake/execution 尚未重跑，G-03 与 G-04 仍未关闭。
+
+## 2026-08-01 G-03 原子任务规约候选
+
+- 学生确认 `docs/specs/2026-08-01-g03-atomic-execution-design.md`，并确认修订后需对同一最终字节重新执行 SPEC/PLAN intake 与 execution；旧 intake/执行失败只保留为过程证据。
+- 本轮只修订 `SPEC.md`：将 G-03 目标锁定为 `F-01S1A` / `F01S1A_SINGLE_RULE_SCANNER_V2`，明确 `source=path`、稳定路径语义、错误码、红绿输出、文件行数与最终摘要预算，并把其余五类规则串行延期到 `F-01S1B`。
+- 当前 SPEC 全文件 SHA-256 为 `5ABC65A41CF953131978A1A291637C5A639AA7AD3FA3573F2D1A3E386F6C598A`。胶囊一致性、严格 UTF-8、占位符和 `git diff --check` 已通过；权威 PLAN 仍绑定旧 SPEC，按阶段门禁等待学生确认本 SPEC 后再使用 `writing-plans` 同步，故当前文件对尚不可派发。
+
 ## 2026-08-01 G-03 Execution Output-Risk Finding
 
 - Two manual Claude execution attempts remained in extended thinking and created no candidate files. The student observed no visible session-termination control and raised output-limit exhaustion as an additional hypothesis.

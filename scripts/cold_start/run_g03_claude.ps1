@@ -114,15 +114,21 @@ function Invoke-G03Claude {
         [ValidateSet('intake','execution')][string]$Stage
     )
     $timeoutCommand = Get-Command timeout -ErrorAction Stop
+    $bashCommand = Get-Command bash -ErrorAction Stop
+    $outputMaxBytes = 1048576
+    $cliHome = Join-Path $env:TEMP ('projectb-g03-cli-home-' + [guid]::NewGuid().ToString())
+    New-Item -ItemType Directory -Path $cliHome -Force | Out-Null
     $startInfo = [Diagnostics.ProcessStartInfo]::new()
-    $startInfo.FileName = $timeoutCommand.Source
+    $startInfo.FileName = $bashCommand.Source
     $startInfo.WorkingDirectory = $coldRoot
     $startInfo.UseShellExecute = $false
     $startInfo.RedirectStandardOutput = $true
     $startInfo.RedirectStandardError = $true
     $startInfo.CreateNoWindow = $true
     if ($null -eq $startInfo.ArgumentList) { throw 'process_argument_list_unavailable' }
-    foreach ($argument in @('--signal=TERM','--kill-after=5s',("$WallSeconds" + 's'),$ClaudeCli) + $Arguments) {
+    Set-G03ClaudeChildEnvironment -StartInfo $startInfo -SecretValue $SecretValue -BaseUrl $BaseUrl -Model $Model -CliHome $cliHome
+    $boundedCommand = 'set -o pipefail; timeout_bin="$1"; shift; "$timeout_bin" --signal=TERM --kill-after=5s ' + $WallSeconds + 's "$@" 2>&1 | head -c "$G03_CLAUDE_OUTPUT_MAX_BYTES"'
+    foreach ($argument in @('-c',$boundedCommand,'projectb-g03-output-cap',$timeoutCommand.Source,$ClaudeCli) + $Arguments) {
         $startInfo.ArgumentList.Add([string]$argument)
     }
     $process = [Diagnostics.Process]::new()
@@ -141,12 +147,14 @@ function Invoke-G03Claude {
         }
         $outText = $stdoutTask.GetAwaiter().GetResult()
         $errText = $stderrTask.GetAwaiter().GetResult()
+        $outputLimitExceeded = (New-Object Text.UTF8Encoding($false, $true)).GetByteCount($outText + $errText) -ge $outputMaxBytes
         $elapsed = $waitReceipt.ElapsedSeconds
         $timedOut = (-not $boundedExit) -or $process.ExitCode -eq 124
         Write-G03Progress -Stage $Stage -Event $(if ($timedOut) { 'timed_out' } else { 'process_finished' }) -ElapsedSeconds $elapsed
         [pscustomobject]@{
-            ExitCode = $process.ExitCode
+            ExitCode = if ($outputLimitExceeded) { 74 } else { $process.ExitCode }
             TimedOut = $timedOut
+            OutputLimitExceeded = $outputLimitExceeded
             Stdout = if ([string]::IsNullOrEmpty($SecretValue)) { $outText } else { $outText.Replace($SecretValue, '[REDACTED]') }
             Stderr = if ([string]::IsNullOrEmpty($SecretValue)) { $errText } else { $errText.Replace($SecretValue, '[REDACTED]') }
         }
@@ -155,6 +163,7 @@ function Invoke-G03Claude {
             try { $process.Kill($true) } catch { try { $process.Kill() } catch { } }
             if (-not $process.WaitForExit(5000)) { throw 'process_tree_termination_failed' }
         }
+        if (Test-Path -LiteralPath $cliHome) { Remove-Item -LiteralPath $cliHome -Recurse -Force }
     }
 }
 
@@ -283,8 +292,8 @@ if ($TestScenario -ne 'None') {
     if ($TestScenario -eq 'IntakeAmbiguous') { Stop-G03 'TEST_ONLY_INTAKE_AMBIGUOUS' 40 }
     $testIntake = [ordered]@{
         spec_sha256 = $specHash; plan_sha256 = $planHash; files = $initialFiles
-        language = $agentDocuments.EffectiveLanguage; task = 'F-01S1'
-        acceptance_id = 'F01S1_RED_GREEN_ARTIFACT_SAFETY_V1'; ambiguities = @()
+        language = $agentDocuments.EffectiveLanguage; task = 'F-01S1A'
+        acceptance_id = 'F01S1A_SINGLE_RULE_SCANNER_V2'; ambiguities = @()
     }
     Write-G03JsonNoBom (Join-Path $EvidenceRoot 'intake-receipt.json') $testIntake
     if ($TestScenario -eq 'Gateway504') { Stop-G03 'TEST_ONLY_EXECUTION_FAILED' 41 }
@@ -339,7 +348,7 @@ $extractorCommand = "pwsh -NoProfile -EncodedCommand $extractorEncoded"
 $strictReadInstruction = "Run exactly this audited command and no alternative file reader: $extractorCommand. It strictly rejects BOM, invalid UTF-8, U+FFFD, missing/multiple capsules, and prints only the two capsules plus hashes and the complete root file list. Do not use the Claude native Read tool."
 $intakePrompt = @"
 You are the read-only intake session for ProjectB G-03. You have exactly SPEC.md and PLAN.md. $strictReadInstruction
-Read the generated capsule in each file, then return one JSON object only with keys spec_sha256, plan_sha256, files, language, task, acceptance_id, ambiguities. Hashes must be uppercase SHA-256, files must be the complete sorted file list, language must be $($agentDocuments.EffectiveLanguage), task must be F-01S1, acceptance_id must be F01S1_RED_GREEN_ARTIFACT_SAFETY_V1, and ambiguities must be an array. Do not edit files, use network, or infer missing requirements.
+Read the generated capsule in each file, then return one JSON object only with keys spec_sha256, plan_sha256, files, language, task, acceptance_id, ambiguities. Hashes must be uppercase SHA-256, files must be the complete sorted file list, language must be $($agentDocuments.EffectiveLanguage), task must be F-01S1A, acceptance_id must be F01S1A_SINGLE_RULE_SCANNER_V2, and ambiguities must be an array. Do not edit files, use network, or infer missing requirements.
 "@
 [IO.File]::WriteAllText((Join-Path $EvidenceRoot 'intake-prompt.txt'), $intakePrompt, (New-Object Text.UTF8Encoding($false, $true)))
 
@@ -351,14 +360,6 @@ try {
     $keyPointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureKey)
     $plainKey = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($keyPointer)
     if ([string]::IsNullOrWhiteSpace($plainKey)) { Stop-G03 'INTAKE_FAILED' 36 }
-    Remove-Item Env:ANTHROPIC_API_KEY -ErrorAction SilentlyContinue
-    $env:ANTHROPIC_AUTH_TOKEN = $plainKey
-    $env:ANTHROPIC_BASE_URL = $BaseUrl
-    $env:ANTHROPIC_MODEL = $Model
-    $env:CLAUDE_CODE_SUBPROCESS_ENV_SCRUB = '1'
-    $env:CLAUDE_CODE_MAX_RETRIES = '0'
-    $env:API_TIMEOUT_MS = '120000'
-
     $intakeArgs = @(
         '--print', '--output-format', 'json', '--no-session-persistence', '--bare', '--safe-mode',
         '--setting-sources', 'project', '--settings', $sandboxSettingsPath, '--no-chrome', '--strict-mcp-config',
@@ -395,7 +396,7 @@ try {
         $afterIntakeFiles.Count -ne 2 -or $afterIntakeFiles[0] -cne 'PLAN.md' -or $afterIntakeFiles[1] -cne 'SPEC.md') {
         Stop-G03 'INTAKE_FAILED' 50
     }
-    $expected = [ordered]@{ spec_sha256 = $specHash; plan_sha256 = $planHash; files = $initialFiles; language = $agentDocuments.EffectiveLanguage; task = 'F-01S1'; acceptance_id = 'F01S1_RED_GREEN_ARTIFACT_SAFETY_V1' }
+    $expected = [ordered]@{ spec_sha256 = $specHash; plan_sha256 = $planHash; files = $initialFiles; language = $agentDocuments.EffectiveLanguage; task = 'F-01S1A'; acceptance_id = 'F01S1A_SINGLE_RULE_SCANNER_V2' }
     $intakeState = Test-G03IntakeReceipt -Receipt $intakeReceipt -Expected $expected
     if ($intakeState -eq 'INTAKE_AMBIGUOUS') { Stop-G03 'INTAKE_AMBIGUOUS' 45 }
     if ($intakeState -ne 'INTAKE_READY') { Stop-G03 'INTAKE_FAILED' 46 }
@@ -414,8 +415,8 @@ try {
 
     $executionPrompt = @"
 You are the separate execution session for ProjectB G-03. You have exactly SPEC.md and PLAN.md. $strictReadInstruction
-Execute only complete task F-01S1. Create exactly scripts/tests/bootstrap_scanner_contract.ps1 and scripts/bootstrap_scan_credentials.ps1. First run the exact unchanged contract command while the scanner is missing and preserve exit 1 with CONTRACT_RED scanner_missing. Then implement only the three named helpers and minimal single-path wiring, rerun the unchanged command, and require usage_and_output, token_rules, artifact_direct_safety, and BOOTSTRAP_SCANNER_CORE_PASS. Positive fixtures are assembled from non-matching fragments. Do not modify SPEC.md or PLAN.md, use network, commit, or create any other file. Stop and report an ambiguity instead of guessing.
-    Finish with one JSON object only: task F-01S1, acceptance_id F01S1_RED_GREEN_ARTIFACT_SAFETY_V1, ambiguities array, questions array, and red_command plus green_command both exactly pwsh -NoProfile -File scripts/tests/bootstrap_scanner_contract.ps1.
+Execute only complete task F-01S1A. Create exactly scripts/tests/bootstrap_scanner_contract.ps1 and scripts/bootstrap_scan_credentials.ps1. Write the contract file first, immediately run pwsh -NoProfile -File scripts/tests/bootstrap_scanner_contract.ps1, and preserve exit 1 with the sole output CONTRACT_RED scanner_missing. Then write the scanner file and immediately rerun the same command; require usage_and_output, provider_rule, and BOOTSTRAP_SCANNER_PATH_PASS. Implement only Write-ScanRecord, Convert-SourceText, Find-DirectSecret, and minimal single-path wiring for provider_api_key. The contract must be at most 180 lines; the scanner must be at most 140 lines. Positive fixtures join two independently non-matching fragments. Do not compose source code in the final response. Do not modify SPEC.md or PLAN.md, use network, commit, or create any other file. Stop and report an ambiguity instead of guessing.
+    Finish with one JSON object only: task must be F-01S1A; acceptance_id must be F01S1A_SINGLE_RULE_SCANNER_V2; ambiguities and questions must be arrays; red_command and green_command must both be exactly pwsh -NoProfile -File scripts/tests/bootstrap_scanner_contract.ps1; summary must be non-empty ASCII English of at most 300 words.
 "@
     [IO.File]::WriteAllText((Join-Path $EvidenceRoot 'execution-prompt.txt'), $executionPrompt, (New-Object Text.UTF8Encoding($false, $true)))
     $executionArgs = @(
@@ -438,10 +439,6 @@ Execute only complete task F-01S1. Create exactly scripts/tests/bootstrap_scanne
     $artifacts = Test-G03ColdStartArtifacts -ColdRoot $coldRoot
     if (-not $artifacts.Valid) { Stop-G03 'COLD_START_INCOMPLETE' 48 }
     $safeQuestions = @($executionEvidence.Questions | ForEach-Object { Protect-G03EvidenceText -Value ([string]$_) -SecretValue $plainKey })
-    Remove-Item Env:ANTHROPIC_API_KEY -ErrorAction SilentlyContinue
-    Remove-Item Env:ANTHROPIC_AUTH_TOKEN -ErrorAction SilentlyContinue
-    Remove-Item Env:ANTHROPIC_BASE_URL -ErrorAction SilentlyContinue
-    Remove-Item Env:ANTHROPIC_MODEL -ErrorAction SilentlyContinue
     $candidateInvoker = {
         param([string]$WorkingDirectory,[string[]]$CommandArguments,[int]$WallSeconds)
         Invoke-G03BwrapCommand -WorkingDirectory $WorkingDirectory -CommandArguments $CommandArguments -WallSeconds $WallSeconds
@@ -451,13 +448,14 @@ Execute only complete task F-01S1. Create exactly scripts/tests/bootstrap_scanne
     if (-not $candidate.Valid) { Stop-G03 'COLD_START_INCOMPLETE' 51 }
     Write-G03Progress -Stage 'replay' -Event 'passed'
     Write-G03JsonNoBom (Join-Path $EvidenceRoot 'execution-summary.json') ([ordered]@{
-        task = 'F-01S1'
-        acceptance_id = 'F01S1_RED_GREEN_ARTIFACT_SAFETY_V1'
+        task = 'F-01S1A'
+        acceptance_id = 'F01S1A_SINGLE_RULE_SCANNER_V2'
         ambiguities = @()
         questions = $safeQuestions
         bash_calls = $executionEvidence.BashCalls
         edit_calls = $executionEvidence.EditCalls
         cost_usd = $executionEvidence.CostUsd
+        summary_word_count = $executionEvidence.SummaryWordCount
         tdd_receipt = $executionEvidence.TddReceipt
         candidate_replay = 'ok'
     })
@@ -465,13 +463,6 @@ Execute only complete task F-01S1. Create exactly scripts/tests/bootstrap_scanne
     if ($finalState -ne 'G03_EVIDENCE_READY') { Stop-G03 $finalState 54 }
     Stop-G03 $finalState 0
 } finally {
-    Remove-Item Env:ANTHROPIC_API_KEY -ErrorAction SilentlyContinue
-    Remove-Item Env:ANTHROPIC_AUTH_TOKEN -ErrorAction SilentlyContinue
-    Remove-Item Env:ANTHROPIC_BASE_URL -ErrorAction SilentlyContinue
-    Remove-Item Env:ANTHROPIC_MODEL -ErrorAction SilentlyContinue
-    Remove-Item Env:CLAUDE_CODE_SUBPROCESS_ENV_SCRUB -ErrorAction SilentlyContinue
-    Remove-Item Env:CLAUDE_CODE_MAX_RETRIES -ErrorAction SilentlyContinue
-    Remove-Item Env:API_TIMEOUT_MS -ErrorAction SilentlyContinue
     $plainKey = $null
     if ($keyPointer -ne [IntPtr]::Zero) { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($keyPointer) }
     if ($null -ne $secureKey) { $secureKey.Dispose() }

@@ -1,11 +1,11 @@
 # AI4SE Project B Requirements Compliance Matrix
 
-**Snapshot:** `2026-07-30`
+**Snapshot:** `2026-08-03`
 
-**SPEC:** `01E9A154B8FE9585997871B23571B079264BE038082D1CC4C239412CCEF1D030`
+**SPEC:** `AEA67BB5544AD22932DC4304964F7FD266FE8A5DE7AA396EA8974D30867E8381`
 
-**PLAN current:** `11EB0111B74EA7320B9A881575AE3C0606FE625A3410F092611F88D86BA9964C`
-**Stage:** `COLD-START REMEDIATION / SNAPSHOT REVALIDATION REQUIRED / NOT DISPATCHABLE`. The 2026-08-01 documentation-layout revision changed the normative SPEC/PLAN bytes without changing product scope. Prior SR-08 reviews do not transfer to these hashes. The first new Claude intake correctly stopped on the stale PLAN-to-SPEC hash binding; the binding and capsule manifest are now being repaired before intake is repeated. G-03 and G-04 remain open.
+**PLAN current:** `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`
+**Stage:** `G-03 ATOMIC PLAN CANDIDATE / NOT DISPATCHABLE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate and splits the former cold-start task into `F-01S1A` and `F-01S1B`. Same-byte mechanical audit and both reviews are PASS; formal non-Codex intake/execution and G-04 remain open. No product implementation evidence exists yet.
 
 `verified` means current local evidence exists; `planned` means a named active task owns it; `blocked` means a named human/external gate remains; `not-started` means no product evidence exists. This is the only active course matrix. Archived plans are recovery evidence, never PASS evidence.
 
@@ -37,15 +37,15 @@
 | GitHub repository visibility/access | public repo or private with TA collaborator | blocked on remote authorization | EXT-REMOTE-PREP visibility/collaborator receipt |
 | GitHub Actions and PR evidence | workflow plus full-SHA actions | not-started | CI-01, EXT-REMOTE-PREP, EXT-REMOTE-FINAL |
 | Final course CI PASS | authoritative NJU GitLab plus mirror evidence on final docs commit | blocked on remote authorization | EXT-REMOTE-FINAL |
-| Incremental commits and PR/MR history | 38 task commits, scanned coordinator evidence commits, 9 stacked worktree branches | planned | per-task protocol and EXT-REMOTE-PREP/FINAL sequential retarget-and-merge closure |
+| Incremental commits and PR/MR history | 39 task commits, scanned coordinator evidence commits, 9 stacked worktree branches | planned | per-task protocol and EXT-REMOTE-PREP/FINAL sequential retarget-and-merge closure |
 | Fresh subagent per PLAN task | one clean session/task | planned | after G-04 |
-| TDD red-green-refactor | exact red/green command in all 38 cards; shared assertion-level 2--5 minute step expansion | not-started | every behavior task after G-04 |
+| TDD red-green-refactor | exact red/green command in all 39 cards; shared assertion-level 2--5 minute step expansion | not-started | every behavior task after G-04 |
 | SPEC review then quality/security/license review | terminal hash-bound review loop | planned | every task protocol; Critical stops sequence |
 | Required Superpowers order | brainstorming -> plan -> worktree -> TDD -> reviews -> finish | brainstorming/writing-plans evidenced; later stages gated | G-03/G-04 then task protocol |
-| `SPEC.md` required sections | 14 sections, 8 stories, 24 AC, risks/deferred scope | structure verified; current bytes await student confirmation | SR-08 same-hash review |
-| `PLAN.md` exact task fields | exactly 38 tasks; dependency/parallel/files/red/green/done in each | mechanical PASS; current-hash dual review pending | close SR-08, then formal G-03 and G-04 |
-| Stranger cold start with only SPEC/PLAN | two fresh non-Codex sessions intake then F-01S1 | old Claude sessions remain failed history; local runner contracts cover behavior and protocol, but live bubblewrap preflight cannot execute on native Windows | confirm final bytes and Claude terms; run once in WSL2/Linux where preflight passes |
-| Cold-start repair then implementation approval | separate post-repair student gate | current repair not yet re-confirmed; G-03/G-04 blocked | student confirms current SPEC/PLAN, G-03 receipt, then explicit G-04 |
+| `SPEC.md` required sections | 14 sections, 8 stories, 24 AC, risks/deferred scope | current bytes confirmed by student; same-byte SR-08 pending | close SR-08 on current pair |
+| `PLAN.md` exact task fields | exactly 39 tasks; dependency/parallel/files/red/green/done in each | atomic rewrite complete; mechanical and dual review pending | close SR-08, then formal G-03 and G-04 |
+| Stranger cold start with only SPEC/PLAN | two fresh non-Codex sessions intake then F-01S1A | old Claude sessions remain failed history; local atomic runner contracts pass, but live bubblewrap run requires WSL2/Linux | confirm final pair and run one intake/execution in WSL2/Linux |
+| Cold-start repair then implementation approval | separate post-repair student gate | current SPEC confirmed; final pair, G-03, and G-04 remain open | student confirms current pair, G-03 receipt, then explicit G-04 |
 | `SPEC_PROCESS.md` process and cold-start diff | sections 1--2 contain >3 real question/answer/revision rounds; sections 8--9 contain G-03P/review diffs | partial: first formal G-03 failure recorded; successful diff/red/green absent | rerun and record completed formal G-03 truthfully |
 | `AGENT_LOG.md` timestamp/task/skill/context/output/hash/human edits/lesson | historical and current entries exist | partial | coordinator evidence commit after every task |
 | Student-written code declaration | conditional top-of-file/function comment plus trailer/log | planned; no product code exists | per-task protocol step 5 |
@@ -55,8 +55,8 @@
 
 ## Evidence Receipts
 
-- Current mechanical: `PLAN_MECHANICAL_PASS Tasks=38 Ledger=38 Fields=5 AcRows=24 Placeholders=0 Unknown=0 Self=0 Cycle=0 DependencyEdges=37` against SPEC `14C03D...0713` / PLAN `95FF14D...C663`; rerun on the final bytes before the current review.
-- Current SR-08 revalidation: the first course/SPEC review on predecessor PLAN `D9AE82...7016` returned `Critical=2, Major=1`; the first quality/security/license review returned `Critical=2, Major=5`. A second SPEC review on SPEC `BE32CA...EFFF` / PLAN `35D989...F48F` returned `Critical=1, Major=1`; the second quality review returned `Critical=2, Major=4, Minor=2`. The second-round Critical findings were an acceptance-ID conflict, sandbox-external candidate execution while credentials remained in the environment, and a forgeable fixed-PASS candidate. The current candidate uses the fixed acceptance ID, Bash-only execution, exact ordered tool-use/tool-result evidence, pre-key live bubblewrap checks, environment-cleared offline replay, and a coordinator behavior oracle. New same-hash reviews are pending; no PASS is inherited.
+- Current mechanical: `PLAN_MECHANICAL_PASS Tasks=39 Ledger=39 Fields=5 AcRows=24 Placeholders=0 Unknown=0 Self=0 Cycle=0 DependencyEdges=38` against SPEC `AEA67BB5...E8381` / PLAN `910A3AEC...9E923`.
+- Current SR-08 revalidation: same-byte SPEC review and quality/security/license review both returned `Critical=0, Major=0`. Current evidence includes fixed acceptance ID, Bash-only execution, exact ordered tool-use/tool-result evidence, pre-key live bubblewrap checks, cleared child environment, bounded output, contract mutation replay, and a coordinator behavior oracle. Minor follow-ups (CR-only line counting, unknown tool event negatives, and direct runtime over-limit test) are recorded as non-blocking hardening items; no product PASS is inherited.
 - Historical Stage B reviews: `/root/plan_spec_review` and `/root/plan_quality_review` both returned `PASS; Critical=0, Major=0, Minor=0` against SPEC `79579162...7862` and PLAN `6FDD69...A05D`; these verdicts do not transfer to current bytes.
 - Failed reviews: the first pair returned `Critical=0, Major=3, Minor=2` and `Critical=1, Major=10, Minor=1` against SPEC `600395...ED71` / PLAN `8A4BE...AFD`. The second pair returned `Critical=0, Major=3, Minor=0` and `Critical=0, Major=6, Minor=2` against SPEC `69A534...855E` / PLAN `47624A...225A`. Findings were repaired but verdicts are not reused.
 - Current G-03P remediation: fresh projectless task `019fa331-3da1-7f80-a37c-ac7abb135a46` used SPEC `6A0DB7...11E56` / predecessor PLAN `D574B8...1D742`, produced exact missing-scanner red and eight-group green with eleven helpers, then its optional self-scan found `credential_assignment` in both contract sources. Final PLAN `E96C...` makes exact `files=4` self-scan cleanliness mandatory; focused dual review passed. This remains same-family evidence and does not close G-03.

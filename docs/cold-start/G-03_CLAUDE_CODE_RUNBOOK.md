@@ -4,12 +4,15 @@
 
 G-03 尚未完成，产品实现仍被 G-04 门禁阻塞。当前候选输入为：
 
-- SPEC SHA-256：`01E9A154B8FE9585997871B23571B079264BE038082D1CC4C239412CCEF1D030`
-- PLAN SHA-256：`11EB0111B74EA7320B9A881575AE3C0606FE625A3410F092611F88D86BA9964C`
-- 目标任务：`F-01S1`
+- SPEC SHA-256：`AEA67BB5544AD22932DC4304964F7FD266FE8A5DE7AA396EA8974D30867E8381`
+- PLAN SHA-256：`910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`
+- 目标任务：`F-01S1A`
+- 验收 ID：`F01S1A_SINGLE_RULE_SCANNER_V2`
 - 固定模型：`claude-sonnet-4-6`
 - 固定过程端点：`https://ai2.1343263.xyz`
 - 总预算上限：`$1.00`，其中 intake `$0.20`、execution `$0.80`
+
+当前同字节机械审计、规约评审和质量/安全/许可证评审均已通过（Critical=0、Major=0）。正式 G-03 仍未完成：必须使用下面的两个两文件快照重新执行 intake 和 execution；之后还要等待学生明确批准 G-04，才能进入产品实现。
 
 这两个哈希必须在同哈希机械审计和双评审通过、学生重新确认后才可用于正式复测。任何 SPEC/PLAN 字节变化都必须更新本手册中的哈希并重走评审。
 
@@ -92,23 +95,25 @@ command -v pwsh timeout bwrap socat node
 
 只有上一条同时列出五个可执行文件后，才在同一个 WSL2 终端运行：
 
-```powershell
-pwsh -NoProfile -File ./scripts/cold_start/run_g03_claude.ps1 `
-  -AgentLanguage Auto `
-  -Model claude-sonnet-4-6 `
-  -MaxTotalBudgetUsd 1.00 `
-  -ExpectedSpecSha256 01E9A154B8FE9585997871B23571B079264BE038082D1CC4C239412CCEF1D030 `
-  -ExpectedPlanSha256 11EB0111B74EA7320B9A881575AE3C0606FE625A3410F092611F88D86BA9964C `
-  -ClaudeCli ./tmp/toolchains/claude-code/node_modules/@anthropic-ai/claude-code/bin/claude
+```bash
+CLAUDE_CLI="$(find tmp/toolchains -type f \( -path '*/claude-code-linux-x64/claude' -o -path '*/@anthropic-ai/claude-code/bin/claude' \) -print -quit)"
+test -x "$CLAUDE_CLI"
+pwsh -NoProfile -File ./scripts/cold_start/run_g03_claude.ps1 \
+  -AgentLanguage Auto \
+  -Model claude-sonnet-4-6 \
+  -MaxTotalBudgetUsd 1.00 \
+  -ExpectedSpecSha256 AEA67BB5544AD22932DC4304964F7FD266FE8A5DE7AA396EA8974D30867E8381 \
+  -ExpectedPlanSha256 910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923 \
+  -ClaudeCli "$CLAUDE_CLI"
 ```
 
 API key 只在隐藏输入框输入。runner 不把子进程原始 stdout/stderr 写入磁盘；只保存白名单结构化字段、费用、工具调用计数、问题、产物哈希、独立重放结果和必要的脱敏 `process-diagnostic.json`。诊断文件只包含阶段、退出码、超时标志和固定枚举码，不包含原始错误、prompt、路径或凭据。认证环境变量在 `finally` 中清除，Claude 子进程凭据继承 scrub 保持启用。
 
 ## 两段执行
 
-1. Intake：全新 session，5 分钟、`$0.20`，只允许 runner 提供的严格 UTF-8 capsule 提取命令。它必须返回两份哈希、完整两文件列表、English、`F-01S1`、固定 acceptance ID 和空歧义数组。任何写入或额外目录都会失败。
-2. Execution：第二个全新 session，20 分钟、`$0.80`，只允许强制 sandbox 内的 Bash。原生 Read 和 Edit 均不授权；它也不能使用网络、commit 或第三份项目上下文。
-3. Coordinator replay：runner 不相信 Claude 自报。它先验证 stream-json 中真实发生过、顺序正确且有对应 tool result 的精确红测和绿测；Claude 失败工具结果允许且只允许规范化的 `Exit code 1` 加 `CONTRACT_RED scanner_missing`，其他退出码或额外行均失败。随后清除认证环境变量，在新的无凭据、断网、限挂载 bubblewrap 中重放；每次重放和直接扫描前后都核对候选 contract/scanner 原始 SHA-256，防止可写重放根替换验证器。coordinator 自有行为 oracle 还会独立检查所有列出的直接规则及前缀变体、下限/上限/超限长度、标点与阻断邻接边界、严格 UTF-8、稳定排序和 JSON 键序、脱敏、缺参错误和两个产物的精确字节，候选脚本自报 PASS 不能替代这些检查。最终证据会持久化规范化且有序的 TDD receipt。
+1. Intake：全新 session，5 分钟、`$0.20`，只允许 runner 提供的严格 UTF-8 capsule 提取命令。它必须返回两份哈希、完整两文件列表、English、`F-01S1A`、固定验收 ID 和空歧义数组。任何写入或额外目录都会失败。
+2. Execution：第二个全新 session，20 分钟、`$0.80`，只实现单路径和 `provider_api_key` 一条规则。合同文件不得超过 180 行，scanner 不得超过 140 行，最终 ASCII 英文摘要不得超过 300 词；无工具写入、输出截断或没有终止结果均判定未完成。
+3. Coordinator replay：runner 不相信 Claude 自报。它验证真实发生且有对应结果的精确红测/绿测，随后在无凭据、断网、限挂载 bubblewrap 中重放。自有 oracle 只检查本轮规定的 provider 最短/最长/超长、标点与阻断邻接、严格 UTF-8、`source=path`、稳定 path/error 语义、脱敏、两个文件行数和精确字节。其余五类直接规则属于后续 `F-01S1B`，不进入本次冷启动。
 
 只有全部满足才写正式 schema `projectb.g03.formal.v1` 和状态 `G03_EVIDENCE_READY`。`TestScenario` 只能写到系统临时目录，schema 固定为 `projectb.g03.test.v1`，状态以 `TEST_ONLY_` 开头，不能作为正式收据。
 
@@ -127,4 +132,4 @@ API key 只在隐藏输入框输入。runner 不把子进程原始 stdout/stderr
 - `71a50d25-4cd7-48b1-9472-8107e82779ed`：Sonnet 5，约 `$0.4712`，空 `end_turn`，仅创建空目录。
 - `32b62490-7817-4d3d-8452-7a29a4de94ea`：Sonnet 4.6，约 `$0.1818`，哈希验证后网关 504。
 
-两次都没有 F-01S1 产物或红绿收据，只能作为失败历史，不能关闭 G-03。
+两次都没有旧目标 F-01S1 的产物或红绿收据，只能作为失败历史，不能关闭新版 G-03。
