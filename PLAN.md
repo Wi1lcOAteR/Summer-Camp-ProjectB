@@ -31,7 +31,7 @@ A candidate execution has exactly the two input documents and two allowed artifa
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` or `superpowers:executing-plans` to execute one task at a time. Every behavior task uses `superpowers:test-driven-development`; unexpected failures use `superpowers:systematic-debugging`; reviews use `superpowers:requesting-code-review` and `superpowers:receiving-code-review`; completion claims use `superpowers:verification-before-completion`; each worktree group closes with `superpowers:finishing-a-development-branch`.
 
-**Status:** `G-03 ATOMIC PLAN CANDIDATE / NOT DISPATCHABLE`
+**Status:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`
 
 **SPEC binding:** the student confirmed the complete G-03 atomic SPEC on 2026-08-03. Current SPEC SHA-256 is `AEA67BB5544AD22932DC4304964F7FD266FE8A5DE7AA396EA8974D30867E8381`; prior reviews and intake do not transfer to these bytes.
 
@@ -134,7 +134,7 @@ git diff --check
 
 | # | Task | Depends on | Parallel | Worktree | Status | Terminal commit |
 | ---: | --- | --- | --- | --- | --- | --- |
-| 1 | F-01S1A | G-04 | no: atomic scanner starts the chain | foundation | not started | none |
+| 1 | F-01S1A | G-04 | no: atomic scanner starts the chain | foundation | in progress | none |
 | 2 | F-01S1B | F-01S1A | no: extends shared direct-rule files | foundation | not started | none |
 | 3 | F-01S2 | F-01S1B | no: extends shared scanner files | foundation | not started | none |
 | 4 | F-01S3 | F-01S2 | no: extends shared scanner files | foundation | not started | none |

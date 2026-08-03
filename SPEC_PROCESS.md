@@ -720,3 +720,10 @@
 - **产物复验：** disposable execution 目录最终恰含两份冻结输入和 `scripts/bootstrap_scan_credentials.ps1`、`scripts/tests/bootstrap_scanner_contract.ps1`。Scanner 为 95 行、SHA-256 `104085D3508C618A5DDC8AF18583825DE809A677575E95196DD1FD776F0B5C6E`；contract 为 161 行、SHA-256 `8BA08B9A6786D21C46312674334D818658688A8AFAA07481FEB90B79B63F161E`。冻结输入未变化。
 - **独立检查与限制：** 主智能体静态核对函数、规则、严格 UTF-8、路径、稳定错误、脱敏和行数，并以不修改候选字节的 PowerShell 5.1 兼容副本得到相同三行 green、exit 0；当前工具沙箱调用 WSL 仍为 `E_ACCESSDENIED`，因此精确 PowerShell 7 输出采用学生转交的 3D-R 原始回执。插件未暴露可核验费用，旧 runner 的 bubblewrap/费用字段不补造。学生已明确选择人工插件流程，这些限制不冒充 runner 收据。
 - **修订结论：** 冷启动发现的是执行分段和候选实现问题，不是当前 SPEC/PLAN 的规范歧义；因此两份冻结文档不改字节，也无需重新执行 SR-08。G-03 按学生指定的人工 Claude Code 替代流程闭合；候选脚本不合入产品，正式 F-01S1A 仍须在 G-04 后重新按 TDD 和双评审实现。
+
+## 20. 2026-08-03 G-04 实现批准
+
+- **学生原始决定：** “批准进入实现阶段”。
+- **门禁结论：** G-04 已闭合；可以按 `PLAN.md` 创建 `codex/foundation-v1` worktree，并从正式 `F-01S1A` 开始逐 task 执行 TDD、规约评审、质量/安全/许可证评审和小提交。
+- **不随本批准开放的操作：** 远程 push、PR/MR、发布、付费资源、公网投放和真实 provider 调用仍受各自命名门禁约束。
+- **规范字节：** G-03 绑定的 SPEC/预派发 PLAN 哈希保持 `AEA67BB5...E8381` / `910A3AEC...E923`。批准后仅按 PLAN 3.1 允许范围把顶层执行状态改为 active、把 `F-01S1A` 标为 in progress；当前证据态 PLAN 哈希为 `382BCDB3...943F2`，不属于规范修订。

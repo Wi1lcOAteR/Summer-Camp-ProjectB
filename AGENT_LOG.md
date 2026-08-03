@@ -1205,3 +1205,12 @@
 - **人工修改及原因**：学生逐段转交 Claude 原始 JSON，并在 3D 非结构化修复后要求只读 3D-R。主智能体未修改候选产物；只检查文件集合、冻结哈希、行数、规则和兼容性 green。插件费用和旧 runner bubblewrap 收据不可得，明确记录为限制而不补造。
 - **清理记录**：为独立诊断创建了忽略目录 `tmp/g03-replay-ps5/`，并尝试下载 `tmp/toolchains/PowerShell-7.6.3-win-x64.zip` 到约 6.9 MB；下载超时。两次 `Remove-Item` 精确清理被环境策略拒绝后，未提权、未使用破坏性 Git 命令；改以 `apply_patch` 删除两个诊断文本，并用 .NET 精确删除已核验且未占用的 archive/空目录。`tmp/g03-replay-ps5/`、该 zip 和空 `tmp/toolchains/powershell-7.6.3/` 均已移除。
 - **经验教训**：模型长思考问题应通过单 session 的原子检查点解决；每轮强制短 JSON 能保留真实 RED/GREEN，又避免把候选自述 `PASS` 当作 oracle。G-03 完成不等于 G-04，正式 F-01S1A 仍为 `not started`。
+
+## 2026-08-03T21:23:01+08:00 - G-04 实现阶段批准
+
+- **Task 编号**：G-04。
+- **触发的 Superpowers skill**：`using-superpowers`、`using-git-worktrees`、`subagent-driven-development`、`test-driven-development`、`requesting-code-review`、`receiving-code-review`、`verification-before-completion`。
+- **关键 prompt / context**：学生在读取 G-03 闭合结果后明确回复“批准进入实现阶段”。权威规范输入仍为 SPEC `AEA67BB5...E8381`、预派发 PLAN `910A3AEC...E923`；批准后的证据态 PLAN 仅更新执行标签和首项状态，哈希为 `382BCDB3...943F2`。
+- **subagent 输出或 commit hash**：本条为人工门禁记录，尚未派发实现 subagent；协调提交 hash 在提交后补记于后续 task 记录。
+- **人工修改及原因**：学生只批准本地实现。远程 push、PR/MR、发布、云资源、公网部署和真实 provider 调用未获本次授权。
+- **经验教训**：冷启动完成与实现批准必须保留为两个独立事实；实现产物仍须从正式 worktree 中重新取得红—绿、双评审和提交证据，不能继承 disposable G-03 候选。
