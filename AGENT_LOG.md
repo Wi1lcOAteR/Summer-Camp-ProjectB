@@ -7,6 +7,7 @@
 - **冻结输入**：SPEC `AEA67BB5544AD22932DC4304964F7FD266FE8A5DE7AA396EA8974D30867E8381`；PLAN `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`。评审期间未修改 SPEC/PLAN。
 - **评审输出**：规约合规 PASS（Critical=0, Major=0, Minor=0）；质量/安全/许可证 PASS（Critical=0, Major=0）。质量评审提出的三个 Minor 已记录为非阻塞后续加固，不伪装成当前缺陷已修复。
 - **验证输出**：`PLAN_MECHANICAL_PASS Tasks=39 Ledger=39 Fields=5 AcRows=24 Placeholders=0 Unknown=0 Self=0 Cycle=0 DependencyEdges=38`；胶囊、快照、runner core 和 entrypoint 合约均通过；课程证据仍为 `rows=63 explicitly_blocked=2`。正式非 Codex G-03 intake/execution 和学生 G-04 批准仍未发生。
+- **Commit**：`4d2d31c`（`fix(g03): harden atomic cold-start gate`）。
 - **人工边界与经验**：本条只冻结和记录证据，不把本地合约通过误报为正式 G-03 PASS，也未进入产品实现。
 
 ## 2026-08-03T17:29:12+08:00 - G-03-019 原子计划与执行预言机修订
