@@ -711,3 +711,12 @@
 - **哈希与门禁：** SPEC/PLAN 仍为 `14C03D688A09451DCA06F66507CE4510510A8A3BC550057376B0A1EF95270713` / `95FF14D23DB92692BA005C3AA42598ABB5DDCFEE2DEFC28B950B00617C3EC663`。G-03、G-04、产品实现、远程授权、部署和学生本人反思仍未闭合；下一次正式运行必须重新产生完整证据，不能继承本次失败收据为 PASS。
 - **第二次正式失败：** 会话 `49fa60fb-85ea-4728-bf86-b68b2a532423` 的 intake 在 25 秒后仍以 Claude 子进程 exit 0、`child_output_protocol` 结束，说明第一轮精确提示白名单没有覆盖实际 stdout 结构；没有保存原始输出，因此不猜测或继续扩大白名单。
 - **安全诊断修订：** runner 仅在协议失败时记录 `output_shape`，内容限于 JSON/提示/ANSI/HTML/其他文本行计数、固定提示前缀和分隔符枚举、完整 JSON 布尔值及 stderr 是否存在。测试以运行时拼接的伪 key 证明诊断 JSON 不含任意原文。该修订不改变冻结 SPEC/PLAN、intake 验收、任务产物或 G-03/G-04 门禁。
+
+## 19. 2026-08-03 正式 G-03 人工 Claude Code 冷启动闭合
+
+- **学生选择与陌生性：** 学生明确停用历史 runner，改用 Claude Code 插件。Intake 与 execution 使用两个互相独立的新 session，初始目录均只含当前 `SPEC.md`、`PLAN.md`；未提供 AGENTS、历史计划、产品源码或第三份项目上下文。
+- **Intake：** 返回 SPEC `AEA67BB5544AD22932DC4304964F7FD266FE8A5DE7AA396EA8974D30867E8381`、PLAN `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`、完整列表 `[PLAN.md, SPEC.md]`、语言 English、任务 `F-01S1A`、验收 `F01S1A_SINGLE_RULE_SCANNER_V2` 和空歧义；主智能体重新计算的哈希与文件集合一致。
+- **分段 execution：** 为避免此前长 thinking 后中断，同一 execution session 按 `1/2A/2B/2C/2D/3A/3B/3C/3D-R` 分段。2D 在 scanner 不存在时得到唯一输出 `CONTRACT_RED scanner_missing`、exit 1；3D 首次暴露无 BOM fixture、缺参退出语义和空集合处理问题，Claude 在同一 session 修订候选。最终 3D-R 不再修改文件，PowerShell 7 返回 `GROUP usage_and_output`、`GROUP provider_rule`、`BOOTSTRAP_SCANNER_PATH_PASS`、exit 0。
+- **产物复验：** disposable execution 目录最终恰含两份冻结输入和 `scripts/bootstrap_scan_credentials.ps1`、`scripts/tests/bootstrap_scanner_contract.ps1`。Scanner 为 95 行、SHA-256 `104085D3508C618A5DDC8AF18583825DE809A677575E95196DD1FD776F0B5C6E`；contract 为 161 行、SHA-256 `8BA08B9A6786D21C46312674334D818658688A8AFAA07481FEB90B79B63F161E`。冻结输入未变化。
+- **独立检查与限制：** 主智能体静态核对函数、规则、严格 UTF-8、路径、稳定错误、脱敏和行数，并以不修改候选字节的 PowerShell 5.1 兼容副本得到相同三行 green、exit 0；当前工具沙箱调用 WSL 仍为 `E_ACCESSDENIED`，因此精确 PowerShell 7 输出采用学生转交的 3D-R 原始回执。插件未暴露可核验费用，旧 runner 的 bubblewrap/费用字段不补造。学生已明确选择人工插件流程，这些限制不冒充 runner 收据。
+- **修订结论：** 冷启动发现的是执行分段和候选实现问题，不是当前 SPEC/PLAN 的规范歧义；因此两份冻结文档不改字节，也无需重新执行 SR-08。G-03 按学生指定的人工 Claude Code 替代流程闭合；候选脚本不合入产品，正式 F-01S1A 仍须在 G-04 后重新按 TDD 和双评审实现。

@@ -5,7 +5,7 @@
 **SPEC:** `AEA67BB5544AD22932DC4304964F7FD266FE8A5DE7AA396EA8974D30867E8381`
 
 **PLAN current:** `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`
-**Stage:** `G-03 ATOMIC PLAN CANDIDATE / NOT DISPATCHABLE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate and splits the former cold-start task into `F-01S1A` and `F-01S1B`. Same-byte mechanical audit and both reviews are PASS; formal non-Codex intake/execution and G-04 remain open. No product implementation evidence exists yet.
+**Stage:** `G-03 COMPLETE / G-04 BLOCKED / NOT DISPATCHABLE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise; G-04 remains open and no product implementation evidence exists yet.
 
 `verified` means current local evidence exists; `planned` means a named active task owns it; `blocked` means a named human/external gate remains; `not-started` means no product evidence exists. This is the only active course matrix. Archived plans are recovery evidence, never PASS evidence.
 
@@ -41,12 +41,12 @@
 | Fresh subagent per PLAN task | one clean session/task | planned | after G-04 |
 | TDD red-green-refactor | exact red/green command in all 39 cards; shared assertion-level 2--5 minute step expansion | not-started | every behavior task after G-04 |
 | SPEC review then quality/security/license review | terminal hash-bound review loop | planned | every task protocol; Critical stops sequence |
-| Required Superpowers order | brainstorming -> plan -> worktree -> TDD -> reviews -> finish | brainstorming/writing-plans evidenced; later stages gated | G-03/G-04 then task protocol |
-| `SPEC.md` required sections | 14 sections, 8 stories, 24 AC, risks/deferred scope | current bytes confirmed by student; same-byte SR-08 pending | close SR-08 on current pair |
-| `PLAN.md` exact task fields | exactly 39 tasks; dependency/parallel/files/red/green/done in each | atomic rewrite complete; mechanical and dual review pending | close SR-08, then formal G-03 and G-04 |
-| Stranger cold start with only SPEC/PLAN | two fresh non-Codex sessions intake then F-01S1A | old Claude sessions remain failed history; local atomic runner contracts pass, but live bubblewrap run requires WSL2/Linux | confirm final pair and run one intake/execution in WSL2/Linux |
-| Cold-start repair then implementation approval | separate post-repair student gate | current SPEC confirmed; final pair, G-03, and G-04 remain open | student confirms current pair, G-03 receipt, then explicit G-04 |
-| `SPEC_PROCESS.md` process and cold-start diff | sections 1--2 contain >3 real question/answer/revision rounds; sections 8--9 contain G-03P/review diffs | partial: first formal G-03 failure recorded; successful diff/red/green absent | rerun and record completed formal G-03 truthfully |
+| Required Superpowers order | brainstorming -> plan -> worktree -> TDD -> reviews -> finish | brainstorming/writing-plans/G-03 evidenced; implementation stages gated | explicit G-04, then task protocol |
+| `SPEC.md` required sections | 14 sections, 8 stories, 24 AC, risks/deferred scope | current bytes confirmed by student; same-byte SR-08 PASS | implementation evidence after G-04 |
+| `PLAN.md` exact task fields | exactly 39 tasks; dependency/parallel/files/red/green/done in each | mechanical audit and dual review PASS | explicit G-04, then ledger execution |
+| Stranger cold start with only SPEC/PLAN | two fresh non-Codex sessions intake then F-01S1A | verified: current hashes, empty ambiguities, exact red, two artifacts, PowerShell 7 green exit 0 | complete; disposable artifacts are not product implementation |
+| Cold-start repair then implementation approval | separate post-repair student gate | G-03 complete; no SPEC/PLAN defect required a normative revision | explicit G-04 remains |
+| `SPEC_PROCESS.md` process and cold-start diff | sections 1--2 contain >3 real question/answer/revision rounds; later sections retain G-03P/failures/final run | verified: final intake, segmented execution, red/green, hashes, line counts and limitations recorded | continue per-task evidence after G-04 |
 | `AGENT_LOG.md` timestamp/task/skill/context/output/hash/human edits/lesson | historical and current entries exist | partial | coordinator evidence commit after every task |
 | Student-written code declaration | conditional top-of-file/function comment plus trailer/log | planned; no product code exists | per-task protocol step 5 |
 | README required sections | intro/install/run/distribution/tree/security/credentials/limits/deployment/licenses | not-started | DOC-01 after remote/host receipts |

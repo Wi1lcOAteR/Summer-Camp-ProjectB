@@ -2,14 +2,16 @@
 
 ## 当前状态
 
-旧版 PowerShell runner 已停用并删除。当前 G-03 使用 Claude Code 插件直接完成两个独立的新 session：先 intake，再 execution。产品实现仍受 G-04 门禁约束。
+旧版 PowerShell runner 已停用并删除。G-03 已于 2026-08-03 使用 Claude Code 插件的两个独立新 session 完成：先 intake，再以短检查点执行。产品实现仍受 G-04 门禁约束。
 
 - SPEC SHA-256：`AEA67BB5544AD22932DC4304964F7FD266FE8A5DE7AA396EA8974D30867E8381`
 - PLAN SHA-256：`910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`
 - 任务：`F-01S1A`
 - 验收 ID：`F01S1A_SINGLE_RULE_SCANNER_V2`
 
-同字节机械审计、规约评审和质量/安全/许可证评审均已通过；正式 G-03 intake/execution 尚未完成。
+同字节机械审计、规约评审和质量/安全/许可证评审均已通过。Intake 无歧义；execution 得到规定红测和绿测，生成的 contract/scanner 分别为 161/95 行。候选产物仅保存在 disposable 目录，不作为正式实现合入。
+
+成功执行采用 `1 -> 2A -> 2B -> 2C -> 2D -> 3A -> 3B -> 3C -> 3D-R` 的短检查点。每轮只执行一个动作、禁止解释推理，并返回紧凑 JSON；`3D-R` 的最终输出为 `GROUP usage_and_output`、`GROUP provider_rule`、`BOOTSTRAP_SCANNER_PATH_PASS`，exit 0。
 
 ## 输入目录
 
