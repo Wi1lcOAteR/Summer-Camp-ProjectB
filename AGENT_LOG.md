@@ -1214,3 +1214,14 @@
 - **subagent 输出或 commit hash**：本条为人工门禁记录，尚未派发实现 subagent；协调提交 hash 在提交后补记于后续 task 记录。
 - **人工修改及原因**：学生只批准本地实现。远程 push、PR/MR、发布、云资源、公网部署和真实 provider 调用未获本次授权。
 - **经验教训**：冷启动完成与实现批准必须保留为两个独立事实；实现产物仍须从正式 worktree 中重新取得红—绿、双评审和提交证据，不能继承 disposable G-03 候选。
+
+## 2026-08-03T22:37:12+08:00 - F-01S1A 单路径凭据扫描器核心
+
+- **Task 编号**：F-01S1A。
+- **触发的 Superpowers skill**：`using-git-worktrees`、`subagent-driven-development`、`test-driven-development`、`systematic-debugging`、`requesting-code-review`、`receiving-code-review`、`verification-before-completion`。
+- **关键 prompt / context**：新鲜 worker `/root/f01s1a_impl` 只获得任务卡、两条 owned path、PowerShell 7 路径、G-04 状态和 TDD/脱敏/行数约束；禁止读取或复制 G-03 disposable 产物。基线为 `3b5c1491a0ad24e4fcde843f4afb9c4f24af890c`。
+- **红—绿证据**：首次 contract-only 运行 exit 1，唯一输出 `CONTRACT_RED scanner_missing`；最小 scanner 后同一命令 exit 0，输出 `usage_and_output`、`provider_rule`、`BOOTSTRAP_SCANNER_PATH_PASS`。首轮独立规约 reviewer 返回 `FAIL Critical=0 Major=3 Minor=0`：错误支持多路径、缺 200/完整字符集正例、缺“只移除一个 ./”断言。修订中 `single_path_only` 先以 exit 1 失败；另以临时 mutation 证明窄化规则命中 `provider_maximum_alphabet`、循环剥离前缀命中 `provider_double_prefix_receipt`，随后恢复正确实现并保持同一 contract green。
+- **评审与复验**：三项 Major 逐条关闭后，协调器按任务卡重新做规约逐项检查，再做正确性、可维护性、安全、测试和许可证复核，结论 `Critical=0 Major=0 Minor=0`。终端复验为 contract exit 0；两份产物分别直接扫描得到 `CREDENTIAL_SCAN_PASS files=1`；AST/严格 UTF-8、`git diff --check`、63 行课程证据、Linux 依赖证据和 provider 证据均通过；contract/scanner 为 100/78 行。无新增依赖或许可证义务。
+- **subagent 输出 / commit hash**：实现提交 `b997fccae5c04cfa08547f5f9a99e8bbbd4f08d8`，仅含 `scripts/bootstrap_scan_credentials.ps1` 与 `scripts/tests/bootstrap_scanner_contract.ps1`。备用只读 Codex CLI reviewer 因继承的无效 OpenAI 环境凭据以 401 退出，未产生 verdict，不计为评审证据，也未重试。
+- **人工修改及原因**：`Human-Changes: none`。协调器仅按已验证的 reviewer 反馈补充行为测试、收束多路径实现和执行 mutation 复验；未加入学生代码、真实凭据或第三方代码。
+- **环境限制与经验教训**：系统 `core.autocrlf=true` 会改变固定哈希证据字节，故 worktree 以 `core.autocrlf=false` checkout；沙箱拒绝 `.git/worktrees/foundation-v1/index.lock`，提交改用忽略目录 `tmp/git-indexes/foundation-v1.index`，并逐一证明 staged blob 与工作树 blob 相同。评审发现测试通过不等于边界完整；对已正确但未被测试的行为，应保留 mutation 失败而不是伪造普通 RED。

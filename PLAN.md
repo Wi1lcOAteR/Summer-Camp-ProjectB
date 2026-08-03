@@ -134,7 +134,7 @@ git diff --check
 
 | # | Task | Depends on | Parallel | Worktree | Status | Terminal commit |
 | ---: | --- | --- | --- | --- | --- | --- |
-| 1 | F-01S1A | G-04 | no: atomic scanner starts the chain | foundation | in progress | none |
+| 1 | F-01S1A | G-04 | no: atomic scanner starts the chain | foundation | complete | b997fccae5c04cfa08547f5f9a99e8bbbd4f08d8 |
 | 2 | F-01S1B | F-01S1A | no: extends shared direct-rule files | foundation | not started | none |
 | 3 | F-01S2 | F-01S1B | no: extends shared scanner files | foundation | not started | none |
 | 4 | F-01S3 | F-01S2 | no: extends shared scanner files | foundation | not started | none |
