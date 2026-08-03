@@ -1201,7 +1201,7 @@
 - **Task 编号**：G-03-015（不同类型智能体的当前哈希 intake 与 disposable F-01S1A；不属于正式产品实现）。
 - **触发的 Superpowers skill**：`using-superpowers`、`brainstorming`、`systematic-debugging`、`receiving-code-review`、`verification-before-completion`。
 - **关键 prompt / context**：学生停用历史 runner，要求用 Claude Code 插件和短检查点降低长 thinking 中断风险。两个新 session 初始均只含冻结 SPEC/PLAN；execution 分为预检、contract 分块、RED、scanner 分块和只读 GREEN 回放。
-- **subagent 输出或 commit hash**：Intake 哈希和文件集合正确、歧义为空；RED 为 `CONTRACT_RED scanner_missing`、exit 1；最终 PowerShell 7 回放为 `GROUP usage_and_output`、`GROUP provider_rule`、`BOOTSTRAP_SCANNER_PATH_PASS`、exit 0。候选 scanner/contract 分别为 95/161 行，SHA-256 `104085D3...B5C6E` / `8BA08B9A...F161E`。本条文档提交 hash 待提交后补记。
+- **subagent 输出或 commit hash**：Intake 哈希和文件集合正确、歧义为空；RED 为 `CONTRACT_RED scanner_missing`、exit 1；最终 PowerShell 7 回放为 `GROUP usage_and_output`、`GROUP provider_rule`、`BOOTSTRAP_SCANNER_PATH_PASS`、exit 0。候选 scanner/contract 分别为 95/161 行，SHA-256 `104085D3...B5C6E` / `8BA08B9A...F161E`。G-03 闭合文档提交为 `e0c5e550453ddde4571ce1dab4fe9586b1d8a34f`。
 - **人工修改及原因**：学生逐段转交 Claude 原始 JSON，并在 3D 非结构化修复后要求只读 3D-R。主智能体未修改候选产物；只检查文件集合、冻结哈希、行数、规则和兼容性 green。插件费用和旧 runner bubblewrap 收据不可得，明确记录为限制而不补造。
 - **清理记录**：为独立诊断创建了忽略目录 `tmp/g03-replay-ps5/`，并尝试下载 `tmp/toolchains/PowerShell-7.6.3-win-x64.zip` 到约 6.9 MB；下载超时。两次 `Remove-Item` 精确清理被环境策略拒绝后，未提权、未使用破坏性 Git 命令；改以 `apply_patch` 删除两个诊断文本，并用 .NET 精确删除已核验且未占用的 archive/空目录。`tmp/g03-replay-ps5/`、该 zip 和空 `tmp/toolchains/powershell-7.6.3/` 均已移除。
 - **经验教训**：模型长思考问题应通过单 session 的原子检查点解决；每轮强制短 JSON 能保留真实 RED/GREEN，又避免把候选自述 `PASS` 当作 oracle。G-03 完成不等于 G-04，正式 F-01S1A 仍为 `not started`。
