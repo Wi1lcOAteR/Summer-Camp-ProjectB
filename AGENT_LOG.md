@@ -1268,3 +1268,28 @@
 - **subagent 输出 / commit hash**：worker 在协调器提交后返回最终回执，报告完整 RED/GREEN、AST、自扫描、独立 review 与最终产物哈希；build commit 为 `d9a1a958fa64d6f812144d044b6de6f054f296a7`。worker 留下的 Base64URL 最大长度 review improvement 与协调器补充的超长反例由 `3a75411e210f99bc7098a2dfb3a1197ce8b96640` 提交，后者为 terminal commit。
 - **人工修改及原因**：`Human-Changes: none`。协调器未改变产品方向，只执行临时 mutation、恢复候选、补齐 Base64URL max/over-limit 对称覆盖、做两阶段复验和提交。
 - **经验教训**：紧贴行数上限的任务仍可完成，但必须使用表驱动断言并保持每个 family 的独立失败证据；并发 worker 在 coordinator commit 后仍可能留下 review fix，因此最终 `update-index --refresh` 与状态检查必须放在所有 agent 回执之后。
+
+## 2026-08-04T16:15:00+08:00 - F-01S3 派发准备
+
+- **Task 编号**：F-01S3（in progress，尚无本 task 产品代码）。
+- **触发的 Superpowers skill**：`subagent-driven-development`、`test-driven-development`、`using-git-worktrees`。
+- **关键 prompt / context**：依赖 F-01S2 terminal commit `3a75411e210f99bc7098a2dfb3a1197ce8b96640` 已满足；fresh worker 仅可修改 scanner 与 contract，通过 PATH-first fake Git 为 tracked worktree 与 staged index 的精确字节、mode/path/rename/error 合同取得 RED。
+- **subagent 输出 / commit hash**：尚未产生；状态提交只记录串行所有权打开。
+- **人工修改及原因**：`Human-Changes: none`；协调器未提前实现 F-01S3。
+- **经验教训**：Git source 扫描必须把工作树字节与 index blob 字节作为两个独立 source/path 对，不能用当前文件系统内容替代 staged blob。
+
+## 2026-08-04T19:03:08+08:00 - F-01S3 实现与复核
+
+- **Task 编号**：F-01S3（complete；terminal commit `b7d929771657c02ff40150a8f81768a31ec0dfed`）。
+- **触发的 Superpowers skill**：`subagent-driven-development`、`test-driven-development`、`systematic-debugging`、`verification-before-completion`；协调器在 worker 评审后执行可读性重构和合同补强。
+- **关键 prompt / context**：依赖 F-01S2 terminal `3a75411e210f99bc7098a2dfb3a1197ce8b96640`；只修改 scanner 与 contract。source 字面量经 SPEC/PLAN 检索确定为 `worktree`、`index`，单路径仍为 `path`。
+- **subagent 输出 / commit hash**：fresh worker 报告初始 scanner `31BDCF...`、contract `4388D6...`，但默认 index 创建 `index.lock` 被沙箱拒绝，未产生 commit。协调器保留其 RED：旧组全部通过后 `CONTRACT_FAIL dirty_worktree`，GREEN 最终 `BOOTSTRAP_SCANNER_SOURCES_PASS`。
+- **人工修改及原因**：`Human-Changes: coordinator review fixes`。修复 PowerShell `VoidTaskResult` 污染 Git 进程返回值、fake Git 的 `ValueFromRemainingArguments` 绑定、`$matches`/`$Matches` 变量冲突和 junction 清理；随后将 scanner 从 68 个压缩行重构为可读函数，并增加绝对路径/未规范化 index 路径合同反例。所有修改在 GREEN 合同下复验。
+- **验证证据**：合同输出 `usage_and_output`、`provider_rule`、`direct_rules_and_order`、`assignment_quotes_boundaries`、`encodings_and_types`、`artifact_direct_safety`、`staged_vs_worktree`、`index_modes_and_rename`、`path_safety_and_errors`、`BOOTSTRAP_SCANNER_SOURCES_PASS`，exit 0；scanner/contract 自扫描均 `CREDENTIAL_SCAN_PASS files=1`；两份 AST 解析错误数为 0；`git diff --check` 无错误（仅 LF/CRLF 警告）。最终 scanner SHA-256 `DC35C2D9AFD4D2F5E852E68BF03B5D27CFA5E34F46861B021302FAA683FDFADB`，contract SHA-256 `EC0A69B9F8BB1A8B32A14DB963950E5F058B27D8CD32AE055DCFC159299F36E6`。
+- **SPEC 合规评审**：Critical=0，Important=0；确认精确工作树字节、stage-0 index blob、模式/路径/reparse 门禁、稳定脱敏错误、两 source/path 输出和前置合同组均覆盖。
+- **质量/安全/许可证评审**：Critical=0，Important=0；未引入依赖或许可证义务，无值/内容/OID/异常日志，进程有 30 秒树终止，合同 fixture 与 fake Git 均为运行时临时内容。
+- **经验教训**：PowerShell 异步 void task 和自动变量 `$Matches` 都会隐式进入输出/覆盖局部变量；此类语言语义必须用函数级探针验证，不能只看合同 marker。当前唯一未闭合项是 linked worktree 默认 index 的宿主写权限。
+- **提交门禁证据**：协调器执行 `git -c safe.directory=E:/Personal_Documentary/ResearchProjects/ProjectB/.worktrees/foundation-v1 add -- AGENT_LOG.md PLAN.md docs/REQUIREMENTS_COMPLIANCE_AUDIT.md scripts/bootstrap_scan_credentials.ps1 scripts/tests/bootstrap_scanner_contract.ps1` 时收到 `fatal: Unable to create 'E:/Personal_Documentary/ResearchProjects/ProjectB/.git/worktrees/foundation-v1/index.lock': Permission denied`；未使用 alternate index、ACL 修改、reset 或 clean。临时探针 `tmp/f01s3-command-probe/` 已在合同结束后删除，未留下 untracked 文件。
+- **插件提交核验**：学生报告通过插件提交后，协调器核验到 commit `8b51796b02b5c1555c2d2468ab7c02838bce79a1` 位于根 worktree 的 `codex/stage-b-scope-reset`，只包含 `AGENTS.md`、`docs/engineering/SUPERPOWERS_VALIDATION.md` 与 10 份既有研究文档，不包含本 task 两个 scanner 文件；因此该 commit 不能作为 F-01S3 terminal hash，且未对其执行重写或撤销。
+- **最终提交核验**：学生在精确配置 `safe.directory` 后，于正确 worktree 创建 `b7d929771657c02ff40150a8f81768a31ec0dfed`；协调器验证该 commit 只修改两个 scanner 文件，`git diff b7d9297^ b7d9297 --check` clean，且工作树产物哈希与最终 GREEN 候选一致。
+- **提交时 scanner 边界**：提交前 `-Staged` 如实以 `decode_failed` 停在已跟踪的 `docs/mockups/course-import-onboarding-v1-desktop.png`；这不是凭据 finding，而是 F-01S3 还没有 F-01S4 所属的文本 allowlist 与 binary skip list。两个实际 staged 产品文件已分别用 `-Path` 扫描并得到 `CREDENTIAL_SCAN_PASS files=1`，因此未把这次全 index 操作失败冒充为 PASS；F-01S4 必须用同一 PNG 回归闭合该缺口。

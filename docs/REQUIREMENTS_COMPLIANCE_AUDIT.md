@@ -6,8 +6,8 @@
 
 **PLAN pre-dispatch:** `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`
 
-**PLAN current evidence-only state:** `956BA17502A2D598FB813AC48E7662A279759C0ADFFA529BF5507E05CB4FB841`
-**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise. On 2026-08-03 the student explicitly approved G-04. Formal `F-01S1A`, `F-01S1B`, and `F-01S2` are implemented; F-01S2 terminates at review-fix commit `3a75411e210f99bc7098a2dfb3a1197ce8b96640`. Later tasks remain incomplete until their own fresh TDD and review evidence exists.
+**PLAN current evidence-only state:** `E733DF4DE88EC3962C7F4BC6CF7D1D871527BB698AEBD0300C74B5916FCA4862`
+**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise. On 2026-08-03 the student explicitly approved G-04. Formal `F-01S1A`, `F-01S1B`, `F-01S2`, and `F-01S3` are implemented; F-01S3 terminates at commit `b7d929771657c02ff40150a8f81768a31ec0dfed`. Later tasks remain incomplete until their own fresh TDD and review evidence exists.
 
 `verified` means current local evidence exists; `planned` means a named active task owns it; `blocked` means a named human/external gate remains; `not-started` means no product evidence exists. This is the only active course matrix. Archived plans are recovery evidence, never PASS evidence.
 
@@ -21,7 +21,7 @@
 | Performance/reliability/errors/observability | SPEC 5 | planned | F-04, API-03, QA-RELEASE, DIST-01 |
 | Input validation and safe deletion | SPEC 3.1 and 8 | planned | M1-01--03, API-01, UI-03/06 |
 | Host/Origin/CSRF/session boundary | local plus explicit public profile | planned | F-04 and DEMO-01 positive/negative tests |
-| Secret never enters DB/config/log/browser/Git | WinVault plus fail-closed scanner | F-01S1A/S1B/S2 direct, assignment and one-layer encoded rules verified | F-01S3--S4, F-01E/F-05 and every-task protocol |
+| Secret never enters DB/config/log/browser/Git | WinVault plus fail-closed scanner | F-01S1A/S1B/S2 and F-01S3 exact Git sources verified at `b7d929771657c02ff40150a8f81768a31ec0dfed` | F-01S4, F-01E/F-05 and every-task protocol |
 | First-run hidden credential status/update/clear | value-free settings contract | planned | F-05, API-03, UI-06, DIST-01 real lifecycle |
 | Optional model is consent-bound and non-authoritative | L+P; mock default; exact text fragments only | P-only evidence verified; adapter not started | P-01/P-02/API-02/UI-04 |
 | No autonomous-agent overclaim | v1 has constrained request ports, no autonomous loop | verified specification boundary | P-01/P-02 contract tests |
