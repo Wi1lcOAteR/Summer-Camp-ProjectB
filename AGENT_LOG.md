@@ -1247,3 +1247,12 @@
 - **subagent 输出 / commit hash**：worker 提交 `2d79a1e11efe7b27123ae963f6007cf290985311`；review-fix 提交 `c07b90823448600950ba59e7ea4522a190918e92` 为本 task terminal commit。
 - **人工修改及原因**：`Human-Changes: none`。协调器只按独立 reviewer findings 增加失败断言、执行 mutation、恢复实现并提交 review fix；学生未修改代码。
 - **环境与经验教训**：本 task 的 `git add`、`git diff --cached --check` 和 commit 均成功使用默认 worktree index，未请求提权或备用 index。规则正则正确不等于回归合同完整；每个允许前缀必须至少有一个正向 fixture，负例不能证明该分支仍被支持。
+
+## 2026-08-04T14:42:00+08:00 - F-01S2 派发准备
+
+- **Task 编号**：F-01S2（in progress，尚无产品代码）。
+- **触发的 Superpowers skill**：`subagent-driven-development`、`test-driven-development`。
+- **关键 prompt / context**：依赖 F-01S1B terminal commit `c07b90823448600950ba59e7ea4522a190918e92` 已满足；下一 fresh worker 仅可修改 scanner 与 contract，按任务卡先增加 assignment/encoded 的最小失败断言，再实现 `Find-AssignmentSecret` 与 `Find-EncodedSecret`。
+- **subagent 输出 / commit hash**：尚未产生 worker 输出或产品 commit。状态提交为 `c12a58b`，只把 PLAN ledger 和课程矩阵改为 in progress。
+- **人工修改及原因**：`Human-Changes: none`。协调器未越过 fresh-subagent 门禁直接编写 F-01S2 行为代码。
+- **经验教训**：任务状态 `in progress` 只表示串行所有权已打开；没有 RED/GREEN、双评审和 terminal commit 时不得声称完成。
