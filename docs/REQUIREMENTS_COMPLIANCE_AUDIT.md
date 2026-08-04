@@ -6,8 +6,8 @@
 
 **PLAN pre-dispatch:** `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`
 
-**PLAN current evidence-only state:** `0A65F471E75371EA80B93D6081A47FD8FD0DF93E43397B17FDF4824AA1EA8350`
-**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise. On 2026-08-03 the student explicitly approved G-04. Formal `F-01S1A`, `F-01S1B`, and `F-01S2` are implemented; F-01S2 terminates at `d9a1a958fa64d6f812144d044b6de6f054f296a7`. Later tasks remain incomplete until their own fresh TDD and review evidence exists.
+**PLAN current evidence-only state:** `956BA17502A2D598FB813AC48E7662A279759C0ADFFA529BF5507E05CB4FB841`
+**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise. On 2026-08-03 the student explicitly approved G-04. Formal `F-01S1A`, `F-01S1B`, and `F-01S2` are implemented; F-01S2 terminates at review-fix commit `3a75411e210f99bc7098a2dfb3a1197ce8b96640`. Later tasks remain incomplete until their own fresh TDD and review evidence exists.
 
 `verified` means current local evidence exists; `planned` means a named active task owns it; `blocked` means a named human/external gate remains; `not-started` means no product evidence exists. This is the only active course matrix. Archived plans are recovery evidence, never PASS evidence.
 
