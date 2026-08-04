@@ -1225,3 +1225,25 @@
 - **subagent 输出 / commit hash**：实现提交 `b997fccae5c04cfa08547f5f9a99e8bbbd4f08d8`，仅含 `scripts/bootstrap_scan_credentials.ps1` 与 `scripts/tests/bootstrap_scanner_contract.ps1`。备用只读 Codex CLI reviewer 因继承的无效 OpenAI 环境凭据以 401 退出，未产生 verdict，不计为评审证据，也未重试。
 - **人工修改及原因**：`Human-Changes: none`。协调器仅按已验证的 reviewer 反馈补充行为测试、收束多路径实现和执行 mutation 复验；未加入学生代码、真实凭据或第三方代码。
 - **环境限制与经验教训**：系统 `core.autocrlf=true` 会改变固定哈希证据字节，故 worktree 以 `core.autocrlf=false` checkout；沙箱拒绝 `.git/worktrees/foundation-v1/index.lock`，提交改用忽略目录 `tmp/git-indexes/foundation-v1.index`，并逐一证明 staged blob 与工作树 blob 相同。评审发现测试通过不等于边界完整；对已正确但未被测试的行为，应保留 mutation 失败而不是伪造普通 RED。
+
+## 2026-08-04T00:30:00+08:00 - Worktree 默认 Git index 写权限复核
+
+- **Task 编号**：环境诊断 / F-01S1B 前置检查。
+- **触发的 Superpowers skill**：`systematic-debugging`、`using-git-worktrees`、`verification-before-completion`。
+- **关键 prompt / context**：复核此前 `index.lock: Permission denied` 与 `config.worktree: Permission denied`，区分 Git 规则、仓库 ACL 与沙箱挂载状态；禁止删除 dirty worktree、reset 或 clean。
+- **证据**：根 `.git` 与链接 worktree 元数据路径均可读取；直接创建并删除精确的 `.git/worktrees/foundation-v1/index.lock` 成功；随后在 worktree 上执行 `git -c safe.directory=... -c core.autocrlf=false read-tree HEAD` exit 0，默认 `git status --short --untracked-files=all` 为空。根目录临时写探针也成功。此前失败只在 worktree 初始化后的沙箱上下文出现，且失败目标集中在 `.git/worktrees/foundation-v1`，不是 PLAN/AGENTS 门禁或 Git 语义错误。
+- **结论与处置**：当前默认 index 已恢复可用，后续提交优先使用默认 index；`tmp/git-indexes/foundation-v1.index` 仅保留为可恢复备用，不再作为强制前置。未发起提权：本会话 approval policy 为 `never`，开发者明确规定 `sandbox_permissions=require_escalated` 会被拒绝；没有可执行的提权通道。若再次复现，记录 exact error 并切换备用 index，不修改全局 Git 配置。
+- **人工修改及原因**：`Human-Changes: none`。本条只记录真实探针和环境结论。
+- **经验教训**：链接 worktree 的 Git 元数据可能受沙箱生命周期或挂载身份影响；先做精确锁文件探针和 `read-tree`，不要把一次性 Permission denied 当成永久 Git 限制。
+
+## 2026-08-04T14:30:00+08:00 - F-01S1B 其余直接凭据规则与产物安全
+
+- **Task 编号**：F-01S1B。
+- **触发的 Superpowers skill**：`subagent-driven-development`、`test-driven-development`、`requesting-code-review`、`receiving-code-review`、`verification-before-completion`；worktree 继续使用已验证的 `codex/foundation-v1`。
+- **关键 prompt / context**：fresh worker `/root/f01s1b_impl2` 仅修改 scanner 与 contract 两条 owned path；在 F-01S1A 基础上增加 GitHub/AWS/Google/Slack/private-key 直接规则、稳定排序去重与产物自扫描，不进入 F-01S2 assignment/encoded 范围。
+- **红—绿证据**：正式 RED 为 contract exit 1，前置组 `usage_and_output`、`provider_rule` 通过后停止于 `CONTRACT_FAIL direct_rules_and_order`；修正 35 字符 Google 正例后 GREEN exit 0。独立规约评审先后返回 `Major=2`（终止标记错误、边界覆盖不足）和 `Major=1`（部分允许前缀只有负例）；修订后以两次 mutation 复验：GitHub 上限放宽到 256 时在 `github_long` 失败，删除 `gho_` 时在 `github_gho` 失败。恢复正确实现后 exact contract 依次输出 `usage_and_output`、`provider_rule`、`direct_rules_and_order`、`artifact_direct_safety`、`BOOTSTRAP_SCANNER_CORE_PASS`，exit 0。
+- **规约复核**：GitHub 五前缀、AWS 两前缀、Slack 五前缀和五种 private-key 头均有正向断言；四类 token 的最小/最大/超限及左右邻接边界已覆盖；provider 前置组未弱化；排序、去重、脱敏和两个产物自扫描满足任务卡。最终 `Critical=0 Major=0`。
+- **质量/安全/许可证复核**：scanner 98 行、contract 165 行，均低于 140/180 上限；严格 UTF-8、稳定 JSON key 顺序、无值/内容/异常泄漏保持不变；两个 owned files 直接扫描均唯一输出 `CREDENTIAL_SCAN_PASS files=1`；`git diff --check` clean。无新增依赖、第三方代码、资产或许可证义务。最终 `Critical=0 Major=0 Minor=0`。
+- **subagent 输出 / commit hash**：worker 提交 `2d79a1e11efe7b27123ae963f6007cf290985311`；review-fix 提交 `c07b90823448600950ba59e7ea4522a190918e92` 为本 task terminal commit。
+- **人工修改及原因**：`Human-Changes: none`。协调器只按独立 reviewer findings 增加失败断言、执行 mutation、恢复实现并提交 review fix；学生未修改代码。
+- **环境与经验教训**：本 task 的 `git add`、`git diff --cached --check` 和 commit 均成功使用默认 worktree index，未请求提权或备用 index。规则正则正确不等于回归合同完整；每个允许前缀必须至少有一个正向 fixture，负例不能证明该分支仍被支持。

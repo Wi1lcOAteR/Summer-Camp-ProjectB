@@ -6,8 +6,8 @@
 
 **PLAN pre-dispatch:** `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`
 
-**PLAN current evidence-only state:** `E00979276FCDFB52FC88E5449B8E726BE9D00453B8FBD5A0B07D0005E4A0FCE1`
-**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise. On 2026-08-03 the student explicitly approved G-04. Formal `F-01S1A` is now implemented and reviewed at `b997fccae5c04cfa08547f5f9a99e8bbbd4f08d8`; later tasks remain incomplete until their own fresh TDD and review evidence exists.
+**PLAN current evidence-only state:** `62936EBCF26629B604A5E8CAE5C7433D4FDAE11999662AD4DC8B14B314E20868`
+**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise. On 2026-08-03 the student explicitly approved G-04. Formal `F-01S1A` and `F-01S1B` are implemented; the F-01S1B terminal review-fix commit is `c07b90823448600950ba59e7ea4522a190918e92`. Later tasks remain incomplete until their own fresh TDD and review evidence exists.
 
 `verified` means current local evidence exists; `planned` means a named active task owns it; `blocked` means a named human/external gate remains; `not-started` means no product evidence exists. This is the only active course matrix. Archived plans are recovery evidence, never PASS evidence.
 
@@ -21,7 +21,7 @@
 | Performance/reliability/errors/observability | SPEC 5 | planned | F-04, API-03, QA-RELEASE, DIST-01 |
 | Input validation and safe deletion | SPEC 3.1 and 8 | planned | M1-01--03, API-01, UI-03/06 |
 | Host/Origin/CSRF/session boundary | local plus explicit public profile | planned | F-04 and DEMO-01 positive/negative tests |
-| Secret never enters DB/config/log/browser/Git | WinVault plus fail-closed scanner | F-01S1A single-path provider rule verified; full scanner and credential lifecycle remain incomplete | F-01S1B--S4, F-01E/F-05 and every-task protocol |
+| Secret never enters DB/config/log/browser/Git | WinVault plus fail-closed scanner | F-01S1A and F-01S1B direct rules verified; assignment/full lifecycle remain incomplete | F-01S2--S4, F-01E/F-05 and every-task protocol |
 | First-run hidden credential status/update/clear | value-free settings contract | planned | F-05, API-03, UI-06, DIST-01 real lifecycle |
 | Optional model is consent-bound and non-authoritative | L+P; mock default; exact text fragments only | P-only evidence verified; adapter not started | P-01/P-02/API-02/UI-04 |
 | No autonomous-agent overclaim | v1 has constrained request ports, no autonomous loop | verified specification boundary | P-01/P-02 contract tests |
@@ -40,9 +40,9 @@
 | GitHub Actions and PR evidence | workflow plus full-SHA actions | not-started | CI-01, EXT-REMOTE-PREP, EXT-REMOTE-FINAL |
 | Final course CI PASS | authoritative NJU GitLab plus mirror evidence on final docs commit | blocked on remote authorization | EXT-REMOTE-FINAL |
 | Incremental commits and PR/MR history | 39 task commits, scanned coordinator evidence commits, 9 stacked worktree branches | planned | per-task protocol and EXT-REMOTE-PREP/FINAL sequential retarget-and-merge closure |
-| Fresh subagent per PLAN task | one clean session/task | verified for F-01S1A; remaining tasks pending | continue per task |
-| TDD red-green-refactor | exact red/green command in all 39 cards; shared assertion-level 2--5 minute step expansion | verified for F-01S1A, including reviewer-driven red/mutation evidence | continue every behavior task |
-| SPEC review then quality/security/license review | terminal hash-bound review loop | verified for F-01S1A after initial Major 3 repair; remaining tasks pending | every task protocol; Critical stops sequence |
+| Fresh subagent per PLAN task | one clean session/task | verified for F-01S1A and F-01S1B | continue per task |
+| TDD red-green-refactor | exact red/green command in all 39 cards; shared assertion-level 2--5 minute step expansion | verified for F-01S1A and F-01S1B; F-01S1B review fixes include a requirement-shaped mutation failure | continue every behavior task |
+| SPEC review then quality/security/license review | terminal hash-bound review loop | F-01S1A verified; F-01S1B initial reviews found Major 2 then Major 1, all closed and reverified | every-task protocol; Critical stops sequence |
 | Required Superpowers order | brainstorming -> plan -> worktree -> TDD -> reviews -> finish | brainstorming/writing-plans/G-03 evidenced; implementation stages gated | explicit G-04, then task protocol |
 | `SPEC.md` required sections | 14 sections, 8 stories, 24 AC, risks/deferred scope | current bytes confirmed by student; same-byte SR-08 PASS | implementation evidence after G-04 |
 | `PLAN.md` exact task fields | exactly 39 tasks; dependency/parallel/files/red/green/done in each | mechanical audit and dual review PASS | explicit G-04, then ledger execution |
