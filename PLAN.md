@@ -136,7 +136,7 @@ git diff --check
 | ---: | --- | --- | --- | --- | --- | --- |
 | 1 | F-01S1A | G-04 | no: atomic scanner starts the chain | foundation | complete | b997fccae5c04cfa08547f5f9a99e8bbbd4f08d8 |
 | 2 | F-01S1B | F-01S1A | no: extends shared direct-rule files | foundation | complete | c07b90823448600950ba59e7ea4522a190918e92 |
-| 3 | F-01S2 | F-01S1B | no: extends shared scanner files | foundation | in progress | none |
+| 3 | F-01S2 | F-01S1B | no: extends shared scanner files | foundation | complete | d9a1a958fa64d6f812144d044b6de6f054f296a7 |
 | 4 | F-01S3 | F-01S2 | no: extends shared scanner files | foundation | not started | none |
 | 5 | F-01S4 | F-01S3 | no: closes full scanner gate | foundation | not started | none |
 | 6 | F-01A | F-01S4 | no: materializes runtimes and locks | foundation | not started | none |
