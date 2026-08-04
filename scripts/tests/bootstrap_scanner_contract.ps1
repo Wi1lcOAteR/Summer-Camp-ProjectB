@@ -1,180 +1,86 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-
 $scanner = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\bootstrap_scan_credentials.ps1'))
-if (-not (Test-Path -LiteralPath $scanner -PathType Leaf)) {
-    Write-Output 'CONTRACT_RED scanner_missing'
-    exit 1
-}
-
-function Stop-Contract {
-    param([string]$Code)
-    Write-Output "CONTRACT_FAIL $Code"
-    exit 1
-}
-
-function Invoke-Scanner {
-    param([string[]]$Arguments)
-    $output = @(& pwsh -NoProfile -File $scanner @Arguments 2>&1 | ForEach-Object { $_.ToString() })
-    [pscustomobject]@{ ExitCode = $LASTEXITCODE; Output = $output }
-}
-
+if (-not (Test-Path -LiteralPath $scanner -PathType Leaf)) { Write-Output 'CONTRACT_RED scanner_missing'; exit 1 }
+function Stop-Contract { param([string]$Code) Write-Output "CONTRACT_FAIL $Code"; exit 1 }
+function Invoke-Scanner { param([string[]]$Arguments) $output = @(& (Join-Path $PSHOME 'pwsh.exe') -NoProfile -File $scanner @Arguments 2>&1 | ForEach-Object { $_.ToString() }); [pscustomobject]@{ ExitCode = $LASTEXITCODE; Output = $output } }
 function Assert-ExactResult {
     param($Result, [int]$ExitCode, [string[]]$Output, [string]$Code)
-    if ($Result.ExitCode -ne $ExitCode -or $Result.Output.Count -ne $Output.Count) {
-        Stop-Contract $Code
-    }
-    for ($index = 0; $index -lt $Output.Count; $index++) {
-        if ($Result.Output[$index] -cne $Output[$index]) { Stop-Contract $Code }
-    }
+    if ($Result.ExitCode -ne $ExitCode -or $Result.Output.Count -ne $Output.Count) { Stop-Contract $Code }
+    for ($i = 0; $i -lt $Output.Count; $i++) { if ($Result.Output[$i] -cne $Output[$i]) { Stop-Contract $Code } }
 }
-
 function Assert-OperationalFailure {
-    param($Result, [string]$ExpectedCode, [string]$ExpectedPath, [string]$Code)
+    param($Result, [string]$ExpectedCode, [string]$ExpectedSource, [string]$ExpectedPath, [string]$Code)
     if ($Result.ExitCode -ne 3 -or $Result.Output.Count -ne 1) { Stop-Contract $Code }
-    try { $record = $Result.Output[0] | ConvertFrom-Json -ErrorAction Stop }
-    catch { Stop-Contract $Code }
-    if ($record.code -cne $ExpectedCode -or $record.source -cne 'path') { Stop-Contract $Code }
-    if ($ExpectedPath -and $record.path -cne $ExpectedPath) { Stop-Contract $Code }
-    $allowed = @('source', 'path', 'code')
-    foreach ($name in $record.PSObject.Properties.Name) {
-        if ($name -notin $allowed) { Stop-Contract $Code }
-    }
+    try { $record = $Result.Output[0] | ConvertFrom-Json -ErrorAction Stop } catch { Stop-Contract $Code }
+    if ($record.code -cne $ExpectedCode) { Stop-Contract $Code }
+    foreach ($entry in @{ source = $ExpectedSource; path = $ExpectedPath }.GetEnumerator()) { $property = $record.PSObject.Properties[$entry.Key]; if ($entry.Value) { if (-not $property -or $property.Value -cne $entry.Value) { Stop-Contract $Code } } elseif ($property) { Stop-Contract $Code } }
+    foreach ($name in $record.PSObject.Properties.Name) { if ($name -notin @('source', 'path', 'code')) { Stop-Contract $Code } }
 }
-
 function Assert-DirectCase {
     param([string]$Name, [string]$Text, [string]$Rule, [bool]$Match, [Text.Encoding]$Encoding)
-    $file = "$Name.txt"
-    [IO.File]::WriteAllText((Join-Path (Get-Location).ProviderPath $file), $Text, $Encoding)
-    if ($Match) {
-        $expected = "{`"source`":`"path`",`"path`":`"$file`",`"rule`":`"$Rule`"}"
-        Assert-ExactResult (Invoke-Scanner @('-Path', $file)) 2 @($expected) $Name
-    }
-    else {
-        Assert-ExactResult (Invoke-Scanner @('-Path', $file)) 0 @('CREDENTIAL_SCAN_PASS files=1') $Name
-    }
+    $file = "$Name.txt"; [IO.File]::WriteAllText((Join-Path (Get-Location).ProviderPath $file), $Text, $Encoding)
+    if ($Match) { Assert-ExactResult (Invoke-Scanner @('-Path', $file)) 2 @("{`"source`":`"path`",`"path`":`"$file`",`"rule`":`"$Rule`"}") $Name } else { Assert-ExactResult (Invoke-Scanner @('-Path', $file)) 0 @('CREDENTIAL_SCAN_PASS files=1') $Name }
 }
-
-$sandbox = Join-Path ([IO.Path]::GetTempPath()) ('projectb-f01s1a-' + [guid]::NewGuid().ToString('N'))
-[IO.Directory]::CreateDirectory($sandbox) | Out-Null
+function Set-FakeGit {
+    param([string[]]$Paths, [string[]]$Rows, [hashtable]$Blobs, [string]$Case = 'ok')
+    $env:FG_PATHS = $Paths -join '|'; $env:FG_ROWS = $Rows -join '|'; $env:FG_CASE = $Case
+    Get-ChildItem -LiteralPath $blobDir -File | Remove-Item -Force
+    foreach ($entry in $Blobs.GetEnumerator()) { [IO.File]::WriteAllBytes((Join-Path $blobDir ($entry.Key + '.bin')), [byte[]]$entry.Value) }
+}
+$sandbox = Join-Path ([IO.Path]::GetTempPath()) ('projectb-f01s3-' + [guid]::NewGuid().ToString('N')); [IO.Directory]::CreateDirectory($sandbox) | Out-Null; $oldPath=$env:PATH
 try {
-    Push-Location $sandbox
-    try {
-        $utf8 = [Text.UTF8Encoding]::new($false)
-        [IO.File]::WriteAllText((Join-Path $sandbox 'clean.txt'), 'ordinary public text', $utf8)
-        [IO.File]::WriteAllText((Join-Path $sandbox 'other.txt'), 'more public text', $utf8)
-        [IO.File]::WriteAllBytes((Join-Path $sandbox 'invalid.txt'), [byte[]](0xC3, 0x28))
-        [IO.File]::WriteAllBytes((Join-Path $sandbox 'bom.txt'), [byte[]](0xEF, 0xBB, 0xBF, 0x61))
-        [IO.File]::WriteAllText((Join-Path $sandbox 'replacement.txt'), "bad$([char]0xFFFD)text", $utf8)
-        [IO.Directory]::CreateDirectory((Join-Path $sandbox 'folder')) | Out-Null
-
-        Assert-OperationalFailure (Invoke-Scanner @()) 'usage_missing_scope' '' 'usage_missing_scope'
-        Assert-OperationalFailure (Invoke-Scanner @('-Path', '.\missing.txt')) 'read_failed' 'missing.txt' 'missing_read'
-        Assert-OperationalFailure (Invoke-Scanner @('-Path', '.\folder')) 'read_failed' 'folder' 'non_file_read'
-        Assert-OperationalFailure (Invoke-Scanner @('-Path', '.\invalid.txt')) 'decode_failed' 'invalid.txt' 'invalid_utf8'
-        Assert-OperationalFailure (Invoke-Scanner @('-Path', '.\bom.txt')) 'decode_failed' 'bom.txt' 'bom_rejected'
-        Assert-OperationalFailure (Invoke-Scanner @('-Path', '.\replacement.txt')) 'decode_failed' 'replacement.txt' 'replacement_rejected'
-        Assert-ExactResult (Invoke-Scanner @('-Path', '.\clean.txt')) 0 @('CREDENTIAL_SCAN_PASS files=1') 'clean_receipt'
-        Assert-OperationalFailure (Invoke-Scanner @('-Path', '.\clean.txt', '.\other.txt')) 'usage_missing_scope' '' 'single_path_only'
-        Write-Output 'usage_and_output'
-
-        [IO.Directory]::CreateDirectory((Join-Path $sandbox 'nested')) | Out-Null
-        $fragmentOne = 'sk-' + ('A' * 10)
-        $fragmentTwo = 'B' * 10
-        $positive = $fragmentOne + $fragmentTwo
-        [IO.File]::WriteAllText((Join-Path $sandbox 'nested\case.txt'), "[$positive]`n$positive", $utf8)
-        $expected = '{"source":"path","path":"nested/case.txt","rule":"provider_api_key"}'
-        Assert-ExactResult (Invoke-Scanner @('-Path', '.\nested\case.txt')) 2 @($expected) 'provider_match_unique'
-        $doublePrefixExpected = '{"source":"path","path":"./nested/case.txt","rule":"provider_api_key"}'
-        Assert-ExactResult (Invoke-Scanner @('-Path', '.\.\nested\case.txt')) 2 @($doublePrefixExpected) 'provider_double_prefix_receipt'
-
-        $maxFragmentOne = 's'
-        $maxFragmentTwo = 'k-' + ('A1_-' * 50)
-        $maximum = $maxFragmentOne + $maxFragmentTwo
-        [IO.File]::WriteAllText((Join-Path $sandbox 'maximum.txt'), $maximum, $utf8)
-        $maximumExpected = '{"source":"path","path":"maximum.txt","rule":"provider_api_key"}'
-        Assert-ExactResult (Invoke-Scanner @('-Path', '.\maximum.txt')) 2 @($maximumExpected) 'provider_maximum_alphabet'
-
-        $short = ('s' + 'k-') + ('C' * 19)
-        $long = ('s' + 'k-') + ('D' * 201)
-        $maximal = ('s' + 'k-') + ('E' * 200)
-        $negative = "x$positive`n${maximal}_`n$short`n$long"
-        [IO.File]::WriteAllText((Join-Path $sandbox 'negative.txt'), $negative, $utf8)
-        Assert-ExactResult (Invoke-Scanner @('-Path', '.\negative.txt')) 0 @('CREDENTIAL_SCAN_PASS files=1') 'provider_boundaries'
-        Write-Output 'provider_rule'
-
-        $github = 'gh' + 'p_' + ('A' * 20)
-        $aws = 'AK' + 'IA' + ('A0' * 8)
-        $google = 'AI' + 'za' + ('a_-' * 11) + 'aa'
-        $slack = 'xo' + 'xb-' + ('A-' * 5)
-        $private = ('-----BEGIN ' + 'RSA ' + 'PRIVATE KEY-----')
-        $directText = "$github`n$github`n$aws`n$google`n$slack`n$private"
-        [IO.File]::WriteAllText((Join-Path $sandbox 'direct.txt'), $directText, $utf8)
-        $directExpected = @(
-            '{"source":"path","path":"direct.txt","rule":"aws_access_key"}',
-            '{"source":"path","path":"direct.txt","rule":"github_token"}',
-            '{"source":"path","path":"direct.txt","rule":"google_api_key"}',
-            '{"source":"path","path":"direct.txt","rule":"private_key"}',
-            '{"source":"path","path":"direct.txt","rule":"slack_token"}'
-        )
-        Assert-ExactResult (Invoke-Scanner @('-Path', '.\direct.txt')) 2 $directExpected 'direct_rules_and_order'
-        Assert-DirectCase 'github_max' ('gh' + 'r_' + ('Z' * 255)) 'github_token' $true $utf8
-        Assert-DirectCase 'github_gho' ('gh' + 'o_' + ('Z' * 20)) 'github_token' $true $utf8
-        Assert-DirectCase 'github_ghu' ('gh' + 'u_' + ('Z' * 20)) 'github_token' $true $utf8
-        Assert-DirectCase 'github_ghs' ('gh' + 's_' + ('Z' * 20)) 'github_token' $true $utf8
-        Assert-DirectCase 'github_short' ('gh' + 'o_' + ('Z' * 19)) 'github_token' $false $utf8
-        Assert-DirectCase 'github_long' ('gh' + 'u_' + ('Z' * 256)) 'github_token' $false $utf8
-        Assert-DirectCase 'github_neighbor' ('xgh' + 's_' + ('Z' * 20)) 'github_token' $false $utf8
-        Assert-DirectCase 'github_right_neighbor' (('gh' + 'p_' + ('Z' * 20)) + '_') 'github_token' $false $utf8
-        Assert-DirectCase 'aws_short' ('AS' + 'IA' + ('Z' * 15)) 'aws_access_key' $false $utf8
-        Assert-DirectCase 'aws_long' ('AS' + 'IA' + ('Z' * 17)) 'aws_access_key' $false $utf8
-        Assert-DirectCase 'aws_neighbor' (('AS' + 'IA' + ('Z' * 16)) + '_') 'aws_access_key' $false $utf8
-        Assert-DirectCase 'aws_left_neighbor' ('xAK' + 'IA' + ('Z' * 16)) 'aws_access_key' $false $utf8
-        Assert-DirectCase 'aws_asia' ('AS' + 'IA' + ('Z' * 16)) 'aws_access_key' $true $utf8
-        Assert-DirectCase 'google_short' ('AI' + 'za' + ('Z' * 34)) 'google_api_key' $false $utf8
-        Assert-DirectCase 'google_long' ('AI' + 'za' + ('Z' * 36)) 'google_api_key' $false $utf8
-        Assert-DirectCase 'google_neighbor' ('xAI' + 'za' + ('Z' * 35)) 'google_api_key' $false $utf8
-        Assert-DirectCase 'google_right_neighbor' (('AI' + 'za' + ('Z' * 35)) + '_') 'google_api_key' $false $utf8
-        Assert-DirectCase 'slack_max' ('xo' + 'xs-' + ('Z-' * 100)) 'slack_token' $true $utf8
-        Assert-DirectCase 'slack_xoxp' ('xo' + 'xp-' + ('Z' * 10)) 'slack_token' $true $utf8
-        Assert-DirectCase 'slack_xoxa' ('xo' + 'xa-' + ('Z' * 10)) 'slack_token' $true $utf8
-        Assert-DirectCase 'slack_xoxr' ('xo' + 'xr-' + ('Z' * 10)) 'slack_token' $true $utf8
-        Assert-DirectCase 'slack_short' ('xo' + 'xp-' + ('Z' * 9)) 'slack_token' $false $utf8
-        Assert-DirectCase 'slack_long' ('xo' + 'xa-' + ('Z' * 201)) 'slack_token' $false $utf8
-        Assert-DirectCase 'slack_neighbor' (('xo' + 'xr-' + ('Z' * 10)) + '_') 'slack_token' $false $utf8
-        Assert-DirectCase 'slack_left_neighbor' ('xxo' + 'xb-' + ('Z' * 10)) 'slack_token' $false $utf8
-        Assert-DirectCase 'private_plain' ('-----BEGIN ' + 'PRIVATE KEY-----') 'private_key' $true $utf8
-        Assert-DirectCase 'private_ec' ('-----BEGIN ' + 'EC ' + 'PRIVATE KEY-----') 'private_key' $true $utf8
-        Assert-DirectCase 'private_dsa' ('-----BEGIN ' + 'DSA ' + 'PRIVATE KEY-----') 'private_key' $true $utf8
-        Assert-DirectCase 'private_openssh' ('-----BEGIN ' + 'OPENSSH ' + 'PRIVATE KEY-----') 'private_key' $true $utf8
-        Write-Output 'direct_rules_and_order'
-
-        foreach ($name in @('api_key', 'api-key', 'apikey', 'access_token', 'auth_token', 'client_secret', 'password', 'passwd', 'secret', 'token')) { Assert-DirectCase "assignment_name_$name" ("#$($name.ToUpperInvariant()) `t: `t" + ('q' * 12)) 'assignment_secret' $true $utf8 }
-        Assert-DirectCase 'assignment_equals_alphabet' ('api' + '_key=Ab0_./+=:@-') 'assignment_secret' $true $utf8; Assert-DirectCase 'assignment_left_boundary' ('xapi' + '_key=' + ('q' * 12)) 'assignment_secret' $false $utf8
-        Assert-DirectCase 'assignment_unquoted_min' ('pass' + 'wd=' + ('q' * 8)) 'assignment_secret' $true $utf8; Assert-DirectCase 'assignment_unquoted_short' ('pass' + 'wd=' + ('q' * 7)) 'assignment_secret' $false $utf8; Assert-DirectCase 'assignment_unquoted_max' ('pass' + 'wd=' + ('q' * 512)) 'assignment_secret' $true $utf8; Assert-DirectCase 'assignment_unquoted_long' ('pass' + 'wd=' + ('q' * 513)) 'assignment_secret' $false $utf8
-        Assert-DirectCase 'assignment_double_escape' ('pass' + 'word=' + '"abc\"d\\ef"') 'assignment_secret' $true $utf8; Assert-DirectCase 'assignment_single_escape' ('pass' + 'word=' + "'abc\'d\\ef'") 'assignment_secret' $true $utf8; Assert-DirectCase 'assignment_quote_short' ('pass' + 'word="' + ('q' * 7) + '"') 'assignment_secret' $false $utf8; Assert-DirectCase 'assignment_quote_max' ('pass' + 'word="' + ('q' * 512) + '"') 'assignment_secret' $true $utf8; Assert-DirectCase 'assignment_quote_long' ('pass' + 'word="' + ('q' * 513) + '"') 'assignment_secret' $false $utf8
-        $supplementary = [char]::ConvertFromUtf32(0x1F600); Assert-DirectCase 'assignment_unicode_max' ('pass' + 'word="' + ($supplementary * 512) + '"') 'assignment_secret' $true $utf8; Assert-DirectCase 'assignment_unicode_long' ('pass' + 'word="' + ($supplementary * 513) + '"') 'assignment_secret' $false $utf8
-        Assert-DirectCase 'assignment_bad_escape' ('pass' + 'word="abc\ndefgh"') 'assignment_secret' $false $utf8; Assert-DirectCase 'assignment_mismatch' ('pass' + "word=`"abcdefgh'") 'assignment_secret' $false $utf8; Assert-DirectCase 'assignment_newline' ('pass' + "word=`"abcd`nefgh`"") 'assignment_secret' $false $utf8
-        $asciiPad = ([char]0x09) + ([char]0x0B) + ([char]0x0C) + ' '; foreach ($safeValue in @('EXAMPLE', 'PLACEHOLDER', 'ChangeMe', 'NOT-SET', 'NONE', 'NULL', 'REDACTED', '<hidden>', '$LONG_ENV_VAR', '${LONG_ENV_VAR}', '[value ReDaCtEd now]')) { Assert-DirectCase "assignment_safe_$($safeValue.Length)" ('sec' + 'ret="' + $asciiPad + $safeValue + $asciiPad + '"') 'assignment_secret' $false $utf8 }; Assert-DirectCase 'assignment_safe_unquoted' ('sec' + 'ret=PLACEHOLDER') 'assignment_secret' $false $utf8; Assert-DirectCase 'assignment_safe_near_miss' ('sec' + 'ret="prefix-redacted"') 'assignment_secret' $true $utf8; Assert-DirectCase 'assignment_angle_pairs' ('sec' + 'ret="<hidden><other>"') 'assignment_secret' $true $utf8
-        Write-Output 'assignment_quotes_boundaries'
-
-        $encodedCases = [ordered]@{ provider_api_key = $positive; github_token = $github; aws_access_key = $aws; google_api_key = $google; slack_token = $slack; private_key = $private }; foreach ($entry in $encodedCases.GetEnumerator()) { Assert-DirectCase "encoded_base64_$($entry.Key)" ([Convert]::ToBase64String($utf8.GetBytes($entry.Value))) 'encoded_secret' $true $utf8 }
-        $base64 = [Convert]::ToBase64String($utf8.GetBytes($positive)); $base64MaxText = ('x' * (3072 - $positive.Length - 5)) + ([char]0xFFFE) + "`n$positive`n"; $base64Max = [Convert]::ToBase64String($utf8.GetBytes($base64MaxText)); Assert-DirectCase 'encoded_base64_left_boundary' ('A' + $base64Max) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_base64_right_boundary' ($base64Max + 'A') 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_base64_noncanonical' ($base64.Substring(0, $base64.Length - 2) + ([char]([int][char]$base64[$base64.Length - 2] + 1)) + '=') 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_base64_utf8' ('/' * 16) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_one_layer' ([Convert]::ToBase64String($utf8.GetBytes($base64))) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_direct_only' ([Convert]::ToBase64String($utf8.GetBytes(('api' + '_key=' + ('q' * 12))))) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_base64_max' $base64Max 'encoded_secret' $true $utf8; Assert-DirectCase 'encoded_base64_long' ([Convert]::ToBase64String($utf8.GetBytes($base64MaxText + 'xxx'))) 'encoded_secret' $false $utf8
-        $base64Url = [Convert]::ToBase64String($utf8.GetBytes(([char]0xFFFE) + "`n$positive`n" + ([char]0xFFFE))).Replace('+', '-').Replace('/', '_'); $urlMaxText = ('x' * 3041) + ([char]0xFFFE) + "`n$positive`n" + ([char]0xFFFE); $urlMax = [Convert]::ToBase64String($utf8.GetBytes($urlMaxText)).Replace('+', '-').Replace('/', '_'); Assert-DirectCase 'encoded_base64url_provider_api_key' $base64Url 'encoded_secret' $true $utf8; Assert-DirectCase 'encoded_base64url_max' $urlMax 'encoded_secret' $true $utf8; Assert-DirectCase 'encoded_base64url_long' ([Convert]::ToBase64String($utf8.GetBytes($urlMaxText + 'xxx')).Replace('+', '-').Replace('/', '_')) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_base64url_left_boundary' ('_' + $urlMax) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_base64url_right_boundary' ($urlMax + '-') 'encoded_secret' $false $utf8; $urlPadding = $base64Url.Length - $base64Url.TrimEnd('=').Length; $urlDataIndex = $base64Url.Length - $urlPadding - 1; Assert-DirectCase 'encoded_base64url_noncanonical' ($base64Url.Substring(0, $urlDataIndex) + ([char]([int][char]$base64Url[$urlDataIndex] + 1)) + ('=' * $urlPadding)) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_base64url_one_layer' ([Convert]::ToBase64String($utf8.GetBytes($base64Url)).Replace('+', '-').Replace('/', '_')) 'encoded_secret' $false $utf8
-        $hex = [Convert]::ToHexString($utf8.GetBytes($positive)); $hexMaxText = ('x' * (4096 - $positive.Length - 2)) + "`n$positive`n"; $hexMax = [Convert]::ToHexString($utf8.GetBytes($hexMaxText)); Assert-DirectCase 'encoded_hex_provider_api_key' $hex.ToLowerInvariant() 'encoded_secret' $true $utf8; Assert-DirectCase 'encoded_hex_left_boundary' ('f' + $hexMax) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_hex_right_boundary' ($hexMax + 'A') 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_hex_utf8' ('FF' * 16) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_hex_one_layer' ([Convert]::ToHexString($utf8.GetBytes($hex))) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_hex_max' $hexMax 'encoded_secret' $true $utf8; Assert-DirectCase 'encoded_hex_long' ([Convert]::ToHexString($utf8.GetBytes($hexMaxText + 'x'))) 'encoded_secret' $false $utf8
-        Write-Output 'encodings_and_types'
-
-        foreach ($owned in @($scanner, $PSCommandPath)) {
-            $ownedResult = Invoke-Scanner @('-Path', $owned)
-            Assert-ExactResult $ownedResult 0 @('CREDENTIAL_SCAN_PASS files=1') 'artifact_direct_safety'
-        }
-        Write-Output 'artifact_direct_safety'
-        Write-Output 'BOOTSTRAP_SCANNER_RULES_PASS'
-    }
-    finally {
-        Pop-Location
-    }
-}
-finally {
-    if ([IO.Directory]::Exists($sandbox)) { [IO.Directory]::Delete($sandbox, $true) }
-}
+ Push-Location $sandbox
+ try {
+    $utf8 = [Text.UTF8Encoding]::new($false); [IO.File]::WriteAllText((Join-Path $sandbox 'clean.txt'), 'ordinary public text', $utf8); [IO.File]::WriteAllText((Join-Path $sandbox 'other.txt'), 'more public text', $utf8)
+    [IO.File]::WriteAllBytes((Join-Path $sandbox 'invalid.txt'), [byte[]](0xC3, 0x28)); [IO.File]::WriteAllBytes((Join-Path $sandbox 'bom.txt'), [byte[]](0xEF, 0xBB, 0xBF, 0x61)); [IO.File]::WriteAllText((Join-Path $sandbox 'replacement.txt'), "bad$([char]0xFFFD)text", $utf8); [IO.Directory]::CreateDirectory((Join-Path $sandbox 'folder')) | Out-Null
+    Assert-OperationalFailure (Invoke-Scanner @()) 'usage_missing_scope' 'path' '' 'usage_missing_scope'; Assert-OperationalFailure (Invoke-Scanner @('-Path', '.\missing.txt')) 'read_failed' 'path' 'missing.txt' 'missing_read'; Assert-OperationalFailure (Invoke-Scanner @('-Path', '.\folder')) 'read_failed' 'path' 'folder' 'non_file_read'
+    Assert-OperationalFailure (Invoke-Scanner @('-Path', '.\invalid.txt')) 'decode_failed' 'path' 'invalid.txt' 'invalid_utf8'; Assert-OperationalFailure (Invoke-Scanner @('-Path', '.\bom.txt')) 'decode_failed' 'path' 'bom.txt' 'bom_rejected'; Assert-OperationalFailure (Invoke-Scanner @('-Path', '.\replacement.txt')) 'decode_failed' 'path' 'replacement.txt' 'replacement_rejected'
+    Assert-ExactResult (Invoke-Scanner @('-Path', '.\clean.txt')) 0 @('CREDENTIAL_SCAN_PASS files=1') 'clean_receipt'; Assert-OperationalFailure (Invoke-Scanner @('-Path', '.\clean.txt', '.\other.txt')) 'usage_missing_scope' 'path' '' 'single_path_only'; Write-Output 'usage_and_output'
+    [IO.Directory]::CreateDirectory((Join-Path $sandbox 'nested')) | Out-Null; $fragmentOne = 'sk-' + ('A' * 10); $fragmentTwo = 'B' * 10; $positive = $fragmentOne + $fragmentTwo; [IO.File]::WriteAllText((Join-Path $sandbox 'nested\case.txt'), "[$positive]`n$positive", $utf8)
+    Assert-ExactResult (Invoke-Scanner @('-Path', '.\nested\case.txt')) 2 @('{"source":"path","path":"nested/case.txt","rule":"provider_api_key"}') 'provider_match_unique'; Assert-ExactResult (Invoke-Scanner @('-Path', '.\.\nested\case.txt')) 2 @('{"source":"path","path":"./nested/case.txt","rule":"provider_api_key"}') 'provider_double_prefix_receipt'
+    $maximum = 's' + 'k-' + ('A1_-' * 50); Assert-DirectCase 'provider_maximum_alphabet' $maximum 'provider_api_key' $true $utf8; $maximal = 's' + 'k-' + ('E' * 200); Assert-DirectCase 'provider_boundaries' ("x$positive`n${maximal}_`n" + ('s' + 'k-' + ('C' * 19)) + "`n" + ('s' + 'k-' + ('D' * 201))) 'provider_api_key' $false $utf8; Write-Output 'provider_rule'
+    $github = 'gh' + 'p_' + ('A' * 20); $aws = 'AK' + 'IA' + ('A0' * 8); $google = 'AI' + 'za' + ('a_-' * 11) + 'aa'; $slack = 'xo' + 'xb-' + ('A-' * 5); $private = '-----' + 'BEGIN ' + 'RSA ' + 'PRIVATE KEY' + '-----'
+    [IO.File]::WriteAllText((Join-Path $sandbox 'direct.txt'), "$github`n$github`n$aws`n$google`n$slack`n$private", $utf8); $directExpected = @('{"source":"path","path":"direct.txt","rule":"aws_access_key"}','{"source":"path","path":"direct.txt","rule":"github_token"}','{"source":"path","path":"direct.txt","rule":"google_api_key"}','{"source":"path","path":"direct.txt","rule":"private_key"}','{"source":"path","path":"direct.txt","rule":"slack_token"}'); Assert-ExactResult (Invoke-Scanner @('-Path', '.\direct.txt')) 2 $directExpected 'direct_rules_and_order'
+    Assert-DirectCase 'github_max' ('gh' + 'r_' + ('Z' * 255)) 'github_token' $true $utf8; foreach ($prefix in @('gho_','ghu_','ghs_')) { Assert-DirectCase "github_$prefix" ($prefix + ('Z' * 20)) 'github_token' $true $utf8 }; Assert-DirectCase 'github_short' ('gho_' + ('Z' * 19)) 'github_token' $false $utf8; Assert-DirectCase 'github_long' ('ghu_' + ('Z' * 256)) 'github_token' $false $utf8; Assert-DirectCase 'github_neighbors' ('xghs_' + ('Z' * 20) + "`n" + ('ghp_' + ('Z' * 20) + '_')) 'github_token' $false $utf8
+    Assert-DirectCase 'aws_short' ('ASIA' + ('Z' * 15)) 'aws_access_key' $false $utf8; Assert-DirectCase 'aws_long' ('ASIA' + ('Z' * 17)) 'aws_access_key' $false $utf8; Assert-DirectCase 'aws_neighbors' (('ASIA' + ('Z' * 16) + '_') + "`n" + ('xAKIA' + ('Z' * 16))) 'aws_access_key' $false $utf8; Assert-DirectCase 'aws_asia' ('ASIA' + ('Z' * 16)) 'aws_access_key' $true $utf8
+    Assert-DirectCase 'google_short' ('AIza' + ('Z' * 34)) 'google_api_key' $false $utf8; Assert-DirectCase 'google_long' ('AIza' + ('Z' * 36)) 'google_api_key' $false $utf8; Assert-DirectCase 'google_neighbors' (('xAIza' + ('Z' * 35)) + "`n" + ('AIza' + ('Z' * 35) + '_')) 'google_api_key' $false $utf8
+    Assert-DirectCase 'slack_max' ('xoxs-' + ('Z-' * 100)) 'slack_token' $true $utf8; foreach ($prefix in @('xoxp-','xoxa-','xoxr-')) { Assert-DirectCase "slack_$prefix" ($prefix + ('Z' * 10)) 'slack_token' $true $utf8 }; Assert-DirectCase 'slack_short' ('xoxp-' + ('Z' * 9)) 'slack_token' $false $utf8; Assert-DirectCase 'slack_long' ('xoxa-' + ('Z' * 201)) 'slack_token' $false $utf8; Assert-DirectCase 'slack_neighbors' (('xoxr-' + ('Z' * 10) + '_') + "`n" + ('xxoxb-' + ('Z' * 10))) 'slack_token' $false $utf8
+    foreach ($prefix in @('','EC ','DSA ','OPENSSH ')) { Assert-DirectCase "private_$($prefix.Length)" ('-----' + 'BEGIN ' + $prefix + 'PRIVATE KEY' + '-----') 'private_key' $true $utf8 }; Write-Output 'direct_rules_and_order'
+    foreach ($name in @('api_key','api-key','apikey','access_token','auth_token','client_secret','password','passwd','secret','token')) { Assert-DirectCase "assignment_name_$name" ("#$($name.ToUpperInvariant()) `t: `t" + ('q' * 12)) 'assignment_secret' $true $utf8 }
+    Assert-DirectCase 'assignment_equals_alphabet' ('api' + '_key=Ab0_./+=:@-') 'assignment_secret' $true $utf8; Assert-DirectCase 'assignment_left_boundary' ('xapi' + '_key=' + ('q' * 12)) 'assignment_secret' $false $utf8; foreach ($case in @(@('unquoted_min',8,$true),@('unquoted_short',7,$false),@('unquoted_max',512,$true),@('unquoted_long',513,$false))) { Assert-DirectCase "assignment_$($case[0])" ('pass' + 'wd=' + ('q' * $case[1])) 'assignment_secret' $case[2] $utf8 }
+    Assert-DirectCase 'assignment_double_escape' (('pass' + 'word=') + '"abc\"d\\ef"') 'assignment_secret' $true $utf8; Assert-DirectCase 'assignment_single_escape' (('pass' + 'word=') + "'abc\'d\\ef'") 'assignment_secret' $true $utf8; foreach ($case in @(@('quote_short',7,$false),@('quote_max',512,$true),@('quote_long',513,$false))) { Assert-DirectCase "assignment_$($case[0])" (('pass' + 'word="') + ('q' * $case[1]) + '"') 'assignment_secret' $case[2] $utf8 }
+    $supplementary = [char]::ConvertFromUtf32(0x1F600); Assert-DirectCase 'assignment_unicode_max' (('pass' + 'word="') + ($supplementary * 512) + '"') 'assignment_secret' $true $utf8; Assert-DirectCase 'assignment_unicode_long' (('pass' + 'word="') + ($supplementary * 513) + '"') 'assignment_secret' $false $utf8; Assert-DirectCase 'assignment_bad_escape' (('pass' + 'word="') + 'abc\ndefgh"') 'assignment_secret' $false $utf8; Assert-DirectCase 'assignment_mismatch' (('pass' + 'word=') + "`"abcdefgh'") 'assignment_secret' $false $utf8; Assert-DirectCase 'assignment_newline' (('pass' + 'word=') + "`"abcd`nefgh`"") 'assignment_secret' $false $utf8
+    $asciiPad = ([char]0x09)+([char]0x0B)+([char]0x0C)+' '; foreach ($safe in @('EXAMPLE','PLACEHOLDER','ChangeMe','NOT-SET','NONE','NULL','REDACTED','<hidden>','$LONG_ENV_VAR','${LONG_ENV_VAR}','[value ReDaCtEd now]')) { Assert-DirectCase "assignment_safe_$($safe.Length)" (('sec' + 'ret="') + $asciiPad + $safe + $asciiPad + '"') 'assignment_secret' $false $utf8 }; Assert-DirectCase 'assignment_safe_unquoted' ('sec' + 'ret=PLACEHOLDER') 'assignment_secret' $false $utf8; Assert-DirectCase 'assignment_safe_near_miss' ('sec' + 'ret="prefix-redacted"') 'assignment_secret' $true $utf8; Assert-DirectCase 'assignment_angle_pairs' ('sec' + 'ret="<hidden><other>"') 'assignment_secret' $true $utf8; Write-Output 'assignment_quotes_boundaries'
+    $encodedCases = [ordered]@{ provider_api_key=$positive; github_token=$github; aws_access_key=$aws; google_api_key=$google; slack_token=$slack; private_key=$private }; foreach ($entry in $encodedCases.GetEnumerator()) { Assert-DirectCase "encoded_base64_$($entry.Key)" ([Convert]::ToBase64String($utf8.GetBytes($entry.Value))) 'encoded_secret' $true $utf8 }
+    $base64 = [Convert]::ToBase64String($utf8.GetBytes($positive)); $base64MaxText = ('x' * (3072-$positive.Length-5))+([char]0xFFFE)+"`n$positive`n"; $base64Max = [Convert]::ToBase64String($utf8.GetBytes($base64MaxText)); Assert-DirectCase 'encoded_base64_left_boundary' ('A'+$base64Max) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_base64_right_boundary' ($base64Max+'A') 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_base64_noncanonical' ($base64.Substring(0,$base64.Length-2)+([char]([int][char]$base64[$base64.Length-2]+1))+'=') 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_base64_utf8' ('/'*16) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_one_layer' ([Convert]::ToBase64String($utf8.GetBytes($base64))) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_direct_only' ([Convert]::ToBase64String($utf8.GetBytes((('api'+'_key=')+('q'*12))))) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_base64_max' $base64Max 'encoded_secret' $true $utf8; Assert-DirectCase 'encoded_base64_long' ([Convert]::ToBase64String($utf8.GetBytes($base64MaxText+'xxx'))) 'encoded_secret' $false $utf8
+    $base64Url = [Convert]::ToBase64String($utf8.GetBytes(([char]0xFFFE)+"`n$positive`n"+([char]0xFFFE))).Replace('+','-').Replace('/','_'); $urlMaxText = ('x'*3041)+([char]0xFFFE)+"`n$positive`n"+([char]0xFFFE); $urlMax = [Convert]::ToBase64String($utf8.GetBytes($urlMaxText)).Replace('+','-').Replace('/','_'); Assert-DirectCase 'encoded_base64url_provider_api_key' $base64Url 'encoded_secret' $true $utf8; Assert-DirectCase 'encoded_base64url_max' $urlMax 'encoded_secret' $true $utf8; Assert-DirectCase 'encoded_base64url_long' ([Convert]::ToBase64String($utf8.GetBytes($urlMaxText+'xxx')).Replace('+','-').Replace('/','_')) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_base64url_left_boundary' ('_'+$urlMax) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_base64url_right_boundary' ($urlMax+'-') 'encoded_secret' $false $utf8; $pad=$base64Url.Length-$base64Url.TrimEnd('=').Length; $di=$base64Url.Length-$pad-1; Assert-DirectCase 'encoded_base64url_noncanonical' ($base64Url.Substring(0,$di)+([char]([int][char]$base64Url[$di]+1))+('='*$pad)) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_base64url_one_layer' ([Convert]::ToBase64String($utf8.GetBytes($base64Url)).Replace('+','-').Replace('/','_')) 'encoded_secret' $false $utf8
+    $hex=[Convert]::ToHexString($utf8.GetBytes($positive)); $hexMaxText=('x'*(4096-$positive.Length-2))+"`n$positive`n"; $hexMax=[Convert]::ToHexString($utf8.GetBytes($hexMaxText)); Assert-DirectCase 'encoded_hex_provider_api_key' $hex.ToLowerInvariant() 'encoded_secret' $true $utf8; Assert-DirectCase 'encoded_hex_left_boundary' ('f'+$hexMax) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_hex_right_boundary' ($hexMax+'A') 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_hex_utf8' ('FF'*16) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_hex_one_layer' ([Convert]::ToHexString($utf8.GetBytes($hex))) 'encoded_secret' $false $utf8; Assert-DirectCase 'encoded_hex_max' $hexMax 'encoded_secret' $true $utf8; Assert-DirectCase 'encoded_hex_long' ([Convert]::ToHexString($utf8.GetBytes($hexMaxText+'x'))) 'encoded_secret' $false $utf8; Write-Output 'encodings_and_types'
+    foreach ($owned in @($scanner,$PSCommandPath)) { Assert-ExactResult (Invoke-Scanner @('-Path',$owned)) 0 @('CREDENTIAL_SCAN_PASS files=1') 'artifact_direct_safety' }; Write-Output 'artifact_direct_safety'
+    $fakeDir=Join-Path $sandbox 'fake'; $blobDir=Join-Path $fakeDir 'blobs'; [IO.Directory]::CreateDirectory($blobDir)|Out-Null; $env:FG_ROOT=$sandbox; $env:FG_BLOBS=$blobDir
+    $fakeSource=@'
+param([Parameter(ValueFromRemainingArguments=$true)][string[]]$A)
+function O([byte[]]$B){$s=[Console]::OpenStandardOutput();$s.Write($B,0,$B.Length)}
+$A=@($A)+@($args)
+$c=$env:FG_CASE
+if($A[0] -eq 'rev-parse'){if($c -eq 'root_fail'){exit 4};[Console]::WriteLine($env:FG_ROOT);exit 0}
+if($A[0] -eq 'ls-files'){if($c -eq 'list_fail'){exit 5};$v=if($A -contains '--stage'){$env:FG_ROWS}else{$env:FG_PATHS};if($v){O ([Text.Encoding]::UTF8.GetBytes(($v -split '\|' -join "`0")+"`0"))};exit 0}
+if($A[0] -eq 'cat-file'){if($c -eq 'cat_fail'){exit 6};O ([IO.File]::ReadAllBytes((Join-Path $env:FG_BLOBS ($A[2]+'.bin'))));exit 0}
+exit 7
+'@
+    Set-Content -LiteralPath (Join-Path $fakeDir 'fake_git.ps1') -Value $fakeSource -Encoding utf8NoBOM; Set-Content -LiteralPath (Join-Path $fakeDir 'git.cmd') -Value "@echo off`r`n`"$PSHOME\pwsh.exe`" -NoProfile -File `"%~dp0fake_git.ps1`" %*" -Encoding ascii; $oldPath=$env:PATH; $env:PATH=$fakeDir+[IO.Path]::PathSeparator+$oldPath
+    $oid1='1111111111111111111111111111111111111111'; $oid2='2222222222222222222222222222222222222222'; $clean=[byte[]]$utf8.GetBytes('ordinary public text'); $secret=[byte[]]$utf8.GetBytes($positive); $qpath='renamed name.txt'; [IO.File]::WriteAllBytes((Join-Path $sandbox $qpath),$secret)
+    Set-FakeGit @($qpath) @("100644 $oid1 0`t$qpath") @{$oid1=$clean}; Assert-ExactResult (Invoke-Scanner @('-Tracked')) 2 @('{"source":"worktree","path":"renamed name.txt","rule":"provider_api_key"}') 'dirty_worktree'; Assert-ExactResult (Invoke-Scanner @('-Staged')) 0 @('CREDENTIAL_SCAN_PASS files=1') 'clean_index'
+    [IO.File]::WriteAllBytes((Join-Path $sandbox $qpath),$clean); Set-FakeGit @($qpath) @("100644 $oid1 0`t$qpath") @{$oid1=$secret}; Assert-ExactResult (Invoke-Scanner @('-Staged')) 2 @('{"source":"index","path":"renamed name.txt","rule":"provider_api_key"}') 'staged_secret'; Assert-ExactResult (Invoke-Scanner @('-Tracked')) 0 @('CREDENTIAL_SCAN_PASS files=1') 'clean_worktree'
+    [IO.File]::WriteAllBytes((Join-Path $sandbox $qpath),$secret); Set-FakeGit @($qpath) @("100755 $oid1 0`t$qpath") @{$oid1=$secret}; Assert-ExactResult (Invoke-Scanner @('-Tracked','-Staged')) 2 @('{"source":"index","path":"renamed name.txt","rule":"provider_api_key"}','{"source":"worktree","path":"renamed name.txt","rule":"provider_api_key"}') 'both_sources'; Write-Output 'staged_vs_worktree'
+    [IO.File]::WriteAllBytes((Join-Path $sandbox 'first.bin'),$clean); [IO.File]::WriteAllBytes((Join-Path $sandbox 'second.txt'),$clean); Set-FakeGit @('first.bin','second.txt') @("100644 $oid1 0`tfirst.bin","100755 $oid2 0`tsecond.txt") @{$oid1=[byte[]](0x00,0x61,0x00);$oid2=$secret}; Assert-ExactResult (Invoke-Scanner @('-Staged')) 2 @('{"source":"index","path":"second.txt","rule":"provider_api_key"}') 'binary_blob_separation'
+    Set-FakeGit @('second.txt') @("100644 $oid1 1`tsecond.txt") @{$oid1=$clean}; Assert-OperationalFailure (Invoke-Scanner @('-Staged')) 'index_entry_failed' 'index' 'second.txt' 'zero_stage0'; Set-FakeGit @('second.txt') @("100644 $oid1 0`tsecond.txt","100644 $oid2 0`tsecond.txt") @{$oid1=$clean;$oid2=$clean}; Assert-OperationalFailure (Invoke-Scanner @('-Staged')) 'index_entry_failed' 'index' 'second.txt' 'two_stage0'
+    Set-FakeGit @('second.txt') @("120000 $oid1 0`tsecond.txt") @{$oid1=$clean}; Assert-OperationalFailure (Invoke-Scanner @('-Staged')) 'index_mode_unsupported' 'index' 'second.txt' 'unsupported_mode'; Set-FakeGit @('second.txt') @("100644 $oid1 0`tsecond.txt") @{$oid1=$clean} 'cat_fail'; Assert-OperationalFailure (Invoke-Scanner @('-Staged')) 'read_failed' 'index' 'second.txt' 'cat_file_nonzero'; Write-Output 'index_modes_and_rename'
+    Set-FakeGit @('second.txt') @() @{} 'root_fail'; Assert-OperationalFailure (Invoke-Scanner @('-Tracked')) 'git_root_failed' '' '' 'root_nonzero'; Set-FakeGit @('second.txt') @() @{} 'list_fail'; Assert-OperationalFailure (Invoke-Scanner @('-Tracked')) 'git_list_failed' 'worktree' '' 'list_nonzero'
+    Set-FakeGit @('../outside.txt') @() @{}; Assert-OperationalFailure (Invoke-Scanner @('-Tracked')) 'path_escape' 'worktree' '../outside.txt' 'worktree_escape'; Set-FakeGit @('../outside.txt') @("100644 $oid1 0`t../outside.txt") @{$oid1=$clean}; Assert-OperationalFailure (Invoke-Scanner @('-Staged')) 'path_escape' 'index' '../outside.txt' 'index_escape'
+    Set-FakeGit @('/absolute.txt') @() @{}; Assert-OperationalFailure (Invoke-Scanner @('-Tracked')) 'path_escape' 'worktree' '/absolute.txt' 'worktree_absolute'; Set-FakeGit @('nested/./second.txt') @("100644 $oid1 0`tnested/./second.txt") @{$oid1=$clean}; Assert-OperationalFailure (Invoke-Scanner @('-Staged')) 'path_escape' 'index' 'nested/./second.txt' 'index_not_normalized'
+    Set-FakeGit @('missing.txt') @() @{}; Assert-OperationalFailure (Invoke-Scanner @('-Tracked')) 'read_failed' 'worktree' 'missing.txt' 'worktree_missing'; Set-FakeGit @('folder') @() @{}; Assert-OperationalFailure (Invoke-Scanner @('-Tracked')) 'not_regular_file' 'worktree' 'folder' 'worktree_directory'
+    $target=Join-Path $sandbox 'target'; [IO.Directory]::CreateDirectory($target)|Out-Null; [IO.File]::WriteAllBytes((Join-Path $target 'clean.txt'),$clean); New-Item -ItemType Junction -Path (Join-Path $sandbox 'link') -Target $target|Out-Null; Set-FakeGit @('link/clean.txt') @() @{}; Assert-OperationalFailure (Invoke-Scanner @('-Tracked')) 'reparse_point' 'worktree' 'link/clean.txt' 'worktree_reparse'; Write-Output 'path_safety_and_errors'
+    Write-Output 'BOOTSTRAP_SCANNER_SOURCES_PASS'
+ } finally { $env:PATH=$oldPath; Pop-Location }
+} finally { $link=Join-Path $sandbox 'link'; if (Test-Path -LiteralPath $link) { Remove-Item -LiteralPath $link -Force -ErrorAction SilentlyContinue }; if ([IO.Directory]::Exists($sandbox)) { [IO.Directory]::Delete($sandbox,$true) } }
