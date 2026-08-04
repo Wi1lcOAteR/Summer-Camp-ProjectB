@@ -1,7 +1,6 @@
 param(
     [string]$Path
 )
-
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
@@ -21,7 +20,6 @@ function Write-ScanRecord {
 
 function Convert-SourceText {
     param([byte[]]$Bytes)
-
     if ($Bytes.Length -ge 3 -and
         $Bytes[0] -eq 0xEF -and $Bytes[1] -eq 0xBB -and $Bytes[2] -eq 0xBF) {
         throw [FormatException]::new('bom')
@@ -34,7 +32,6 @@ function Convert-SourceText {
 
 function Find-DirectSecret {
     param([string]$Text)
-
     $privateMarker = '-----' + 'BEGIN ' + '(?:RSA |EC |DSA |OPENSSH )?' + 'PRIVATE KEY' + '-----'
     $rules = [ordered]@{
         provider_api_key = '(?<![A-Za-z0-9_-])sk-[A-Za-z0-9_-]{20,200}(?![A-Za-z0-9_-])'
@@ -51,6 +48,45 @@ function Find-DirectSecret {
         }
     }
     return $found.ToArray()
+}
+
+function Find-AssignmentSecret {
+    param([string]$Text)
+    $pattern = '(?i)(?<![A-Za-z0-9_-])(?:api_key|api-key|apikey|access_token|auth_token|client_secret|password|passwd|secret|token)[ \t]*[:=][ \t]*(?:"(?<d>(?:[^"\\\r\n]|\\["\\])*)"|''(?<s>(?:[^''\\\r\n]|\\[''\\])*)''|(?<u>[A-Za-z0-9_./+=:@-]{8,512})(?![A-Za-z0-9_./+=:@-]))'
+    foreach ($match in [Text.RegularExpressions.Regex]::Matches($Text, $pattern)) {
+        if ($match.Groups['d'].Success) { $value = [Text.RegularExpressions.Regex]::Replace($match.Groups['d'].Value, '\\(["\\])', '$1') }
+        elseif ($match.Groups['s'].Success) { $value = [Text.RegularExpressions.Regex]::Replace($match.Groups['s'].Value, '\\([''\\])', '$1') }
+        else { $value = $match.Groups['u'].Value }
+        $decodedLength = @($value.EnumerateRunes()).Count
+        if ($decodedLength -lt 8 -or $decodedLength -gt 512) { continue }
+        $safe = $value.Trim([char[]](0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x20))
+        if ($safe -in @('example', 'placeholder', 'changeme', 'not-set', 'none', 'null', 'redacted')) { continue }
+        if ($safe -match '(?i)^(?:<[^<>\r\n]+>|\$(?:[A-Za-z_][A-Za-z0-9_]*|\{[A-Za-z_][A-Za-z0-9_]*\})|\[[^\]\r\n]*redacted[^\]\r\n]*\])$') { continue }
+        return @('assignment_secret')
+    }
+    return @()
+}
+
+function Find-EncodedSecret {
+    param([string]$Text)
+    $families = @(
+        [pscustomobject]@{ Type = 'base64'; Pattern = '(?<![A-Za-z0-9+/=])(?<v>[A-Za-z0-9+/]{16,4096}={0,2})(?![A-Za-z0-9+/=])' },
+        [pscustomobject]@{ Type = 'base64url'; Pattern = '(?<![A-Za-z0-9_=-])(?<v>[A-Za-z0-9_-]{16,4096}={0,2})(?![A-Za-z0-9_=-])' },
+        [pscustomobject]@{ Type = 'hex'; Pattern = '(?<![0-9A-Fa-f])(?<v>[0-9A-Fa-f]{32,8192})(?![0-9A-Fa-f])' }
+    )
+    foreach ($family in $families) {
+        foreach ($match in [Text.RegularExpressions.Regex]::Matches($Text, $family.Pattern)) {
+            $value = $match.Groups['v'].Value
+            try {
+                if ($family.Type -eq 'hex') { if (($value.Length % 2) -ne 0) { continue }; $bytes = [Convert]::FromHexString($value) }
+                else { if (($value.Length % 4) -ne 0) { continue }; $canonical = if ($family.Type -eq 'base64url') { $value.Replace('-', '+').Replace('_', '/') } else { $value }; $bytes = [Convert]::FromBase64String($canonical); if ([Convert]::ToBase64String($bytes) -cne $canonical) { continue } }
+                $decoded = [Text.UTF8Encoding]::new($false, $true).GetString($bytes)
+            }
+            catch { continue }
+            if (@(Find-DirectSecret -Text $decoded).Count -gt 0) { return @('encoded_secret') }
+        }
+    }
+    return @()
 }
 
 if (-not $Path -or $args.Count -gt 0) {
@@ -83,6 +119,12 @@ catch {
 
 $findings = @(
     foreach ($rule in @(Find-DirectSecret -Text $text)) {
+        [pscustomobject]@{ source = 'path'; path = $receiptPath; rule = $rule }
+    }
+    foreach ($rule in @(Find-AssignmentSecret -Text $text)) {
+        [pscustomobject]@{ source = 'path'; path = $receiptPath; rule = $rule }
+    }
+    foreach ($rule in @(Find-EncodedSecret -Text $text)) {
         [pscustomobject]@{ source = 'path'; path = $receiptPath; rule = $rule }
     }
 )
