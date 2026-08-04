@@ -42,6 +42,19 @@ function Assert-OperationalFailure {
     }
 }
 
+function Assert-DirectCase {
+    param([string]$Name, [string]$Text, [string]$Rule, [bool]$Match, [Text.Encoding]$Encoding)
+    $file = "$Name.txt"
+    [IO.File]::WriteAllText((Join-Path (Get-Location).ProviderPath $file), $Text, $Encoding)
+    if ($Match) {
+        $expected = "{`"source`":`"path`",`"path`":`"$file`",`"rule`":`"$Rule`"}"
+        Assert-ExactResult (Invoke-Scanner @('-Path', $file)) 2 @($expected) $Name
+    }
+    else {
+        Assert-ExactResult (Invoke-Scanner @('-Path', $file)) 0 @('CREDENTIAL_SCAN_PASS files=1') $Name
+    }
+}
+
 $sandbox = Join-Path ([IO.Path]::GetTempPath()) ('projectb-f01s1a-' + [guid]::NewGuid().ToString('N'))
 [IO.Directory]::CreateDirectory($sandbox) | Out-Null
 try {
@@ -105,6 +118,35 @@ try {
             '{"source":"path","path":"direct.txt","rule":"slack_token"}'
         )
         Assert-ExactResult (Invoke-Scanner @('-Path', '.\direct.txt')) 2 $directExpected 'direct_rules_and_order'
+        Assert-DirectCase 'github_max' ('gh' + 'r_' + ('Z' * 255)) 'github_token' $true $utf8
+        Assert-DirectCase 'github_gho' ('gh' + 'o_' + ('Z' * 20)) 'github_token' $true $utf8
+        Assert-DirectCase 'github_ghu' ('gh' + 'u_' + ('Z' * 20)) 'github_token' $true $utf8
+        Assert-DirectCase 'github_ghs' ('gh' + 's_' + ('Z' * 20)) 'github_token' $true $utf8
+        Assert-DirectCase 'github_short' ('gh' + 'o_' + ('Z' * 19)) 'github_token' $false $utf8
+        Assert-DirectCase 'github_long' ('gh' + 'u_' + ('Z' * 256)) 'github_token' $false $utf8
+        Assert-DirectCase 'github_neighbor' ('xgh' + 's_' + ('Z' * 20)) 'github_token' $false $utf8
+        Assert-DirectCase 'github_right_neighbor' (('gh' + 'p_' + ('Z' * 20)) + '_') 'github_token' $false $utf8
+        Assert-DirectCase 'aws_short' ('AS' + 'IA' + ('Z' * 15)) 'aws_access_key' $false $utf8
+        Assert-DirectCase 'aws_long' ('AS' + 'IA' + ('Z' * 17)) 'aws_access_key' $false $utf8
+        Assert-DirectCase 'aws_neighbor' (('AS' + 'IA' + ('Z' * 16)) + '_') 'aws_access_key' $false $utf8
+        Assert-DirectCase 'aws_left_neighbor' ('xAK' + 'IA' + ('Z' * 16)) 'aws_access_key' $false $utf8
+        Assert-DirectCase 'aws_asia' ('AS' + 'IA' + ('Z' * 16)) 'aws_access_key' $true $utf8
+        Assert-DirectCase 'google_short' ('AI' + 'za' + ('Z' * 34)) 'google_api_key' $false $utf8
+        Assert-DirectCase 'google_long' ('AI' + 'za' + ('Z' * 36)) 'google_api_key' $false $utf8
+        Assert-DirectCase 'google_neighbor' ('xAI' + 'za' + ('Z' * 35)) 'google_api_key' $false $utf8
+        Assert-DirectCase 'google_right_neighbor' (('AI' + 'za' + ('Z' * 35)) + '_') 'google_api_key' $false $utf8
+        Assert-DirectCase 'slack_max' ('xo' + 'xs-' + ('Z-' * 100)) 'slack_token' $true $utf8
+        Assert-DirectCase 'slack_xoxp' ('xo' + 'xp-' + ('Z' * 10)) 'slack_token' $true $utf8
+        Assert-DirectCase 'slack_xoxa' ('xo' + 'xa-' + ('Z' * 10)) 'slack_token' $true $utf8
+        Assert-DirectCase 'slack_xoxr' ('xo' + 'xr-' + ('Z' * 10)) 'slack_token' $true $utf8
+        Assert-DirectCase 'slack_short' ('xo' + 'xp-' + ('Z' * 9)) 'slack_token' $false $utf8
+        Assert-DirectCase 'slack_long' ('xo' + 'xa-' + ('Z' * 201)) 'slack_token' $false $utf8
+        Assert-DirectCase 'slack_neighbor' (('xo' + 'xr-' + ('Z' * 10)) + '_') 'slack_token' $false $utf8
+        Assert-DirectCase 'slack_left_neighbor' ('xxo' + 'xb-' + ('Z' * 10)) 'slack_token' $false $utf8
+        Assert-DirectCase 'private_plain' ('-----BEGIN ' + 'PRIVATE KEY-----') 'private_key' $true $utf8
+        Assert-DirectCase 'private_ec' ('-----BEGIN ' + 'EC ' + 'PRIVATE KEY-----') 'private_key' $true $utf8
+        Assert-DirectCase 'private_dsa' ('-----BEGIN ' + 'DSA ' + 'PRIVATE KEY-----') 'private_key' $true $utf8
+        Assert-DirectCase 'private_openssh' ('-----BEGIN ' + 'OPENSSH ' + 'PRIVATE KEY-----') 'private_key' $true $utf8
         Write-Output 'direct_rules_and_order'
 
         foreach ($owned in @($scanner, $PSCommandPath)) {
@@ -112,7 +154,7 @@ try {
             Assert-ExactResult $ownedResult 0 @('CREDENTIAL_SCAN_PASS files=1') 'artifact_direct_safety'
         }
         Write-Output 'artifact_direct_safety'
-        Write-Output 'BOOTSTRAP_SCANNER_PATH_PASS'
+        Write-Output 'BOOTSTRAP_SCANNER_CORE_PASS'
     }
     finally {
         Pop-Location
