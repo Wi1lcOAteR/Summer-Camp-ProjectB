@@ -89,6 +89,29 @@ try {
         [IO.File]::WriteAllText((Join-Path $sandbox 'negative.txt'), $negative, $utf8)
         Assert-ExactResult (Invoke-Scanner @('-Path', '.\negative.txt')) 0 @('CREDENTIAL_SCAN_PASS files=1') 'provider_boundaries'
         Write-Output 'provider_rule'
+
+        $github = 'gh' + 'p_' + ('A' * 20)
+        $aws = 'AK' + 'IA' + ('A0' * 8)
+        $google = 'AI' + 'za' + ('a_-' * 11) + 'aa'
+        $slack = 'xo' + 'xb-' + ('A-' * 5)
+        $private = ('-----BEGIN ' + 'RSA ' + 'PRIVATE KEY-----')
+        $directText = "$github`n$github`n$aws`n$google`n$slack`n$private"
+        [IO.File]::WriteAllText((Join-Path $sandbox 'direct.txt'), $directText, $utf8)
+        $directExpected = @(
+            '{"source":"path","path":"direct.txt","rule":"aws_access_key"}',
+            '{"source":"path","path":"direct.txt","rule":"github_token"}',
+            '{"source":"path","path":"direct.txt","rule":"google_api_key"}',
+            '{"source":"path","path":"direct.txt","rule":"private_key"}',
+            '{"source":"path","path":"direct.txt","rule":"slack_token"}'
+        )
+        Assert-ExactResult (Invoke-Scanner @('-Path', '.\direct.txt')) 2 $directExpected 'direct_rules_and_order'
+        Write-Output 'direct_rules_and_order'
+
+        foreach ($owned in @($scanner, $PSCommandPath)) {
+            $ownedResult = Invoke-Scanner @('-Path', $owned)
+            Assert-ExactResult $ownedResult 0 @('CREDENTIAL_SCAN_PASS files=1') 'artifact_direct_safety'
+        }
+        Write-Output 'artifact_direct_safety'
         Write-Output 'BOOTSTRAP_SCANNER_PATH_PASS'
     }
     finally {

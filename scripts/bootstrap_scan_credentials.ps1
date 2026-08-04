@@ -35,10 +35,22 @@ function Convert-SourceText {
 function Find-DirectSecret {
     param([string]$Text)
 
-    [Text.RegularExpressions.Regex]::IsMatch(
-        $Text,
-        '(?<![A-Za-z0-9_-])sk-[A-Za-z0-9_-]{20,200}(?![A-Za-z0-9_-])'
-    )
+    $privateMarker = '-----' + 'BEGIN ' + '(?:RSA |EC |DSA |OPENSSH )?' + 'PRIVATE KEY' + '-----'
+    $rules = [ordered]@{
+        provider_api_key = '(?<![A-Za-z0-9_-])sk-[A-Za-z0-9_-]{20,200}(?![A-Za-z0-9_-])'
+        github_token = '(?<![A-Za-z0-9_-])(?:ghp_|gho_|ghu_|ghs_|ghr_)[A-Za-z0-9]{20,255}(?![A-Za-z0-9_-])'
+        aws_access_key = '(?<![A-Za-z0-9_-])(?:AKIA|ASIA)[A-Z0-9]{16}(?![A-Za-z0-9_-])'
+        google_api_key = '(?<![A-Za-z0-9_-])AIza[A-Za-z0-9_-]{35}(?![A-Za-z0-9_-])'
+        slack_token = '(?<![A-Za-z0-9_-])(?:xoxb-|xoxp-|xoxa-|xoxr-|xoxs-)[A-Za-z0-9-]{10,200}(?![A-Za-z0-9_-])'
+        private_key = $privateMarker
+    }
+    $found = [System.Collections.Generic.List[string]]::new()
+    foreach ($entry in $rules.GetEnumerator()) {
+        if ([Text.RegularExpressions.Regex]::IsMatch($Text, $entry.Value)) {
+            [void]$found.Add($entry.Key)
+        }
+    }
+    return $found.ToArray()
 }
 
 if (-not $Path -or $args.Count -gt 0) {
@@ -69,8 +81,16 @@ catch {
     exit 3
 }
 
-if (Find-DirectSecret -Text $text) {
-    Write-ScanRecord -ReceiptPath $receiptPath -Rule 'provider_api_key'
+$findings = @(
+    foreach ($rule in @(Find-DirectSecret -Text $text)) {
+        [pscustomobject]@{ source = 'path'; path = $receiptPath; rule = $rule }
+    }
+)
+$findings = @($findings | Sort-Object source, path, rule -Unique)
+if ($findings.Count -gt 0) {
+    foreach ($finding in $findings) {
+        Write-ScanRecord -ReceiptPath $finding.path -Rule $finding.rule
+    }
     exit 2
 }
 
