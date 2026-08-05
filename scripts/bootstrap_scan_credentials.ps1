@@ -455,7 +455,7 @@ function Invoke-BootstrapScan {
 
     $binaryExtensions = @('.png', '.jpg', '.jpeg', '.gif', '.webp', '.pdf', '.ico', '.zip', '.gz', '.7z', '.exe', '.dll', '.pyd', '.so', '.woff', '.woff2', '.ttf', '.mp3', '.mp4', '.sqlite', '.db')
     $textExtensions = @('.md', '.txt', '.json', '.jsonl', '.toml', '.yaml', '.yml', '.ini', '.cfg', '.conf', '.env', '.example', '.py', '.pyi', '.js', '.mjs', '.cjs', '.ts', '.tsx', '.jsx', '.html', '.css', '.scss', '.sql', '.ps1', '.psm1', '.psd1', '.sh', '.bash', '.cmd', '.bat', '.lock', '.in')
-    $extensionlessNames = @('.gitignore', '.gitattributes', '.dockerignore', 'Dockerfile', 'Makefile', 'LICENSE', 'NOTICE')
+    $extensionlessNames = @('.gitignore', '.gitattributes', '.dockerignore', '.python-version', '.npmrc', 'Dockerfile', 'Makefile', 'LICENSE', 'NOTICE')
     $findings = @()
     $scannedCount = 0
     foreach ($item in $items) {
