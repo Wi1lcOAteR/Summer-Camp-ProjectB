@@ -39,8 +39,7 @@ $script = [IO.File]::ReadAllText($bootstrap, [Text.UTF8Encoding]::new($false, $t
 foreach ($needle in @('Install-BootstrapLicenses', 'api.github.com', 'FromBase64String', 'Get-FileHash', 'BOOTSTRAP_LICENSE_PASS')) { if ($script -notmatch [regex]::Escape($needle)) { Fail "bootstrap_$needle" } }
 if ($script -match 'api\.github\.com/repos/.+ref=(?:0\.11\.14|v3\.14\.6|v24\.18\.0)') { Fail 'transport_tag_fallback' }
 
-$sandbox = Join-Path $repo 'tmp/f01b-license-contract'
-if (Test-Path -LiteralPath $sandbox) { Remove-Item -LiteralPath $sandbox -Recurse -Force }
+$sandbox = Join-Path $repo ("tmp/f01b-license-contract-$([guid]::NewGuid().ToString('N'))")
 try {
     $harness = Join-Path $sandbox 'transport-harness.ps1'
     [void](New-Item -ItemType Directory -Path $sandbox -Force)
@@ -67,10 +66,11 @@ function Invoke-WebRequest { param($Uri,$Headers,$TimeoutSec,[switch]$UseBasicPa
     $run = @(& (Join-Path $PSHOME 'powershell.exe') -NoProfile -File $bootstrap -LicenseOnly -Offline -LicenseRoot $junctionRoot 2>&1 | % { $_.ToString() })
     $exitCode = $LASTEXITCODE; $ErrorActionPreference = $oldPreference
     if ($exitCode -eq 0 -or ($run -join "`n") -notmatch 'runtime_root_reparse') { Fail 'license_root_reparse' }
-    foreach ($case in @('api_success','api_fail_raw_success','api_bad_metadata','api_wrong_bytes','raw_wrong_bytes','both_fail','partial_exists')) {
+    foreach ($case in @('api_success','api_fail_raw_success','api_bad_metadata','api_wrong_bytes','raw_wrong_bytes','both_fail','partial_exists','destination_directory')) {
         $caseRoot = Join-Path $sandbox "case-$case"
         $log = Join-Path $sandbox "$case.log"
         if ($case -eq 'partial_exists') { [void](New-Item -ItemType Directory -Path $caseRoot -Force); [IO.File]::WriteAllText((Join-Path $caseRoot 'uv-LICENSE-APACHE.partial'), 'do-not-overwrite') }
+        if ($case -eq 'destination_directory') { [void](New-Item -ItemType Directory -Path (Join-Path $caseRoot 'uv-LICENSE-APACHE') -Force) }
         $oldPreference = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
         $run = @(& (Join-Path $PSHOME 'powershell.exe') -NoProfile -File $harness -Bootstrap $bootstrap -Root $caseRoot -Case $case -Fixture (Join-Path $repo 'licenses/bootstrap') -Log $log 2>&1 | % { $_.ToString() })
         $exitCode = $LASTEXITCODE; $ErrorActionPreference = $oldPreference
@@ -79,9 +79,10 @@ function Invoke-WebRequest { param($Uri,$Headers,$TimeoutSec,[switch]$UseBasicPa
             if ($exitCode -ne 0 -or $run.Count -ne 1 -or $run[0] -cne 'BOOTSTRAP_LICENSE_PASS files=5') { Fail "transport_${case}_exit_${exitCode}_calls_$($calls -join ',')_$($run -join '-')" }
             if (@($calls | ? { $_ -eq 'api' }).Count -ne 5 -or @($calls | ? { $_ -eq 'raw' }).Count -ne $(if($case -eq 'api_success'){0}else{5})) { Fail "order_$case" }
         } else {
-            $code = if($case -eq 'api_bad_metadata'){'license_api_metadata_mismatch'}elseif($case -eq 'both_fail'){'license_transport_failed'}elseif($case -eq 'partial_exists'){'license_partial_exists'}else{'license_blob_mismatch'}
+            $code = if($case -eq 'api_bad_metadata'){'license_api_metadata_mismatch'}elseif($case -eq 'both_fail'){'license_transport_failed'}elseif($case -eq 'partial_exists'){'license_partial_exists'}elseif($case -eq 'destination_directory'){'license_destination_not_file'}else{'license_blob_mismatch'}
             if ($exitCode -eq 0 -or ($run -join "`n") -notmatch $code) { Fail "negative_$case" }
             if ($case -eq 'partial_exists' -and [IO.File]::ReadAllText((Join-Path $caseRoot 'uv-LICENSE-APACHE.partial')) -cne 'do-not-overwrite') { Fail 'partial_overwritten' }
+            if ($case -eq 'destination_directory' -and (Test-Path -LiteralPath (Join-Path $caseRoot 'uv-LICENSE-APACHE/uv-LICENSE-APACHE.partial'))) { Fail 'moved_inside_destination' }
         }
     }
     $licenseCopy = Join-Path $sandbox 'licenses/bootstrap'

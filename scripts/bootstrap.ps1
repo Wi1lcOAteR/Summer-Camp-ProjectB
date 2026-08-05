@@ -107,6 +107,14 @@ function Install-BootstrapLicenses {
     )
 
     $expectedEvidenceHash = 'FD65C5D2F8421F7B99AE4D540B80A8BBED1C28C78EF45851F7C6E5051034F310'
+    function Test-LicenseFile {
+        param([string]$Path, $Identity)
+        if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $false }
+        if (((Get-Item -LiteralPath $Path -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { return $false }
+        $content = [IO.File]::ReadAllBytes($Path)
+        return $content.Length -eq $Identity.Bytes -and (Get-FileSha256 $Path) -ieq $Identity.Hash -and (Get-GitBlobSha1 $content) -ceq $Identity.Blob
+    }
+
     $repoPrefix = $repo.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
     $rootFull = [IO.Path]::GetFullPath($Root)
     if (-not $rootFull.StartsWith($repoPrefix, [StringComparison]::OrdinalIgnoreCase)) { Stop-License 'license_root_outside_project' }
@@ -133,10 +141,10 @@ function Install-BootstrapLicenses {
         $commits = @([regex]::Matches($row.Immutable, '(?i)[0-9a-f]{40}') | ForEach-Object { $_.Value.ToLowerInvariant() } | Select-Object -Unique)
         if (-not $raw.Success -or $commits.Count -ne 1 -or $raw.Groups['commit'].Value.ToLowerInvariant() -cne $commits[0]) { Stop-License 'evidence_not_immutable' }
         $destination = Join-Path $rootFull ($target.Substring('licenses/bootstrap/'.Length))
-        $validExisting = $false
-        if (Test-Path -LiteralPath $destination -PathType Leaf) {
-            $existing = [IO.File]::ReadAllBytes($destination)
-            $validExisting = $existing.Length -eq $row.Bytes -and (Get-FileSha256 $destination) -ieq $row.Hash -and (Get-GitBlobSha1 $existing) -ceq $row.Blob
+        $destinationExists = Test-Path -LiteralPath $destination
+        if ($destinationExists -and (-not (Test-Path -LiteralPath $destination -PathType Leaf) -or ((Get-Item -LiteralPath $destination -Force).Attributes -band [IO.FileAttributes]::ReparsePoint))) { Stop-License 'license_destination_not_file' }
+        $validExisting = Test-LicenseFile $destination $row
+        if ($destinationExists) {
             if (-not $validExisting -and $OfflineMode) { Stop-License 'license_bytes_mismatch' }
         }
         if ($validExisting) { continue }
@@ -177,6 +185,10 @@ function Install-BootstrapLicenses {
             Move-Item -LiteralPath $partial -Destination $destination -Force
         }
         finally { if ($createdPartial -and (Test-Path -LiteralPath $partial)) { Remove-Item -LiteralPath $partial -Force -ErrorAction SilentlyContinue } }
+    }
+    foreach ($target in $expected) {
+        $destination = Join-Path $rootFull ($target.Substring('licenses/bootstrap/'.Length))
+        if (-not (Test-LicenseFile $destination $rows[$target])) { Stop-License 'license_final_validation_failed' }
     }
     Write-Output 'BOOTSTRAP_LICENSE_PASS files=5'
 }
