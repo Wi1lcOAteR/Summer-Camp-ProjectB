@@ -16,10 +16,10 @@ function Write-ScanRecord {
     )
 
     $record = [ordered]@{}
+    if ($Code) { $record.code = $Code }
     if ($Source) { $record.source = $Source }
     if ($ReceiptPath) { $record.path = $ReceiptPath }
     if ($Rule) { $record.rule = $Rule }
-    if ($Code) { $record.code = $Code }
     $record | ConvertTo-Json -Compress
 }
 
@@ -37,15 +37,34 @@ function Convert-SourceText {
     param([byte[]]$Bytes)
 
     if (
+        $Bytes.Length -ge 4 -and
+        (($Bytes[0] -eq 0xFF -and $Bytes[1] -eq 0xFE -and $Bytes[2] -eq 0x00 -and $Bytes[3] -eq 0x00) -or
+        ($Bytes[0] -eq 0x00 -and $Bytes[1] -eq 0x00 -and $Bytes[2] -eq 0xFE -and $Bytes[3] -eq 0xFF))
+    ) {
+        throw [FormatException]::new('unsupported_bom')
+    }
+    elseif ($Bytes.Length -ge 2 -and $Bytes[0] -eq 0xFF -and $Bytes[1] -eq 0xFE) {
+        $text = [Text.UnicodeEncoding]::new($false, $false, $true).GetString($Bytes, 2, $Bytes.Length - 2)
+    }
+    elseif ($Bytes.Length -ge 2 -and $Bytes[0] -eq 0xFE -and $Bytes[1] -eq 0xFF) {
+        $text = [Text.UnicodeEncoding]::new($true, $false, $true).GetString($Bytes, 2, $Bytes.Length - 2)
+    }
+    else {
+        $offset = 0
+        if (
         $Bytes.Length -ge 3 -and
         $Bytes[0] -eq 0xEF -and
         $Bytes[1] -eq 0xBB -and
         $Bytes[2] -eq 0xBF
-    ) {
-        throw [FormatException]::new('bom')
+        ) {
+            $offset = 3
+        }
+        $text = [Text.UTF8Encoding]::new($false, $true).GetString(
+            $Bytes,
+            $offset,
+            $Bytes.Length - $offset
+        )
     }
-
-    $text = [Text.UTF8Encoding]::new($false, $true).GetString($Bytes)
     if ($text.Contains([char]0xFFFD)) {
         throw [FormatException]::new('replacement')
     }
@@ -367,23 +386,33 @@ function Read-IndexBlobBytes {
     , $result.Bytes
 }
 
-$invalidScope =
-    $args.Count -or
-    ($Path -and ($Tracked -or $Staged)) -or
-    (-not $Path -and -not $Tracked -and -not $Staged)
-if ($invalidScope) {
-    Write-ScanRecord 'path' -Code 'usage_missing_scope'
-    exit 3
-}
+function Invoke-BootstrapScan {
+    param(
+        [string]$InputPath,
+        [switch]$IncludeTracked,
+        [switch]$IncludeStaged,
+        [object[]]$ExtraArguments = @()
+    )
 
-try {
-    if ($Path) {
-        $receipt = $Path -replace '\\', '/'
+    $invalidScope =
+        $ExtraArguments.Count -or
+        ($InputPath -and ($IncludeTracked -or $IncludeStaged)) -or
+        (-not $InputPath -and -not $IncludeTracked -and -not $IncludeStaged)
+    if ($invalidScope) {
+        return [pscustomobject]@{
+            ExitCode = 3
+            Output = @(Write-ScanRecord 'path' -Code 'usage_missing_scope')
+        }
+    }
+
+    try {
+    if ($InputPath) {
+        $receipt = $InputPath -replace '\\', '/'
         if ($receipt.StartsWith('./', [StringComparison]::Ordinal)) {
             $receipt = $receipt.Substring(2)
         }
         try {
-            $resolved = [IO.Path]::GetFullPath($Path, (Get-Location).ProviderPath)
+            $resolved = [IO.Path]::GetFullPath($InputPath, (Get-Location).ProviderPath)
             $attributes = [IO.File]::GetAttributes($resolved)
             $notFile =
                 [IO.FileAttributes]::Directory -bor
@@ -404,7 +433,7 @@ try {
     }
     else {
         $items = @()
-        if ($Tracked) {
+        if ($IncludeTracked) {
             foreach ($item in @(Get-WorktreeSources)) {
                 $items += , [pscustomobject]@{
                     source = $item.source
@@ -413,7 +442,7 @@ try {
                 }
             }
         }
-        if ($Staged) {
+        if ($IncludeStaged) {
             foreach ($item in @(Get-IndexSources)) {
                 $items += , [pscustomobject]@{
                     source = $item.source
@@ -424,8 +453,31 @@ try {
         }
     }
 
+    $binaryExtensions = @('.png', '.jpg', '.jpeg', '.gif', '.webp', '.pdf', '.ico', '.zip', '.gz', '.7z', '.exe', '.dll', '.pyd', '.so', '.woff', '.woff2', '.ttf', '.mp3', '.mp4', '.sqlite', '.db')
+    $textExtensions = @('.md', '.txt', '.json', '.jsonl', '.toml', '.yaml', '.yml', '.ini', '.cfg', '.conf', '.env', '.example', '.py', '.pyi', '.js', '.mjs', '.cjs', '.ts', '.tsx', '.jsx', '.html', '.css', '.scss', '.sql', '.ps1', '.psm1', '.psd1', '.sh', '.bash', '.cmd', '.bat', '.lock', '.in')
+    $extensionlessNames = @('.gitignore', '.gitattributes', '.dockerignore', 'Dockerfile', 'Makefile', 'LICENSE', 'NOTICE')
     $findings = @()
+    $scannedCount = 0
     foreach ($item in $items) {
+        $extension = [IO.Path]::GetExtension($item.path).ToLowerInvariant()
+        if ($extension -in $binaryExtensions) {
+            continue
+        }
+        $name = [IO.Path]::GetFileName($item.path)
+        if ($extension -notin $textExtensions -and $name -notin $extensionlessNames) {
+            Fail-Scan 'unsupported_file_type' $item.source $item.path
+        }
+        $scannedCount++
+        $utf32Marked =
+            $item.bytes.Length -ge 4 -and
+            (($item.bytes[0] -eq 0xFF -and $item.bytes[1] -eq 0xFE -and $item.bytes[2] -eq 0x00 -and $item.bytes[3] -eq 0x00) -or
+            ($item.bytes[0] -eq 0x00 -and $item.bytes[1] -eq 0x00 -and $item.bytes[2] -eq 0xFE -and $item.bytes[3] -eq 0xFF))
+        $marked = $utf32Marked -or
+            ($item.bytes.Length -ge 2 -and (($item.bytes[0] -eq 0xFF -and $item.bytes[1] -eq 0xFE) -or ($item.bytes[0] -eq 0xFE -and $item.bytes[1] -eq 0xFF))) -or
+            ($item.bytes.Length -ge 3 -and $item.bytes[0] -eq 0xEF -and $item.bytes[1] -eq 0xBB -and $item.bytes[2] -eq 0xBF)
+        if (-not $marked -and ($item.bytes -contains [byte]0)) {
+            Fail-Scan 'nul_unmarked' $item.source $item.path
+        }
         try {
             $text = Convert-SourceText $item.bytes
         }
@@ -451,21 +503,33 @@ try {
 
     $findings = @($findings | Sort-Object source, path, rule -Unique)
     if ($findings.Count) {
-        foreach ($finding in $findings) {
-            Write-ScanRecord $finding.source $finding.path $finding.rule
+        return [pscustomobject]@{
+            ExitCode = 2
+            Output = @($findings | ForEach-Object { Write-ScanRecord $_.source $_.path $_.rule })
         }
-        exit 2
     }
-    Write-Output "CREDENTIAL_SCAN_PASS files=$($items.Count)"
-    exit 0
+    return [pscustomobject]@{
+        ExitCode = 0
+        Output = @("CREDENTIAL_SCAN_PASS files=$scannedCount")
+    }
 }
 catch {
     $parts = $_.Exception.Message.Split([char]0)
     if ($parts.Count -eq 3) {
-        Write-ScanRecord $parts[1] $parts[2] -Code $parts[0]
+        return [pscustomobject]@{
+            ExitCode = 3
+            Output = @(Write-ScanRecord $parts[1] $parts[2] -Code $parts[0])
+        }
     }
-    else {
-        Write-ScanRecord -Code 'read_failed'
-    }
-    exit 3
+    throw
+}
+}
+
+try {
+    $result = Invoke-BootstrapScan -InputPath $Path -IncludeTracked:$Tracked -IncludeStaged:$Staged -ExtraArguments $args
+    $result.Output | Write-Output
+    exit $result.ExitCode
+}
+catch {
+    Write-ScanRecord -Code 'scan_failed'; exit 3
 }
