@@ -1308,3 +1308,16 @@
 - **subagent 输出 / commit hash**：worker `/root/f01s4_impl` 完成实现并保留完整证据；学生在宿主终端创建产品提交 `1d6dcab15adf1649cda7309360f3cdeff0423e27`，提交 trailers 为 `Task-ID: F-01S4`、`Agent: /root/f01s4_impl`、`Human-Changes: none`。
 - **人工修改及原因**：产品文件 `Human-Changes: none`。协调器只执行只读复核与经学生批准的独立 archive 误报修复；没有改变 scanner 验收范围。
 - **经验教训**：完整 scanner 第一次启用时必须先清除仓库历史文本中的合成 assignment 误报，不能通过忽略 archive 或缩小扫描范围制造 PASS；二进制跳过计数应只统计实际扫描文本，tracked/index 双来源则分别计数。
+
+## 2026-08-05T13:01:39+08:00 - F-01A 可复现运行时与锁闭包
+
+- **Task 编号**：F-01A（complete；terminal commit `201c09ebf044b20e601aef5bb3ba8c6dd0336a60`）。
+- **触发的 Superpowers skill**：`using-git-worktrees`、`subagent-driven-development`、`test-driven-development`、`systematic-debugging`、`requesting-code-review`、`verification-before-completion`。
+- **关键 prompt / context**：fresh worker `/root/f01a_impl` 只获得 F-01A task card、权威依赖/锁路径、已验证 worktree 与验证命令；创建十个任务文件，禁止改写后续应用功能。权威输入为 uv `0.11.14`、CPython `3.14.6`、Node `24.18.0` 及三份 Python 锁和 npm 锁。
+- **TDD RED/GREEN**：初始合同 exit 1，覆盖缺失产物/哈希、四份 raw-lock parity、manifest、`npm.ps1`、损坏下载、版本漂移和系统修改；随后为 Python site 配置、uv 漂移、`.python-version`/`.npmrc` scanner allowlist、正式 npm identity、junction 路径和 120 秒下载超时分别取得真实 RED。最终运行时合同输出 `FOUNDATION_RUNTIME_CONTRACT_PASS locks=4 python=3.14.6 node=24.18.0 npm=11.16.0`。
+- **subagent 输出 / commit hash**：worker 产品提交 `d86f2d0ada64924eb63a4898b5c7743bfa59f870`；scanner 无扩展名文本修复为独立提交 `de3f336050dc781fca71252fa07086897e6a2949`；协调器安全/质量 review-fix 终点为 `201c09ebf044b20e601aef5bb3ba8c6dd0336a60`。
+- **规约合规评审**：Critical=0，Major=0。十个 task-card 文件、项目内运行时、下载后哈希、解压前验证、四锁 raw parity、`npm.cmd`、无 PATH/registry 修改和精确版本均有合同证据。
+- **质量/安全/许可证评审**：初审发现旧权威 npm 锁的 `undici` High、`postcss` Moderate、一次性 G-02A npm identity、junction 逃逸、无下载超时五项 Major；修订后 fresh `npm ci` 安装 115 个平台包，`npm audit` 与 `npm ls` 均 exit 0，证据验证保持 `rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`，许可证计数不变。最终 Critical=0，Major=0。独立 reviewer 派发接口本回合不可用，未冒充独立回执；协调器按 task card/SPEC/完整 diff 和新鲜命令完成两阶段评审。
+- **人工修改及原因**：`Human-Changes: none`。学生只在宿主终端执行受阻的 Git 提交；协调器 review fix 更新两个传递安全补丁、正式私有 npm identity、reparse/timeout 防护和权威证据绑定，未改变直接依赖或产品范围。
+- **凭据/依赖/环境证据**：最终 `CREDENTIAL_SCAN_PASS files=182`；bootstrap 与合同 AST error 均为 0；npm canonical-LF hash 更新为 `8b793ee9ca823ca1079efe12c4962a8786059b4aaf08bcb715264ad7b4718354`，生产锁与权威锁逐字节一致。权限探针空提交 `4ec79e7` 证明 `git commit` 可经宿主审批提权，今后不再把同类提交转交学生。
+- **经验教训**：预审时“audit 为零”会随公告变化，生产锁物化当天必须重新审计；路径的字符串前缀不等于物理包含，下载/解压根必须拒绝 reparse point；权威锁可以为安全补丁修订，但必须同步哈希、验证器、PLAN 和过程证据，不能静默漂移。
