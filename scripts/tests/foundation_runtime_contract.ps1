@@ -158,7 +158,8 @@ try {
 
     if (Test-Path -LiteralPath 'frontend/.npmrc') {
         $npmrc = @(Get-Content -Encoding utf8 frontend/.npmrc | Where-Object { $_ })
-        if ($npmrc.Count -ne 2 -or 'engine-strict=true' -notin $npmrc -or 'ignore-scripts=true' -notin $npmrc) {
+        $requiredNpmPolicy = @('engine-strict=true', 'ignore-scripts=true', 'audit=true', 'fund=false', 'save-exact=true', 'package-lock=true')
+        if ($npmrc.Count -ne $requiredNpmPolicy.Count -or @($requiredNpmPolicy | Where-Object { $_ -notin $npmrc }).Count -ne 0) {
             Add-Failure 'manifest' '.npmrc policy'
         }
     }

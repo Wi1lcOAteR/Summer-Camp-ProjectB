@@ -158,7 +158,10 @@ function Install-BootstrapLicenses {
         try { $api = Invoke-RestMethod -Uri $apiUri -Headers $headers -TimeoutSec 30 }
         catch { $apiTransportFailed = $true }
         if (-not $apiTransportFailed) {
-            if ($null -eq $api -or $api.encoding -cne 'base64' -or $api.sha -cne $row.Blob -or [int64]$api.size -ne $row.Bytes) { Stop-License 'license_api_metadata_mismatch' }
+            if ($null -eq $api) { Stop-License 'license_api_metadata_mismatch' }
+            try { $apiSize = [int64]$api.size }
+            catch { Stop-License 'license_api_metadata_mismatch' }
+            if ($api.encoding -cne 'base64' -or $api.sha -cne $row.Blob -or $apiSize -ne $row.Bytes) { Stop-License 'license_api_metadata_mismatch' }
             try { $bytes = [Convert]::FromBase64String(([string]$api.content)) }
             catch { Stop-License 'license_api_decode_failed' }
         }
