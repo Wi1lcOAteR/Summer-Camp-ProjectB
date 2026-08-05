@@ -47,6 +47,24 @@ if (-not $RuntimeRoot.StartsWith($projectLocalPrefix, [StringComparison]::Ordina
     Stop-Bootstrap 'runtime_root_outside_project'
 }
 
+function Assert-NoReparsePath {
+    param([string]$Path)
+
+    $candidate = [IO.Path]::GetFullPath($Path)
+    while ($true) {
+        if (Test-Path -LiteralPath $candidate) {
+            $item = Get-Item -LiteralPath $candidate -Force
+            if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+                Stop-Bootstrap 'runtime_root_reparse'
+            }
+        }
+        if ($candidate.Equals($projectLocalRoot, [StringComparison]::OrdinalIgnoreCase)) { break }
+        $parent = [IO.Directory]::GetParent($candidate)
+        if ($null -eq $parent) { break }
+        $candidate = $parent.FullName
+    }
+}
+
 function Assert-ChildPath {
     param([string]$Path)
     $fullPath = [IO.Path]::GetFullPath($Path)
@@ -54,7 +72,10 @@ function Assert-ChildPath {
     if (-not $fullPath.StartsWith($rootPrefix, [StringComparison]::OrdinalIgnoreCase)) {
         Stop-Bootstrap 'path_escape'
     }
+    Assert-NoReparsePath $fullPath
 }
+
+Assert-NoReparsePath $RuntimeRoot
 
 function Get-FileSha256 {
     param([string]$Path)
@@ -149,7 +170,7 @@ if (-not ($pythonReady -and $nodeReady -and $uvReady)) {
             $partial = "$archive.partial"
             Assert-ChildPath $partial
             try {
-                Invoke-WebRequest -UseBasicParsing -Uri $artifact.Uri -OutFile $partial
+                Invoke-WebRequest -UseBasicParsing -Uri $artifact.Uri -OutFile $partial -TimeoutSec 120
                 if ((Get-FileSha256 $partial) -cne $artifact.Hash) {
                     Stop-Bootstrap "artifact_hash_mismatch $($artifact.Name)"
                 }

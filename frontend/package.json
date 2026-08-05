@@ -1,6 +1,6 @@
 {
-  "name": "projectb-g02a-npm-985d41ddbb004457b9e80e09f77cef91",
-  "version": "1.0.0",
+  "name": "projectb",
+  "version": "0.1.0",
   "private": true,
   "dependencies": {
     "lucide-react": "1.25.0",

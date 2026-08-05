@@ -31,7 +31,7 @@ $dependencyEvidenceFiles = @(
 
 $expectedLockHashes = @{
     Python = "246083f8b210c3e33904f3057dfd48e7d8db548804d11fa5b087ecb291ad0fc6"
-    Npm = "071826d575cbcc472020a7df984e2e8f2410a75c1782550c5ddfeed268af3c2f"
+    Npm = "8b793ee9ca823ca1079efe12c4962a8786059b4aaf08bcb715264ad7b4718354"
 }
 
 $bootstrapLicenseEvidence = @{

@@ -97,7 +97,7 @@ try {
         @('backend/requirements-windows-x64.lock', 'docs/engineering/locks/python-3.14.6-windows-x64.lock', '246083f8b210c3e33904f3057dfd48e7d8db548804d11fa5b087ecb291ad0fc6', 'windows'),
         @('requirements.linux-ci.lock', 'docs/engineering/locks/python-3.14.6-linux-amd64-ci.lock', 'd24ddf3789ea9f276ee6ba4062634fef3c85c4572a7eb62096cbd570bfb0fc35', 'linux-ci'),
         @('packaging/oci/requirements.linux-demo.lock', 'docs/engineering/locks/python-3.14.6-linux-amd64-demo.lock', '09ce57726c02a090f134d4f2c25f2681dce58ebf2d8425502129d42ac2be34f7', 'linux-demo'),
-        @('frontend/package-lock.json', 'docs/engineering/locks/frontend-package-lock.json', '071826d575cbcc472020a7df984e2e8f2410a75c1782550c5ddfeed268af3c2f', 'npm')
+        @('frontend/package-lock.json', 'docs/engineering/locks/frontend-package-lock.json', '8b793ee9ca823ca1079efe12c4962a8786059b4aaf08bcb715264ad7b4718354', 'npm')
     )
     foreach ($lock in $locks) {
         $authorityHash = Get-CanonicalLfHash (Join-Path $repo $lock[1])
@@ -137,7 +137,7 @@ try {
     if (Test-Path -LiteralPath 'frontend/package.json') {
         try {
             $package = Get-Content -Raw -Encoding utf8 frontend/package.json | ConvertFrom-Json
-            if ($package.name -cne 'projectb-g02a-npm-985d41ddbb004457b9e80e09f77cef91' -or $package.version -cne '1.0.0' -or -not $package.private) {
+            if ($package.name -cne 'projectb' -or $package.version -cne '0.1.0' -or -not $package.private) {
                 Add-Failure 'manifest' 'npm identity'
             }
             Test-ExactMap $package.dependencies @{
@@ -173,6 +173,9 @@ try {
         if ($source -notmatch 'runtime_root_outside_project') {
             Add-Failure 'system_mutation' 'runtime root guard missing'
         }
+        if ($source -notmatch 'Invoke-WebRequest[^\r\n]+-TimeoutSec\s+120') {
+            Add-Failure 'download_timeout' 'guard missing'
+        }
         if ($source -match '(?i)SetEnvironmentVariable|\bsetx(?:\.exe)?\b|HKCU:|HKLM:|\$env:PATH\s*=') {
             Add-Failure 'system_mutation' 'forbidden API'
         }
@@ -180,6 +183,22 @@ try {
         $sandbox = Join-Path $repo 'tmp/f01a-runtime-contract'
         try {
             if (Test-Path -LiteralPath $sandbox) { Remove-Item -LiteralPath $sandbox -Recurse -Force }
+            $junctionTarget = Join-Path $sandbox 'junction-target'
+            $junctionRoot = Join-Path $sandbox 'junction-root'
+            [void](New-Item -ItemType Directory -Path $junctionTarget -Force)
+            [void](New-Item -ItemType Junction -Path $junctionRoot -Target $junctionTarget)
+            try {
+                $null = & $bootstrap -RuntimeRoot $junctionRoot -Offline
+                Add-Failure 'runtime_root' 'reparse accepted'
+            }
+            catch {
+                if ($_.Exception.Message -notmatch '^BOOTSTRAP_ERROR runtime_root_reparse$') {
+                    Add-Failure 'runtime_root' 'reparse wrong error'
+                }
+            }
+            finally {
+                if (Test-Path -LiteralPath $junctionRoot) { [IO.Directory]::Delete($junctionRoot) }
+            }
             [void](New-Item -ItemType Directory -Path (Join-Path $sandbox 'corrupt/downloads') -Force)
             [IO.File]::WriteAllBytes((Join-Path $sandbox 'corrupt/downloads/python-3.14.6-embed-amd64.zip'), [byte[]](1, 2, 3, 4))
             $before = Get-EnvironmentSnapshot
