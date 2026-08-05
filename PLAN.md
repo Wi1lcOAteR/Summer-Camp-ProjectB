@@ -140,7 +140,7 @@ git diff --check
 | 4 | F-01S3 | F-01S2 | no: extends shared scanner files | foundation | complete | b7d929771657c02ff40150a8f81768a31ec0dfed |
 | 5 | F-01S4 | F-01S3 | no: closes full scanner gate | foundation | complete | 1d6dcab15adf1649cda7309360f3cdeff0423e27 |
 | 6 | F-01A | F-01S4 | no: materializes runtimes and locks | foundation | complete | `201c09ebf044b20e601aef5bb3ba8c6dd0336a60` |
-| 7 | F-01B | F-01A + BOOTSTRAP-LICENSE-EVIDENCE | no: closes bootstrap licenses | foundation | complete | `cad13ce0b29137a95c58b8a85a57b325f4e20e48` |
+| 7 | F-01B | F-01A + BOOTSTRAP-LICENSE-EVIDENCE | no: closes bootstrap licenses | foundation | complete | `efaa8f0814f82ccccd3a980eb49d4e34bfd612ac` |
 | 8 | F-01C | F-01B | no: creates frontend harness | foundation | not started | none |
 | 9 | F-01D | F-01C | no: seeds push CI before feature branches | foundation | not started | none |
 | 10 | F-01E | F-01D | no: creates shared quality gates | foundation | not started | none |
