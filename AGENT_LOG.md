@@ -1293,3 +1293,18 @@
 - **插件提交核验**：学生报告通过插件提交后，协调器核验到 commit `8b51796b02b5c1555c2d2468ab7c02838bce79a1` 位于根 worktree 的 `codex/stage-b-scope-reset`，只包含 `AGENTS.md`、`docs/engineering/SUPERPOWERS_VALIDATION.md` 与 10 份既有研究文档，不包含本 task 两个 scanner 文件；因此该 commit 不能作为 F-01S3 terminal hash，且未对其执行重写或撤销。
 - **最终提交核验**：学生在精确配置 `safe.directory` 后，于正确 worktree 创建 `b7d929771657c02ff40150a8f81768a31ec0dfed`；协调器验证该 commit 只修改两个 scanner 文件，`git diff b7d9297^ b7d9297 --check` clean，且工作树产物哈希与最终 GREEN 候选一致。
 - **提交时 scanner 边界**：提交前 `-Staged` 如实以 `decode_failed` 停在已跟踪的 `docs/mockups/course-import-onboarding-v1-desktop.png`；这不是凭据 finding，而是 F-01S3 还没有 F-01S4 所属的文本 allowlist 与 binary skip list。两个实际 staged 产品文件已分别用 `-Path` 扫描并得到 `CREDENTIAL_SCAN_PASS files=1`，因此未把这次全 index 操作失败冒充为 PASS；F-01S4 必须用同一 PNG 回归闭合该缺口。
+
+## 2026-08-05T11:10:21+08:00 - F-01S4 完整凭据扫描门禁
+
+- **Task 编号**：F-01S4（complete；terminal commit `1d6dcab15adf1649cda7309360f3cdeff0423e27`）。
+- **触发的 Superpowers skill**：`subagent-driven-development`、`test-driven-development`、`systematic-debugging`、`requesting-code-review`、`verification-before-completion`。
+- **关键 prompt / context**：fresh worker 仅修改 scanner 与 contract；按任务卡依次补齐 UTF-8 BOM、UTF-16LE/BE、未标记 NUL、文本 allowlist、binary skip list、未知类型失败、`Invoke-BootstrapScan`、稳定错误顺序与顶层常量 `scan_failed`。前序合同组不得弱化。
+- **TDD RED/GREEN**：首个 RED 将 UTF-8 BOM 期望改为接受，旧 scanner 返回 `decode_failed`；后续逐项增加 UTF-16、NUL、未知扩展、PNG、完整 allowlist/skiplist、AST redaction 与 fresh Git `files=4` 断言。最终同一命令输出精确十组并以 `BOOTSTRAP_SCANNER_CONTRACT_PASS` 结束，exit 0。
+- **安全门禁修复**：首次全仓扫描 exit 2，只报告两份 `docs/archive/superseded-2026-07-23/` 历史计划的 `assignment_secret`。经学生明确批准，仅将四个合成代码变量重命名并同步引用；独立提交 `f6350daf66260f8850fed32ef2d2c4a0bd2be6a6` 后，`-Tracked -Staged` 得到 `CREDENTIAL_SCAN_PASS files=162`。未输出匹配值，未添加 archive 例外。
+- **验证证据**：fresh 合同 exit 0；scanner 与 contract AST error 均为 0；fresh Git 仅含两文件时 `CREDENTIAL_SCAN_PASS files=4`；真实仓库 PNG 回归 `files=0`；两个 owned 文件直接扫描各 `files=1`；最终全仓双来源 `files=162`；`git diff --check` clean。
+- **产物哈希**：scanner `55F058673608FEEE5968F52FE22DCEC03E22AFD50DB99B038F115622532B326E`；contract `34F628AE4E401AE6AB184321155C46ABD42628BBDAC9D913A66DA2BD1AD37614`。
+- **SPEC 合规评审**：Critical=0，Major=0。确认严格编码、文件类型门禁、source/path/rule 去重排序、稳定 `code/source/path` 错误、常量顶层失败和精确十组输出均符合 F-01S4。
+- **质量/安全/许可证评审**：Critical=0，Major=0。独立 reviewer 已派发但跨日恢复后没有回执，未冒充其 PASS；协调器使用当前 diff、任务卡、AST、完整合同与全仓扫描完成两阶段复核。未引入依赖、第三方代码或许可证义务。
+- **subagent 输出 / commit hash**：worker `/root/f01s4_impl` 完成实现并保留完整证据；学生在宿主终端创建产品提交 `1d6dcab15adf1649cda7309360f3cdeff0423e27`，提交 trailers 为 `Task-ID: F-01S4`、`Agent: /root/f01s4_impl`、`Human-Changes: none`。
+- **人工修改及原因**：产品文件 `Human-Changes: none`。协调器只执行只读复核与经学生批准的独立 archive 误报修复；没有改变 scanner 验收范围。
+- **经验教训**：完整 scanner 第一次启用时必须先清除仓库历史文本中的合成 assignment 误报，不能通过忽略 archive 或缩小扫描范围制造 PASS；二进制跳过计数应只统计实际扫描文本，tracked/index 双来源则分别计数。

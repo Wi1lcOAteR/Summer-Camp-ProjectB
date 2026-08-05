@@ -138,7 +138,7 @@ git diff --check
 | 2 | F-01S1B | F-01S1A | no: extends shared direct-rule files | foundation | complete | c07b90823448600950ba59e7ea4522a190918e92 |
 | 3 | F-01S2 | F-01S1B | no: extends shared scanner files | foundation | complete | 3a75411e210f99bc7098a2dfb3a1197ce8b96640 |
 | 4 | F-01S3 | F-01S2 | no: extends shared scanner files | foundation | complete | b7d929771657c02ff40150a8f81768a31ec0dfed |
-| 5 | F-01S4 | F-01S3 | no: closes full scanner gate | foundation | not started | none |
+| 5 | F-01S4 | F-01S3 | no: closes full scanner gate | foundation | complete | 1d6dcab15adf1649cda7309360f3cdeff0423e27 |
 | 6 | F-01A | F-01S4 | no: materializes runtimes and locks | foundation | not started | none |
 | 7 | F-01B | F-01A + BOOTSTRAP-LICENSE-EVIDENCE | no: closes bootstrap licenses | foundation | not started | none |
 | 8 | F-01C | F-01B | no: creates frontend harness | foundation | not started | none |
