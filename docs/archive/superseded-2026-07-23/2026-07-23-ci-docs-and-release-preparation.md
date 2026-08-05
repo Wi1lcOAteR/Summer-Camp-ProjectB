@@ -457,7 +457,7 @@ from typing import Any
 
 EXPECTED_PARSER = "6.0.2"
 CANONICAL = "python scripts/test_all.py"
-SECRET = re.compile(r"(?i)(api[_-]?key|token|password|secret|private[_-]?key)")
+SECRET_PATTERN = re.compile(r"(?i)(api[_-]?key|token|password|secret|private[_-]?key)")
 
 
 class ContractError(Exception):
@@ -491,7 +491,7 @@ def load_yaml(path: Path) -> dict[str, Any]:
 
 def has_secret_key(value: Any) -> bool:
     if isinstance(value, dict):
-        return any(SECRET.search(str(key)) or has_secret_key(child) for key, child in value.items())
+        return any(SECRET_PATTERN.search(str(key)) or has_secret_key(child) for key, child in value.items())
     if isinstance(value, list):
         return any(has_secret_key(child) for child in value)
     return False

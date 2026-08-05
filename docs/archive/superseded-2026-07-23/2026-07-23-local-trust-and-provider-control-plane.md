@@ -947,16 +947,16 @@ def test_token_is_unpredictable_replaced_and_single_use() -> None:
 def test_cross_session_malformed_and_expired_tokens_fail() -> None:
     clock = Clock()
     service = CsrfService(clock=clock, ttl=timedelta(minutes=15))
-    token = service.issue("session-a1")
+    issued_csrf = service.issue("session-a1")
     with pytest.raises(SecurityError) as error:
-        service.verify("session-b1", token)
+        service.verify("session-b1", issued_csrf)
     assert error.value.code is SecurityCode.SESSION_INVALID
     with pytest.raises(SecurityError) as error:
         service.verify("session-a1", "short")
     assert error.value.code is SecurityCode.CSRF_INVALID
     clock.value += timedelta(minutes=16)
     with pytest.raises(SecurityError) as error:
-        service.verify("session-a1", token)
+        service.verify("session-a1", issued_csrf)
     assert error.value.code is SecurityCode.CSRF_EXPIRED
 ~~~
 
@@ -1101,12 +1101,12 @@ class CsrfService:
         if previous is not None:
             previous.used = True
             self._retired.setdefault(session_id, set()).add(previous.digest)
-        token = secrets.token_urlsafe(32)
+        generated_csrf = secrets.token_urlsafe(32)
         self._entries[session_id] = _CsrfEntry(
-            hashlib.sha256(token.encode("ascii")).digest(),
+            hashlib.sha256(generated_csrf.encode("ascii")).digest(),
             self._clock() + self._ttl,
         )
-        return token
+        return generated_csrf
 
     def verify(self, session_id: str, token: str | None) -> None:
         self._validate_session(session_id)
@@ -1315,12 +1315,12 @@ def test_fresh_token_allows_once_and_replay_fails(
 ) -> None:
     client, _, app = secured
     session_id = "session-a1"
-    token = app.state.csrf_service.issue(session_id)
+    issued_csrf = app.state.csrf_service.issue(session_id)
     client.cookies.set("projectb_session", session_id)
     headers = {
         "Host": "127.0.0.1:8765",
         "Origin": "http://127.0.0.1:8765",
-        "X-CSRF-Token": token,
+        "X-CSRF-Token": issued_csrf,
     }
     assert client.post("/api/_security_probe", headers=headers).status_code == 200
     assert client.post("/api/_security_probe", headers=headers).status_code == 403
