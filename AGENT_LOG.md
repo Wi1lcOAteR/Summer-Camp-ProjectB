@@ -1311,7 +1311,7 @@
 
 ## 2026-08-05T13:01:39+08:00 - F-01A 可复现运行时与锁闭包
 
-- **Task 编号**：F-01A（complete；terminal commit `201c09ebf044b20e601aef5bb3ba8c6dd0336a60`）。
+- **Task 编号**：F-01A（complete；terminal commit `8b725db53d044af41e9d6352802eecbe0c2e5d6d`，后续策略修复与并发 F-01B 评审修复合并于该提交）。
 - **触发的 Superpowers skill**：`using-git-worktrees`、`subagent-driven-development`、`test-driven-development`、`systematic-debugging`、`requesting-code-review`、`verification-before-completion`。
 - **关键 prompt / context**：fresh worker `/root/f01a_impl` 只获得 F-01A task card、权威依赖/锁路径、已验证 worktree 与验证命令；创建十个任务文件，禁止改写后续应用功能。权威输入为 uv `0.11.14`、CPython `3.14.6`、Node `24.18.0` 及三份 Python 锁和 npm 锁。
 - **TDD RED/GREEN**：初始合同 exit 1，覆盖缺失产物/哈希、四份 raw-lock parity、manifest、`npm.ps1`、损坏下载、版本漂移和系统修改；随后为 Python site 配置、uv 漂移、`.python-version`/`.npmrc` scanner allowlist、正式 npm identity、junction 路径和 120 秒下载超时分别取得真实 RED。最终运行时合同输出 `FOUNDATION_RUNTIME_CONTRACT_PASS locks=4 python=3.14.6 node=24.18.0 npm=11.16.0`。
@@ -1324,13 +1324,22 @@
 
 ## 2026-08-05T14:57:05+08:00 - F-01B 字节锁定 bootstrap 许可证闭包
 
-- **Task 编号**：F-01B（complete；terminal commit `efaa8f0814f82ccccd3a980eb49d4e34bfd612ac`）。
+- **Task 编号**：F-01B（complete；terminal commit `8b725db53d044af41e9d6352802eecbe0c2e5d6d`，并发暂存导致与 F-01A 策略修复同提交）。
 - **触发的 Superpowers skill**：`subagent-driven-development`、`test-driven-development`、`systematic-debugging`、`requesting-code-review`、`receiving-code-review`、`verification-before-completion`。
 - **关键 prompt / context**：fresh worker `/root/f01b_impl` 只获得 F-01B task card、F-01A 前置接口和 `BOOTSTRAP_LICENSE_EVIDENCE.md`；仅实现五份精确许可证、许可证合同和 `scripts/bootstrap.ps1` 的许可证安装入口。
 - **TDD RED/GREEN**：初始合同对五个缺失目标、错误字节/数量/哈希、可变引用、传输回退和证据绑定产生 RED；规约评审指出初版仅静态检查传输关键字，随后增加真实 API-first、不可变 raw fallback、错误元数据、两类错误字节、双传输失败、partial 文件拒绝和 junction 根拒绝。最终输出 `BOOTSTRAP_LICENSE_CONTRACT_PASS`，离线入口输出 `BOOTSTRAP_LICENSE_PASS files=5`。
-- **subagent 输出 / commit hash**：产品提交 `35e0561dcf6a20e11b57181fc28021f75647a77b`；路径类型、最终文件复验和唯一测试沙箱修复为 `cad13ce0b29137a95c58b8a85a57b325f4e20e48`；API null 元数据 fail-closed 复审终点为 `efaa8f0814f82ccccd3a980eb49d4e34bfd612ac`；协调器先提交门禁兼容修复 `de96057`，使 scanner 精确识别五个 extensionless 许可证名，并用 `.gitattributes` 保持上游字节且避免文本 diff 空白误报。
+- **subagent 输出 / commit hash**：产品提交 `35e0561dcf6a20e11b57181fc28021f75647a77b`；路径类型和唯一测试沙箱修复为 `cad13ce0b29137a95c58b8a85a57b325f4e20e48`；API null 元数据 fail-closed 复审为 `efaa8f0814f82ccccd3a980eb49d4e34bfd612ac`；最终与 F-01A npm 策略收紧一并落在 `8b725db53d044af41e9d6352802eecbe0c2e5d6d`。协调器先提交门禁兼容修复 `de96057`，使 scanner 精确识别五个 extensionless 许可证名，并用 `.gitattributes` 保持上游字节且避免文本 diff 空白误报。
 - **规约合规评审**：独立 reviewer 初审发现 1 Critical（传输合同未执行真实路径）、1 Major（license root reparse）和 1 Minor（恒真断言）；修订后合同覆盖计划要求的正负路径，Critical=0、Major=0。
 - **质量/安全/许可证评审**：五个目标的 byte count、SHA-256 与 Git blob ID 均和唯一证据表一致；API 错误或 null 元数据都不回退，只有 API 传输抛错才使用相同不可变 commit 的 raw URL，复制前再次验证长度/blob/SHA；partial 使用 `CreateNew` 且不覆盖既有文件。最终 Critical=0、Major=0。
 - **人工修改及原因**：`Human-Changes: none`。协调器只处理 reviewer finding、扫描器精确 allowlist 和字节锁定 diff 属性；未改许可证内容、依赖选择或产品范围。
 - **验证证据**：提交后合同 exit 0；标准证据 `rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；`CREDENTIAL_SCAN_PASS files=194`。五份许可证的长度/SHA-256 分别为 13804/`B0E25A78...10231`、157606/`148EACF7...6CA5`、9742/`7610D223...A257`、11357/`C71D239D...0AB4`、1077/`860E3D7A...176C`。
 - **经验教训**：哈希锁定第三方文本可能合法包含 Git 空白诊断形状，也可能没有扩展名；门禁应以精确路径和不可变哈希理解这类产物，不能修改上游字节或宽泛跳过扫描。传输安全必须由可执行正负合同支撑，静态关键字搜索不能作为 PASS 证据。
+
+## 2026-08-05T15:00:00+08:00 - F-01A npm 策略前置修复
+
+- **Task 编号**：F-01A-review（complete；与并发 F-01B 修复共同终止于 `8b725db53d044af41e9d6352802eecbe0c2e5d6d`）。
+- **触发的 Superpowers skill**：`systematic-debugging`、`test-driven-development`、`verification-before-completion`。
+- **根因与 TDD 证据**：F-01C 预检发现计划声称的六项 frontend npm policy 与实际两项不一致；先收紧 F-01A contract，真实 RED 为 `CONTRACT_RED manifest .npmrc policy`，补齐 `audit=true`、`fund=false`、`save-exact=true`、`package-lock=true` 后 GREEN 为 `FOUNDATION_RUNTIME_CONTRACT_PASS locks=4 python=3.14.6 node=24.18.0 npm=11.16.0`。
+- **人工修改及原因**：`Human-Changes: none`。未改变依赖版本，只补齐已冻结的安全安装策略；并发 worker 当时已暂存两份 F-01B 复审修复，因此 Git 将它们一并提交，未重写历史。
+- **验证**：`CREDENTIAL_SCAN_PASS files=194`、`git diff --cached --check` exit 0；最终 F-01B 合同和标准证据验证均通过。
+- **经验教训**：进入后续 task 前必须逐字核对前置合同与实际文件，不要仅依据 PLAN 的“already requires”描述。
