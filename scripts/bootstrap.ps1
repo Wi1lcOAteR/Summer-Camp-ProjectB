@@ -1,6 +1,9 @@
 param(
     [string]$RuntimeRoot,
-    [switch]$Offline
+    [switch]$Offline,
+    [switch]$LicenseOnly,
+    [string]$LicenseRoot,
+    [string]$LicenseEvidencePath
 )
 
 Set-StrictMode -Version Latest
@@ -82,6 +85,102 @@ function Get-FileSha256 {
     return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 
+function Get-GitBlobSha1 {
+    param([byte[]]$Bytes)
+    $header = [Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
+    $payload = [byte[]]::new($header.Length + $Bytes.Length)
+    [Array]::Copy($header, 0, $payload, 0, $header.Length)
+    [Array]::Copy($Bytes, 0, $payload, $header.Length, $Bytes.Length)
+    return ([Security.Cryptography.SHA1]::Create().ComputeHash($payload) | ForEach-Object { $_.ToString('x2') }) -join ''
+}
+
+function Stop-License {
+    param([string]$Code)
+    throw [IO.InvalidDataException]::new("BOOTSTRAP_LICENSE_ERROR $Code")
+}
+
+function Install-BootstrapLicenses {
+    param(
+        [string]$Root,
+        [string]$EvidencePath,
+        [switch]$OfflineMode
+    )
+
+    $expectedEvidenceHash = 'FD65C5D2F8421F7B99AE4D540B80A8BBED1C28C78EF45851F7C6E5051034F310'
+    $repoPrefix = $repo.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+    $rootFull = [IO.Path]::GetFullPath($Root)
+    if (-not $rootFull.StartsWith($repoPrefix, [StringComparison]::OrdinalIgnoreCase)) { Stop-License 'license_root_outside_project' }
+    Assert-NoReparsePath $rootFull
+    if (-not (Test-Path -LiteralPath $EvidencePath -PathType Leaf)) { Stop-License 'evidence_missing' }
+    if ((Get-FileSha256 $EvidencePath) -ine $expectedEvidenceHash) { Stop-License 'evidence_hash_mismatch' }
+
+    $text = [IO.File]::ReadAllText($EvidencePath, [Text.UTF8Encoding]::new($false, $true))
+    $rows = @{}
+    foreach ($line in ($text -split "`r?`n")) {
+        if ($line -notmatch '^\| `(?<target>licenses/bootstrap/[^`]+)` \| [^|]+ \| (?<immutable>[^|]+) \| `(?<blob>[0-9a-f]{40})` \| (?<bytes>[1-9][0-9]*) \| `(?<hash>[0-9A-Fa-f]{64})` \|') { continue }
+        if ($rows.ContainsKey($Matches.target)) { Stop-License 'duplicate_evidence_target' }
+        $rows[$Matches.target] = [pscustomobject]@{ Target = $Matches.target; Immutable = $Matches.immutable.Trim(); Blob = $Matches.blob; Bytes = [int64]$Matches.bytes; Hash = $Matches.hash }
+    }
+    $expected = @('licenses/bootstrap/uv-LICENSE-APACHE','licenses/bootstrap/uv-LICENSE-MIT','licenses/bootstrap/cpython-LICENSE','licenses/bootstrap/node-LICENSE','licenses/bootstrap/npm-LICENSE')
+    if ($rows.Count -ne $expected.Count) { Stop-License 'evidence_row_count' }
+
+    [void](New-Item -ItemType Directory -Path $rootFull -Force)
+    foreach ($target in $expected) {
+        if (-not $rows.ContainsKey($target)) { Stop-License 'evidence_target_missing' }
+        $row = $rows[$target]
+        $immutable = $row.Immutable.Trim().Trim('`').Trim()
+        $raw = [regex]::Match($immutable, 'https://raw\.githubusercontent\.com/(?<owner>[^/\s`]+)/(?<project>[^/\s`]+)/(?<commit>[0-9a-f]{40})/(?<path>[^\s`]+)(?:`)?$')
+        $commits = @([regex]::Matches($row.Immutable, '(?i)[0-9a-f]{40}') | ForEach-Object { $_.Value.ToLowerInvariant() } | Select-Object -Unique)
+        if (-not $raw.Success -or $commits.Count -ne 1 -or $raw.Groups['commit'].Value.ToLowerInvariant() -cne $commits[0]) { Stop-License 'evidence_not_immutable' }
+        $destination = Join-Path $rootFull ($target.Substring('licenses/bootstrap/'.Length))
+        $validExisting = $false
+        if (Test-Path -LiteralPath $destination -PathType Leaf) {
+            $existing = [IO.File]::ReadAllBytes($destination)
+            $validExisting = $existing.Length -eq $row.Bytes -and (Get-FileSha256 $destination) -ieq $row.Hash -and (Get-GitBlobSha1 $existing) -ceq $row.Blob
+            if (-not $validExisting -and $OfflineMode) { Stop-License 'license_bytes_mismatch' }
+        }
+        if ($validExisting) { continue }
+        if ($OfflineMode) { Stop-License 'license_missing' }
+
+        $bytes = $null
+        $apiUri = "https://api.github.com/repos/$($raw.Groups['owner'].Value)/$($raw.Groups['project'].Value)/contents/$($raw.Groups['path'].Value)?ref=$($raw.Groups['commit'].Value)"
+        $headers = @{ Accept = 'application/vnd.github+json'; 'X-GitHub-Api-Version' = '2022-11-28'; 'User-Agent' = 'ProjectB-bootstrap' }
+        $api = $null
+        try { $api = Invoke-RestMethod -Uri $apiUri -Headers $headers -TimeoutSec 30 }
+        catch { $api = $null }
+        if ($null -ne $api) {
+            if ($api.encoding -cne 'base64' -or $api.sha -cne $row.Blob -or [int64]$api.size -ne $row.Bytes) { Stop-License 'license_api_metadata_mismatch' }
+            try { $bytes = [Convert]::FromBase64String(([string]$api.content)) }
+            catch { Stop-License 'license_api_decode_failed' }
+        }
+        else {
+            try {
+                $response = Invoke-WebRequest -UseBasicParsing -Uri ("https://raw.githubusercontent.com/$($raw.Groups['owner'].Value)/$($raw.Groups['project'].Value)/$($raw.Groups['commit'].Value)/$($raw.Groups['path'].Value)") -Headers @{ 'User-Agent' = 'ProjectB-bootstrap' } -TimeoutSec 30
+                $bytes = [byte[]]$response.RawContentStream.ToArray()
+            }
+            catch { Stop-License 'license_transport_failed' }
+        }
+        if ($bytes.Length -ne $row.Bytes -or (Get-GitBlobSha1 $bytes) -cne $row.Blob) { Stop-License 'license_blob_mismatch' }
+        $actualHash = ([Security.Cryptography.SHA256]::Create().ComputeHash($bytes) | ForEach-Object { $_.ToString('x2') }) -join ''
+        if ($actualHash -ine $row.Hash) { Stop-License 'license_hash_mismatch' }
+        $partial = "$destination.partial"
+        if (Test-Path -LiteralPath $partial) { Stop-License 'license_partial_exists' }
+        $createdPartial = $false
+        try {
+            try {
+                $stream = [IO.File]::Open($partial, [IO.FileMode]::CreateNew, [IO.FileAccess]::Write, [IO.FileShare]::None)
+                $createdPartial = $true
+            }
+            catch { Stop-License 'license_partial_exists' }
+            try { $stream.Write($bytes, 0, $bytes.Length); $stream.Flush($true) }
+            finally { $stream.Dispose() }
+            Move-Item -LiteralPath $partial -Destination $destination -Force
+        }
+        finally { if ($createdPartial -and (Test-Path -LiteralPath $partial)) { Remove-Item -LiteralPath $partial -Force -ErrorAction SilentlyContinue } }
+    }
+    Write-Output 'BOOTSTRAP_LICENSE_PASS files=5'
+}
+
 function Get-NpmCommand {
     param([string]$NodeRoot)
     $command = Join-Path $NodeRoot 'npm.cmd'
@@ -133,6 +232,11 @@ function Test-UvRuntime {
     }
     return $true
 }
+
+if (-not $LicenseRoot) { $LicenseRoot = Join-Path $repo 'licenses/bootstrap' }
+if (-not $LicenseEvidencePath) { $LicenseEvidencePath = Join-Path $repo 'docs/engineering/BOOTSTRAP_LICENSE_EVIDENCE.md' }
+$licenseReceipt = @(Install-BootstrapLicenses -Root $LicenseRoot -EvidencePath $LicenseEvidencePath -OfflineMode:$Offline)
+if ($LicenseOnly) { $licenseReceipt | Write-Output; exit 0 }
 
 $downloads = Join-Path $RuntimeRoot 'downloads'
 $runtimes = Join-Path $RuntimeRoot 'runtimes'
