@@ -1321,3 +1321,16 @@
 - **人工修改及原因**：`Human-Changes: none`。学生只在宿主终端执行受阻的 Git 提交；协调器 review fix 更新两个传递安全补丁、正式私有 npm identity、reparse/timeout 防护和权威证据绑定，未改变直接依赖或产品范围。
 - **凭据/依赖/环境证据**：最终 `CREDENTIAL_SCAN_PASS files=182`；bootstrap 与合同 AST error 均为 0；npm canonical-LF hash 更新为 `8b793ee9ca823ca1079efe12c4962a8786059b4aaf08bcb715264ad7b4718354`，生产锁与权威锁逐字节一致。权限探针空提交 `4ec79e7` 证明 `git commit` 可经宿主审批提权，今后不再把同类提交转交学生。
 - **经验教训**：预审时“audit 为零”会随公告变化，生产锁物化当天必须重新审计；路径的字符串前缀不等于物理包含，下载/解压根必须拒绝 reparse point；权威锁可以为安全补丁修订，但必须同步哈希、验证器、PLAN 和过程证据，不能静默漂移。
+
+## 2026-08-05T14:57:05+08:00 - F-01B 字节锁定 bootstrap 许可证闭包
+
+- **Task 编号**：F-01B（complete；terminal commit `cad13ce0b29137a95c58b8a85a57b325f4e20e48`）。
+- **触发的 Superpowers skill**：`subagent-driven-development`、`test-driven-development`、`systematic-debugging`、`requesting-code-review`、`receiving-code-review`、`verification-before-completion`。
+- **关键 prompt / context**：fresh worker `/root/f01b_impl` 只获得 F-01B task card、F-01A 前置接口和 `BOOTSTRAP_LICENSE_EVIDENCE.md`；仅实现五份精确许可证、许可证合同和 `scripts/bootstrap.ps1` 的许可证安装入口。
+- **TDD RED/GREEN**：初始合同对五个缺失目标、错误字节/数量/哈希、可变引用、传输回退和证据绑定产生 RED；规约评审指出初版仅静态检查传输关键字，随后增加真实 API-first、不可变 raw fallback、错误元数据、两类错误字节、双传输失败、partial 文件拒绝和 junction 根拒绝。最终输出 `BOOTSTRAP_LICENSE_CONTRACT_PASS`，离线入口输出 `BOOTSTRAP_LICENSE_PASS files=5`。
+- **subagent 输出 / commit hash**：产品提交 `35e0561dcf6a20e11b57181fc28021f75647a77b`；路径类型、最终文件复验和唯一测试沙箱的评审修复终点为 `cad13ce0b29137a95c58b8a85a57b325f4e20e48`；协调器先提交门禁兼容修复 `de96057`，使 scanner 精确识别五个 extensionless 许可证名，并用 `.gitattributes` 保持上游字节且避免文本 diff 空白误报。
+- **规约合规评审**：独立 reviewer 初审发现 1 Critical（传输合同未执行真实路径）、1 Major（license root reparse）和 1 Minor（恒真断言）；修订后合同覆盖计划要求的正负路径，Critical=0、Major=0。
+- **质量/安全/许可证评审**：五个目标的 byte count、SHA-256 与 Git blob ID 均和唯一证据表一致；API 元数据错误不回退，只有 API 传输失败才使用相同不可变 commit 的 raw URL，复制前再次验证长度/blob/SHA；partial 使用 `CreateNew` 且不覆盖既有文件。最终 Critical=0、Major=0。
+- **人工修改及原因**：`Human-Changes: none`。协调器只处理 reviewer finding、扫描器精确 allowlist 和字节锁定 diff 属性；未改许可证内容、依赖选择或产品范围。
+- **验证证据**：提交后合同 exit 0；标准证据 `rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；`CREDENTIAL_SCAN_PASS files=194`。五份许可证的长度/SHA-256 分别为 13804/`B0E25A78...10231`、157606/`148EACF7...6CA5`、9742/`7610D223...A257`、11357/`C71D239D...0AB4`、1077/`860E3D7A...176C`。
+- **经验教训**：哈希锁定第三方文本可能合法包含 Git 空白诊断形状，也可能没有扩展名；门禁应以精确路径和不可变哈希理解这类产物，不能修改上游字节或宽泛跳过扫描。传输安全必须由可执行正负合同支撑，静态关键字搜索不能作为 PASS 证据。

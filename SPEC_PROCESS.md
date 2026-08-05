@@ -734,3 +734,10 @@
 - **受控修订：** 只更新传递依赖为 `undici 7.29.0`、`postcss 8.5.25`，并把一次性证据工作区身份改为正式私有 `projectb@0.1.0`。16 个直接 npm 选择、166 个非根包、115 个 Windows 安装包和全部许可证计数保持不变；未运行会改变直接版本的宽泛升级。
 - **关键 diff：** npm canonical-LF hash 从 `071826d5...3c2f` 更新为 `8b793ee9...8354`；生产锁、权威锁、`PLAN.md`、`scripts/verify_evidence.ps1`、运行时合同和依赖基线同步绑定。当前证据态 PLAN hash 为 `91798DAFE433049B654ACE1D8638188730FA00DAFDA6FC23411F70643351812D`。
 - **复验与边界：** fresh `npm ci`、`npm audit`、`npm ls`、运行时合同、63 行课程证据验证和凭据扫描均通过。该修订是同一 F-01A 范围内的安全维护，不新增产品能力、服务、许可证选择或远程发布授权。
+
+## 22. 2026-08-05 F-01B 许可证传输合同修订
+
+- **冷启动式误解/差距：** 初版实现正确使用 GitHub Contents API 和不可变 raw fallback，但测试只搜索脚本文本中的关键字，不能证明 API 优先、错误元数据拒绝、回退顺序和错误字节 fail-closed。
+- **关键修订 diff：** 合同增加内存 transport harness，分别验证 API 成功不触发 raw、API 传输失败后逐项 raw 回退、API 元数据错误禁止回退、API/raw 错误字节、双传输失败、已有 partial 文件和 junction 输出根；实现区分“API 传输不可用”与“API 返回不可信元数据”，只对前者回退。
+- **字节边界：** 五份许可证严格保持证据表的 byte count、SHA-256 和 Git blob ID。Node 上游许可证含合法 space-before-tab，仓库以 `-text -diff` 保存这组哈希产物；scanner 仅增加五个精确 extensionless 文件名，不放宽未知文件失败策略。
+- **结果与范围：** F-01B 合同、标准证据验证、离线 bootstrap、全仓凭据扫描和 staged diff 均通过。该修订只闭合 bootstrap 许可证，不改变 SPEC、依赖版本、应用功能或远程授权门禁。
