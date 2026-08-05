@@ -1343,3 +1343,15 @@
 - **人工修改及原因**：`Human-Changes: none`。未改变依赖版本，只补齐已冻结的安全安装策略；并发 worker 当时已暂存两份 F-01B 复审修复，因此 Git 将它们一并提交，未重写历史。
 - **验证**：`CREDENTIAL_SCAN_PASS files=194`、`git diff --cached --check` exit 0；最终 F-01B 合同和标准证据验证均通过。
 - **经验教训**：进入后续 task 前必须逐字核对前置合同与实际文件，不要仅依据 PLAN 的“already requires”描述。
+
+## 2026-08-05T16:47:49+08:00 - F-01C 严格前端基础骨架
+
+- **Task 编号**：F-01C（complete；terminal commit `39d79c2e6d423883a0614cc8d9bb947dd02a7dba`）。
+- **触发的 Superpowers skill**：`test-driven-development`、`systematic-debugging`、`requesting-code-review`、`verification-before-completion`；沿用 `using-git-worktrees` 的 `codex/foundation-v1` worktree。
+- **关键 prompt / context**：只实现 F-01C 的五个 owned path：严格 TypeScript、Vite/Vitest loopback/JSDOM 配置、可访问计数器组件、真实 user-event 测试和 PowerShell 合同。该组件仅是测试骨架，不是产品 UI；Open Design 仍由 UI-01 执行。
+- **TDD RED/GREEN**：合同先以 `CONTRACT_RED missing_frontend_tsconfig.json` 失败；首次真实 Vitest 运行又分别暴露 `describe is not defined` 和缺少 JSDOM 的 user-event 失败。显式导入 Vitest API，并在 `frontend/` 工作目录加载 `vite.config.ts` 后，合同输出 `FRONTEND_FOUNDATION_CONTRACT_PASS`，真实交互为 `1 passed`；不存在的测试过滤器 exit 1，证明空 suite 不会变绿。
+- **规约合规评审**：strict + `noUncheckedIndexedAccess`、React/JSDOM、5173/4173 loopback、禁止 `0.0.0.0`、可访问 button/status 和 click 后计数更新均有合同/运行证据。Critical=0，Major=0。
+- **质量/安全/许可证评审**：`tsc --noEmit` exit 0，`npm audit --audit-level=moderate` 为 0 vulnerabilities；合同优先项目内锁定 npm，在 CI 环境可回退当前 `npm.cmd`/`npm`，并恢复 PowerShell 错误策略。没有新增依赖或许可证。Critical=0，Major=0。
+- **subagent / 人工修改**：fresh worker 派发接口本轮没有返回可用会话，协调器 `/root` 执行并使用 `[agent: coordinator]`，未冒充 worker；`Human-Changes: none`。PLAN 所写 `npm --prefix frontend exec` 不改变 cwd，实际等价验证在 `frontend/` 目录执行锁定 npm，以确保加载唯一的 `vite.config.ts`；未修改冻结 PLAN 语义。
+- **验证证据**：`CREDENTIAL_SCAN_PASS files=204`、`EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`、`git diff --cached --check` exit 0。
+- **经验教训**：npm 的 `--prefix` 选择包根但不保证子进程 cwd；前端测试配置发现必须由实际启动目录验证，不能只做配置文本检查。
