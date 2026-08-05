@@ -1355,3 +1355,17 @@
 - **subagent / 人工修改**：fresh worker 派发接口本轮没有返回可用会话，协调器 `/root` 执行并使用 `[agent: coordinator]`，未冒充 worker；`Human-Changes: none`。PLAN 所写 `npm --prefix frontend exec` 不改变 cwd，实际等价验证在 `frontend/` 目录执行锁定 npm，以确保加载唯一的 `vite.config.ts`；未修改冻结 PLAN 语义。
 - **验证证据**：`CREDENTIAL_SCAN_PASS files=204`、`EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`、`git diff --cached --check` exit 0。
 - **经验教训**：npm 的 `--prefix` 选择包根但不保证子进程 cwd；前端测试配置发现必须由实际启动目录验证，不能只做配置文本检查。
+
+## 2026-08-05T18:01:20+08:00 - F-01D 可移植 push CI 种子
+
+- **Task 编号**：F-01D（complete；terminal commit `069acb8541b8d59a7977a484f06d8f9abbefe780`）。
+- **触发的 Superpowers skill**：`test-driven-development`、`systematic-debugging`、`requesting-code-review`、`receiving-code-review`、`verification-before-completion`；沿用 `using-git-worktrees` 创建的 `codex/foundation-v1` worktree。
+- **关键 prompt / context**：只创建 `.gitlab-ci.yml`、`.github/workflows/ci.yml` 和 `scripts/tests/ci_seed_contract.ps1`。两端每次 push 运行固定 digest 的 scanner/backend/frontend current-suite；GitLab job 名精确为 `unit-test`；F-01E 前 backend 只能记录 `runner_absent_pre_feature`，存在 `backend/projectb` 却缺 runner 时必须失败。F-01A/B 的 Windows-only bootstrap 契约不塞入 Linux runner，Windows push job 仍由 DIST-01 所有。
+- **TDD RED/GREEN**：初始合同得到 `CONTRACT_RED gitlab_missing`；创建两份 CI 后转绿。评审修订先得到 `CONTRACT_RED gitlab_commands`，随后两端 scanner job 加入 seed contract、前端改为 `vitest run` 自动发现全部测试。最小权限变异临时加入 `id-token: write` 后得到 `CONTRACT_RED github_permissions`，恢复仅 `contents: read` 后再次输出 `CI_SEED_CONTRACT_PASS`。
+- **跨平台修复**：固定 Linux CI 暴露 scanner contract 的 Windows 路径与 `pwsh.exe` 假设；前置修复 `7210b25fb3e33f92ed34a964f1e926607738639a` 改为平台路径、Linux `pwsh` 和可执行 fake Git。Windows 全量输出 `BOOTSTRAP_SCANNER_CONTRACT_PASS`；WSL 真实 Git 最小仓库输出 `CREDENTIAL_SCAN_PASS files=2`。完整 WSL 合同因本机每次子进程启动约 8 秒而在 10 分钟超时，未冒充完整 Linux PASS。
+- **规约合规评审**：fresh reviewer `/root/f01d_review` 初审提出 CI current-suite 与 trigger/fail-closed 检查问题；依据 PLAN 的 Windows-only/current-suite 明确边界撤销不适用项，其余修订完成后最终 `Critical=0, Major=0`。
+- **质量/安全/许可证评审**：精确校验 GitHub 顶层权限块、三个 checkout 引用全部使用唯一固定 SHA、GitLab 唯一 workflow rules、无 path/branch filter、allow-failure、manual/delayed 或 `|| true` 绕过；无新增依赖或许可证。最终 `Critical=0, Major=0`。
+- **subagent / 人工修改**：实现由 coordinator 完成，fresh subagent 负责独立双阶段评审；未冒充 worker。`Human-Changes: none`。此前沙箱 Git index 限制已通过正式提权提交解决，不再转交学生。
+- **验证证据**：`CI_SEED_CONTRACT_PASS`；前端 `1 passed`；`tsc --noEmit` exit 0；`CI_YAML_PARSE_PASS files=2`；`CREDENTIAL_SCAN_PASS files=210`；`EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；`git diff --cached --check` exit 0。Docker daemon 不可用，固定容器内命令和远程 pipeline 均为 `not executed / blocked`。
+- **commit hash**：跨平台前置修复 `7210b25fb3e33f92ed34a964f1e926607738639a`；F-01D 产品提交 `069acb8541b8d59a7977a484f06d8f9abbefe780`。
+- **经验教训**：seed CI 合同不能只验证关键字存在；触发条件、最小权限、固定 action、测试发现和绕过路径都要有可变异的失败证据。平台专用契约必须按已确认计划进入对应 runner，不能为了表面上的“全量”把 Windows 行为伪装成 Linux PASS。

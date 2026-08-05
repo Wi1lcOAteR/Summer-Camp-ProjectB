@@ -142,7 +142,7 @@ git diff --check
 | 6 | F-01A | F-01S4 | no: materializes runtimes and locks | foundation | complete | `8b725db53d044af41e9d6352802eecbe0c2e5d6d` |
 | 7 | F-01B | F-01A + BOOTSTRAP-LICENSE-EVIDENCE | no: closes bootstrap licenses | foundation | complete | `8b725db53d044af41e9d6352802eecbe0c2e5d6d` |
 | 8 | F-01C | F-01B | no: creates frontend harness | foundation | complete | `39d79c2e6d423883a0614cc8d9bb947dd02a7dba` |
-| 9 | F-01D | F-01C | no: seeds push CI before feature branches | foundation | not started | none |
+| 9 | F-01D | F-01C | no: seeds push CI before feature branches | foundation | complete | `069acb8541b8d59a7977a484f06d8f9abbefe780` |
 | 10 | F-01E | F-01D | no: creates shared quality gates | foundation | not started | none |
 | 11 | F-02 | F-01E | no: migration order | foundation | not started | none |
 | 12 | F-03 | F-02 | no: migration order | foundation | not started | none |
