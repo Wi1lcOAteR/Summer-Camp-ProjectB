@@ -154,10 +154,11 @@ function Install-BootstrapLicenses {
         $apiUri = "https://api.github.com/repos/$($raw.Groups['owner'].Value)/$($raw.Groups['project'].Value)/contents/$($raw.Groups['path'].Value)?ref=$($raw.Groups['commit'].Value)"
         $headers = @{ Accept = 'application/vnd.github+json'; 'X-GitHub-Api-Version' = '2022-11-28'; 'User-Agent' = 'ProjectB-bootstrap' }
         $api = $null
+        $apiTransportFailed = $false
         try { $api = Invoke-RestMethod -Uri $apiUri -Headers $headers -TimeoutSec 30 }
-        catch { $api = $null }
-        if ($null -ne $api) {
-            if ($api.encoding -cne 'base64' -or $api.sha -cne $row.Blob -or [int64]$api.size -ne $row.Bytes) { Stop-License 'license_api_metadata_mismatch' }
+        catch { $apiTransportFailed = $true }
+        if (-not $apiTransportFailed) {
+            if ($null -eq $api -or $api.encoding -cne 'base64' -or $api.sha -cne $row.Blob -or [int64]$api.size -ne $row.Bytes) { Stop-License 'license_api_metadata_mismatch' }
             try { $bytes = [Convert]::FromBase64String(([string]$api.content)) }
             catch { Stop-License 'license_api_decode_failed' }
         }
