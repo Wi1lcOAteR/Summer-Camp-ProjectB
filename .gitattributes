@@ -10,3 +10,6 @@ docs/cold-start/*.md text eol=lf
 docs/cold-start/*.json text eol=lf
 scripts/cold_start/*.ps1 text eol=lf
 scripts/cold_start/tests/*.ps1 text eol=lf
+
+# Bootstrap licenses are upstream byte-pinned artifacts; preserve exact bytes and suppress text diff whitespace checks.
+licenses/bootstrap/** -text -diff
