@@ -144,8 +144,8 @@ git diff --check
 | 8 | F-01C | F-01B | no: creates frontend harness | foundation | complete | `39d79c2e6d423883a0614cc8d9bb947dd02a7dba` |
 | 9 | F-01D | F-01C | no: seeds push CI before feature branches | foundation | complete | `069acb8541b8d59a7977a484f06d8f9abbefe780` |
 | 10 | F-01E | F-01D | no: creates shared quality gates | foundation | complete | ae152e3 |
-| 11 | F-02 | F-01E | no: migration order | foundation | verified; commit pending | pending local Git commit |
-| 12 | F-03 | F-02 | no: migration order | foundation | not started | none |
+| 11 | F-02 | F-01E | no: migration order | foundation | complete | 62022db |
+| 12 | F-03 | F-02 | no: migration order | foundation | complete | `1aaeb6f1912c7f1e5323ea6ab843b689937adbd1` |
 | 13 | F-04 | F-03 | no: security base | foundation | not started | none |
 | 14 | F-05 | F-04 | no: security base | foundation | not started | none |
 | 15 | M1-01 | F-05 | no: material contracts | m1-materials | not started | none |

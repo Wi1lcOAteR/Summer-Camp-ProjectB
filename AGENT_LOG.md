@@ -1386,3 +1386,14 @@
 - Quality review: independent review found 5 Major and 3 Minor issues. Fixed uppercase hash acceptance, PDF page ranges, mutable material hash, deletable coverage history, missing blob tombstones, migration atomicity and BEGIN connection cleanup. Blob bytes remain owned by M1-03; F-02 preserves `storage_ref` with `delete_pending=1` until that later boundary succeeds.
 - Verification: targeted `7 passed`; backend regression `26 passed`; full runner and final scan are rerun after this evidence update. Human changes: none. Fresh worker dispatch was unavailable, so coordinator implementation is recorded rather than attributed to a worker.
 - Lesson: database deletion metadata must survive physical-byte failure, and insert-time hash equality is insufficient without update immutability.
+
+## 2026-08-06T17:52:17+08:00 - F-03 学习证据与复习计划数据库约束
+
+- **Task 编号**：`F-03`；使用 `using-git-worktrees`、`subagent-driven-development`、`test-driven-development`、`systematic-debugging`、`requesting-code-review`、`receiving-code-review`、`verification-before-completion`。
+- **关键 context**：fresh worker `/root/f03_impl` 只处理 migration 002、学习 schema 测试及经 coordinator 明确授权的 F-02 迁移清单兼容断言；基线提交为 `29da38e`，`Human-Changes: none`。
+- **红绿证据**：初始 RED 因缺少 `002_learning` 和目标表失败；后续分别观察到旧迁移清单断言、SPEC 枚举/字段、Attempt 幂等键和同一 Attempt 多证据的失败。最终目标命令为 `14 passed`，后端回归为 `14 passed`。
+- **规约评审**：fresh reviewer `/root/f03_spec_review` 发现 5 个 Major：掌握状态、`finals` 模式、预算/任务时长、LearningEvidence 字段与枚举、外键删除测试。已改为 `unknown/demonstrated_now/retained`、`continuous/finals`、预算 10--120 且步长 5、任务固定 10 分钟，并增加 evidence context、版本、枚举、幂等与删除规则约束。
+- **质量/安全/许可证评审**：coordinator 复核发现 Attempt 缺少规范化 check kind/幂等键，以及同一 Attempt 可产生多条证据；均以独立 RED 后修复。未新增第三方代码或依赖。全量 runner 输出 `35 passed`、Vitest `1 passed`、Vite build PASS、`CREDENTIAL_SCAN_PASS files=234`、`LICENSE_VERIFICATION_PASS python=54 npm=166`、`TEST_ALL_PASS mode=all`。
+- **subagent 输出与 commit**：worker 产物经评审修订后提交为 `1aaeb6f1912c7f1e5323ea6ab843b689937adbd1`；coordinator 修订均来自已记录的 reviewer finding 或额外 RED，没有学生代码改动。
+- **已知基线问题**：计划中的独立 Ruff/mypy 命令仍因既有 `scripts/evidence/g02a_python_smoke.py` E402 和 `uow.py` 双模块名失败；F-03 未修改这些路径，全量项目 runner 仍通过。
+- **经验教训**：schema 的绿色测试必须同时核对 SPEC 正文枚举和跨表权威关系；只给 evidence 一个通用幂等键，不能自动保证“一次 attempt 只生成一条证据”。

@@ -17,7 +17,7 @@
 | At least three clear modules | M1 materials, M2 learning, M3 review | verified specification; not implemented | M1-01--03, M2-01--04, M3-01--02 |
 | At least five INVEST stories | US-01--US-08 | verified document; current-hash SR-08 revalidation pending | implementation evidence after G-04 |
 | Module contracts and objective acceptance | SPEC 3 and AC-01--24 | planned; each AC mapped in PLAN 12 | named task/gate per AC |
-| Architecture/data flow/data model | SPEC 6--7 | F-02 core SQLite schema/UoW verified locally; later learning schema and repositories remain planned | F-02 terminal commit, F-03, feature repositories, API-01--03 |
+| Architecture/data flow/data model | SPEC 6--7 | F-02 core SQLite schema/UoW committed at `62022db`; F-03 learning/review schema committed at `1aaeb6f`; repositories remain planned | feature repositories, API-01--03 |
 | Performance/reliability/errors/observability | SPEC 5 | planned | F-04, API-03, QA-RELEASE, DIST-01 |
 | Input validation and safe deletion | SPEC 3.1 and 8 | planned | M1-01--03, API-01, UI-03/06 |
 | Host/Origin/CSRF/session boundary | local plus explicit public profile | planned | F-04 and DEMO-01 positive/negative tests |
