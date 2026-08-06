@@ -13,3 +13,6 @@ scripts/cold_start/tests/*.ps1 text eol=lf
 
 # Bootstrap licenses are upstream byte-pinned artifacts; preserve exact bytes and suppress text diff whitespace checks.
 licenses/bootstrap/** -text -diff
+
+# PDF fixtures are binary artifacts; line-ending conversion corrupts their byte hashes.
+backend/tests/fixtures/**/*.pdf -text -diff
