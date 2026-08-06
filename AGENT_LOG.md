@@ -1461,3 +1461,13 @@
 - **隐私与故障**：反馈措辞回调只收到 evaluator/outcome/rubric/source IDs，不接收 answer、rationale 或 variant；provider 异常发生在 evidence 提交后并被隔离。目标 `4 passed` 覆盖重复 key、mutation、stale source、explanation-only 和答案不外发。
 - **验证与 commit**：全量后端 `112 passed`，Vitest `1 passed`，TypeScript/Vite build PASS，Ruff/mypy PASS，`CREDENTIAL_SCAN_PASS files=298`，许可证 PASS，`TEST_ALL_PASS mode=all`。产品提交 `2da06362bbd11d3d8da2a8b8b3e49c63f57cae82`。
 - **经验教训**：幂等查找必须早于随时间变化的 coverage 复验和 provider 调用；答案隐私最好通过类型边界实现，而不是依赖调用者记得删除字段。
+
+## 2026-08-06T20:40:00+08:00 - M2-04 完整证据驱动的掌握度推导
+
+- **Task 编号与 skill**：`M2-04`；使用 `subagent-driven-development`、`test-driven-development`、`requesting-code-review`、`verification-before-completion`；实现者为 fresh worker `/root/m2_04_impl`；`Human-Changes: none`。
+- **关键 context**：只新增 mastery repository/service 和目标测试。服务必须在 SQLite 写锁内读取 concept 的完整追加式 evidence 历史，不接受手工或 provider 指定的掌握状态。
+- **TDD RED/GREEN**：RED 因 `projectb.services.learning.mastery` 不存在而收集失败，原因与计划一致。GREEN 目标命令为 `4 passed`；完整历史 ID 缺失或重复失败关闭，输入顺序不影响状态或 SHA-256。
+- **规约合规评审**：只有 passed isomorphic + transfer 可提升为 `demonstrated_now`；后续跨课程本地日且 variant 不同的 passed delayed check 可提升为 `retained`；错误、跳过和来源不足不降级。Critical=0，Major=0。
+- **质量/安全/许可证评审**：推导与幂等写入在同一 `BEGIN IMMEDIATE` 事务中；时区使用 IANA `ZoneInfo`，时间戳必须为 UTC `Z`；未新增依赖或第三方代码。仓库现有 namespace mypy 调用需 `--explicit-package-bases`，定向复验通过。Critical=0，Major=0。
+- **验证与 commit**：定向 Ruff PASS，定向 Mypy PASS；全量后端 `116 passed`，Vitest `1 passed`，Vite production build PASS，`CREDENTIAL_SCAN_PASS files=304`，`LICENSE_VERIFICATION_PASS python=54 npm=166`，`TEST_ALL_PASS mode=all`。产品提交 `7d72b02e46f0a05d456e031d6e1720923570f8f5`。文档提交前的 evidence RED 暴露全局 `core.autocrlf=true` 将原始字节锁定文件转为 CRLF；规范化 LF 后哈希恢复 `FD65...F310`，以 `.gitattributes` 精确锁定修复提交 `eecb54d1a30fedb57b617d6b3f021be3753106e6`，随后 `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`。
+- **经验教训**：掌握度不能从调用方提供的证据子集推断；必须由存储层完整读取、规范化并绑定输入哈希，才能保持可审计性。
