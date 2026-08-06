@@ -1505,3 +1505,11 @@
 - **规约与质量评审**：app middleware 将所有请求绑定 loopback Host，禁止 forwarded headers，不安全方法必须同时提供 loopback Origin、session cookie 与 CSRF header。课程、导入结果、来源、映射和删除 API 全部贯通；数量/单文件/批次字节限制在解析前执行。静态挂载目录与内容库/数据库必须不重叠，路径穿越与私有文件不可服务。Critical=0，Major=0。
 - **验证与 commit**：定向 Ruff PASS，owned-file Mypy PASS；全量后端 `156 passed`，Vitest `1 passed`，Vite production build PASS，`CREDENTIAL_SCAN_PASS files=334`，`LICENSE_VERIFICATION_PASS python=54 npm=166`，`TEST_ALL_PASS mode=all`。产品提交 `6d44eacfbde94d36042e9037c8d4cacfe208b4fc`。
 - **经验教训**：安全临时文件名不能直接流入业务元数据；上传的存储身份和用户可见文件名必须分离。
+
+## 2026-08-06T22:00:00+08:00 - API-02 学习、mastery 与 provider API
+
+- **Task 编号与 skill**：`API-02`；使用 `test-driven-development`、`requesting-code-review`、`verification-before-completion`；coordinator 实现并使用 `[agent: coordinator]`；`Human-Changes: none`。
+- **TDD RED/GREEN**：RED 为 app factory 不接受 test-only provider registry seam，且 learning/provider route 不存在。GREEN 目标 `3 passed`，覆盖 attempt 幂等、两类通过 evidence 推导 `demonstrated_now`、三类 preview/consent/execute 和 consent 重放。
+- **规约与质量评审**：API 按 concept evaluator 将 JSON 转为结构化练习/答案，并使用已评审 AttemptService/MasteryService。feedback preview 使用 extra-forbid schema，原始 answer 在 provider 调用前 422；三类 candidate 均标记 `authoritative=false`，调用前后 coverage/evidence/mastery/plan 计数不变。local 默认 registry 无 adapter，test 才可注入 mock。Critical=0，Major=0。
+- **验证与 commit**：定向 Ruff 和 owned-file Mypy PASS；全量后端 `159 passed`，Vitest `1 passed`，Vite production build PASS，`CREDENTIAL_SCAN_PASS files=348`，许可证 PASS，`TEST_ALL_PASS mode=all`。产品提交 `7da00e3cb5dc371291d2d164a1ebd677049cdabc`。
+- **经验教训**：provider preview 可以在本地进程内短暂保留精确片段，但不应追加到 SQLite；重启后丢失 preview 必须失败关闭，而不能仅凭 consent ID 重建外发。
