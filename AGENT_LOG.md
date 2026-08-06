@@ -1471,3 +1471,13 @@
 - **质量/安全/许可证评审**：推导与幂等写入在同一 `BEGIN IMMEDIATE` 事务中；时区使用 IANA `ZoneInfo`，时间戳必须为 UTC `Z`；未新增依赖或第三方代码。仓库现有 namespace mypy 调用需 `--explicit-package-bases`，定向复验通过。Critical=0，Major=0。
 - **验证与 commit**：定向 Ruff PASS，定向 Mypy PASS；全量后端 `116 passed`，Vitest `1 passed`，Vite production build PASS，`CREDENTIAL_SCAN_PASS files=304`，`LICENSE_VERIFICATION_PASS python=54 npm=166`，`TEST_ALL_PASS mode=all`。产品提交 `7d72b02e46f0a05d456e031d6e1720923570f8f5`。文档提交前的 evidence RED 暴露全局 `core.autocrlf=true` 将原始字节锁定文件转为 CRLF；规范化 LF 后哈希恢复 `FD65...F310`，以 `.gitattributes` 精确锁定修复提交 `eecb54d1a30fedb57b617d6b3f021be3753106e6`，随后 `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`。
 - **经验教训**：掌握度不能从调用方提供的证据子集推断；必须由存储层完整读取、规范化并绑定输入哈希，才能保持可审计性。
+
+## 2026-08-06T21:10:00+08:00 - P-01 精确 consent 与 provider-neutral 候选端口
+
+- **Task 编号与 skill**：`P-01`；使用 `subagent-driven-development`、`test-driven-development`、`systematic-debugging`、`requesting-code-review`、`verification-before-completion`。fresh-agent 派发接口本阶段未返回可用会话，由 coordinator `/root` 实现并明确使用 `[agent: coordinator]`；`Human-Changes: none`。
+- **关键 context**：只实现 `generate_explanation`、`generate_practice_candidate`、`generate_feedback_wording` 三类非权威候选端口，以及 local/test/demo registry、profile repository、deterministic mock 和一次性 consent。本 task 不连接真实 OpenAI 或写 API route。
+- **TDD RED/GREEN**：初始 RED 为缺少 `projectb.providers`。首轮 GREEN 后审查用回归 RED 复现两个 Major：调用方可保留旧 hash 重建 preview 并偷换 instruction/rubric；任意当前 locator 未经用户确认也可进入预览。修复为执行前重算完整 request hash，并每次重验最新 confirmed coverage。最终目标 `15 passed`。
+- **规约合规评审**：feedback 类型不存在原始答案字段；consent 绑定 operation、locator/version/hash/片段预览哈希、profile/policy、token/费用上限和 nonce。无 consent、不匹配、已使用或过期来源均在 provider 调用前失败。Critical=0，Major=0。
+- **质量/安全/许可证评审**：一次性消费使用 `BEGIN IMMEDIATE` 与追加式 `audit_event`，并在网络调用前提交，因此并发/失败都不能重放。schema/timeout/error 三种失败后 coverage/evidence/mastery/plan 计数不变。local 无 adapter 且拒绝 mock，mock 仅 test/demo 注入。无新依赖或第三方代码。Critical=0，Major=0。
+- **验证与 commit**：定向 Ruff PASS，定向 Mypy PASS；全量后端 `131 passed`，Vitest `1 passed`，Vite production build PASS，`CREDENTIAL_SCAN_PASS files=310`，`LICENSE_VERIFICATION_PASS python=54 npm=166`，`TEST_ALL_PASS mode=all`。产品提交 `f2563ac87cf61665dae98d404a02dff41f9fab37`。
+- **经验教训**：consent 不能只信任调用方携带的 hash，必须从实际将外发的结构重算；“当前 locator”也不等于“用户确认来源”。
