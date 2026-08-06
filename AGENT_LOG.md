@@ -1489,3 +1489,11 @@
 - **规约与质量评审**：同 concept/日期只保留最弱 evidence，每日依 weakness -> request date -> concept ID 稳定排序且不超预算；`stale_source/system_error` 仅排除，不伪装为学习失败。打乱完整输入后 tasks 与 input hash 不变。未新增依赖或第三方代码；Critical=0，Major=0。
 - **验证与 commit**：定向 Ruff/Mypy PASS；全量后端 `146 passed`，Vitest `1 passed`，Vite production build PASS，`CREDENTIAL_SCAN_PASS files=324`，`LICENSE_VERIFICATION_PASS python=54 npm=166`，`TEST_ALL_PASS mode=all`。产品提交 `36e7ee8992fc8b15df7ee3360e9f5ca517c7e52c`。
 - **经验教训**：策略输入哈希必须包含被排除的过期/系统错误状态，才能在状态恢复时生成新 revision；但这些错误不能影响 weakness 优先级。
+
+## 2026-08-06T21:36:00+08:00 - M3-02 复习 revision、diff 与恢复
+
+- **Task 编号与 skill**：`M3-02`；使用 `test-driven-development`、`requesting-code-review`、`verification-before-completion`。fresh-agent 调度本阶段仍不可用，coordinator 实现并使用 `[agent: coordinator]`；`Human-Changes: none`。
+- **TDD RED/GREEN**：初始 RED 因缺少 `services.review.revisions`。首轮 GREEN 后审查以 RED 证明同一 `concept@due` 的 evidence/source 变化被误报 retained；修复为稳定 `added/removed/changed/retained` 四分 diff。最终目标 `6 passed`。
+- **规约与质量评审**：同 course/input hash 返回原 revision；输入变化追加确定 revision ID 和父链。已完成 concept/日期任务保留在历史中，新 revision 不重建；skipped 可恢复 pending，completed 失败关闭；stale source 新 revision 删除未来任务。SQLite 写入均在 `BEGIN IMMEDIATE` 内，未新增依赖。Critical=0，Major=0。
+- **验证与 commit**：定向 Ruff/Mypy PASS；全量后端 `152 passed`，Vitest `1 passed`，Vite production build PASS，`CREDENTIAL_SCAN_PASS files=328`，`LICENSE_VERIFICATION_PASS python=54 npm=166`，`TEST_ALL_PASS mode=all`。产品提交 `3a93f27a48f3e027380135a2b65f4b28f3f4a624`。
+- **经验教训**：revision diff 不能只比较任务槽位 ID；同日同 concept 的来源或证据变化也是用户必须看到的修订。

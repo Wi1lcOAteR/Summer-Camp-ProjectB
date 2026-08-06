@@ -157,7 +157,7 @@ git diff --check
 | 21 | M2-04 | M2-03 | no: mastery consumes evidence | m2-learning | complete | `7d72b02e46f0a05d456e031d6e1720923570f8f5` |
 | 22 | P-01 | M2-04 | no: provider port and mock | m3-api | complete | `f2563ac87cf61665dae98d404a02dff41f9fab37` |
 | 23 | M3-01 | P-01 | no: planner contract | m3-api | complete | `36e7ee8992fc8b15df7ee3360e9f5ca517c7e52c` |
-| 24 | M3-02 | M3-01 | no: revision persistence | m3-api | not started | none |
+| 24 | M3-02 | M3-01 | no: revision persistence | m3-api | complete | `3a93f27a48f3e027380135a2b65f4b28f3f4a624` |
 | 25 | API-01 | M3-02 | no: creates app registry | m3-api | not started | none |
 | 26 | API-02 | API-01 | no: modifies app registry | m3-api | not started | none |
 | 27 | API-03 | API-02 | no: closes local API | m3-api | not started | none |
