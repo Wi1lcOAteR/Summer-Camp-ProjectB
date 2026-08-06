@@ -1453,3 +1453,11 @@
 - **红绿与合同**：RED 为缺少 race/deadlock 模块。race 按 read/add/write 重放线程内顺序、共享最终值和重叠事务；deadlock 从 hold/wait 构造 wait-for graph 并校验环。初版目标 11 passed；审查以 RED 发现多环图只接受内部首个环，改为验证答案是否为任一真实闭环后目标 `12 passed`。
 - **验证与 commit**：registry 串行扩展为 `os.mutex.v1/os.race.v1/os.deadlock.v1`。全量后端 `108 passed`，Vitest `1 passed`，TypeScript/Vite build PASS，Ruff/mypy PASS，`CREDENTIAL_SCAN_PASS files=290`，许可证 PASS，`TEST_ALL_PASS mode=all`。产品提交 `4c384f7e7d6360a96a81480d22309645356f9fe0`。
 - **经验教训**：deadlock 题应接受图中任意可验证的真实环，不能把 evaluator 的遍历顺序变成隐藏答案；race trace 必须同时验证事件完整性和学生给出的最终共享状态。
+
+## 2026-08-06T20:22:00+08:00 - M2-03 不可变学习证据
+
+- **Task 编号与 skill**：`M2-03`；使用 `test-driven-development`、`requesting-code-review`、`verification-before-completion`；coordinator 实现并记录 fresh-agent 调度偏离，`Human-Changes: none`。
+- **红绿与合同**：RED 为缺少 learning attempts 服务。submit 先按 attempt_key 查询稳定幂等结果，再验证 current confirmed coverage、concept evaluator 和 evaluator ID/version；attempt 与 evidence 单事务追加，DB trigger 保护 evidence 更新/删除。结构化答案含可选 rationale，只写本地 attempt JSON。
+- **隐私与故障**：反馈措辞回调只收到 evaluator/outcome/rubric/source IDs，不接收 answer、rationale 或 variant；provider 异常发生在 evidence 提交后并被隔离。目标 `4 passed` 覆盖重复 key、mutation、stale source、explanation-only 和答案不外发。
+- **验证与 commit**：全量后端 `112 passed`，Vitest `1 passed`，TypeScript/Vite build PASS，Ruff/mypy PASS，`CREDENTIAL_SCAN_PASS files=298`，许可证 PASS，`TEST_ALL_PASS mode=all`。产品提交 `2da06362bbd11d3d8da2a8b8b3e49c63f57cae82`。
+- **经验教训**：幂等查找必须早于随时间变化的 coverage 复验和 provider 调用；答案隐私最好通过类型边界实现，而不是依赖调用者记得删除字段。

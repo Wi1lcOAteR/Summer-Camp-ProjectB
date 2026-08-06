@@ -153,7 +153,7 @@ git diff --check
 | 17 | M1-03 | M1-02 | no: consumes material repo | m1-materials | complete | `aa2a6da62cc0d185510c2b17e33ab168f33a74d6` |
 | 18 | M2-01 | M1-03 | no: evaluator base | m2-learning | complete | `9b49e07b6e5a237005c1d267f84b902cc48fff7c` |
 | 19 | M2-02 | M2-01 | no: registry assembly | m2-learning | complete | `4c384f7e7d6360a96a81480d22309645356f9fe0` |
-| 20 | M2-03 | M2-02 | no: evidence authority | m2-learning | not started | none |
+| 20 | M2-03 | M2-02 | no: evidence authority | m2-learning | complete | `2da06362bbd11d3d8da2a8b8b3e49c63f57cae82` |
 | 21 | M2-04 | M2-03 | no: mastery consumes evidence | m2-learning | not started | none |
 | 22 | P-01 | M2-04 | no: provider port and mock | m3-api | not started | none |
 | 23 | M3-01 | P-01 | no: planner contract | m3-api | not started | none |
