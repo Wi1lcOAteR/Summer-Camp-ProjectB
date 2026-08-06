@@ -93,7 +93,8 @@ class MaterialImporter:
                 )
             staged = self.store.stage(path, content_hash)
             promoted = self.store.promote(staged, content_hash)
-            staged = None
+            if promoted:
+                staged = None
             persisted = self.repository.persist(
                 course_id=course_id,
                 filename=path.name,
@@ -102,6 +103,15 @@ class MaterialImporter:
                 storage_ref=self.store.storage_ref(content_hash),
                 created_at=datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z"),
             )
+            if not self.store.exists(content_hash):
+                if staged is None:
+                    staged = self.store.stage(path, content_hash)
+                restored = self.store.promote(staged, content_hash)
+                promoted = promoted or restored
+                if restored:
+                    staged = None
+                if not self.store.exists(content_hash):
+                    raise ContentStoreError("content_restore_failed")
             return ImportOutcome(
                 path.name,
                 persisted.status,

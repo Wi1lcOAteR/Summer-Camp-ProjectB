@@ -52,13 +52,11 @@ class ContentStore:
     def promote(self, staged: Path, content_hash: str) -> bool:
         destination = self.path_for(content_hash)
         if destination.is_file():
-            staged.unlink(missing_ok=True)
             return False
         destination.parent.mkdir(parents=True, exist_ok=True)
         try:
             os.replace(staged, destination)
         except FileExistsError:
-            staged.unlink(missing_ok=True)
             return False
         return True
 
