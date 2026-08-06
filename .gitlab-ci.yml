@@ -46,3 +46,4 @@ frontend:
     - npm ci --ignore-scripts
     - npm exec -- vitest run
     - npm exec -- tsc --noEmit
+    - npm exec -- vite build
