@@ -30,3 +30,8 @@ quality = [
 build = [
     "pyinstaller==6.21.0",
 ]
+
+[tool.pytest.ini_options]
+markers = [
+    "windows: exercises a disposable Windows-only integration",
+]
