@@ -1405,3 +1405,12 @@
 - **红绿与评审**：初始 RED 为 15 个缺模块失败；GREEN 为 15 passed。SPEC 合规检查覆盖 loopback Host/Origin、unsafe 方法的 session-CSRF、跨 session replay、稳定 request ID/error code 和审计字段白名单。质量检查额外以 RED 修复底层 URL 异常 cause 泄露和十六进制 request ID 兼容；提交前合成 `token=` 形状被 scanner 拒绝后改为无凭据形状 fixture。
 - **验证与 commit**：owned-path Ruff PASS、mypy PASS；全量 `50 passed`、Vitest `1 passed`、Vite build PASS、`CREDENTIAL_SCAN_PASS files=238`、许可证 PASS、`TEST_ALL_PASS mode=all`。产品提交为 `736292a14b41083122791a7182f554e354943a5f`，未新增依赖或第三方代码。
 - **经验教训**：安全错误不能只隐藏响应正文，还要抑制携带不可信输入的异常链；HTTP request ID 是 opaque ID，不应复用业务 error-code 的格式约束。
+
+## 2026-08-06T18:42:00+08:00 - F-05 Windows 凭据生命周期
+
+- **Task 编号与 skill**：`F-05`；使用 `test-driven-development`、`systematic-debugging`、`requesting-code-review`、`receiving-code-review`、`verification-before-completion`，沿用 `codex/foundation-v1` worktree。
+- **关键 context**：实现仅含 Windows Credential Manager 后端、无明文读取的 status/update/clear 服务、确定性 fake 与一次性 WinVault 集成测试；`Human-Changes: none`。
+- **红绿证据**：初始 RED 为 5 个缺模块失败；包根修复后目标测试通过。规约评审发现状态缺少更新时间，新增 RED 后改为只返回 `configured` 与可空 UTC `updated_at`。质量评审再发现原始 target 可进入审计、审计 sink 异常会误报已完成变更及异常路径覆盖不足；新增 RED 后改用固定 opaque 引用、稳定脱敏后端错误，并明确审计传输失败不反转权威凭据结果。
+- **评审与验证**：最终复审 `Critical=0, Major=0`。目标测试 `9 passed`；Windows 随机 target 的首次写入、二次更新和 `finally` 清理为 `1 passed`；全量后端 `59 passed`，Vitest `1 passed`，Vite build PASS，Ruff/mypy PASS，`CREDENTIAL_SCAN_PASS files=246`，许可证 PASS，`TEST_ALL_PASS mode=all`。
+- **subagent 输出与 commit**：两个既有独立 reviewer 分别检查 SPEC 合同与质量/安全边界；修订后复核无剩余 Major。产品提交为 `e11a150e1f0233206803a4763a53f237fced097c`，未新增依赖或第三方代码。
+- **经验教训**：凭据状态不能暴露实现后端；审计引用必须与调用方 target 解耦；外部审计传输失败时，API 返回状态必须与已经完成的不可回滚凭据变更一致。
