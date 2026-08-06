@@ -1446,3 +1446,10 @@
 - **红绿与合同**：RED 为缺少 `projectb.domain.learning`。实现冻结的 check/outcome schema、Evaluator protocol、`os.mutex.v1` 和 registry。有效 trace、首个互斥冲突 witness、畸形/未闭合 trace、重复执行、来源顺序/去重及 explanation-only guard 共 `7 passed`；rubric 固定按 code 排序，无 LLM 参与评分。
 - **验证与 commit**：全量后端 `96 passed`，Vitest `1 passed`，TypeScript/Vite build PASS，Ruff/mypy PASS，`CREDENTIAL_SCAN_PASS files=280`，许可证 PASS，`TEST_ALL_PASS mode=all`。产品提交 `9b49e07b6e5a237005c1d267f84b902cc48fff7c`。
 - **经验教训**：确定性 evaluator 的输入顺序中只有语义事件顺序可影响结果；来源 ID 和 rubric 呈现顺序必须规范化，避免同一证据因集合顺序产生不同 hash。
+
+## 2026-08-06T20:12:00+08:00 - M2-02 race/deadlock evaluator 与 registry
+
+- **Task 编号与 skill**：`M2-02`；使用 `test-driven-development`、`receiving-code-review`、`verification-before-completion`；coordinator 实现，fresh-agent 调度偏离延续，`Human-Changes: none`。
+- **红绿与合同**：RED 为缺少 race/deadlock 模块。race 按 read/add/write 重放线程内顺序、共享最终值和重叠事务；deadlock 从 hold/wait 构造 wait-for graph 并校验环。初版目标 11 passed；审查以 RED 发现多环图只接受内部首个环，改为验证答案是否为任一真实闭环后目标 `12 passed`。
+- **验证与 commit**：registry 串行扩展为 `os.mutex.v1/os.race.v1/os.deadlock.v1`。全量后端 `108 passed`，Vitest `1 passed`，TypeScript/Vite build PASS，Ruff/mypy PASS，`CREDENTIAL_SCAN_PASS files=290`，许可证 PASS，`TEST_ALL_PASS mode=all`。产品提交 `4c384f7e7d6360a96a81480d22309645356f9fe0`。
+- **经验教训**：deadlock 题应接受图中任意可验证的真实环，不能把 evaluator 的遍历顺序变成隐藏答案；race trace 必须同时验证事件完整性和学生给出的最终共享状态。

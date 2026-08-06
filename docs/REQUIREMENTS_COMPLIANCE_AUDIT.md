@@ -7,14 +7,14 @@
 **PLAN pre-dispatch:** `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`
 
 **PLAN current evidence-only state:** `F02BB44D209ABB8436A25775A1925F1329B5193DAF7508E4B1F13CDF3B8E1B42`
-**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise. On 2026-08-03 the student explicitly approved G-04. Foundation, M1, and M2-01 mutex evaluation are implemented and reviewed; the current terminal product commit is `9b49e07b6e5a237005c1d267f84b902cc48fff7c`. Container execution and remote pipeline receipts remain unverified. Later tasks remain incomplete until their own fresh TDD and review evidence exists.
+**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise. On 2026-08-03 the student explicitly approved G-04. Foundation, M1, and the complete mutex/race/deadlock evaluator set through M2-02 are implemented and reviewed; the current terminal product commit is `4c384f7e7d6360a96a81480d22309645356f9fe0`. Container execution and remote pipeline receipts remain unverified. Later tasks remain incomplete until their own fresh TDD and review evidence exists.
 
 `verified` means current local evidence exists; `planned` means a named active task owns it; `blocked` means a named human/external gate remains; `not-started` means no product evidence exists. This is the only active course matrix. Archived plans are recovery evidence, never PASS evidence.
 
 | Hard requirement | Active mapping | Status / current evidence | Closure |
 | --- | --- | --- | --- |
 | Real useful problem explainable in 30 seconds | SPEC 1.1--1.3 | verified document | implementation evidence after G-04 |
-| At least three clear modules | M1 materials, M2 learning, M3 review | M1 complete; M2 evaluator base and mutex rubric implemented at `9b49e07`; remaining M2/M3 services planned | M2-02--04, M3-01--02 |
+| At least three clear modules | M1 materials, M2 learning, M3 review | M1 complete; all three deterministic M2 evaluators implemented through `4c384f7`; evidence/mastery and M3 remain planned | M2-03--04, M3-01--02 |
 | At least five INVEST stories | US-01--US-08 | verified document; current-hash SR-08 revalidation pending | implementation evidence after G-04 |
 | Module contracts and objective acceptance | SPEC 3 and AC-01--24 | planned; each AC mapped in PLAN 12 | named task/gate per AC |
 | Architecture/data flow/data model | SPEC 6--7 | F-02 core SQLite schema/UoW committed at `62022db`; F-03 learning/review schema committed at `1aaeb6f`; repositories remain planned | feature repositories, API-01--03 |
@@ -41,15 +41,15 @@
 | Final course CI PASS | authoritative NJU GitLab plus mirror evidence on final docs commit | blocked on remote authorization | EXT-REMOTE-FINAL |
 | Incremental commits and PR/MR history | 39 task commits, scanned coordinator evidence commits, 9 stacked worktree branches | planned | per-task protocol and EXT-REMOTE-PREP/FINAL sequential retarget-and-merge closure |
 | Fresh subagent per PLAN task | one clean session/task | fresh worker `/root/m1_01_impl` completed M1-01; earlier deviations and reviewer identities remain recorded | continue every behavior task |
-| TDD red-green-refactor | exact red/green command in all 39 cards; shared assertion-level 2--5 minute step expansion | verified through M2-01, including missing evaluator package RED/GREEN | continue every behavior task |
-| SPEC review then quality/security/license review | terminal hash-bound review loop | verified through M2-01; deterministic/source-bound/explanation-only contracts reviewed, final target/full gates passed | every-task protocol; Critical stops sequence |
+| TDD red-green-refactor | exact red/green command in all 39 cards; shared assertion-level 2--5 minute step expansion | verified through M2-02, including missing evaluators and multiple-cycle acceptance RED/GREEN | continue every behavior task |
+| SPEC review then quality/security/license review | terminal hash-bound review loop | verified through M2-02; deterministic replay, invalid traces, stable rubrics and any-valid-cycle semantics reviewed | every-task protocol; Critical stops sequence |
 | Required Superpowers order | brainstorming -> plan -> worktree -> TDD -> reviews -> finish | brainstorming/writing-plans/G-03 evidenced; implementation stages gated | explicit G-04, then task protocol |
 | `SPEC.md` required sections | 14 sections, 8 stories, 24 AC, risks/deferred scope | current bytes confirmed by student; same-byte SR-08 PASS | implementation evidence after G-04 |
 | `PLAN.md` exact task fields | exactly 39 tasks; dependency/parallel/files/red/green/done in each | mechanical audit and dual review PASS | explicit G-04, then ledger execution |
 | Stranger cold start with only SPEC/PLAN | two fresh non-Codex sessions intake then F-01S1A | verified: current hashes, empty ambiguities, exact red, two artifacts, PowerShell 7 green exit 0 | complete; disposable artifacts are not product implementation |
 | Cold-start repair then implementation approval | separate post-repair student gate | verified: G-03 complete; student explicitly approved G-04 on 2026-08-03 | local implementation active; remote/release gates remain separate |
 | `SPEC_PROCESS.md` process and cold-start diff | sections 1--2 contain >3 real question/answer/revision rounds; later sections retain G-03P/failures/final run | verified: final intake, segmented execution, red/green, hashes, line counts and limitations recorded | continue per-task evidence after G-04 |
-| `AGENT_LOG.md` timestamp/task/skill/context/output/hash/human edits/lesson | historical and current entries exist | current through M2-01 | coordinator evidence commit after every task |
+| `AGENT_LOG.md` timestamp/task/skill/context/output/hash/human edits/lesson | historical and current entries exist | current through M2-02 | coordinator evidence commit after every task |
 | Student-written code declaration | conditional top-of-file/function comment plus trailer/log | F-01C records `Human-Changes: none`; no student-authored code claimed | per-task protocol step 5 |
 | README required sections | intro/install/run/distribution/tree/security/credentials/limits/deployment/licenses | not-started | DOC-01 after remote/host receipts |
 | Third-party sources/licenses | 63-row ledger, 54 Python/166 npm closure, Linux subset, five immutable bootstrap license rows | F-01A manifests/locks and F-01B exact license bytes implemented; F-01E notice inventory and baseline-license hash verifier pass (`python=54 npm=166`) | F-01E terminal commit, DIST SBOM, DOC-01 final index |
