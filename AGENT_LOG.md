@@ -1481,3 +1481,11 @@
 - **质量/安全/许可证评审**：一次性消费使用 `BEGIN IMMEDIATE` 与追加式 `audit_event`，并在网络调用前提交，因此并发/失败都不能重放。schema/timeout/error 三种失败后 coverage/evidence/mastery/plan 计数不变。local 无 adapter 且拒绝 mock，mock 仅 test/demo 注入。无新依赖或第三方代码。Critical=0，Major=0。
 - **验证与 commit**：定向 Ruff PASS，定向 Mypy PASS；全量后端 `131 passed`，Vitest `1 passed`，Vite production build PASS，`CREDENTIAL_SCAN_PASS files=310`，`LICENSE_VERIFICATION_PASS python=54 npm=166`，`TEST_ALL_PASS mode=all`。产品提交 `f2563ac87cf61665dae98d404a02dff41f9fab37`。
 - **经验教训**：consent 不能只信任调用方携带的 hash，必须从实际将外发的结构重算；“当前 locator”也不等于“用户确认来源”。
+
+## 2026-08-06T21:24:00+08:00 - M3-01 确定性连续/期末复习策略
+
+- **Task 编号与 skill**：`M3-01`；使用 `test-driven-development`、`requesting-code-review`、`verification-before-completion`。fresh-agent 调度本阶段仍未返回可用会话，由 coordinator 实现并使用 `[agent: coordinator]`；`Human-Changes: none`。
+- **TDD RED/GREEN**：RED 因 `projectb.domain.review` 不存在而收集失败。GREEN 目标 `15 passed`，覆盖 mode/IANA timezone/预算范围与步长、默认 30 分钟、固定 10 分钟任务、三组精确期末间隔、连续 30 日窗口、考试截止和过期归档。
+- **规约与质量评审**：同 concept/日期只保留最弱 evidence，每日依 weakness -> request date -> concept ID 稳定排序且不超预算；`stale_source/system_error` 仅排除，不伪装为学习失败。打乱完整输入后 tasks 与 input hash 不变。未新增依赖或第三方代码；Critical=0，Major=0。
+- **验证与 commit**：定向 Ruff/Mypy PASS；全量后端 `146 passed`，Vitest `1 passed`，Vite production build PASS，`CREDENTIAL_SCAN_PASS files=324`，`LICENSE_VERIFICATION_PASS python=54 npm=166`，`TEST_ALL_PASS mode=all`。产品提交 `36e7ee8992fc8b15df7ee3360e9f5ca517c7e52c`。
+- **经验教训**：策略输入哈希必须包含被排除的过期/系统错误状态，才能在状态恢复时生成新 revision；但这些错误不能影响 weakness 优先级。
