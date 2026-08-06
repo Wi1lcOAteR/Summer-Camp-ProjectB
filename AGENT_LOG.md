@@ -1369,3 +1369,11 @@
 - **验证证据**：`CI_SEED_CONTRACT_PASS`；前端 `1 passed`；`tsc --noEmit` exit 0；`CI_YAML_PARSE_PASS files=2`；`CREDENTIAL_SCAN_PASS files=210`；`EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`；`git diff --cached --check` exit 0。Docker daemon 不可用，固定容器内命令和远程 pipeline 均为 `not executed / blocked`。
 - **commit hash**：跨平台前置修复 `7210b25fb3e33f92ed34a964f1e926607738639a`；F-01D 产品提交 `069acb8541b8d59a7977a484f06d8f9abbefe780`。
 - **经验教训**：seed CI 合同不能只验证关键字存在；触发条件、最小权限、固定 action、测试发现和绕过路径都要有可变异的失败证据。平台专用契约必须按已确认计划进入对应 runner，不能为了表面上的“全量”把 Windows 行为伪装成 Linux PASS。
+## 2026-08-06T15:45:00+08:00 - F-01E quality gates review repair
+
+- Task: `F-01E`; skills: `systematic-debugging`, `test-driven-development`, `receiving-code-review`, `verification-before-completion`.
+- Context: second-stage quality review identified Git enumeration/count drift, an index-mode error-code mismatch, and an unbound Python license baseline.
+- Changes: added one-pass `scan_git_snapshot`; aligned unsupported modes to `index_mode_unsupported`; bound normalized baseline license rows to SHA-256 `7013e4d8dee96ab1c461bf7b093c35770cd371b5ea7462a77f050f8912f51beb`; removed the obsolete second-pass counter.
+- Verification: `21 passed` with project-local pytest basetemp; `CREDENTIAL_SCAN_PASS files=226`; `LICENSE_VERIFICATION_PASS python=54 npm=166`; `TEST_ALL_PASS mode=all`; `CI_SEED_CONTRACT_PASS`; `git diff --check`; Python compilation.
+- Human changes: none. Commit is pending normal Git index permission; no alternate index or ACL workaround used.
+- Lesson: a quality receipt must derive its findings and counts from the same captured Git source lists, and mutable license evidence must be hash-bound.

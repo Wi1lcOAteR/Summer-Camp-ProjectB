@@ -143,7 +143,7 @@ git diff --check
 | 7 | F-01B | F-01A + BOOTSTRAP-LICENSE-EVIDENCE | no: closes bootstrap licenses | foundation | complete | `8b725db53d044af41e9d6352802eecbe0c2e5d6d` |
 | 8 | F-01C | F-01B | no: creates frontend harness | foundation | complete | `39d79c2e6d423883a0614cc8d9bb947dd02a7dba` |
 | 9 | F-01D | F-01C | no: seeds push CI before feature branches | foundation | complete | `069acb8541b8d59a7977a484f06d8f9abbefe780` |
-| 10 | F-01E | F-01D | no: creates shared quality gates | foundation | not started | none |
+| 10 | F-01E | F-01D | no: creates shared quality gates | foundation | verified; commit pending | pending local Git commit |
 | 11 | F-02 | F-01E | no: migration order | foundation | not started | none |
 | 12 | F-03 | F-02 | no: migration order | foundation | not started | none |
 | 13 | F-04 | F-03 | no: security base | foundation | not started | none |
@@ -258,6 +258,8 @@ git diff --check
 - **Red:** create `scripts/tests/test_quality_gates.py`; run `& $Py -m pytest scripts/tests/test_quality_gates.py -q`; expect missing runner/scanner/license-verifier, unsupported mode, empty-suite, CI current-suite, failure-propagation, redaction, notice, and exact-command assertions.
 - **Green/refactor:** rerun the exact Red command, `& $Py scripts/scan_credentials.py --tracked --staged`, `& $Py scripts/verify_licenses.py`, the literal `python scripts/test_all.py` under the common bootstrap's process-local PATH, `& $Py scripts/test_all.py --backend`, `& $Py scripts/test_all.py --frontend`, both evidence verifiers, and the F-01D seed contract.
 - **Done / commit:** one-command/mode orchestration, child failure propagation, credential redaction, full notices, evidence binding, and CI current-suite enforcement pass; no empty suite yields green. Commit `build(F-01E): add fail-closed quality gates [agent: worker]`.
+
+**Coordinator verification update (2026-08-06):** Review regressions were repaired before closure. The Python scanner now captures tracked and staged Git enumerations once and derives findings/count from that snapshot; unsupported index modes emit `index_mode_unsupported`; the license verifier binds normalized Python license rows to baseline SHA-256 `7013e4d8dee96ab1c461bf7b093c35770cd371b5ea7462a77f050f8912f51beb`. Evidence: quality gates `21 passed`; scanner `CREDENTIAL_SCAN_PASS files=226`; license verifier `LICENSE_VERIFICATION_PASS python=54 npm=166`; `test_all.py --all` and `CI_SEED_CONTRACT_PASS` passed; `git diff --check` and Python compilation passed. Docker and remote CI remain unexecuted environment gates. The terminal commit is recorded after normal Git index permission is available.
 
 ### F-02: Core metadata schema and unit of work
 
