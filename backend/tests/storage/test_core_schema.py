@@ -28,7 +28,7 @@ def test_fresh_and_existing_database_migrations_are_idempotent(tmp_path: Path) -
     database.initialize()
     first = database.connect()
     try:
-        migration_rows = first.execute("SELECT migration_id FROM schema_migrations").fetchall()
+        migration_rows = first.execute("SELECT migration_id FROM schema_migrations ORDER BY migration_id").fetchall()
         tables = {
             row[0]
             for row in first.execute(
@@ -41,7 +41,9 @@ def test_fresh_and_existing_database_migrations_are_idempotent(tmp_path: Path) -
     database.initialize()
     second = database.connect()
     try:
-        assert [row[0] for row in migration_rows] == ["001_core"]
+        migration_ids = [row[0] for row in migration_rows]
+        assert migration_ids == sorted(migration_ids)
+        assert "001_core" in migration_ids
         assert {
             "course",
             "material",
@@ -56,7 +58,7 @@ def test_fresh_and_existing_database_migrations_are_idempotent(tmp_path: Path) -
             "audit_event",
             "schema_migrations",
         } <= tables
-        assert [row[0] for row in second.execute("SELECT migration_id FROM schema_migrations")] == ["001_core"]
+        assert [row[0] for row in second.execute("SELECT migration_id FROM schema_migrations ORDER BY migration_id")] == migration_ids
     finally:
         second.close()
 
