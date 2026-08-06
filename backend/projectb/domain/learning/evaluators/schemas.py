@@ -29,6 +29,7 @@ class MutexExercise:
 class MutexAnswer:
     holds: bool
     violation_index: int | None = None
+    rationale: str | None = None
 
     def __post_init__(self) -> None:
         if self.violation_index is not None and self.violation_index < 1:
