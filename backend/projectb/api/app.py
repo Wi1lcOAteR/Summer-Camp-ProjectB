@@ -8,8 +8,9 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from projectb.api.app_support import ApiError
-from projectb.api.routes import courses, materials
+from projectb.api.routes import courses, learning, materials, providers
 from projectb.api.static import mount_static
+from projectb.providers.registry import ProviderRegistry
 from projectb.security.http import HttpBoundaryError, LocalHttpPolicy
 from projectb.storage.content_store import ContentStore
 from projectb.storage.db import Database
@@ -26,7 +27,13 @@ def _error_payload(code: str, retryable: bool, next_action: str, request_id: str
     }
 
 
-def create_app(*, database_path: Path, content_dir: Path, static_dir: Path | None = None) -> FastAPI:
+def create_app(
+    *,
+    database_path: Path,
+    content_dir: Path,
+    static_dir: Path | None = None,
+    provider_registry: ProviderRegistry | None = None,
+) -> FastAPI:
     database = Database(database_path)
     database.initialize()
     content_store = ContentStore(content_dir)
@@ -34,6 +41,8 @@ def create_app(*, database_path: Path, content_dir: Path, static_dir: Path | Non
     app = FastAPI(title="ProjectB", docs_url=None, redoc_url=None, openapi_url=None)
     app.state.database = database
     app.state.content_store = content_store
+    app.state.provider_registry = provider_registry or ProviderRegistry("local")
+    app.state.provider_previews = {}
 
     @app.middleware("http")
     async def local_trust(request: Request, call_next):  # type: ignore[no-untyped-def]
@@ -91,6 +100,8 @@ def create_app(*, database_path: Path, content_dir: Path, static_dir: Path | Non
 
     app.include_router(courses.router)
     app.include_router(materials.router)
+    app.include_router(learning.router)
+    app.include_router(providers.router)
     if static_dir is not None:
         mount_static(app, static_dir, private_roots=(content_dir, database_path))
     return app
