@@ -1497,3 +1497,11 @@
 - **规约与质量评审**：同 course/input hash 返回原 revision；输入变化追加确定 revision ID 和父链。已完成 concept/日期任务保留在历史中，新 revision 不重建；skipped 可恢复 pending，completed 失败关闭；stale source 新 revision 删除未来任务。SQLite 写入均在 `BEGIN IMMEDIATE` 内，未新增依赖。Critical=0，Major=0。
 - **验证与 commit**：定向 Ruff/Mypy PASS；全量后端 `152 passed`，Vitest `1 passed`，Vite production build PASS，`CREDENTIAL_SCAN_PASS files=328`，`LICENSE_VERIFICATION_PASS python=54 npm=166`，`TEST_ALL_PASS mode=all`。产品提交 `3a93f27a48f3e027380135a2b65f4b28f3f4a624`。
 - **经验教训**：revision diff 不能只比较任务槽位 ID；同日同 concept 的来源或证据变化也是用户必须看到的修订。
+
+## 2026-08-06T21:50:00+08:00 - API-01 FastAPI 材料应用边界
+
+- **Task 编号与 skill**：`API-01`；使用 `test-driven-development`、`requesting-code-review`、`verification-before-completion`；由 coordinator 实现并使用 `[agent: coordinator]`；`Human-Changes: none`。
+- **TDD RED/GREEN**：RED 因 `projectb.api` 缺失。首轮 GREEN 后审查以 RED 发现 importer 持久化临时名 `0.txt` 而不是经验证的原文件名；修复为每文件独立临时子目录，同时保留 basename 并避免同名覆盖。目标 `4 passed`。
+- **规约与质量评审**：app middleware 将所有请求绑定 loopback Host，禁止 forwarded headers，不安全方法必须同时提供 loopback Origin、session cookie 与 CSRF header。课程、导入结果、来源、映射和删除 API 全部贯通；数量/单文件/批次字节限制在解析前执行。静态挂载目录与内容库/数据库必须不重叠，路径穿越与私有文件不可服务。Critical=0，Major=0。
+- **验证与 commit**：定向 Ruff PASS，owned-file Mypy PASS；全量后端 `156 passed`，Vitest `1 passed`，Vite production build PASS，`CREDENTIAL_SCAN_PASS files=334`，`LICENSE_VERIFICATION_PASS python=54 npm=166`，`TEST_ALL_PASS mode=all`。产品提交 `6d44eacfbde94d36042e9037c8d4cacfe208b4fc`。
+- **经验教训**：安全临时文件名不能直接流入业务元数据；上传的存储身份和用户可见文件名必须分离。

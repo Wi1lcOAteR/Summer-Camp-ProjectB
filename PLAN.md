@@ -158,7 +158,7 @@ git diff --check
 | 22 | P-01 | M2-04 | no: provider port and mock | m3-api | complete | `f2563ac87cf61665dae98d404a02dff41f9fab37` |
 | 23 | M3-01 | P-01 | no: planner contract | m3-api | complete | `36e7ee8992fc8b15df7ee3360e9f5ca517c7e52c` |
 | 24 | M3-02 | M3-01 | no: revision persistence | m3-api | complete | `3a93f27a48f3e027380135a2b65f4b28f3f4a624` |
-| 25 | API-01 | M3-02 | no: creates app registry | m3-api | not started | none |
+| 25 | API-01 | M3-02 | no: creates app registry | m3-api | complete | `6d44eacfbde94d36042e9037c8d4cacfe208b4fc` |
 | 26 | API-02 | API-01 | no: modifies app registry | m3-api | not started | none |
 | 27 | API-03 | API-02 | no: closes local API | m3-api | not started | none |
 | 28 | UI-01 | API-03 | no: creates route registry | webui | not started | none |
