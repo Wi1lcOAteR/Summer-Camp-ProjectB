@@ -1414,3 +1414,12 @@
 - **评审与验证**：最终复审 `Critical=0, Major=0`。目标测试 `9 passed`；Windows 随机 target 的首次写入、二次更新和 `finally` 清理为 `1 passed`；全量后端 `59 passed`，Vitest `1 passed`，Vite build PASS，Ruff/mypy PASS，`CREDENTIAL_SCAN_PASS files=246`，许可证 PASS，`TEST_ALL_PASS mode=all`。
 - **subagent 输出与 commit**：两个既有独立 reviewer 分别检查 SPEC 合同与质量/安全边界；修订后复核无剩余 Major。产品提交为 `e11a150e1f0233206803a4763a53f237fced097c`，未新增依赖或第三方代码。
 - **经验教训**：凭据状态不能暴露实现后端；审计引用必须与调用方 target 解耦；外部审计传输失败时，API 返回状态必须与已经完成的不可回滚凭据变更一致。
+
+## 2026-08-06T19:18:00+08:00 - M1-01 确定性材料抽取与来源定位
+
+- **Task 编号与 skill**：`M1-01`；使用 `subagent-driven-development`、`test-driven-development`、`systematic-debugging`、`requesting-code-review`、`receiving-code-review`、`verification-before-completion`；新 worktree/分支为 `codex/m1-materials-v1`。
+- **关键 context / subagent**：fresh worker `/root/m1_01_impl` 只创建任务卡列出的 9 个文件，不修改过程文档或提交。测试使用仓库 `tmp` 工具链并设置 `PYTHONNOUSERSITE=1`，确认实际解析器为锁定的 `pypdf 6.14.2`、`pypdfium2 5.12.1`；`Human-Changes: none`。
+- **红绿证据**：初始 RED 因 `projectb.domain` 与 `projectb.services` 缺失而收集失败；locator 上界补充 RED 为 `source_kind` 参数缺失。worker GREEN 为目标 `11 passed`。协调者审查又观察到改后缀 ZIP 被接受及 PDF 指纹漏记 pdfium 的 `2 failed`，最小修复后同一命令恢复 `11 passed`。
+- **规约与质量评审**：原始字节 SHA-256、严格 UTF-8 与换行规范化、一基页/行 locator、真实上界、不可变版本、数字 PDF 双解析器一致性、扫描/加密/伪装拒绝、30 秒默认 worker、进程树终止、临时输出清理及稳定错误均符合 M1-01。未新增依赖；fixture 为项目合成内容并有许可说明。
+- **验证与 commit**：全量后端 `70 passed`，Vitest `1 passed`，TypeScript/Vite build PASS，owned-path Ruff/mypy PASS，`CREDENTIAL_SCAN_PASS files=250`，许可证 PASS，`TEST_ALL_PASS mode=all`。核心提交 `0ba43d849de4595b36e9f7ddd36a2544c5320a30`；发现 Git 将 PDF 当文本检查后，新增 binary 属性提交 `07ebf95f0ac3c4c9436619bf74be4c78a7612913`，两份工作区 PDF 与 Git blob 哈希一致。
+- **经验教训**：参与抽取判定的每个解析器都必须进入版本指纹；文本扩展名不能代替二进制 magic 检查；PowerShell 不会默认因外部命令非零退出而停止，提交链必须显式检查 `$LASTEXITCODE`。
