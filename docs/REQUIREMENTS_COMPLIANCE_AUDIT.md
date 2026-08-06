@@ -1,13 +1,13 @@
 # AI4SE Project B Requirements Compliance Matrix
 
-**Snapshot:** `2026-08-05`
+**Snapshot:** `2026-08-06`
 
 **SPEC:** `AEA67BB5544AD22932DC4304964F7FD266FE8A5DE7AA396EA8974D30867E8381`
 
 **PLAN pre-dispatch:** `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`
 
 **PLAN current evidence-only state:** `F02BB44D209ABB8436A25775A1925F1329B5193DAF7508E4B1F13CDF3B8E1B42`
-**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise. On 2026-08-03 the student explicitly approved G-04. Formal implementation is current through `F-01D`; its reviewed terminal commit is `069acb8541b8d59a7977a484f06d8f9abbefe780`. Container execution and remote pipeline receipts remain unverified. Later tasks remain incomplete until their own fresh TDD and review evidence exists.
+**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise. On 2026-08-03 the student explicitly approved G-04. Formal implementation is current through `F-01E`; its reviewed terminal commits are `82eec27`, `ae152e3`, and `1e53e74`. Container execution and remote pipeline receipts remain unverified. Later tasks remain incomplete until their own fresh TDD and review evidence exists.
 
 `verified` means current local evidence exists; `planned` means a named active task owns it; `blocked` means a named human/external gate remains; `not-started` means no product evidence exists. This is the only active course matrix. Archived plans are recovery evidence, never PASS evidence.
 
@@ -17,7 +17,7 @@
 | At least three clear modules | M1 materials, M2 learning, M3 review | verified specification; not implemented | M1-01--03, M2-01--04, M3-01--02 |
 | At least five INVEST stories | US-01--US-08 | verified document; current-hash SR-08 revalidation pending | implementation evidence after G-04 |
 | Module contracts and objective acceptance | SPEC 3 and AC-01--24 | planned; each AC mapped in PLAN 12 | named task/gate per AC |
-| Architecture/data flow/data model | SPEC 6--7 | planned | F-02/03, feature repositories, API-01--03 |
+| Architecture/data flow/data model | SPEC 6--7 | F-02 core SQLite schema/UoW verified locally; later learning schema and repositories remain planned | F-02 terminal commit, F-03, feature repositories, API-01--03 |
 | Performance/reliability/errors/observability | SPEC 5 | planned | F-04, API-03, QA-RELEASE, DIST-01 |
 | Input validation and safe deletion | SPEC 3.1 and 8 | planned | M1-01--03, API-01, UI-03/06 |
 | Host/Origin/CSRF/session boundary | local plus explicit public profile | planned | F-04 and DEMO-01 positive/negative tests |
@@ -32,7 +32,7 @@
 | Windows cold start <=10 seconds | clean reference VM contract | not-started; named environment gate | DIST-01-VM-CLOSE measured receipt |
 | Linux/amd64 dependency/base evidence | separate CI/demo hashed locks and OCI digests | verified planning input: 41 CI, 14 demo | F-01A exact-lock sync; DIST-02 build/SBOM/smoke |
 | Public HTTPS WebUI URL | immutable mock OCI image | blocked on student D-025 | D-025-HOST-CLOSE then DOC-01 |
-| One-command tests | `python scripts/test_all.py` | verified locally: `TEST_ALL_PASS mode=all`; quality-gate tests, frontend Vitest/tsc/Vite build, scanner and license verifier passed | F-01E terminal commit; QA-RELEASE observes full pass |
+| One-command tests | `python scripts/test_all.py` | verified locally: `TEST_ALL_PASS mode=all`; quality-gate tests, frontend Vitest/tsc/Vite build, scanner and license verifier passed; F-01E committed in `ae152e3` | QA-RELEASE observes full pass |
 | Core automated tests | domain/storage/API/UI/E2E/security/performance | not-started | F-02 through DEMO-01/P-02 |
 | Every push runs CI | F-01D seeds pinned scanner/backend/frontend current-suite workflows; CI-01 adds distribution | implemented locally at `069acb8541b8d59a7977a484f06d8f9abbefe780`; YAML and seed contract verified, remote push not executed | EXT-REMOTE-PREP branch-tip current-suite receipts |
 | GitLab job exactly `unit-test` | `.gitlab-ci.yml` | implemented locally and mechanically verified; remote pipeline not executed | CI-01, final NJU pipeline receipt |

@@ -1377,3 +1377,12 @@
 - Verification: `21 passed` with project-local pytest basetemp; `CREDENTIAL_SCAN_PASS files=226`; `LICENSE_VERIFICATION_PASS python=54 npm=166`; `TEST_ALL_PASS mode=all`; `CI_SEED_CONTRACT_PASS`; `git diff --check`; Python compilation.
 - Human changes: none. Commit is pending normal Git index permission; no alternate index or ACL workaround used.
 - Lesson: a quality receipt must derive its findings and counts from the same captured Git source lists, and mutable license evidence must be hash-bound.
+## 2026-08-06T16:25:00+08:00 - F-02 core SQLite schema and UoW
+
+- Task: `F-02`; skills: `test-driven-development`, `systematic-debugging`, `receiving-code-review`, `verification-before-completion`.
+- Context: implement only the F-02 owned migration, database entry point, UoW and storage contract tests after F-01E commit `ae152e3`.
+- TDD: controlled RED was `5 failed` because `backend/projectb/storage/db.py` was absent; the literal command also hit the pre-existing host `%TEMP%` ACL, so evidence uses project-local `--basetemp`. GREEN is `7 passed` after review regressions were added.
+- Spec review: the ten SPEC section 7 entities, lower-case content hashes, single-page/text-line locator union, uniqueness, foreign keys, immutable history, shared blob references and rollback boundaries are represented and tested.
+- Quality review: independent review found 5 Major and 3 Minor issues. Fixed uppercase hash acceptance, PDF page ranges, mutable material hash, deletable coverage history, missing blob tombstones, migration atomicity and BEGIN connection cleanup. Blob bytes remain owned by M1-03; F-02 preserves `storage_ref` with `delete_pending=1` until that later boundary succeeds.
+- Verification: targeted `7 passed`; backend regression `26 passed`; full runner and final scan are rerun after this evidence update. Human changes: none. Fresh worker dispatch was unavailable, so coordinator implementation is recorded rather than attributed to a worker.
+- Lesson: database deletion metadata must survive physical-byte failure, and insert-time hash equality is insufficient without update immutability.
