@@ -36,6 +36,55 @@ class MutexAnswer:
 
 
 @dataclass(frozen=True, slots=True)
+class RaceStep:
+    thread_id: str
+    action: Literal["read", "add", "write"]
+    value: int
+
+    def __post_init__(self) -> None:
+        if not self.thread_id.strip():
+            raise ValueError("thread_id_required")
+        if self.action not in {"read", "add", "write"}:
+            raise ValueError("race_action_invalid")
+        if type(self.value) is not int:
+            raise ValueError("race_value_invalid")
+
+
+@dataclass(frozen=True, slots=True)
+class RaceExercise:
+    initial_value: int
+    steps: tuple[RaceStep, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class RaceAnswer:
+    has_race: bool
+    final_value: int
+
+
+@dataclass(frozen=True, slots=True)
+class ResourceClaim:
+    thread_id: str
+    resource_id: str
+
+    def __post_init__(self) -> None:
+        if not self.thread_id.strip() or not self.resource_id.strip():
+            raise ValueError("resource_claim_invalid")
+
+
+@dataclass(frozen=True, slots=True)
+class DeadlockExercise:
+    holds: tuple[ResourceClaim, ...]
+    waits: tuple[ResourceClaim, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class DeadlockAnswer:
+    has_deadlock: bool
+    cycle: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
 class EvaluationRequest:
     evaluator_id: str
     check_kind: CheckKind

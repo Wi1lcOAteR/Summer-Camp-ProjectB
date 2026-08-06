@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from projectb.domain.learning.evaluators.base import Evaluator
+from projectb.domain.learning.evaluators.deadlock import DeadlockEvaluator
 from projectb.domain.learning.evaluators.mutex import MutexEvaluator
+from projectb.domain.learning.evaluators.race import RaceEvaluator
 
 
 class ExplanationOnlyError(RuntimeError):
@@ -31,4 +33,4 @@ class EvaluatorRegistry:
 
 
 def default_registry() -> EvaluatorRegistry:
-    return EvaluatorRegistry((MutexEvaluator(),))
+    return EvaluatorRegistry((MutexEvaluator(), RaceEvaluator(), DeadlockEvaluator()))
