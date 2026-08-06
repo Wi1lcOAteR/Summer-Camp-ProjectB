@@ -149,7 +149,7 @@ git diff --check
 | 13 | F-04 | F-03 | no: security base | foundation | complete | `736292a14b41083122791a7182f554e354943a5f` |
 | 14 | F-05 | F-04 | no: security base | foundation | complete | `e11a150e1f0233206803a4763a53f237fced097c` |
 | 15 | M1-01 | F-05 | no: material contracts | m1-materials | complete | `07ebf95f0ac3c4c9436619bf74be4c78a7612913` |
-| 16 | M1-02 | M1-01 | no: consumes extraction | m1-materials | not started | none |
+| 16 | M1-02 | M1-01 | no: consumes extraction | m1-materials | complete | `bdc893ef99e0ac7cac4d1481052fc30e5d5333b9` |
 | 17 | M1-03 | M1-02 | no: consumes material repo | m1-materials | not started | none |
 | 18 | M2-01 | M1-03 | no: evaluator base | m2-learning | not started | none |
 | 19 | M2-02 | M2-01 | no: registry assembly | m2-learning | not started | none |

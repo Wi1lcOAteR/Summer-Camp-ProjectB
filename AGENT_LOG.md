@@ -1423,3 +1423,11 @@
 - **规约与质量评审**：原始字节 SHA-256、严格 UTF-8 与换行规范化、一基页/行 locator、真实上界、不可变版本、数字 PDF 双解析器一致性、扫描/加密/伪装拒绝、30 秒默认 worker、进程树终止、临时输出清理及稳定错误均符合 M1-01。未新增依赖；fixture 为项目合成内容并有许可说明。
 - **验证与 commit**：全量后端 `70 passed`，Vitest `1 passed`，TypeScript/Vite build PASS，owned-path Ruff/mypy PASS，`CREDENTIAL_SCAN_PASS files=250`，许可证 PASS，`TEST_ALL_PASS mode=all`。核心提交 `0ba43d849de4595b36e9f7ddd36a2544c5320a30`；发现 Git 将 PDF 当文本检查后，新增 binary 属性提交 `07ebf95f0ac3c4c9436619bf74be4c78a7612913`，两份工作区 PDF 与 Git blob 哈希一致。
 - **经验教训**：参与抽取判定的每个解析器都必须进入版本指纹；文本扩展名不能代替二进制 magic 检查；PowerShell 不会默认因外部命令非零退出而停止，提交链必须显式检查 `$LASTEXITCODE`。
+
+## 2026-08-06T19:38:00+08:00 - M1-02 原子导入与内容地址存储
+
+- **Task 编号与 skill**：`M1-02`；使用 `test-driven-development`、`systematic-debugging`、`requesting-code-review`、`verification-before-completion`。fresh-agent 调度接口未返回可用调用，为避免阻塞按学生“尽快推进”指令由 coordinator 实现；此偏离未冒充 subagent，`Human-Changes: none`。
+- **关键 context**：批次先校验 5 文件和 50 MiB，再对整批做无写入的流式哈希/大小快照；每个文件独立抽取、staging、内容 promote 和 SQLite 事务。状态为 `imported/idempotent/failed`，错误不回显路径或底层异常。
+- **红绿与评审**：初始 RED 为缺少 importer/repository/content-store；初版目标 `13 passed`。规约复核以 RED 复现解析期间源文件变化仍被导入，修复为 snapshot hash 不一致时 `content_changed` 且零权威写入。最终覆盖 5/20/50 MiB、200 页、1,000,000 codepoints 的边界，same-course 幂等、新 parser 新版本、跨课程 blob 共享、混合批次、超时与临时清理。
+- **验证与 commit**：目标 `14 passed`，全量后端 `84 passed`，Vitest `1 passed`，TypeScript/Vite build PASS，Ruff/mypy PASS，`CREDENTIAL_SCAN_PASS files=264`，许可证 PASS，`TEST_ALL_PASS mode=all`。产品提交为 `bdc893ef99e0ac7cac4d1481052fc30e5d5333b9`，未新增依赖或第三方代码。
+- **经验教训**：文件大小 `stat` 只能做快速预检，权威写入前仍需对同一批次完成流式快照并将解析 hash 绑定该快照；文件系统 promote 与 SQLite 事务之间必须在失败后按实际引用状态补偿清理。
