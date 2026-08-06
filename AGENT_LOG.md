@@ -1431,3 +1431,11 @@
 - **红绿与评审**：初始 RED 为缺少 importer/repository/content-store；初版目标 `13 passed`。规约复核以 RED 复现解析期间源文件变化仍被导入，修复为 snapshot hash 不一致时 `content_changed` 且零权威写入。最终覆盖 5/20/50 MiB、200 页、1,000,000 codepoints 的边界，same-course 幂等、新 parser 新版本、跨课程 blob 共享、混合批次、超时与临时清理。
 - **验证与 commit**：目标 `14 passed`，全量后端 `84 passed`，Vitest `1 passed`，TypeScript/Vite build PASS，Ruff/mypy PASS，`CREDENTIAL_SCAN_PASS files=264`，许可证 PASS，`TEST_ALL_PASS mode=all`。产品提交为 `bdc893ef99e0ac7cac4d1481052fc30e5d5333b9`，未新增依赖或第三方代码。
 - **经验教训**：文件大小 `stat` 只能做快速预检，权威写入前仍需对同一批次完成流式快照并将解析 hash 绑定该快照；文件系统 promote 与 SQLite 事务之间必须在失败后按实际引用状态补偿清理。
+
+## 2026-08-06T19:50:00+08:00 - M1-03 确认式来源映射与删除
+
+- **Task 编号与 skill**：`M1-03`；使用 `test-driven-development`、`systematic-debugging`、`requesting-code-review`、`verification-before-completion`。fresh-agent 调度仍不可用，由 coordinator 实现并明确记录偏离；`Human-Changes: none`。
+- **关键 context**：coverage decision 只追加历史；每个 concept 仅最新 decision 生效，且必须 confirmed、同课程、locator 仍存在并属于材料最新版本。删除先提交课程 material/ref 删除和最后引用 tombstone，再清理 blob；失败保留可重试状态。
+- **红绿与评审**：RED 为缺少 coverage/delete 模块；GREEN 为 5 passed。规约检查覆盖多个知识点、rejected/unconfirmed、parser 升级后旧 locator 失效、材料删除后未来授权失败且 decision 历史保留。质量检查修复最后引用删除与并发复用同 hash 的交错：删除在 SQLite 写锁内再次确认零引用；导入 staging 保留到引用提交后并可恢复缺失 blob。
+- **验证与 commit**：M1-02/03 联合 `19 passed`，全量后端 `89 passed`，Vitest `1 passed`，TypeScript/Vite build PASS，Ruff/mypy PASS，`CREDENTIAL_SCAN_PASS files=272`，许可证 PASS，`TEST_ALL_PASS mode=all`。产品提交 `aa2a6da62cc0d185510c2b17e33ab168f33a74d6`，未新增依赖或第三方代码。
+- **经验教训**：coverage 授权必须在每次使用时重新验证 locator 的存在性和 current version，不能只信历史确认；跨 SQLite/文件系统删除必须在提交后清理，并在最终零引用检查期间阻止新引用插入。
