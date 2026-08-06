@@ -151,7 +151,7 @@ git diff --check
 | 15 | M1-01 | F-05 | no: material contracts | m1-materials | complete | `07ebf95f0ac3c4c9436619bf74be4c78a7612913` |
 | 16 | M1-02 | M1-01 | no: consumes extraction | m1-materials | complete | `bdc893ef99e0ac7cac4d1481052fc30e5d5333b9` |
 | 17 | M1-03 | M1-02 | no: consumes material repo | m1-materials | complete | `aa2a6da62cc0d185510c2b17e33ab168f33a74d6` |
-| 18 | M2-01 | M1-03 | no: evaluator base | m2-learning | not started | none |
+| 18 | M2-01 | M1-03 | no: evaluator base | m2-learning | complete | `9b49e07b6e5a237005c1d267f84b902cc48fff7c` |
 | 19 | M2-02 | M2-01 | no: registry assembly | m2-learning | not started | none |
 | 20 | M2-03 | M2-02 | no: evidence authority | m2-learning | not started | none |
 | 21 | M2-04 | M2-03 | no: mastery consumes evidence | m2-learning | not started | none |

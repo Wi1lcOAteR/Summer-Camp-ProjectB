@@ -1439,3 +1439,10 @@
 - **红绿与评审**：RED 为缺少 coverage/delete 模块；GREEN 为 5 passed。规约检查覆盖多个知识点、rejected/unconfirmed、parser 升级后旧 locator 失效、材料删除后未来授权失败且 decision 历史保留。质量检查修复最后引用删除与并发复用同 hash 的交错：删除在 SQLite 写锁内再次确认零引用；导入 staging 保留到引用提交后并可恢复缺失 blob。
 - **验证与 commit**：M1-02/03 联合 `19 passed`，全量后端 `89 passed`，Vitest `1 passed`，TypeScript/Vite build PASS，Ruff/mypy PASS，`CREDENTIAL_SCAN_PASS files=272`，许可证 PASS，`TEST_ALL_PASS mode=all`。产品提交 `aa2a6da62cc0d185510c2b17e33ab168f33a74d6`，未新增依赖或第三方代码。
 - **经验教训**：coverage 授权必须在每次使用时重新验证 locator 的存在性和 current version，不能只信历史确认；跨 SQLite/文件系统删除必须在提交后清理，并在最终零引用检查期间阻止新引用插入。
+
+## 2026-08-06T20:00:00+08:00 - M2-01 确定性 mutex evaluator
+
+- **Task 编号与 skill**：`M2-01`；使用 `test-driven-development`、`requesting-code-review`、`verification-before-completion`。fresh-agent 调度不可用，由 coordinator 实现并记录偏离；`Human-Changes: none`。
+- **红绿与合同**：RED 为缺少 `projectb.domain.learning`。实现冻结的 check/outcome schema、Evaluator protocol、`os.mutex.v1` 和 registry。有效 trace、首个互斥冲突 witness、畸形/未闭合 trace、重复执行、来源顺序/去重及 explanation-only guard 共 `7 passed`；rubric 固定按 code 排序，无 LLM 参与评分。
+- **验证与 commit**：全量后端 `96 passed`，Vitest `1 passed`，TypeScript/Vite build PASS，Ruff/mypy PASS，`CREDENTIAL_SCAN_PASS files=280`，许可证 PASS，`TEST_ALL_PASS mode=all`。产品提交 `9b49e07b6e5a237005c1d267f84b902cc48fff7c`。
+- **经验教训**：确定性 evaluator 的输入顺序中只有语义事件顺序可影响结果；来源 ID 和 rubric 呈现顺序必须规范化，避免同一证据因集合顺序产生不同 hash。
