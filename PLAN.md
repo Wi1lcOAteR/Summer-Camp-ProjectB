@@ -146,7 +146,7 @@ git diff --check
 | 10 | F-01E | F-01D | no: creates shared quality gates | foundation | complete | ae152e3 |
 | 11 | F-02 | F-01E | no: migration order | foundation | complete | 62022db |
 | 12 | F-03 | F-02 | no: migration order | foundation | complete | `1aaeb6f1912c7f1e5323ea6ab843b689937adbd1` |
-| 13 | F-04 | F-03 | no: security base | foundation | not started | none |
+| 13 | F-04 | F-03 | no: security base | foundation | complete | `736292a14b41083122791a7182f554e354943a5f` |
 | 14 | F-05 | F-04 | no: security base | foundation | not started | none |
 | 15 | M1-01 | F-05 | no: material contracts | m1-materials | not started | none |
 | 16 | M1-02 | M1-01 | no: consumes extraction | m1-materials | not started | none |

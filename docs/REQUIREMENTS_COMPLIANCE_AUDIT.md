@@ -20,7 +20,7 @@
 | Architecture/data flow/data model | SPEC 6--7 | F-02 core SQLite schema/UoW committed at `62022db`; F-03 learning/review schema committed at `1aaeb6f`; repositories remain planned | feature repositories, API-01--03 |
 | Performance/reliability/errors/observability | SPEC 5 | planned | F-04, API-03, QA-RELEASE, DIST-01 |
 | Input validation and safe deletion | SPEC 3.1 and 8 | planned | M1-01--03, API-01, UI-03/06 |
-| Host/Origin/CSRF/session boundary | local plus explicit public profile | planned | F-04 and DEMO-01 positive/negative tests |
+| Host/Origin/CSRF/session boundary | local plus explicit public profile | local loopback policy, session-bound CSRF, safe errors and audit allowlist committed at `736292a`; public profile remains planned | DEMO-01 positive/negative tests |
 | Secret never enters DB/config/log/browser/Git | WinVault plus fail-closed scanner | Complete bootstrap scanner verified at `1d6dcab15adf1649cda7309360f3cdeff0423e27`; extensionless manifests closed at `de3f336050dc781fca71252fa07086897e6a2949`; exact bootstrap license names closed at `de96057` | F-01E/F-05 and every-task protocol |
 | First-run hidden credential status/update/clear | value-free settings contract | planned | F-05, API-03, UI-06, DIST-01 real lifecycle |
 | Optional model is consent-bound and non-authoritative | L+P; mock default; exact text fragments only | P-only evidence verified; adapter not started | P-01/P-02/API-02/UI-04 |

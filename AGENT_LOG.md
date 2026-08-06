@@ -1397,3 +1397,11 @@
 - **subagent 输出与 commit**：worker 产物经评审修订后提交为 `1aaeb6f1912c7f1e5323ea6ab843b689937adbd1`；coordinator 修订均来自已记录的 reviewer finding 或额外 RED，没有学生代码改动。
 - **已知基线问题**：计划中的独立 Ruff/mypy 命令仍因既有 `scripts/evidence/g02a_python_smoke.py` E402 和 `uow.py` 双模块名失败；F-03 未修改这些路径，全量项目 runner 仍通过。
 - **经验教训**：schema 的绿色测试必须同时核对 SPEC 正文枚举和跨表权威关系；只给 evidence 一个通用幂等键，不能自动保证“一次 attempt 只生成一条证据”。
+
+## 2026-08-06T18:15:44+08:00 - F-04 本地 HTTP 信任边界与审计白名单
+
+- **Task 编号与 skill**：`F-04`；使用 `test-driven-development`、`systematic-debugging`、`requesting-code-review`、`verification-before-completion`，沿用 `codex/foundation-v1` worktree。
+- **关键 context**：只创建计划列出的 HTTP 策略、审计模块和两份测试；不提前创建 FastAPI app、业务路由或 F-05 凭据逻辑。fresh subagent 派发接口本阶段不可用，因此实现明确归属 coordinator，`Human-Changes: none`。
+- **红绿与评审**：初始 RED 为 15 个缺模块失败；GREEN 为 15 passed。SPEC 合规检查覆盖 loopback Host/Origin、unsafe 方法的 session-CSRF、跨 session replay、稳定 request ID/error code 和审计字段白名单。质量检查额外以 RED 修复底层 URL 异常 cause 泄露和十六进制 request ID 兼容；提交前合成 `token=` 形状被 scanner 拒绝后改为无凭据形状 fixture。
+- **验证与 commit**：owned-path Ruff PASS、mypy PASS；全量 `50 passed`、Vitest `1 passed`、Vite build PASS、`CREDENTIAL_SCAN_PASS files=238`、许可证 PASS、`TEST_ALL_PASS mode=all`。产品提交为 `736292a14b41083122791a7182f554e354943a5f`，未新增依赖或第三方代码。
+- **经验教训**：安全错误不能只隐藏响应正文，还要抑制携带不可信输入的异常链；HTTP request ID 是 opaque ID，不应复用业务 error-code 的格式约束。
