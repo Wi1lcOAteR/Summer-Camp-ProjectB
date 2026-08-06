@@ -8,6 +8,7 @@ SPEC.md text eol=lf
 PLAN.md text eol=lf
 docs/cold-start/*.md text eol=lf
 docs/cold-start/*.json text eol=lf
+docs/engineering/BOOTSTRAP_LICENSE_EVIDENCE.md text eol=lf
 scripts/cold_start/*.ps1 text eol=lf
 scripts/cold_start/tests/*.ps1 text eol=lf
 
