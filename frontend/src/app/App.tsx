@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import { AlertTriangle, LockKeyhole, RotateCw, Settings, ShieldCheck } from 'lucide-react';
 import { routeForPath, workbenchRoutes } from './routes';
+import { ImportView } from '../views/import/ImportView';
 import '../styles/global.css';
 
 const tasks = [
@@ -51,6 +52,16 @@ export function App() {
       </header>
       <main>
         <div className="mainInner">
+          {current.href === '/import' ? <ImportView /> : <LearningView />}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function LearningView() {
+  return (
+    <>
           <section className="pageIntro" aria-labelledby="page-title">
             <div><p className="eyebrow">第 3 阶段 · 今日学习</p><h1 id="page-title">练习与掌握</h1><p className="introCopy">先完成概念辨析，再处理信号量代码题。</p></div>
             <div className="progress" aria-label="今日进度 64%"><p className="progressMeta"><span>今日进度</span><strong>64%</strong></p><div className="progressTrack"><div className="progressFill" /></div></div>
@@ -71,9 +82,7 @@ export function App() {
             </aside>
           </div>
           <p className="liveRegion" role="status" aria-live="polite">ProjectB 本地档案已就绪</p>
-        </div>
-      </main>
-    </div>
+    </>
   );
 }
 

@@ -16,5 +16,5 @@ export const workbenchRoutes: readonly WorkbenchRoute[] = [
 ];
 
 export function routeForPath(pathname: string): WorkbenchRoute {
-  return workbenchRoutes.find(({ href }) => pathname.startsWith(href)) ?? workbenchRoutes[2]!;
+  return workbenchRoutes.find(({ href }) => pathname.startsWith(href)) ?? workbenchRoutes[0]!;
 }
