@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>ProjectB - 操作系统学习工作台</title>
+  <style>
+    :root {
+      /* ─── Surface (3 levels — #Gap 2) ─────────────────────────────────
+       * Per craft/color.md: never pure black, never pure white. Default
+       * uses #FAFAFA for bg and #FFFFFF for surface — the cream-to-white
+       * contrast gives cards lift without a shadow. `--surface-warm` is a
+       * schema slot for brands that need a tertiary tier (kami's warm-sand
+       * button bg); default has no third tier and aliases it to surface. */
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --surface-warm: var(--surface);   /* alias — default has no warm tier */
+
+      /* ─── Foreground ramp (4 levels — #Gap 1) ───────────────────────
+       * Default differentiates only two text levels (primary + muted).
+       * `--fg-2` and `--meta` are schema slots for brands with richer
+       * ramps (kami uses near-black / dark-warm / olive / stone). They
+       * alias here so components targeting the full ramp resolve. */
+      --fg: #111111;
+      --fg-2: var(--fg);                /* alias — default has no secondary tier */
+      --muted: #6b6b6b;
+      --meta: var(--muted);             /* alias — default has no metadata tier */
+
+      /* ─── Border (2 levels — #Gap 3) ────────────────────────────────
+       * Default has one border weight; `--border-soft` is a schema slot
+       * for brands with row-separator vs card-edge differentiation. */
+      --border: #e5e5e5;
+      --border-soft: var(--border);     /* alias — default has no soft tier */
+
+      /* ─── Accent ──────────────────────────────────────────────────────
+       * Cobalt — primary CTAs, links, ONE hero element per screen.
+       * Hard cap of 2 visible uses per screen is enforced by lint
+       * (`accent-overuse` P1 fires at >6 inline occurrences). */
+      --accent: #2f6feb;
+      --accent-on: #ffffff; /* fg when accent is the bg (e.g. button label) */
+
+      /* ─── Accent states (#Gap 4) ────────────────────────────────────
+       * Hover and active variants for any element using --accent as bg.
+       * Default's mid-luminance cobalt admits a black-mix formula
+       * cleanly; that's a brand-specific binding, NOT a schema rule.
+       * kami binds --accent-hover to var(--accent) (no color shift,
+       * hover via elevation) because ink-blue is too dark for further
+       * darkening to read; other brands with light accents must
+       * hand-pick.
+       *
+       * Schema rule: every brand provides --accent-hover and
+       * --accent-active. The binding strategy (formula / identity /
+       * hand-picked) is brand-decided.
+       *
+       * Why these two are tokens (and other tints stay inline):
+       *   - cross-component (button, chip, tab, dropdown all need them)
+       *   - cross-mode reversal (dark-mode hover should mix white, not
+       *     black — token re-binding is one line per mode)
+       *   - cross-brand customization (formula breaks on light accents)
+       *   - lint-enforceable contract (every brand must provide these)
+       * Other inline `color-mix(...)` calls in components don't yet hit
+       * any of the above — promote them to tokens when a second use
+       * appears. */
+      --accent-hover: color-mix(in oklab, var(--accent), black 8%);
+      --accent-active: color-mix(in oklab, var(--accent), black 14%);
+
+      /* ─── Semantic ────────────────────────────────────────────────────
+       * Reserved for state, not decoration. Keep total semantic-color
+       * pixels under 5% of the surface. */
+      --success: #17a34a;
+      --warn: #eab308;
+      --danger: #dc2626;
+
+      /* ─── Typography ──────────────────────────────────────────────────
+       * Inter for display is the documented "modern minimal" override
+       * to anti-ai-slop's serif-display rule (see DESIGN.md
+       * §Visual Theme & Atmosphere — "Calm, functional, quietly
+       * confident"). Other brands should rebind --font-display to a
+       * serif unless their direction is also tech/utility. */
+      --font-display: "Inter", -apple-system, system-ui, sans-serif;
+      --font-body: "Inter", -apple-system, system-ui, sans-serif;
+      --font-mono: ui-monospace, "JetBrains Mono", monospace;
+
+      /* Type scale (px) — direct copy of DESIGN.md §Typography Rules */
+      --text-xs: 12px;
+      --text-sm: 14px;
+      --text-base: 16px;
+      --text-lg: 20px;
+      --text-xl: 24px;
+      --text-2xl: 32px;
+      --text-3xl: 48px;
+      --text-4xl: 64px;
+
+      --leading-body: 1.5;
+      --leading-tight: 1.2;
+      --tracking-display: -0.01em; /* applied to display sizes ≥32px */
+
+      /* ─── Spacing ─────────────────────────────────────────────────────
+       * 4px base unit. Section rhythm (80/48/32) lives below as named
+       * tokens because DESIGN.md §Layout Principles treats them as
+       * breakpoint-specific decisions, not generic spacing. */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-12: 48px;
+      --space-20: 80px;
+
+      --section-y-desktop: 80px;
+      --section-y-tablet: 48px;
+      --section-y-phone: 32px;
+
+      /* ─── Radius ──────────────────────────────────────────────────────
+       * Two intents: small (button/input) and medium (card/modal).
+       * `--radius-pill` reserved for chips/avatars; do not use it on
+       * cards or buttons. */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-pill: 9999px;
+
+      /* ─── Elevation (3 levels — #Gap 5) ─────────────────────────────
+       * Default uses two levels (flat + raised blur shadow) per its own
+       * DESIGN.md §Depth & Elevation. The schema gains `--elev-ring` as
+       * a first-class level so brands using ring shadows as primary
+       * elevation (kami, paper, editorial) don't need to rebind
+       * --elev-raised away from blur. Default declares all three; ring
+       * is available for hairline edges where a 1px border would shift
+       * layout. No fourth level — that's neumorphism territory. */
+      --elev-flat: none;
+      --elev-ring: 0 0 0 1px var(--border);
+      --elev-raised: 0 2px 8px color-mix(in oklab, var(--fg), transparent 92%);
+
+      /* ─── Focus ring ──────────────────────────────────────────────────
+       * Single source of truth for keyboard-focus indicators. Every
+       * `:focus-visible` rule on buttons, inputs, links, and tabs must
+       * use this token — uniform behavior is itself a brand signal, and
+       * craft/accessibility-baseline.md treats focus visibility as a
+       * non-negotiable. Implemented as a `box-shadow` so it layers
+       * outside the element without affecting layout. */
+      --focus-ring: 0 0 0 3px color-mix(in oklab, var(--accent), transparent 70%);
+
+      /* ─── Motion ─────────────────────────────────────────────────────
+       * Two durations + one easing curve, per anti-ai-slop's "short,
+       * purposeful transitions (150–250ms) with stable easing". Add a
+       * third duration only when a real interaction needs it; do not
+       * invent `--motion-slow` speculatively. */
+      --motion-fast: 150ms;            /* hover, focus, micro-states */
+      --motion-base: 200ms;            /* general state changes */
+      --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+      /* ─── Layout ──────────────────────────────────────────────────────
+       * Container width and per-breakpoint gutter. Skill-side responsive
+       * code reads these to decide grid columns. */
+      --container-max: 1200px;
+      --container-gutter-desktop: 24px;
+      --container-gutter-tablet: 16px;
+      --container-gutter-phone: 12px;
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--bg); color: var(--fg); overflow-x: hidden; }
+    body {
+      min-width: 320px;
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      line-height: var(--leading-body);
+      letter-spacing: 0;
+      overflow-x: hidden;
+    }
+    button, select, input { font: inherit; letter-spacing: 0; }
+    button, select, a { -webkit-tap-highlight-color: transparent; }
+    button { color: inherit; }
+    button:focus-visible, select:focus-visible, a:focus-visible, input:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+    svg { display: block; }
+    .container {
+      width: min(100%, var(--container-max));
+      margin-inline: auto;
+      padding-inline: var(--container-gutter-desktop);
+    }
+    .app-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .utility-bar {
+      min-height: 64px;
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) auto minmax(280px, 1fr);
+      align-items: center;
+      gap: var(--space-5);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      min-width: 0;
+    }
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--fg);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      flex: 0 0 auto;
+    }
+    .brand-copy { min-width: 0; }
+    .brand-name { margin: 0; font-size: var(--text-base); font-weight: 600; line-height: 1.2; }
+    .brand-context { margin: 2px 0 0; color: var(--muted); font-size: var(--text-xs); white-space: nowrap; }
+    .course-control {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .course-control label { color: var(--muted); font-size: var(--text-xs); }
+    .course-control select {
+      min-height: 40px;
+      padding: 8px 34px 8px 12px;
+      color: var(--fg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+    .utility-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: var(--space-2);
+      min-width: 0;
+    }
+    .privacy, .profile-status {
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding-inline: var(--space-3);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      white-space: nowrap;
+    }
+    .profile-status { color: var(--fg); cursor: pointer; }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      flex: 0 0 auto;
+    }
+    .icon-control {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard);
+    }
+    .icon-control:hover { background: var(--bg); border-color: var(--border); }
+    .icon-control:active { transform: translateY(1px); }
+    .icon-control::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      z-index: 10;
+      top: calc(100% + 8px);
+      right: 0;
+      padding: 5px 8px;
+      color: var(--surface);
+      background: var(--fg);
+      border-radius: 4px;
+      font-size: var(--text-xs);
+      line-height: 1.4;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-2px);
+      transition: opacity var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard);
+    }
+    .icon-control:hover::after, .icon-control:focus-visible::after { opacity: 1; transform: translateY(0); }
+    .workflow-nav { border-top: 1px solid var(--border-soft); }
+    .workflow-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .workflow-item { position: relative; min-width: 0; }
+    .workflow-item:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      top: 27px;
+      left: calc(50% + 18px);
+      right: calc(-50% + 18px);
+      height: 1px;
+      background: var(--border);
+    }
+    .workflow-button {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: 12px 8px;
+      background: var(--surface);
+      border: 0;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: background var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard);
+    }
+    .workflow-button:hover { background: var(--bg); }
+    .workflow-button[aria-current="step"] { border-bottom-color: var(--success); }
+    .step-number {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--muted);
+      background: var(--surface);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+    }
+    .workflow-button.is-complete .step-number,
+    .workflow-button[aria-current="step"] .step-number {
+      color: var(--surface);
+      background: var(--success);
+      border-color: var(--success);
+    }
+    .step-label { font-weight: 550; min-width: 0; }
+    .workflow-button:not([aria-current="step"]):not(.is-complete) .step-label { color: var(--muted); }
+    main { padding-block: var(--space-8) var(--space-12); }
+    .page-intro {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .eyebrow { margin: 0 0 4px; color: var(--muted); font-size: var(--text-xs); }
+    h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
+    h1 { margin: 0; font-size: var(--text-xl); line-height: 1.35; font-weight: 600; }
+    h2 { margin: 0; font-size: var(--text-lg); line-height: 1.35; font-weight: 600; }
+    h3 { margin: 0; font-size: var(--text-base); line-height: 1.4; font-weight: 600; }
+    .intro-meta { margin: 6px 0 0; color: var(--muted); max-width: 65ch; }
+    .session-progress { min-width: 220px; }
+    .progress-copy { display: flex; justify-content: space-between; gap: var(--space-3); margin-bottom: 6px; font-size: var(--text-xs); }
+    .progress-copy span:first-child { color: var(--muted); }
+    .progress-track { height: 6px; overflow: hidden; background: var(--border); border-radius: 3px; }
+    .progress-fill { width: 64%; height: 100%; background: var(--success); transition: width var(--motion-base) var(--ease-standard); }
+    .alert-region {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+      padding: var(--space-3) var(--space-4);
+      border-block: 1px solid color-mix(in oklab, var(--warn), var(--border) 66%);
+      background: color-mix(in oklab, var(--warn), var(--surface) 93%);
+    }
+    .alert-copy { display: flex; align-items: flex-start; gap: var(--space-3); min-width: 0; }
+    .alert-icon { color: color-mix(in oklab, var(--warn), var(--fg) 38%); flex: 0 0 auto; margin-top: 1px; }
+    .alert-copy strong { display: block; font-size: var(--text-sm); font-weight: 600; }
+    .alert-copy p { margin: 2px 0 0; color: var(--muted); font-size: var(--text-xs); }
+    .btn {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: 9px 14px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: var(--text-sm);
+      cursor: pointer;
+      transition: background var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard);
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn:disabled {
+      color: var(--muted);
+      background: var(--border-soft);
+      border-color: var(--border);
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-primary { color: var(--accent-on); background: var(--accent); border: 1px solid var(--accent); }
+    .btn-primary:hover { color: var(--accent-on); background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn-primary:active { background: var(--accent-active); border-color: var(--accent-active); }
+    .btn-secondary { color: var(--fg); background: var(--surface); border: 1px solid var(--border); }
+    .btn-secondary:hover { color: var(--fg); background: var(--bg); border-color: var(--fg); }
+    .btn-quiet { min-height: 36px; color: var(--fg); background: transparent; border: 1px solid var(--border); }
+    .btn-quiet:hover { color: var(--fg); background: var(--surface); border-color: var(--fg); }
+    .workbench-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 8fr) minmax(260px, 4fr);
+      gap: var(--space-8);
+      align-items: start;
+    }
+    .workspace-section, .side-section { min-width: 0; }
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--border);
+    }
+    .section-kicker { margin: 0; color: var(--muted); font-size: var(--text-xs); }
+    .task-list { list-style: none; margin: 0; padding: 0; }
+    .task-row {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr) auto;
+      gap: var(--space-3);
+      align-items: center;
+      padding: var(--space-4) 0;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .task-state {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--muted);
+      background: var(--surface);
+    }
+    .task-row.is-current .task-state { color: var(--surface); background: var(--success); border-color: var(--success); }
+    .task-copy { min-width: 0; }
+    .task-title { margin: 0; font-weight: 550; }
+    .task-detail { margin: 3px 0 0; color: var(--muted); font-size: var(--text-xs); }
+    .task-meta { text-align: right; color: var(--muted); font-family: var(--font-mono); font-size: var(--text-xs); white-space: nowrap; }
+    .active-tool {
+      margin-top: var(--space-6);
+      padding: var(--space-5);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+    .tool-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); margin-bottom: var(--space-5); }
+    .tool-label { margin: 0 0 4px; color: var(--muted); font-size: var(--text-xs); }
+    .tool-prompt { margin: 0; font-size: var(--text-base); line-height: 1.7; }
+    .code-block {
+      margin: var(--space-4) 0;
+      padding: var(--space-4);
+      overflow-x: auto;
+      color: var(--fg);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font: var(--text-sm)/1.65 var(--font-mono);
+    }
+    .answer-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+    .answer-option {
+      min-height: 48px;
+      padding: 10px 12px;
+      text-align: left;
+      color: var(--fg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+    .answer-option:hover { background: var(--bg); border-color: var(--fg); }
+    .answer-option[aria-pressed="true"] { border-color: var(--success); box-shadow: inset 3px 0 0 var(--success); }
+    .tool-footer { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); margin-top: var(--space-5); }
+    .keyboard-hint { color: var(--muted); font-size: var(--text-xs); }
+    kbd { padding: 2px 5px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 4px; background: var(--bg); font: inherit; }
+    .side-section + .side-section { margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--border); }
+    .summary-list { margin: var(--space-3) 0 0; padding: 0; list-style: none; }
+    .summary-row { display: flex; justify-content: space-between; gap: var(--space-4); padding: 10px 0; border-bottom: 1px solid var(--border-soft); }
+    .summary-row span:first-child { color: var(--muted); }
+    .summary-row strong { font-weight: 550; text-align: right; }
+    .review-list { margin: var(--space-3) 0 0; padding: 0; list-style: none; }
+    .review-item { padding: 12px 0; border-bottom: 1px solid var(--border-soft); }
+    .review-top { display: flex; justify-content: space-between; gap: var(--space-3); }
+    .review-title { font-weight: 550; }
+    .review-time { color: var(--muted); font-family: var(--font-mono); font-size: var(--text-xs); white-space: nowrap; }
+    .review-detail { margin: 4px 0 0; color: var(--muted); font-size: var(--text-xs); }
+    .local-note { display: flex; gap: var(--space-3); align-items: flex-start; padding-top: var(--space-4); color: var(--muted); font-size: var(--text-xs); }
+    .local-note svg { flex: 0 0 auto; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    .toast {
+      position: fixed;
+      z-index: 30;
+      right: var(--space-6);
+      bottom: var(--space-6);
+      max-width: min(360px, calc(100vw - 24px));
+      padding: 12px 16px;
+      color: var(--surface);
+      background: var(--fg);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--elev-raised);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity var(--motion-base) var(--ease-standard), transform var(--motion-base) var(--ease-standard);
+    }
+    .toast.is-visible { opacity: 1; transform: translateY(0); }
+    dialog {
+      width: min(520px, calc(100vw - 24px));
+      padding: 0;
+      color: var(--fg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--elev-raised);
+    }
+    dialog::backdrop { background: color-mix(in oklab, var(--fg), transparent 72%); }
+    .dialog-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border); }
+    .dialog-body { padding: var(--space-5); }
+    .setting-row { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-5); padding: 12px 0; border-bottom: 1px solid var(--border-soft); }
+    .setting-row:last-child { border-bottom: 0; }
+    .setting-copy strong { display: block; font-weight: 550; }
+    .setting-copy span { display: block; margin-top: 2px; color: var(--muted); font-size: var(--text-xs); }
+    .setting-row input { width: 18px; height: 18px; accent-color: var(--success); }
+    .profile-menu {
+      position: fixed;
+      z-index: 20;
+      width: 240px;
+      padding: var(--space-4);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--elev-raised);
+    }
+    .profile-menu[hidden] { display: none; }
+    .profile-menu strong { display: block; font-weight: 600; }
+    .profile-menu p { margin: 4px 0 0; color: var(--muted); font-size: var(--text-xs); }
+    .profile-menu .sync-line { margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--border); }
+
+    @media (min-width: 640px) and (max-width: 1023px) {
+      .container { padding-inline: var(--container-gutter-tablet); }
+      .utility-bar { grid-template-columns: 1fr auto; }
+      .course-control { grid-column: 1 / -1; grid-row: 2; padding-bottom: var(--space-3); }
+      .utility-actions { grid-column: 2; grid-row: 1; }
+      .workbench-grid { grid-template-columns: minmax(0, 5fr) minmax(240px, 3fr); gap: var(--space-6); }
+      .workflow-button { flex-direction: column; gap: 4px; }
+    }
+
+    @media (max-width: 639px) {
+      .container { padding-inline: var(--container-gutter-phone); }
+      .utility-bar { grid-template-columns: 1fr auto; gap: var(--space-3); padding-block: var(--space-3); }
+      .brand-context, .profile-label { display: none; }
+      .course-control { grid-column: 1 / -1; grid-row: 2; }
+      .course-control select { flex: 1; min-width: 0; }
+      .utility-actions { grid-column: 2; grid-row: 1; }
+      .privacy { min-height: 40px; padding-inline: 10px; }
+      .profile-status { width: 40px; height: 40px; justify-content: center; padding: 0; }
+      .workflow-nav .container { padding-inline: 0; }
+      .workflow-button { min-height: 78px; flex-direction: column; gap: 4px; padding: 10px 3px 8px; }
+      .workflow-item:not(:last-child)::after { top: 22px; left: calc(50% + 14px); right: calc(-50% + 14px); }
+      .step-number { width: 22px; height: 22px; }
+      .step-label { max-width: 72px; font-size: var(--text-xs); line-height: 1.35; text-align: center; }
+      main { padding-block: var(--space-6) var(--space-8); }
+      .page-intro { display: block; margin-bottom: var(--space-5); }
+      .session-progress { min-width: 0; margin-top: var(--space-4); }
+      .alert-region { align-items: flex-start; margin-inline: calc(var(--container-gutter-phone) * -1); margin-bottom: var(--space-6); padding-inline: var(--container-gutter-phone); }
+      .alert-copy p { max-width: 30ch; }
+      .workbench-grid { grid-template-columns: 1fr; gap: var(--space-8); }
+      .task-row { grid-template-columns: 26px minmax(0, 1fr); }
+      .task-meta { grid-column: 2; text-align: left; }
+      .active-tool { margin-inline: calc(var(--container-gutter-phone) * -1); padding: var(--space-4) var(--container-gutter-phone); border-inline: 0; border-radius: 0; }
+      .tool-header { display: block; }
+      .tool-header .section-kicker { margin-top: 6px; }
+      .answer-grid { grid-template-columns: 1fr; }
+      .tool-footer { align-items: stretch; flex-direction: column-reverse; }
+      .tool-footer .btn { width: 100%; min-height: 44px; }
+      .keyboard-hint { text-align: center; }
+      .toast { right: var(--container-gutter-phone); bottom: var(--container-gutter-phone); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header" data-od-id="app-header">
+    <div class="container utility-bar">
+      <div class="brand" data-od-id="projectb-brand">
+        <div class="brand-mark" aria-hidden="true">PB</div>
+        <div class="brand-copy">
+          <p class="brand-name">ProjectB</p>
+          <p class="brand-context">本地学习工作台</p>
+        </div>
+      </div>
+
+      <div class="course-control" data-od-id="course-selector">
+        <label for="course">课程</label>
+        <select id="course" aria-label="选择课程">
+          <option selected>操作系统</option>
+        </select>
+      </div>
+
+      <div class="utility-actions">
+        <div class="privacy" data-od-id="local-privacy" title="学习数据仅保存在此设备">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+          <span>仅本机</span>
+        </div>
+        <button class="profile-status" id="profileButton" type="button" aria-expanded="false" aria-controls="profileMenu" data-od-id="local-profile">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span class="profile-label">本地档案正常</span>
+          <span class="sr-only">打开本地档案状态</span>
+        </button>
+        <button class="icon-control" id="settingsButton" type="button" aria-label="设置" data-tooltip="设置" data-od-id="settings-button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21h-4v-.08A1.7 1.7 0 0 0 8.96 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.03H3v-4h.08A1.7 1.7 0 0 0 4.6 8.96a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 8.96 4.6 1.7 1.7 0 0 0 10 3.08V3h4v.08a1.7 1.7 0 0 0 1.03 1.52 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.52 1.03H21v4h-.08A1.7 1.7 0 0 0 19.4 15Z"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <nav class="workflow-nav" aria-label="学习流程" data-od-id="workflow-navigation">
+      <div class="container">
+        <ol class="workflow-list">
+          <li class="workflow-item"><button class="workflow-button is-complete" type="button" data-stage="import" data-od-id="workflow-import"><span class="step-number">1</span><span class="step-label">导入材料</span></button></li>
+          <li class="workflow-item"><button class="workflow-button is-complete" type="button" data-stage="map" data-od-id="workflow-map"><span class="step-number">2</span><span class="step-label">确认映射</span></button></li>
+          <li class="workflow-item"><button class="workflow-button" type="button" data-stage="practice" aria-current="step" data-od-id="workflow-practice"><span class="step-number">3</span><span class="step-label">练习与掌握</span></button></li>
+          <li class="workflow-item"><button class="workflow-button" type="button" data-stage="review" data-od-id="workflow-review"><span class="step-number">4</span><span class="step-label">复习计划</span></button></li>
+        </ol>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container" data-od-id="workbench-main">
+    <section class="page-intro" aria-labelledby="pageTitle" data-od-id="stage-summary">
+      <div>
+        <p class="eyebrow" id="stageEyebrow">第 3 阶段 · 今日学习</p>
+        <h1 id="pageTitle" data-od-id="workbench-heading">练习与掌握</h1>
+        <p class="intro-meta" id="stageDescription">继续“进程同步与互斥”，先完成概念辨析，再处理信号量代码题。</p>
+      </div>
+      <div class="session-progress" aria-label="今日进度 64%" data-od-id="daily-progress">
+        <div class="progress-copy"><span>今日进度</span><strong id="progressValue">64%</strong></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </section>
+
+    <section class="alert-region" id="recoverableAlert" aria-live="assertive" data-od-id="recoverable-status">
+      <div class="alert-copy">
+        <svg class="alert-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3 2.8 19h18.4L12 3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+        <div><strong>有 2 页讲义尚未完成文本提取</strong><p>原文件已保留，不影响当前练习；可重新尝试解析。</p></div>
+      </div>
+      <button class="btn btn-quiet" id="retryButton" type="button" data-od-id="retry-import">重试</button>
+    </section>
+
+    <div class="workbench-grid">
+      <section class="workspace-section" aria-labelledby="taskHeading" data-od-id="current-tasks">
+        <div class="section-heading">
+          <div><h2 id="taskHeading">当前任务</h2><p class="section-kicker" id="taskCount">3 项 · 预计 18 分钟</p></div>
+          <button class="btn btn-secondary" id="resetButton" type="button" data-od-id="reset-session">重置本轮</button>
+        </div>
+
+        <ol class="task-list" id="taskList">
+          <li class="task-row is-current" data-od-id="task-card-concept">
+            <div class="task-state" aria-hidden="true">1</div>
+            <div class="task-copy"><p class="task-title">区分临界区、互斥与同步</p><p class="task-detail">4 道概念辨析 · 当前第 3 题</p></div>
+            <span class="task-meta">6 分钟</span>
+          </li>
+          <li class="task-row" data-od-id="task-card-semaphore">
+            <div class="task-state" aria-hidden="true">2</div>
+            <div class="task-copy"><p class="task-title">补全生产者—消费者信号量</p><p class="task-detail">依据课堂讲义第 5 章生成</p></div>
+            <span class="task-meta">8 分钟</span>
+          </li>
+          <li class="task-row" data-od-id="task-card-explain">
+            <div class="task-state" aria-hidden="true">3</div>
+            <div class="task-copy"><p class="task-title">口述解释死锁四个必要条件</p><p class="task-detail">完成后加入明日复习队列</p></div>
+            <span class="task-meta">4 分钟</span>
+          </li>
+        </ol>
+
+        <section class="active-tool" aria-labelledby="practicePrompt" data-od-id="practice-tool">
+          <div class="tool-header">
+            <div><p class="tool-label">概念辨析 · 3 / 4</p><h3 id="practicePrompt">哪项最准确地描述了“互斥”？</h3></div>
+            <p class="section-kicker">来源：课堂讲义 5.2</p>
+          </div>
+          <p class="tool-prompt">当多个进程访问共享资源时，互斥机制主要保证：</p>
+          <div class="answer-grid" role="group" aria-label="选择答案">
+            <button class="answer-option" type="button" aria-pressed="false">A. 每个进程都按固定顺序执行</button>
+            <button class="answer-option" type="button" aria-pressed="false">B. 同一时刻只有一个进程进入临界区</button>
+            <button class="answer-option" type="button" aria-pressed="false">C. 所有进程最终都不会阻塞</button>
+            <button class="answer-option" type="button" aria-pressed="false">D. 进程之间不再需要共享数据</button>
+          </div>
+          <div class="tool-footer">
+            <span class="keyboard-hint"><kbd>1</kbd>–<kbd>4</kbd> 选择 · <kbd>Enter</kbd> 提交</span>
+            <button class="btn btn-primary" id="submitAnswer" type="button" disabled data-od-id="submit-answer">提交答案</button>
+          </div>
+        </section>
+      </section>
+
+      <aside aria-label="学习摘要">
+        <section class="side-section" aria-labelledby="masteryHeading" data-od-id="mastery-summary">
+          <div class="section-heading"><h2 id="masteryHeading">掌握概况</h2><p class="section-kicker">本地估算</p></div>
+          <ul class="summary-list">
+            <li class="summary-row"><span>进程与线程</span><strong>已掌握</strong></li>
+            <li class="summary-row"><span>同步与互斥</span><strong>学习中</strong></li>
+            <li class="summary-row"><span>死锁</span><strong>待巩固</strong></li>
+            <li class="summary-row"><span>内存管理</span><strong>未开始</strong></li>
+          </ul>
+        </section>
+
+        <section class="side-section" aria-labelledby="reviewHeading" data-od-id="review-queue">
+          <div class="section-heading"><h2 id="reviewHeading">近期复习</h2><p class="section-kicker">3 项到期</p></div>
+          <ul class="review-list">
+            <li class="review-item" data-od-id="review-card-pcb"><div class="review-top"><span class="review-title">PCB 中的进程状态</span><span class="review-time">今天</span></div><p class="review-detail">上次回答含混：阻塞态与就绪态转换</p></li>
+            <li class="review-item" data-od-id="review-card-scheduling"><div class="review-top"><span class="review-title">时间片轮转调度</span><span class="review-time">明天</span></div><p class="review-detail">需再次计算平均周转时间</p></li>
+            <li class="review-item" data-od-id="review-card-page"><div class="review-top"><span class="review-title">页面置换算法</span><span class="review-time">周日</span></div><p class="review-detail">重点比较 LRU 与 Clock</p></li>
+          </ul>
+          <div class="local-note">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+            <span>进度、错题和复习计划均保存在当前设备，不会上传。</span>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <div class="profile-menu" id="profileMenu" hidden data-od-id="profile-status-panel">
+    <strong>本地档案：主学习区</strong>
+    <p>最近保存：刚刚</p>
+    <p class="sync-line">浏览器存储可用 · 数据完整性检查通过</p>
+  </div>
+
+  <dialog id="settingsDialog" aria-labelledby="settingsTitle" data-od-id="settings-dialog">
+    <div class="dialog-header">
+      <h2 id="settingsTitle">设置</h2>
+      <button class="icon-control" id="closeSettings" type="button" aria-label="关闭设置" data-tooltip="关闭">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+      </button>
+    </div>
+    <div class="dialog-body">
+      <label class="setting-row"><span class="setting-copy"><strong>自动保存学习进度</strong><span>每次答题后写入本地档案</span></span><input type="checkbox" checked></label>
+      <label class="setting-row"><span class="setting-copy"><strong>显示键盘提示</strong><span>在练习工具中显示可用快捷键</span></span><input type="checkbox" checked></label>
+      <label class="setting-row"><span class="setting-copy"><strong>导入完成后保留原文件</strong><span>便于重新提取和人工核对</span></span><input type="checkbox" checked></label>
+    </div>
+  </dialog>
+
+  <div class="toast" id="liveToast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    const stageContent = {
+      import: { eyebrow: '第 1 阶段 · 材料管理', title: '导入材料', description: '添加课程讲义、实验指导或个人笔记；文件仅在本机处理。', progress: 25 },
+      map: { eyebrow: '第 2 阶段 · 结构核对', title: '确认映射', description: '检查材料与课程章节的对应关系，修正未识别的标题。', progress: 48 },
+      practice: { eyebrow: '第 3 阶段 · 今日学习', title: '练习与掌握', description: '继续“进程同步与互斥”，先完成概念辨析，再处理信号量代码题。', progress: 64 },
+      review: { eyebrow: '第 4 阶段 · 间隔复习', title: '复习计划', description: '处理今日到期的薄弱知识点，并查看接下来七天的安排。', progress: 72 }
+    };
+
+    const toast = document.getElementById('liveToast');
+    let toastTimer;
+    function announce(message) {
+      toast.textContent = message;
+      toast.classList.add('is-visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 2800);
+    }
+
+    document.querySelectorAll('.workflow-button').forEach((button) => {
+      button.addEventListener('click', () => {
+        const content = stageContent[button.dataset.stage];
+        document.querySelectorAll('.workflow-button').forEach((item) => item.removeAttribute('aria-current'));
+        button.setAttribute('aria-current', 'step');
+        document.getElementById('stageEyebrow').textContent = content.eyebrow;
+        document.getElementById('pageTitle').textContent = content.title;
+        document.getElementById('stageDescription').textContent = content.description;
+        document.getElementById('progressValue').textContent = content.progress + '%';
+        document.getElementById('progressFill').style.width = content.progress + '%';
+        document.querySelector('.session-progress').setAttribute('aria-label', '当前阶段进度 ' + content.progress + '%');
+        announce('已切换到：' + content.title);
+      });
+    });
+
+    const answerButtons = Array.from(document.querySelectorAll('.answer-option'));
+    const submitAnswer = document.getElementById('submitAnswer');
+    function chooseAnswer(index) {
+      answerButtons.forEach((button, itemIndex) => button.setAttribute('aria-pressed', itemIndex === index ? 'true' : 'false'));
+      submitAnswer.disabled = false;
+      answerButtons[index].focus();
+    }
+    answerButtons.forEach((button, index) => button.addEventListener('click', () => chooseAnswer(index)));
+    document.addEventListener('keydown', (event) => {
+      if (event.target.matches('input, select') || document.getElementById('settingsDialog').open) return;
+      const answerIndex = Number(event.key) - 1;
+      if (answerIndex >= 0 && answerIndex < answerButtons.length) chooseAnswer(answerIndex);
+      if (event.key === 'Enter' && !submitAnswer.disabled && document.activeElement !== submitAnswer) submitAnswer.click();
+    });
+    submitAnswer.addEventListener('click', () => {
+      const chosen = answerButtons.findIndex((button) => button.getAttribute('aria-pressed') === 'true');
+      const correct = chosen === 1;
+      announce(correct ? '回答正确，已保存到本地档案。' : '已记录本次回答，建议回看讲义 5.2。');
+      document.getElementById('progressValue').textContent = '68%';
+      document.getElementById('progressFill').style.width = '68%';
+    });
+
+    document.getElementById('retryButton').addEventListener('click', (event) => {
+      const alert = document.getElementById('recoverableAlert');
+      event.currentTarget.disabled = true;
+      event.currentTarget.textContent = '处理中';
+      setTimeout(() => {
+        alert.innerHTML = '<div class="alert-copy"><span class="status-dot" aria-hidden="true"></span><div><strong>文本提取已恢复</strong><p>2 页讲义已加入“确认映射”队列。</p></div></div>';
+        alert.style.background = 'color-mix(in oklab, var(--success), var(--surface) 94%)';
+        alert.style.borderColor = 'color-mix(in oklab, var(--success), var(--border) 72%)';
+        announce('重新解析完成。');
+      }, 650);
+    });
+
+    document.getElementById('resetButton').addEventListener('click', () => {
+      answerButtons.forEach((button) => button.setAttribute('aria-pressed', 'false'));
+      submitAnswer.disabled = true;
+      announce('本轮练习已重置，历史记录未删除。');
+    });
+
+    const settingsDialog = document.getElementById('settingsDialog');
+    document.getElementById('settingsButton').addEventListener('click', () => settingsDialog.showModal());
+    document.getElementById('closeSettings').addEventListener('click', () => settingsDialog.close());
+    settingsDialog.addEventListener('click', (event) => {
+      if (event.target === settingsDialog) settingsDialog.close();
+    });
+
+    const profileButton = document.getElementById('profileButton');
+    const profileMenu = document.getElementById('profileMenu');
+    function positionProfileMenu() {
+      const rect = profileButton.getBoundingClientRect();
+      profileMenu.style.top = Math.round(rect.bottom + 8) + 'px';
+      profileMenu.style.left = Math.max(12, Math.round(rect.right - 240)) + 'px';
+    }
+    profileButton.addEventListener('click', () => {
+      const open = profileMenu.hidden;
+      profileMenu.hidden = !open;
+      profileButton.setAttribute('aria-expanded', String(open));
+      if (open) positionProfileMenu();
+    });
+    window.addEventListener('resize', () => { if (!profileMenu.hidden) positionProfileMenu(); });
+    document.addEventListener('click', (event) => {
+      if (!profileMenu.hidden && !profileMenu.contains(event.target) && !profileButton.contains(event.target)) {
+        profileMenu.hidden = true;
+        profileButton.setAttribute('aria-expanded', 'false');
+      }
+    });
+  </script>
+</body>
+</html>
