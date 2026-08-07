@@ -47,13 +47,17 @@ class ReviewSeed:
             raise PlannerError("request_date_invalid")
         if self.eligibility not in {"ready", "stale_source", "system_error"}:
             raise PlannerError("eligibility_invalid")
-        object.__setattr__(self, "source_refs", self._refs(self.source_refs, "source_refs_invalid"))
-        object.__setattr__(self, "evidence_refs", self._refs(self.evidence_refs, "evidence_refs_invalid"))
+        object.__setattr__(
+            self,
+            "source_refs",
+            self._refs(self.source_refs, "source_refs_invalid", allow_empty=self.eligibility != "ready"),
+        )
+        object.__setattr__(self, "evidence_refs", self._refs(self.evidence_refs, "evidence_refs_invalid", allow_empty=True))
 
     @staticmethod
-    def _refs(values: tuple[str, ...], code: str) -> tuple[str, ...]:
+    def _refs(values: tuple[str, ...], code: str, *, allow_empty: bool) -> tuple[str, ...]:
         normalized = tuple(sorted(set(values)))
-        if not normalized or any(not value.strip() for value in normalized):
+        if (not normalized and not allow_empty) or any(not value.strip() for value in normalized):
             raise PlannerError(code)
         return normalized
 

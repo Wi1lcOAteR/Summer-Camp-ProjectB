@@ -8,10 +8,11 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from projectb.api.app_support import ApiError
-from projectb.api.routes import courses, learning, materials, providers
+from projectb.api.routes import courses, credentials, learning, materials, providers, review, settings
 from projectb.api.static import mount_static
 from projectb.providers.registry import ProviderRegistry
 from projectb.security.http import HttpBoundaryError, LocalHttpPolicy
+from projectb.security.credentials import CredentialService
 from projectb.storage.content_store import ContentStore
 from projectb.storage.db import Database
 
@@ -33,6 +34,8 @@ def create_app(
     content_dir: Path,
     static_dir: Path | None = None,
     provider_registry: ProviderRegistry | None = None,
+    credential_service: CredentialService | None = None,
+    profile_name: str = "local",
 ) -> FastAPI:
     database = Database(database_path)
     database.initialize()
@@ -43,6 +46,8 @@ def create_app(
     app.state.content_store = content_store
     app.state.provider_registry = provider_registry or ProviderRegistry("local")
     app.state.provider_previews = {}
+    app.state.credential_service = credential_service
+    app.state.profile_name = profile_name
 
     @app.middleware("http")
     async def local_trust(request: Request, call_next):  # type: ignore[no-untyped-def]
@@ -102,6 +107,9 @@ def create_app(
     app.include_router(materials.router)
     app.include_router(learning.router)
     app.include_router(providers.router)
+    app.include_router(review.router)
+    app.include_router(credentials.router)
+    app.include_router(settings.router)
     if static_dir is not None:
         mount_static(app, static_dir, private_roots=(content_dir, database_path))
     return app
