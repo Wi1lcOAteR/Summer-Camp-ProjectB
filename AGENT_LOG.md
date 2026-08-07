@@ -1533,3 +1533,12 @@
 - **验证与 commit**：最终一键回归为后端 `163 passed`、前端 `5 passed`、Vite production build PASS、`CREDENTIAL_SCAN_PASS files=368`、`LICENSE_VERIFICATION_PASS python=54 npm=166`、`TEST_ALL_PASS mode=all`；最终定向 E2E `12 passed`。产品提交 `c6a63d7ddd887384170ccfee70fa3f54b3b00102`。
 - **清理**：清理前后均记录 `git status --short --untracked-files=all` 与 `git worktree list`；删除本任务生成的 `test-results/.last-run.json`、空 `test-results/` 和 `tmp/opendesign-*` 临时转发文件，停止临时 Node 转发，保留 Open Design 桌面程序和持久化证据。
 - **经验教训**：响应式 grid 的列宽不能覆盖子元素残留的 `min-width`；安全状态也不能从未知服务响应静默降级，必须以运行时校验失败关闭。
+
+## 2026-08-07T12:40:00+08:00 - UI-02 材料导入页
+
+- **Task 编号与 skill**：`UI-02`；使用 `subagent-driven-development`、`test-driven-development`、`systematic-debugging`、`requesting-code-review`、`verification-before-completion`。fresh worker `/root/ui02_impl` 实现，coordinator `/root` 复验和关闭审查问题；`Human-Changes: none`。
+- **关键 context**：只实现 `/import`，接入已有课程、session-CSRF、multipart 导入和材料列表 API；显示 5 文件/单文件 20 MiB/批次 50 MiB 限制、选择、进度、逐文件结果与可恢复错误。按学生要求压缩验证，不重复运行全量仓库测试。
+- **TDD RED/GREEN**：首个 RED 因 `ImportView` 缺失；首轮环境失败来自未设置 `PLAYWRIGHT_BROWSERS_PATH`，随后精确定位 `npm --prefix` 未加载 frontend Playwright config，改用显式 `--config frontend/playwright.config.ts`。审查以新增 RED 证明未知 per-file `status` 会被误当成功，修复为只接受 `imported/idempotent/failed` 且失败状态必须携带错误码。
+- **双评审**：规约评审确认 AC-01 所需文件限制、导入结果、失败保留和材料刷新均可见；质量/安全评审确认同源 cookie、session-bound CSRF header、FormData、React 转义和响应 schema 失败关闭。未引入新依赖。Critical=0，Major=0。
+- **验证与提交状态**：最终聚焦 Vitest `3 passed`；Playwright 在 360/768/1440 三个 project 中 `3 passed`；TypeScript exit 0；`CREDENTIAL_SCAN_PASS files=400`；`git diff --cached --check` exit 0。宿主沙箱两次拒绝创建 `.git/worktrees/webui-v1/index.lock`，学生仅执行原样提供的 commit 命令完成产品提交 `4c14231ad3511109929779d88a49f05969413eaa`，没有修改代码。
+- **清理与经验教训**：删除本任务生成的 `frontend/test-results/.last-run.json` 和空目录；没有残留 4173 listener。Playwright 命令必须显式绑定 config 和浏览器缓存；API 成功状态必须白名单验证，不能以“没有 error_code”推断成功。

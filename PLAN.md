@@ -162,7 +162,7 @@ git diff --check
 | 26 | API-02 | API-01 | no: modifies app registry | m3-api | complete | `7da00e3cb5dc371291d2d164a1ebd677049cdabc` |
 | 27 | API-03 | API-02 | no: closes local API | m3-api | complete | `e41df6a93eb999746c1b6314c2e2a2d9c4dda8bb` |
 | 28 | UI-01 | API-03 | no: creates route registry | webui | complete | `c6a63d7ddd887384170ccfee70fa3f54b3b00102` |
-| 29 | UI-02 | UI-01 | no: modifies route registry | webui | not started | none |
+| 29 | UI-02 | UI-01 | no: modifies route registry | webui | complete | `4c14231ad3511109929779d88a49f05969413eaa` |
 | 30 | UI-03 | UI-02 | no: modifies route registry | webui | not started | none |
 | 31 | UI-04 | UI-03 | no: modifies route registry | webui | not started | none |
 | 32 | UI-05 | UI-04 | no: modifies route registry | webui | not started | none |
