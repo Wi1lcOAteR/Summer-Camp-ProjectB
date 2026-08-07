@@ -1,13 +1,13 @@
 # AI4SE Project B Requirements Compliance Matrix
 
-**Snapshot:** `2026-08-06`
+**Snapshot:** `2026-08-07`
 
 **SPEC:** `AEA67BB5544AD22932DC4304964F7FD266FE8A5DE7AA396EA8974D30867E8381`
 
 **PLAN pre-dispatch:** `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`
 
-**PLAN current evidence-only state:** `F02BB44D209ABB8436A25775A1925F1329B5193DAF7508E4B1F13CDF3B8E1B42`
-**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise. On 2026-08-03 the student explicitly approved G-04. Foundation, all three domain modules, and material/learning/provider FastAPI boundaries are implemented and reviewed; the current terminal product commit is `7da00e3cb5dc371291d2d164a1ebd677049cdabc`. Container execution and remote pipeline receipts remain unverified. Later tasks remain incomplete until their own fresh TDD and review evidence exists.
+**PLAN current evidence-only state:** `9F5B8FBE27E334C3298A4F56AB04BDC3CCFA3A20EF034673076744D277F9E9AF`
+**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise. On 2026-08-03 the student explicitly approved G-04. Foundation, all three domain modules, and the complete local FastAPI boundary are implemented and reviewed; the current terminal product commit is `e41df6a93eb999746c1b6314c2e2a2d9c4dda8bb`. Container execution and remote pipeline receipts remain unverified. WebUI and later tasks remain incomplete until their own fresh TDD and review evidence exists.
 
 `verified` means current local evidence exists; `planned` means a named active task owns it; `blocked` means a named human/external gate remains; `not-started` means no product evidence exists. This is the only active course matrix. Archived plans are recovery evidence, never PASS evidence.
 
@@ -17,12 +17,12 @@
 | At least three clear modules | M1 materials, M2 learning, M3 review | M1, M2 and M3 domain/repository flows complete through `3a93f27` | API-01--03 and UI integration |
 | At least five INVEST stories | US-01--US-08 | verified document; current-hash SR-08 revalidation pending | implementation evidence after G-04 |
 | Module contracts and objective acceptance | SPEC 3 and AC-01--24 | planned; each AC mapped in PLAN 12 | named task/gate per AC |
-| Architecture/data flow/data model | SPEC 6--7 | core and learning schema plus M1/M2/M3 repositories implemented; app factory and M1/M2/P routes at `7da00e3` | API-03 |
-| Performance/reliability/errors/observability | SPEC 5 | planned | F-04, API-03, QA-RELEASE, DIST-01 |
+| Architecture/data flow/data model | SPEC 6--7 | core and learning schema plus M1/M2/M3 repositories and complete local API implemented through `e41df6a` | UI-01--06 integration |
+| Performance/reliability/errors/observability | SPEC 5 | cached non-import API p95 contract verified at `e41df6a`; release measurements remain planned | QA-RELEASE, DIST-01 |
 | Input validation and safe deletion | SPEC 3.1 and 8 | parser/type/timeout/limits plus shared/last-ref deletion, source invalidation and retryable tombstone verified through `aa2a6da` | API-01, UI-03/06 integration |
 | Host/Origin/CSRF/session boundary | local plus explicit public profile | local loopback policy, session-bound CSRF, safe errors and audit allowlist committed at `736292a`; public profile remains planned | DEMO-01 positive/negative tests |
-| Secret never enters DB/config/log/browser/Git | WinVault plus fail-closed scanner | Scanner verified at `1d6dcab15adf1649cda7309360f3cdeff0423e27`; value-free WinVault lifecycle, redacted backend failures and safe audit references verified at `e11a150e1f0233206803a4763a53f237fced097c` | API-03/UI-06 browser and response integration plus every-task scan |
-| First-run hidden credential status/update/clear | value-free settings contract | backend lifecycle verified on deterministic fake and disposable Windows WinVault target at `e11a150e1f0233206803a4763a53f237fced097c` | API-03, UI-06, DIST-01 application lifecycle |
+| Secret never enters DB/config/log/browser/Git | WinVault plus fail-closed scanner | Scanner verified at `1d6dcab`; value-free WinVault lifecycle, redacted failures, safe audit references and value-free API responses verified through `e41df6a` | UI-06 browser integration plus every-task scan |
+| First-run hidden credential status/update/clear | value-free settings contract | backend lifecycle and local API status/update/clear verified through `e41df6a`; first run remains unconfigured | UI-06, DIST-01 application lifecycle |
 | Optional model is consent-bound and non-authoritative | L+P; mock default; exact text fragments only | P-only evidence verified; adapter not started | P-01/P-02/API-02/UI-04 |
 | No autonomous-agent overclaim | v1 has constrained request ports, no autonomous loop | verified specification boundary | P-01/P-02 contract tests |
 | Usable WebUI | import, mapping, learning, review, settings | planned | UI-01--06 |
@@ -33,7 +33,7 @@
 | Linux/amd64 dependency/base evidence | separate CI/demo hashed locks and OCI digests | verified planning input: 41 CI, 14 demo | F-01A exact-lock sync; DIST-02 build/SBOM/smoke |
 | Public HTTPS WebUI URL | immutable mock OCI image | blocked on student D-025 | D-025-HOST-CLOSE then DOC-01 |
 | One-command tests | `python scripts/test_all.py` | verified locally: `TEST_ALL_PASS mode=all`; quality-gate tests, frontend Vitest/tsc/Vite build, scanner and license verifier passed; F-01E committed in `ae152e3` | QA-RELEASE observes full pass |
-| Core automated tests | domain/storage/API/UI/E2E/security/performance | storage/security/material extraction tests implemented locally; API/UI/E2E remain planned | M1-02 through DEMO-01/P-02 |
+| Core automated tests | domain/storage/API/UI/E2E/security/performance | local domain/storage/API/security/performance suite implemented; full run at API-03 was `163 passed`; UI/E2E remain planned | UI-01 through DEMO-01/P-02 |
 | Every push runs CI | F-01D seeds pinned scanner/backend/frontend current-suite workflows; CI-01 adds distribution | implemented locally at `069acb8541b8d59a7977a484f06d8f9abbefe780`; YAML and seed contract verified, remote push not executed | EXT-REMOTE-PREP branch-tip current-suite receipts |
 | GitLab job exactly `unit-test` | `.gitlab-ci.yml` | implemented locally and mechanically verified; remote pipeline not executed | CI-01, final NJU pipeline receipt |
 | GitHub repository visibility/access | public repo or private with TA collaborator | blocked on remote authorization | EXT-REMOTE-PREP visibility/collaborator receipt |
@@ -41,15 +41,15 @@
 | Final course CI PASS | authoritative NJU GitLab plus mirror evidence on final docs commit | blocked on remote authorization | EXT-REMOTE-FINAL |
 | Incremental commits and PR/MR history | 39 task commits, scanned coordinator evidence commits, 9 stacked worktree branches | planned | per-task protocol and EXT-REMOTE-PREP/FINAL sequential retarget-and-merge closure |
 | Fresh subagent per PLAN task | one clean session/task | fresh worker `/root/m1_01_impl` completed M1-01; earlier deviations and reviewer identities remain recorded | continue every behavior task |
-| TDD red-green-refactor | exact red/green command in all 39 cards; shared assertion-level 2--5 minute step expansion | verified through API-02, including provider-registry seam RED | continue every behavior task |
-| SPEC review then quality/security/license review | terminal hash-bound review loop | verified through API-02; evaluator parsing, evidence idempotency, mastery, three candidate ports, raw-answer rejection, consent replay and authority isolation reviewed | every-task protocol; Critical stops sequence |
+| TDD red-green-refactor | exact red/green command in all 39 cards; shared assertion-level 2--5 minute step expansion | verified through API-03, including caller-supplied review-seed authority RED | continue every behavior task |
+| SPEC review then quality/security/license review | terminal hash-bound review loop | verified through API-03; credential value isolation, server-authoritative review inputs, loopback profile and p95 contract reviewed | every-task protocol; Critical stops sequence |
 | Required Superpowers order | brainstorming -> plan -> worktree -> TDD -> reviews -> finish | brainstorming/writing-plans/G-03 evidenced; implementation stages gated | explicit G-04, then task protocol |
 | `SPEC.md` required sections | 14 sections, 8 stories, 24 AC, risks/deferred scope | current bytes confirmed by student; same-byte SR-08 PASS | implementation evidence after G-04 |
 | `PLAN.md` exact task fields | exactly 39 tasks; dependency/parallel/files/red/green/done in each | mechanical audit and dual review PASS | explicit G-04, then ledger execution |
 | Stranger cold start with only SPEC/PLAN | two fresh non-Codex sessions intake then F-01S1A | verified: current hashes, empty ambiguities, exact red, two artifacts, PowerShell 7 green exit 0 | complete; disposable artifacts are not product implementation |
 | Cold-start repair then implementation approval | separate post-repair student gate | verified: G-03 complete; student explicitly approved G-04 on 2026-08-03 | local implementation active; remote/release gates remain separate |
 | `SPEC_PROCESS.md` process and cold-start diff | sections 1--2 contain >3 real question/answer/revision rounds; later sections retain G-03P/failures/final run | verified: final intake, segmented execution, red/green, hashes, line counts and limitations recorded | continue per-task evidence after G-04 |
-| `AGENT_LOG.md` timestamp/task/skill/context/output/hash/human edits/lesson | historical and current entries exist | current through API-02 | coordinator evidence commit after every task |
+| `AGENT_LOG.md` timestamp/task/skill/context/output/hash/human edits/lesson | historical and current entries exist | current through API-03 | coordinator evidence commit after every task |
 | Student-written code declaration | conditional top-of-file/function comment plus trailer/log | F-01C records `Human-Changes: none`; no student-authored code claimed | per-task protocol step 5 |
 | README required sections | intro/install/run/distribution/tree/security/credentials/limits/deployment/licenses | not-started | DOC-01 after remote/host receipts |
 | Third-party sources/licenses | 63-row ledger, 54 Python/166 npm closure, Linux subset, five immutable bootstrap license rows | F-01A manifests/locks and F-01B exact license bytes implemented; F-01E notice inventory and baseline-license hash verifier pass (`python=54 npm=166`) | F-01E terminal commit, DIST SBOM, DOC-01 final index |

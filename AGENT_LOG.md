@@ -1513,3 +1513,12 @@
 - **规约与质量评审**：API 按 concept evaluator 将 JSON 转为结构化练习/答案，并使用已评审 AttemptService/MasteryService。feedback preview 使用 extra-forbid schema，原始 answer 在 provider 调用前 422；三类 candidate 均标记 `authoritative=false`，调用前后 coverage/evidence/mastery/plan 计数不变。local 默认 registry 无 adapter，test 才可注入 mock。Critical=0，Major=0。
 - **验证与 commit**：定向 Ruff 和 owned-file Mypy PASS；全量后端 `159 passed`，Vitest `1 passed`，Vite production build PASS，`CREDENTIAL_SCAN_PASS files=348`，许可证 PASS，`TEST_ALL_PASS mode=all`。产品提交 `7da00e3cb5dc371291d2d164a1ebd677049cdabc`。
 - **经验教训**：provider preview 可以在本地进程内短暂保留精确片段，但不应追加到 SQLite；重启后丢失 preview 必须失败关闭，而不能仅凭 consent ID 重建外发。
+
+## 2026-08-07T10:35:00+08:00 - API-03 本地 API 闭合
+
+- **Task 编号与 skill**：`API-03`；使用 `test-driven-development`、`systematic-debugging`、`requesting-code-review`、`verification-before-completion`；由 coordinator `/root` 实现，`Human-Changes: none`。
+- **关键 context**：新增复习、凭据、设置路由和 Windows 本地 profile；凭据响应不得包含密钥值，首次运行保持未配置，本地服务只绑定 `127.0.0.1`，复习计划输入必须由服务端已有证据推导。
+- **TDD RED/GREEN**：初始 RED 为 app factory 缺少 credential service 且目标路由不存在，共 4 项失败；首轮 GREEN 为 4 项通过。合规审查发现调用方可提交掌握度、弱点和来源 seed 的 Critical 权限问题，新增回归 RED 后改为服务端读取 coverage/evidence/mastery，外部 `seeds` 字段返回 422；最终目标集 `19 passed`。
+- **双评审**：规约评审确认复习计划、revision、凭据生命周期、设置校验和回环绑定符合 API-03；质量/安全/许可评审确认凭据响应无值、调用方不能伪造复习权威输入、静态目录不越界，且未引入新依赖。Critical=0，Major=0。
+- **验证与 commit**：owned Ruff/Mypy PASS；全量后端 `163 passed in 45.27s`，Vitest `1 passed`，Vite production build PASS，`CREDENTIAL_SCAN_PASS files=354`，许可证验证 PASS，`TEST_ALL_PASS mode=all`。产品提交 `e41df6a93eb999746c1b6314c2e2a2d9c4dda8bb`。
+- **经验教训**：复习计划即使是确定性算法，也不能信任浏览器上传的掌握度或来源；API 应只接受用户控制项，把权威学习证据留在服务端重建。
