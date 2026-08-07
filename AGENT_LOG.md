@@ -1522,3 +1522,14 @@
 - **双评审**：规约评审确认复习计划、revision、凭据生命周期、设置校验和回环绑定符合 API-03；质量/安全/许可评审确认凭据响应无值、调用方不能伪造复习权威输入、静态目录不越界，且未引入新依赖。Critical=0，Major=0。
 - **验证与 commit**：owned Ruff/Mypy PASS；全量后端 `163 passed in 45.27s`，Vitest `1 passed`，Vite production build PASS，`CREDENTIAL_SCAN_PASS files=354`，许可证验证 PASS，`TEST_ALL_PASS mode=all`。产品提交 `e41df6a93eb999746c1b6314c2e2a2d9c4dda8bb`。
 - **经验教训**：复习计划即使是确定性算法，也不能信任浏览器上传的掌握度或来源；API 应只接受用户控制项，把权威学习证据留在服务端重建。
+
+## 2026-08-07T11:55:00+08:00 - UI-01 Open Design 与响应式工作台壳层
+
+- **Task 编号与 skill**：`UI-01`；使用 Open Design `frontend-design` + `default`/Neutral Modern、`test-driven-development`、`systematic-debugging`、`requesting-code-review`、`verification-before-completion`。fresh worker `/root/ui01_impl` 完成 RED 后会话结束，coordinator `/root` 接续 GREEN 和评审修复；这是明确记录的单 task 双会话偏离，`Human-Changes: none`。
+- **Open Design 证据**：项目 `projectb-learning-workbench-v1`，run `1fec5e0c-ef5b-4960-982a-2e374ef739ff`，Open Design `0.18.0`，Codex CLI `0.144.4`，结果 `succeeded/exit 0/deliverableValid=true`。HTML、原始预览和 360/768/1440 生产截图路径、SHA-256、资产/许可及修订均记录于 `docs/engineering/OPEN_DESIGN_RUN.md`。
+- **TDD RED/GREEN**：Vitest 初始 RED 因 `App.tsx` 缺失；Playwright 三档 12 项中 6 项按预期因 banner/阶段导航/键盘目标缺失失败。GREEN 先修正精确命令不加载 frontend config 的 harness；随后 360/768 分别观察到 20px/6px 溢出，定位为设置入口 `min-width:80px` 后修复。审查新增未知 profile 失败关闭 RED，最终目标 Vitest `4 passed`、Playwright `12 passed`。
+- **规约评审**：真实 Open Design 产物先于生产实现；四阶段和设置入口、回环/本地状态、360/768/1440、键盘焦点、状态非仅颜色均满足 UI-01/AC-16。外部设计默认 12/16px token 未复制，生产圆角只保留 4/8px。Critical=0，Major=0。
+- **质量/安全/许可评审**：API client 使用同源凭据策略且不写浏览器存储；未知 profile/mode 或 local 非回环响应失败关闭；无外部图片、字体、CDN 或新依赖，Lucide 来源已在现有锁与许可清单。移动端保留可见阶段名，错误横幅不再孤字换行。Critical=0，Major=0。
+- **验证与 commit**：最终一键回归为后端 `163 passed`、前端 `5 passed`、Vite production build PASS、`CREDENTIAL_SCAN_PASS files=368`、`LICENSE_VERIFICATION_PASS python=54 npm=166`、`TEST_ALL_PASS mode=all`；最终定向 E2E `12 passed`。产品提交 `c6a63d7ddd887384170ccfee70fa3f54b3b00102`。
+- **清理**：清理前后均记录 `git status --short --untracked-files=all` 与 `git worktree list`；删除本任务生成的 `test-results/.last-run.json`、空 `test-results/` 和 `tmp/opendesign-*` 临时转发文件，停止临时 Node 转发，保留 Open Design 桌面程序和持久化证据。
+- **经验教训**：响应式 grid 的列宽不能覆盖子元素残留的 `min-width`；安全状态也不能从未知服务响应静默降级，必须以运行时校验失败关闭。

@@ -6,8 +6,8 @@
 
 **PLAN pre-dispatch:** `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`
 
-**PLAN current evidence-only state:** `9F5B8FBE27E334C3298A4F56AB04BDC3CCFA3A20EF034673076744D277F9E9AF`
-**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise. On 2026-08-03 the student explicitly approved G-04. Foundation, all three domain modules, and the complete local FastAPI boundary are implemented and reviewed; the current terminal product commit is `e41df6a93eb999746c1b6314c2e2a2d9c4dda8bb`. Container execution and remote pipeline receipts remain unverified. WebUI and later tasks remain incomplete until their own fresh TDD and review evidence exists.
+**PLAN current evidence-only state:** `E12DE44BCCCDD5A72545EF66B0FDD791D1D07B59E7796A464995F62B652EF26A`
+**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise. On 2026-08-03 the student explicitly approved G-04. Foundation, all three domain modules, the complete local FastAPI boundary, and the reviewed responsive WebUI shell are implemented; the current terminal product commit is `c6a63d7ddd887384170ccfee70fa3f54b3b00102`. Container execution and remote pipeline receipts remain unverified. Feature views and later tasks remain incomplete until their own fresh TDD and review evidence exists.
 
 `verified` means current local evidence exists; `planned` means a named active task owns it; `blocked` means a named human/external gate remains; `not-started` means no product evidence exists. This is the only active course matrix. Archived plans are recovery evidence, never PASS evidence.
 
@@ -25,9 +25,9 @@
 | First-run hidden credential status/update/clear | value-free settings contract | backend lifecycle and local API status/update/clear verified through `e41df6a`; first run remains unconfigured | UI-06, DIST-01 application lifecycle |
 | Optional model is consent-bound and non-authoritative | L+P; mock default; exact text fragments only | P-only evidence verified; adapter not started | P-01/P-02/API-02/UI-04 |
 | No autonomous-agent overclaim | v1 has constrained request ports, no autonomous loop | verified specification boundary | P-01/P-02 contract tests |
-| Usable WebUI | import, mapping, learning, review, settings | planned | UI-01--06 |
-| Open Design workflow | `frontend-design`, `default`/Neutral Modern selected; environment PASS | partially verified | actual run/artifact/evidence in UI-01 |
-| Responsive/keyboard/accessibility | 360/768/1440, visible focus, axe | planned | each UI task red/green plus QA-RELEASE |
+| Usable WebUI | import, mapping, learning, review, settings | responsive shell and serialized route registry verified at `c6a63d7`; feature views remain planned | UI-02--06 |
+| Open Design workflow | `frontend-design`, `default`/Neutral Modern selected; environment PASS | verified: real project/run/artifact, immutable hashes and reviewed production screenshots in `docs/engineering/OPEN_DESIGN_RUN.md` | reuse reviewed tokens/components in UI-02--06 |
+| Responsive/keyboard/accessibility | 360/768/1440, visible focus, axe | UI-01 Playwright `12 passed`: no overflow, workflow focus visible, no serious/critical axe findings | repeat per feature view plus QA-RELEASE |
 | At least one reproducible distribution | Windows x64 single file and OCI mock demo | exact inputs verified; products not started | DIST-01/02; registry/pull closes at EXT-REMOTE-PREP |
 | Windows cold start <=10 seconds | clean reference VM contract | not-started; named environment gate | DIST-01-VM-CLOSE measured receipt |
 | Linux/amd64 dependency/base evidence | separate CI/demo hashed locks and OCI digests | verified planning input: 41 CI, 14 demo | F-01A exact-lock sync; DIST-02 build/SBOM/smoke |
@@ -41,15 +41,15 @@
 | Final course CI PASS | authoritative NJU GitLab plus mirror evidence on final docs commit | blocked on remote authorization | EXT-REMOTE-FINAL |
 | Incremental commits and PR/MR history | 39 task commits, scanned coordinator evidence commits, 9 stacked worktree branches | planned | per-task protocol and EXT-REMOTE-PREP/FINAL sequential retarget-and-merge closure |
 | Fresh subagent per PLAN task | one clean session/task | fresh worker `/root/m1_01_impl` completed M1-01; earlier deviations and reviewer identities remain recorded | continue every behavior task |
-| TDD red-green-refactor | exact red/green command in all 39 cards; shared assertion-level 2--5 minute step expansion | verified through API-03, including caller-supplied review-seed authority RED | continue every behavior task |
-| SPEC review then quality/security/license review | terminal hash-bound review loop | verified through API-03; credential value isolation, server-authoritative review inputs, loopback profile and p95 contract reviewed | every-task protocol; Critical stops sequence |
+| TDD red-green-refactor | exact red/green command in all 39 cards; shared assertion-level 2--5 minute step expansion | verified through UI-01, including missing-shell RED, responsive overflow RED and capability fail-closed RED | continue every behavior task |
+| SPEC review then quality/security/license review | terminal hash-bound review loop | verified through UI-01; Open Design binding, 8px radius, responsive text, browser storage boundary and runtime response validation reviewed | every-task protocol; Critical stops sequence |
 | Required Superpowers order | brainstorming -> plan -> worktree -> TDD -> reviews -> finish | brainstorming/writing-plans/G-03 evidenced; implementation stages gated | explicit G-04, then task protocol |
 | `SPEC.md` required sections | 14 sections, 8 stories, 24 AC, risks/deferred scope | current bytes confirmed by student; same-byte SR-08 PASS | implementation evidence after G-04 |
 | `PLAN.md` exact task fields | exactly 39 tasks; dependency/parallel/files/red/green/done in each | mechanical audit and dual review PASS | explicit G-04, then ledger execution |
 | Stranger cold start with only SPEC/PLAN | two fresh non-Codex sessions intake then F-01S1A | verified: current hashes, empty ambiguities, exact red, two artifacts, PowerShell 7 green exit 0 | complete; disposable artifacts are not product implementation |
 | Cold-start repair then implementation approval | separate post-repair student gate | verified: G-03 complete; student explicitly approved G-04 on 2026-08-03 | local implementation active; remote/release gates remain separate |
 | `SPEC_PROCESS.md` process and cold-start diff | sections 1--2 contain >3 real question/answer/revision rounds; later sections retain G-03P/failures/final run | verified: final intake, segmented execution, red/green, hashes, line counts and limitations recorded | continue per-task evidence after G-04 |
-| `AGENT_LOG.md` timestamp/task/skill/context/output/hash/human edits/lesson | historical and current entries exist | current through API-03 | coordinator evidence commit after every task |
+| `AGENT_LOG.md` timestamp/task/skill/context/output/hash/human edits/lesson | historical and current entries exist | current through UI-01 | coordinator evidence commit after every task |
 | Student-written code declaration | conditional top-of-file/function comment plus trailer/log | F-01C records `Human-Changes: none`; no student-authored code claimed | per-task protocol step 5 |
 | README required sections | intro/install/run/distribution/tree/security/credentials/limits/deployment/licenses | not-started | DOC-01 after remote/host receipts |
 | Third-party sources/licenses | 63-row ledger, 54 Python/166 npm closure, Linux subset, five immutable bootstrap license rows | F-01A manifests/locks and F-01B exact license bytes implemented; F-01E notice inventory and baseline-license hash verifier pass (`python=54 npm=166`) | F-01E terminal commit, DIST SBOM, DOC-01 final index |
