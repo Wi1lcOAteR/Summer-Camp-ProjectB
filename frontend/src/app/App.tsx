@@ -4,6 +4,7 @@ import { routeForPath, workbenchRoutes, type RouteMatch, type WorkbenchRouteId }
 import { ImportView } from '../views/import/ImportView';
 import { LearningView } from '../views/learning/LearningView';
 import { MappingView } from '../views/mapping/MappingView';
+import { ReviewView } from '../views/review/ReviewView';
 import '../styles/global.css';
 
 export function App() {
@@ -55,6 +56,7 @@ function RouteContent({ route }: { route: RouteMatch }) {
   if (route.id === 'import') return <ImportView />;
   if (route.id === 'mapping') return <MappingView />;
   if (route.id === 'learning') return <LearningView />;
+  if (route.id === 'review') return <ReviewView />;
   if (route.id === 'not-found') return <NotFoundView />;
   return <UnavailableView routeId={route.id} />;
 }

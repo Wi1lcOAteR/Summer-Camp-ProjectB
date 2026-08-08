@@ -87,7 +87,6 @@ describe('ProjectB workbench shell', () => {
 
 describe('explicit route states', () => {
   it.each([
-    ['/review', '\u590d\u4e60\u529f\u80fd\u6682\u4e0d\u53ef\u7528'],
     ['/settings', '\u8bbe\u7f6e\u529f\u80fd\u6682\u4e0d\u53ef\u7528'],
   ])('renders an unavailable state for %s', (pathname, heading) => {
     window.history.pushState({}, '', pathname);
