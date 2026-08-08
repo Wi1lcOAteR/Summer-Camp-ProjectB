@@ -1542,3 +1542,9 @@
 - **双评审**：规约评审确认 AC-01 所需文件限制、导入结果、失败保留和材料刷新均可见；质量/安全评审确认同源 cookie、session-bound CSRF header、FormData、React 转义和响应 schema 失败关闭。未引入新依赖。Critical=0，Major=0。
 - **验证与提交状态**：最终聚焦 Vitest `3 passed`；Playwright 在 360/768/1440 三个 project 中 `3 passed`；TypeScript exit 0；`CREDENTIAL_SCAN_PASS files=400`；`git diff --cached --check` exit 0。宿主沙箱两次拒绝创建 `.git/worktrees/webui-v1/index.lock`，学生仅执行原样提供的 commit 命令完成产品提交 `4c14231ad3511109929779d88a49f05969413eaa`，没有修改代码。
 - **清理与经验教训**：删除本任务生成的 `frontend/test-results/.last-run.json` 和空目录；没有残留 4173 listener。Playwright 命令必须显式绑定 config 和浏览器缓存；API 成功状态必须白名单验证，不能以“没有 error_code”推断成功。
+
+## 2026-08-08T17:42:00+08:00 - UI-03/UI-04 路由收口与来源绑定学习页
+
+- **Task 与 skill**：同步 UI-03 已有提交，并执行 UI-04；使用 `subagent-driven-development`、`test-driven-development`、`receiving-code-review`、`verification-before-completion`。fresh worker `/root/ui04_learning` 完成首轮实现，coordinator `/root` 处理规格审查问题并提交；`Human-Changes: none`。
+- **TDD 与评审**：首轮 RED 因 `LearningView` 缺失。规格评审发现硬编码来源、固定 evidence、缺少 material version/hash 绑定及键盘/重要状态 E2E 覆盖；新增失败测试后改为读取既有课程、材料、source 与 coverage API，未确认或 stale 来源失败关闭，explanation-only 不产生评分证据，P 预览显示 locator/version/hash/profile/caps 且不含原始答案。Critical=0，Major=0。
+- **验证与提交**：聚焦 Vitest `5 passed`；frontend 回归 `35 passed`；TypeScript、Vite build、凭据扫描与许可证检查通过；系统 Chrome 在 360/768/1440 三个 viewport 中 Playwright `3 passed`。UI-03 提交 `891c057a5b0faa1ce390a1534efd87be65bce62e`；UI-04 提交 `6f057f25a0ca1ccd7909e6b247e3359bfcd0e3f4`。
