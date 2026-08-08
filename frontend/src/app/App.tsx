@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client';
 import { LockKeyhole, Settings } from 'lucide-react';
 import { routeForPath, workbenchRoutes, type RouteMatch, type WorkbenchRouteId } from './routes';
 import { ImportView } from '../views/import/ImportView';
+import { LearningView } from '../views/learning/LearningView';
 import { MappingView } from '../views/mapping/MappingView';
 import '../styles/global.css';
 
@@ -53,12 +54,12 @@ export function App() {
 function RouteContent({ route }: { route: RouteMatch }) {
   if (route.id === 'import') return <ImportView />;
   if (route.id === 'mapping') return <MappingView />;
+  if (route.id === 'learning') return <LearningView />;
   if (route.id === 'not-found') return <NotFoundView />;
   return <UnavailableView routeId={route.id} />;
 }
 
-const unavailableLabels: Record<Exclude<WorkbenchRouteId, 'import' | 'mapping' | 'not-found'>, string> = {
-  learning: '\u5b66\u4e60',
+const unavailableLabels: Record<Exclude<WorkbenchRouteId, 'import' | 'mapping' | 'learning' | 'not-found'>, string> = {
   review: '\u590d\u4e60',
   settings: '\u8bbe\u7f6e',
 };
