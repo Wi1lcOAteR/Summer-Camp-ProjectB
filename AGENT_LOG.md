@@ -1548,3 +1548,9 @@
 - **Task 与 skill**：同步 UI-03 已有提交，并执行 UI-04；使用 `subagent-driven-development`、`test-driven-development`、`receiving-code-review`、`verification-before-completion`。fresh worker `/root/ui04_learning` 完成首轮实现，coordinator `/root` 处理规格审查问题并提交；`Human-Changes: none`。
 - **TDD 与评审**：首轮 RED 因 `LearningView` 缺失。规格评审发现硬编码来源、固定 evidence、缺少 material version/hash 绑定及键盘/重要状态 E2E 覆盖；新增失败测试后改为读取既有课程、材料、source 与 coverage API，未确认或 stale 来源失败关闭，explanation-only 不产生评分证据，P 预览显示 locator/version/hash/profile/caps 且不含原始答案。Critical=0，Major=0。
 - **验证与提交**：聚焦 Vitest `5 passed`；frontend 回归 `35 passed`；TypeScript、Vite build、凭据扫描与许可证检查通过；系统 Chrome 在 360/768/1440 三个 viewport 中 Playwright `3 passed`。UI-03 提交 `891c057a5b0faa1ce390a1534efd87be65bce62e`；UI-04 提交 `6f057f25a0ca1ccd7909e6b247e3359bfcd0e3f4`。
+
+## 2026-08-08T21:00:02+08:00 - UI-05 确定性复习计划与 revision 差异
+
+- **Task 与 skill**：执行 UI-05；使用 `subagent-driven-development`、`test-driven-development`、`requesting-code-review`、`receiving-code-review`、`systematic-debugging`、`verification-before-completion`。fresh Terra worker `/root/ui05_review` 完成首轮实现，spec reviewer `/root/ui05_spec_review` 只读评审，coordinator `/root` 修复评审问题并提交；`Human-Changes: none`。
+- **TDD 与评审**：首轮 RED 为 `ReviewView` 缺失。独立复跑发现测试未 cleanup、Shell 保留旧 unavailable 断言及嵌套 `<main>` axe 失败；补失败证据后修复。规格评审发现 `final`/`finals` 错配、非法 12 分钟预算、缺少考试日期/归档、静态 diff/recovery 与伪 source/mastery；新增 RED 后实现 30 分钟合法预算、canonical mastery、完整 hash、finals 间隔/截断、动态任务数与恢复状态。Critical=0；评审 Major 均已处理。
+- **验证与提交**：聚焦 Vitest `4 passed`；frontend 回归 `38 passed`；TypeScript、Vite build、`CREDENTIAL_SCAN_PASS files=440`、许可证检查和 `git diff --cached --check` 通过；系统 Chrome 在 360/768/1440 三个 viewport 中 Playwright `3 passed`，含键盘、预算/压缩、考试截断、恢复、overflow 与 axe。产品提交 `0f644dd5cf9d865d5c70fad0ce52d96ac3aad47b`。
