@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client';
 import { AlertTriangle, LockKeyhole, RotateCw, Settings, ShieldCheck } from 'lucide-react';
 import { routeForPath, workbenchRoutes } from './routes';
 import { ImportView } from '../views/import/ImportView';
+import { MappingView } from '../views/mapping/MappingView';
 import '../styles/global.css';
 
 const tasks = [
@@ -52,7 +53,7 @@ export function App() {
       </header>
       <main>
         <div className="mainInner">
-          {current.href === '/import' ? <ImportView /> : <LearningView />}
+          {current.href === '/import' ? <ImportView /> : current.href === '/mapping' ? <MappingView /> : <LearningView />}
         </div>
       </main>
     </div>

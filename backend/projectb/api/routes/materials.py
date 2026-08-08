@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 import tempfile
 from dataclasses import asdict
 from pathlib import Path
+from typing import Any
 
 from fastapi import APIRouter, File, Request, UploadFile, status
 from pydantic import BaseModel, ConfigDict
@@ -35,6 +37,41 @@ class MappingCreate(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     locator_ids: list[str]
     decision: str
+
+
+def _coverage_payload(connection: sqlite3.Connection, course_id: str, row: tuple[Any, ...]) -> dict[str, object] | None:
+    locator_json = row[6]
+    if locator_json is None:
+        return None
+    try:
+        locator_ids = json.loads(locator_json)
+    except (TypeError, json.JSONDecodeError):
+        raise ApiError("coverage_invalid", 500, retryable=True) from None
+    if (
+        not isinstance(locator_ids, list)
+        or not locator_ids
+        or any(not isinstance(locator_id, str) or not locator_id for locator_id in locator_ids)
+        or len(set(locator_ids)) != len(locator_ids)
+    ):
+        raise ApiError("coverage_invalid", 500, retryable=True)
+    current = True
+    for locator_id in locator_ids:
+        locator = connection.execute(
+            "SELECT m.course_id, mv.rowid, "
+            "(SELECT max(latest.rowid) FROM material_version latest WHERE latest.material_id = mv.material_id) "
+            "FROM source_locator sl JOIN material_version mv ON mv.version_id = sl.material_version_id "
+            "JOIN material m ON m.material_id = mv.material_id WHERE sl.locator_id = ?",
+            (locator_id,),
+        ).fetchone()
+        if locator is None or str(locator[0]) != course_id or int(locator[1]) != int(locator[2]):
+            current = False
+            break
+    return {
+        "decision": str(row[5]),
+        "locator_ids": locator_ids,
+        "source_status": "current" if current else "stale",
+        "version": int(row[7]),
+    }
 
 
 @router.get("/api/courses/{course_id}/materials")
@@ -151,6 +188,38 @@ def create_concept(course_id: str, payload: ConceptCreate, request: Request) -> 
     except CoverageError as error:
         raise ApiError(error.code, 400) from None
     return asdict(concept)
+
+
+@router.get("/api/courses/{course_id}/concepts")
+def list_concepts(course_id: str, request: Request) -> dict[str, object]:
+    if not CourseRepository(request.app.state.database).exists(course_id):
+        raise ApiError("course_not_found", 404)
+    connection = request.app.state.database.connect()
+    try:
+        rows = connection.execute(
+            "SELECT kc.concept_id, kc.name, kc.evaluator_id, kc.state, kc.version, "
+            "cd.decision, cd.locator_ids_json, cd.version "
+            "FROM knowledge_concept kc LEFT JOIN coverage_decision cd ON cd.concept_id = kc.concept_id "
+            "AND cd.version = (SELECT max(latest.version) FROM coverage_decision latest "
+            "WHERE latest.concept_id = kc.concept_id) "
+            "WHERE kc.course_id = ? ORDER BY kc.created_at, kc.concept_id",
+            (course_id,),
+        ).fetchall()
+        concepts = []
+        for row in rows:
+            concepts.append(
+                {
+                    "concept_id": str(row[0]),
+                    "name": str(row[1]),
+                    "evaluator_id": str(row[2]) if row[2] is not None else None,
+                    "state": str(row[3]),
+                    "version": int(row[4]),
+                    "coverage": _coverage_payload(connection, course_id, row),
+                }
+            )
+    finally:
+        connection.close()
+    return {"concepts": concepts}
 
 
 @router.post("/api/concepts/{concept_id}/mapping")

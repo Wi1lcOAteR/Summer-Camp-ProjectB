@@ -97,10 +97,29 @@ def test_course_import_source_mapping_and_delete_flow(tmp_path: Path) -> None:
     )
     assert mapped.json() == {"version": 1, "decision": "confirmed"}
 
+    concepts = value.get(f"/api/courses/{course_id}/concepts")
+    assert concepts.status_code == 200
+    assert concepts.json()["concepts"] == [
+        {
+            "concept_id": concept_id,
+            "name": "Mutex",
+            "evaluator_id": "os.mutex.v1",
+            "state": "active",
+            "version": 1,
+            "coverage": {
+                "decision": "confirmed",
+                "locator_ids": [locator_id],
+                "source_status": "current",
+                "version": 1,
+            },
+        }
+    ]
+
     deleted = value.delete(f"/api/materials/{material_id}", headers=headers)
     assert deleted.status_code == 200
     assert deleted.json()["status"] == "deleted"
     assert value.get(f"/api/materials/{material_id}/sources").status_code == 404
+    assert value.get(f"/api/courses/{course_id}/concepts").json()["concepts"][0]["coverage"]["source_status"] == "stale"
 
 
 def test_import_limits_return_stable_value_free_errors(tmp_path: Path) -> None:

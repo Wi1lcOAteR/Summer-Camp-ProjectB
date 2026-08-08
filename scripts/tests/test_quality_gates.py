@@ -301,6 +301,38 @@ def test_runner_frontend_includes_build() -> None:
     assert ["npm", "exec", "--", "vite", "build"] in commands
 
 
+def test_frontend_exposes_plan_build_command() -> None:
+    package = json.loads((REPO / "frontend/package.json").read_text(encoding="utf-8"))
+    assert package.get("scripts", {}).get("build") == "vite build"
+
+
+def test_planned_e2e_command_loads_all_viewport_projects() -> None:
+    runner = load_module("scripts/test_all.py")
+    result = subprocess.run(
+        [
+            runner.npm_command(REPO),
+            "--prefix",
+            "frontend",
+            "exec",
+            "--",
+            "playwright",
+            "test",
+            "e2e/mapping.spec.ts",
+            "--list",
+        ],
+        cwd=REPO,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=False,
+        timeout=30,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "[mobile-360]" in result.stdout
+    assert "[tablet-768]" in result.stdout
+    assert "[desktop-1440]" in result.stdout
+
+
 def test_runner_prefers_project_local_npm() -> None:
     runner = load_module("scripts/test_all.py")
     command = Path(runner.npm_command(REPO))

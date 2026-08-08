@@ -1,0 +1,60 @@
+.view { min-width: 0; }
+.course { margin: 0; text-align: right; color: var(--muted); }
+.course span, .course strong { display: block; }
+.course strong { color: var(--ink); font-size: 16px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(320px, .85fr); gap: var(--space-8); }
+.layout > section { min-width: 0; }
+.heading { min-height: 58px; display: flex; align-items: end; justify-content: space-between; gap: var(--space-3); padding-bottom: var(--space-3); border-bottom: 1px solid var(--line); }
+.heading h2, .heading p { margin: 0; }
+.heading h2 { font-size: 19px; }
+.heading p { color: var(--muted); font-size: 12px; }
+.heading select, .conceptSelect select, .conceptForm input, .conceptForm select { min-height: 38px; max-width: 100%; padding: 6px 10px; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius); }
+.sourceList, .conceptList { list-style: none; margin: 0; padding: 0; }
+.sourceList li { border-bottom: 1px solid var(--line); }
+.sourceList label { min-width: 0; display: grid; grid-template-columns: auto auto minmax(0, 1fr); align-items: start; gap: var(--space-3); padding: var(--space-4) 0; cursor: pointer; }
+.sourceList input { width: 18px; height: 18px; margin: 2px 0 0; }
+.locator { color: var(--action); font: 650 12px ui-monospace, monospace; white-space: nowrap; }
+.sourceText { min-width: 0; overflow-wrap: anywhere; }
+.conceptForm { display: grid; grid-template-columns: minmax(0, 1fr) minmax(120px, .75fr) auto; gap: var(--space-2); padding: var(--space-4) 0; border-bottom: 1px solid var(--line); }
+.conceptForm label span, .conceptSelect span { display: block; margin-bottom: 3px; color: var(--muted); font-size: 11px; }
+.conceptForm input, .conceptForm select { width: 100%; }
+.conceptForm button, .primary, .secondary, .danger, .deleteButton { min-height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); padding: 7px 12px; border-radius: var(--radius); cursor: pointer; }
+.conceptForm button { align-self: end; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); }
+.conceptList button { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-3); text-align: left; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+.conceptList button:hover, .activeConcept button { background: var(--surface); }
+.conceptList span, .conceptList strong, .conceptList small { min-width: 0; display: block; }
+.conceptList small { color: var(--muted); overflow-wrap: anywhere; }
+.conceptList em { color: var(--muted); font-size: 12px; font-style: normal; white-space: nowrap; }
+.conceptList .stale { color: var(--danger); font-weight: 700; }
+.conceptSelect { display: block; margin-top: var(--space-4); }
+.conceptSelect select { width: 100%; }
+.selectionStatus { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-4); padding: var(--space-3); background: var(--surface); border-block: 1px solid var(--line); }
+.selectionStatus p { margin: 1px 0 0; color: var(--muted); font-size: 12px; }
+.actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-4); }
+.primary { color: white; background: var(--action); border: 1px solid var(--action); }
+.secondary { color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); }
+.danger { color: white; background: var(--danger); border: 1px solid var(--danger); }
+.primary:disabled, .secondary:disabled, .conceptForm button:disabled { opacity: .55; cursor: not-allowed; }
+.deleteButton { margin-top: var(--space-4); color: var(--danger); background: transparent; border: 1px solid var(--line-strong); }
+.error, .message { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-5); padding: var(--space-3) var(--space-4); border-block: 1px solid var(--line); }
+.error { color: var(--danger); background: #fff3f1; }
+.message { color: var(--success); background: var(--success-soft); }
+.empty { color: var(--muted); }
+.scrim { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: var(--space-4); background: rgb(23 32 27 / 42%); }
+.dialog { width: min(440px, 100%); padding: var(--space-6); background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius); box-shadow: var(--shadow-tool); }
+.dialog h2 { margin: 0; font-size: 19px; }
+.dialog p { margin: var(--space-3) 0 0; color: var(--muted); }
+
+@media (max-width: 780px) {
+  .layout { grid-template-columns: 1fr; gap: var(--space-6); }
+}
+@media (max-width: 520px) {
+  .course { margin-top: var(--space-3); text-align: left; }
+  .heading { align-items: stretch; flex-direction: column; }
+  .conceptForm { grid-template-columns: 1fr; }
+  .conceptForm button { width: 100%; }
+  .sourceList label { grid-template-columns: auto minmax(0, 1fr); }
+  .sourceText { grid-column: 2; }
+  .actions { flex-direction: column-reverse; }
+  .actions button { width: 100%; }
+}
