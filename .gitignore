@@ -25,6 +25,7 @@ __pycache__/
 coverage/
 dist/
 build/
+test-results/
 .next/
 
 # Local Open Design artifacts unless deliberately promoted later

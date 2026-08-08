@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import importlib.util
+import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from urllib.parse import unquote
 
 import pytest
 
@@ -176,6 +179,19 @@ def test_git_scan_snapshot_returns_findings_and_count_from_one_enumeration(monke
     assert calls == {"tracked": 1, "index": 1}
 
 
+def test_git_scan_skips_a_tracked_file_deleted_from_the_worktree(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    scanner = load_module("scripts/scan_credentials.py")
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / ".git").mkdir()
+    monkeypatch.setattr(scanner, "tracked_paths", lambda _: ["deleted.md"])
+    monkeypatch.setattr(scanner, "index_entries", lambda _: {})
+
+    assert scanner.scan_git_snapshot(repo, include_tracked=True, include_staged=True) == ([], 0)
+
+
 def test_index_mode_error_matches_bootstrap_contract(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     scanner = load_module("scripts/scan_credentials.py")
 
@@ -301,6 +317,28 @@ def test_runner_frontend_includes_build() -> None:
     assert ["npm", "exec", "--", "vite", "build"] in commands
 
 
+def test_runner_quality_commands_use_exact_mode_and_working_directory() -> None:
+    runner = load_module("scripts/test_all.py")
+    backend = runner.build_quality_commands(REPO, "backend", PYTHON, "npm")
+    frontend = runner.build_quality_commands(REPO, "frontend", PYTHON, "npm")
+
+    assert backend == [
+        ([PYTHON, "-m", "ruff", "check", "backend", "scripts", "--select", "F401,F841"], REPO),
+        ([PYTHON, "-m", "ruff", "check", "backend", "scripts"], REPO),
+        ([PYTHON, "-m", "mypy", "--explicit-package-bases", "projectb"], REPO / "backend"),
+    ]
+    assert frontend == [
+        (["npm", "exec", "--", "tsc", "-p", "tsconfig.json", "--noEmit", "--noUnusedLocals", "--noUnusedParameters"], REPO / "frontend"),
+    ]
+    assert runner.build_quality_commands(REPO, "all", PYTHON, "npm") == backend + frontend
+
+
+def test_evidence_smoke_documents_only_the_deliberate_e402_suppression() -> None:
+    source = (REPO / "scripts/evidence/g02a_python_smoke.py").read_text(encoding="utf-8")
+    assert "# ruff: noqa: E402" in source
+    assert "PROJECTB_G02A_SITE_PACKAGES" in source.split("# ruff: noqa: E402", 1)[0]
+
+
 def test_frontend_exposes_plan_build_command() -> None:
     package = json.loads((REPO / "frontend/package.json").read_text(encoding="utf-8"))
     assert package.get("scripts", {}).get("build") == "vite build"
@@ -349,3 +387,77 @@ def test_seeded_ci_uses_the_current_runner() -> None:
     github = (REPO / ".github/workflows/ci.yml").read_text(encoding="utf-8")
     assert "python scripts/test_all.py --backend" in gitlab
     assert "python scripts/test_all.py --backend" in github
+
+
+def test_completed_process_archive_preserves_exact_historical_bytes() -> None:
+    archive = REPO / "docs/archive/completed-process-2026-08-07"
+    expected = {
+        "SKILLS_SETUP.md": ("SKILLS_SETUP.md", 8235, "0e42daec5853cb156368681e29d0b3b4f376e5a19564dc32f5cc12ad06e67409"),
+        "PROJECT_AUDIT.md": ("docs/PROJECT_AUDIT.md", 19217, "71f38c9a2672eedc616c70692e718f669b575a921e740193b7924a6594012205"),
+        "plans/2026-07-30-g03-progress-logging.md": ("docs/plans/2026-07-30-g03-progress-logging.md", 4588, "ae6b95bb69014b9fefc64d155d56db7d06f6f178f7f32826b005b1508147dc86"),
+        "plans/2026-07-31-g03-structured-output-env.md": ("docs/plans/2026-07-31-g03-structured-output-env.md", 15290, "08ea1306074b581569e8df7257737e42942158306b422ae619efc9590b371534"),
+        "specs/2026-07-31-g03-structured-output-env-design.md": ("docs/specs/2026-07-31-g03-structured-output-env-design.md", 6673, "0741e660e0254cdf0890c33d7cc700b8edd3ab0145860aa60a4605a489734914"),
+        "specs/2026-08-01-g03-atomic-execution-design.md": ("docs/specs/2026-08-01-g03-atomic-execution-design.md", 4264, "e8d41420870bee0c52990e7bf7a0fc99b83a9c98c21eb7f3461e5ec5944a9b63"),
+        "engineering/SESSION_HANDOFF.md": ("docs/engineering/SESSION_HANDOFF.md", 3288, "f8f842f05510f1b5e341e5aec9ea61c4d24d5ca3e0e7c82de0dfd5c40576c83e"),
+        "engineering/WRITING_PLANS_VALIDATION.md": ("docs/engineering/WRITING_PLANS_VALIDATION.md", 38244, "b30f72cd18da68cfc6fb75e2d02c528817438ffd04e0152a902abe2c70d3411e"),
+    }
+    manifest = (archive / "MANIFEST.md").read_text(encoding="utf-8")
+
+    for destination, (source, size, digest) in expected.items():
+        target = archive / destination
+        assert not (REPO / source).exists(), source
+        assert target.stat().st_size == size
+        assert hashlib.sha256(target.read_bytes()).hexdigest() == digest
+        assert f"`{source}`" in manifest
+        assert f"`docs/archive/completed-process-2026-08-07/{destination}`" in manifest
+        assert f"`{digest}`" in manifest
+
+
+def test_completed_process_archive_disables_line_ending_normalization() -> None:
+    archive_file = "docs/archive/completed-process-2026-08-07/SKILLS_SETUP.md"
+    result = subprocess.run(
+        ["git", "check-attr", "text", "diff", "--", archive_file],
+        cwd=REPO,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=False,
+        timeout=30,
+    )
+    assert result.returncode == 0, result.stderr
+    assert f"{archive_file}: text: unset" in result.stdout
+    assert f"{archive_file}: diff: unset" in result.stdout
+
+
+def test_active_markdown_local_links_resolve() -> None:
+    link_pattern = re.compile(r"(?<!!)\[[^]]+\]\(([^)\s]+)")
+    broken: list[str] = []
+    for document in REPO.rglob("*.md"):
+        relative = document.relative_to(REPO).as_posix()
+        if relative.startswith(("docs/archive/", "tmp/", "node_modules/", "frontend/node_modules/")):
+            continue
+        for target in link_pattern.findall(document.read_text(encoding="utf-8")):
+            path_part = unquote(target.split("#", 1)[0])
+            if not path_part or "://" in path_part or path_part.startswith(("#", "mailto:")):
+                continue
+            resolved = (document.parent / path_part).resolve()
+            if not resolved.exists():
+                broken.append(f"{relative} -> {target}")
+    assert broken == []
+
+
+def test_generated_test_result_directories_are_ignored() -> None:
+    for relative in ("test-results/results.json", "frontend/test-results/results.json"):
+        result = subprocess.run(
+            ["git", "check-ignore", "-q", "--", relative],
+            cwd=REPO,
+            check=False,
+            timeout=30,
+        )
+        assert result.returncode == 0, relative
+
+
+def test_e2e_screenshots_stay_in_ignored_test_results() -> None:
+    shell_spec = (REPO / "frontend/e2e/shell.spec.ts").read_text(encoding="utf-8")
+    assert "'docs', 'engineering', 'open-design'" not in shell_spec
+    assert "test-results" in shell_spec

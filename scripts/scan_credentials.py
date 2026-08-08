@@ -163,7 +163,7 @@ def assert_repo_path(path: str, source: str) -> None:
         raise ScanError("path_escape", source, path)
 
 
-def read_worktree(repo: Path, path: str) -> bytes:
+def read_worktree(repo: Path, path: str) -> bytes | None:
     assert_repo_path(path, "worktree")
     candidate = repo.joinpath(*path.split("/"))
     try:
@@ -177,6 +177,8 @@ def read_worktree(repo: Path, path: str) -> bytes:
         if not candidate.is_file():
             raise ScanError("read_failed", "worktree", path)
         return candidate.read_bytes()
+    except FileNotFoundError:
+        return None
     except OSError as error:
         raise ScanError("read_failed", "worktree", path) from error
 
@@ -217,6 +219,8 @@ def scan_git_snapshot(
         paths = tracked_paths(repo)
         for path in paths:
             raw = read_worktree(repo, path)
+            if raw is None:
+                continue
             if supports_text(path, "worktree"):
                 count += 1
                 findings.extend(scan_bytes("worktree", path, raw))
@@ -242,13 +246,14 @@ def scan_git_sources(repo: Path, *, include_tracked: bool, include_staged: bool)
 def main(arguments: list[str]) -> int:
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--path")
+    parser.add_argument("--root")
     parser.add_argument("--tracked", action="store_true")
     parser.add_argument("--staged", action="store_true")
     try:
         namespace, extras = parser.parse_known_args(arguments)
     except SystemExit:
         extras = ["invalid"]
-        namespace = argparse.Namespace(path=None, tracked=False, staged=False)
+        namespace = argparse.Namespace(path=None, root=None, tracked=False, staged=False)
     if extras or (not namespace.path and not namespace.tracked and not namespace.staged) or (namespace.path and (namespace.tracked or namespace.staged)):
         print(receipt("path", code="usage_missing_scope"))
         return 3
@@ -257,10 +262,17 @@ def main(arguments: list[str]) -> int:
             supplied = namespace.path.replace("\\", "/")
             if supplied.startswith("./"):
                 supplied = supplied[2:]
-            target = Path(namespace.path)
-            if not target.is_file() or target.is_symlink():
-                raise ScanError("read_failed", "path", supplied)
-            findings = scan_bytes("path", supplied, target.read_bytes())
+            if namespace.root:
+                repo = Path(namespace.root).resolve()
+                raw = read_worktree(repo, supplied)
+                if raw is None:
+                    raise ScanError("read_failed", "path", supplied)
+            else:
+                target = Path(namespace.path)
+                if not target.is_file() or target.is_symlink():
+                    raise ScanError("read_failed", "path", supplied)
+                raw = target.read_bytes()
+            findings = scan_bytes("path", supplied, raw)
             count = 1 if supports_text(supplied, "path") else 0
         else:
             repo = Path.cwd()

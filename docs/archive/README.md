@@ -5,6 +5,8 @@
 
 Status: ARCHIVED / NOT DISPATCHABLE
 
+Completed setup, audit, G-03 planning, and handoff records are indexed in `completed-process-2026-08-07/MANIFEST.md`.
+
 ## 使用边界
 
 本目录保存 2026-07-23 旧 113-unit / 14-plan 体系的原始计划证据。归档动作不把任何旧任务变成可派发任务，也不延续旧 hash 上的局部 PASS。所有文件统一按 **NOT PASS / NOT DISPATCHABLE** 处理，不得用于 G-03、worktree 创建或正式实现。

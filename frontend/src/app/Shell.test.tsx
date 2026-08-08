@@ -6,7 +6,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
 import { createApiClient } from '../api/client';
 
-afterEach(cleanup);
+const initialPath = window.location.pathname;
+
+afterEach(() => {
+  cleanup();
+  window.history.replaceState({}, '', initialPath);
+});
 
 describe('ProjectB workbench shell', () => {
   it('publishes the four learning stages and settings through semantic landmarks', () => {
@@ -77,5 +82,25 @@ describe('ProjectB workbench shell', () => {
     await expect(createApiClient({ fetchImpl }).getCapabilities()).rejects.toThrow(
       'invalid_capabilities_response',
     );
+  });
+});
+
+describe('explicit route states', () => {
+  it.each([
+    ['/learning', '\u5b66\u4e60\u529f\u80fd\u6682\u4e0d\u53ef\u7528'],
+    ['/review', '\u590d\u4e60\u529f\u80fd\u6682\u4e0d\u53ef\u7528'],
+    ['/settings', '\u8bbe\u7f6e\u529f\u80fd\u6682\u4e0d\u53ef\u7528'],
+  ])('renders an unavailable state for %s', (pathname, heading) => {
+    window.history.pushState({}, '', pathname);
+    render(<App />);
+
+    expect(screen.getByRole('heading', { name: heading })).toBeTruthy();
+  });
+
+  it('renders not found instead of falling through for an unknown path', () => {
+    window.history.pushState({}, '', '/mappingfoo');
+    render(<App />);
+
+    expect(screen.getByRole('heading', { name: '\u9875\u9762\u4e0d\u5b58\u5728' })).toBeTruthy();
   });
 });

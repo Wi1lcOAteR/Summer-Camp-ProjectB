@@ -13,6 +13,7 @@
 
 | 目录 | 内容 | 是否可作为当前实现依据 |
 | --- | --- | --- |
+| `archive/completed-process-2026-08-07/` | Completed setup, audit, G-03 planning, and handoff records with byte hashes | Historical only; not dispatch authority |
 | `requirements/` | 课程原文与要求摘录 | 是，课程原文优先 |
 | `cold-start/` | G-03 冷启动运行手册与证据说明 | 是，执行 G-03 时使用 |
 | `engineering/` | 过程审计、交接、质量与安全记录 | 仅按当前任务选择性阅读 |

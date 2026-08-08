@@ -34,6 +34,38 @@ def npm_command(root: Path) -> str:
     return "npm"
 
 
+def build_quality_commands(
+    root: Path, mode: str, python: str, npm: str
+) -> list[tuple[list[str], Path]]:
+    commands: list[tuple[list[str], Path]] = []
+    if mode in {"all", "backend"}:
+        commands.extend(
+            [
+                ([python, "-m", "ruff", "check", "backend", "scripts", "--select", "F401,F841"], root),
+                ([python, "-m", "ruff", "check", "backend", "scripts"], root),
+                ([python, "-m", "mypy", "--explicit-package-bases", "projectb"], root / "backend"),
+            ]
+        )
+    if mode in {"all", "frontend"}:
+        commands.append(
+            (
+                [
+                    npm,
+                    "exec",
+                    "--",
+                    "tsc",
+                    "-p",
+                    "tsconfig.json",
+                    "--noEmit",
+                    "--noUnusedLocals",
+                    "--noUnusedParameters",
+                ],
+                root / "frontend",
+            )
+        )
+    return commands
+
+
 def build_commands(root: Path, mode: str, python: str, npm: str) -> list[list[str]]:
     commands: list[list[str]] = []
     if mode in {"all", "backend"}:
@@ -42,7 +74,6 @@ def build_commands(root: Path, mode: str, python: str, npm: str) -> list[list[st
     if mode in {"all", "frontend"}:
         commands.extend([
             [npm, "exec", "--", "vitest", "run"],
-            [npm, "exec", "--", "tsc", "--noEmit"],
             [npm, "exec", "--", "vite", "build"],
         ])
     commands.extend([
@@ -59,6 +90,11 @@ def main(arguments: list[str]) -> int:
         return 3
     python = sys.executable
     npm = npm_command(ROOT)
+    for command, cwd in build_quality_commands(ROOT, mode, python, npm):
+        code = run_child(command, cwd=cwd)
+        if code:
+            print(f"TEST_ALL_ERROR child_exit={code}")
+            return code
     for command in build_commands(ROOT, mode, python, npm):
         if command[0] == npm:
             code = run_child(command, cwd=ROOT / "frontend")

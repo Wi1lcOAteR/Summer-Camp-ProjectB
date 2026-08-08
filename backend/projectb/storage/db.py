@@ -69,6 +69,6 @@ class Database:
 
     def unit_of_work(self) -> Any:
         """Return a context manager without importing repositories at module load time."""
-        from backend.projectb.repositories.uow import UnitOfWork
+        from projectb.repositories.uow import UnitOfWork
 
         return UnitOfWork(self)

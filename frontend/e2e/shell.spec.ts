@@ -4,7 +4,7 @@ import { mkdir } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { ensureShellTestServer, shellBaseUrl } from './support/testServer';
 
-const screenshotDir = resolve(__dirname, '..', '..', 'docs', 'engineering', 'open-design');
+const screenshotDir = resolve(__dirname, '..', 'test-results', 'open-design');
 
 const viewports = [
   { name: 'mobile-360', width: 360, height: 800 },

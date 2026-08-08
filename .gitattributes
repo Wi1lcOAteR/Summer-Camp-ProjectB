@@ -2,6 +2,8 @@
 docs/superpowers/plans/archive/** -text
 # Superseded drafts may contain historical CRLF and are checked by blob hash instead of a text diff.
 docs/superpowers/plans/archive/superseded-2026-07-23/** -diff
+# Completed-process archive is byte-pinned; preserve its historical CRLF bytes.
+docs/archive/completed-process-2026-08-07/** -text -diff
 
 # Active cold-start inputs and scripts are byte-hashed and executed on Linux/WSL2.
 SPEC.md text eol=lf

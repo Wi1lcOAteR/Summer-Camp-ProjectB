@@ -9,6 +9,8 @@ site_packages = os.environ.get("PROJECTB_G02A_SITE_PACKAGES")
 if site_packages:
     sys.path.insert(0, site_packages)
 
+# These imports deliberately follow the optional, audited G-02A package path injection.
+# ruff: noqa: E402
 import httpx
 import keyring.backends.Windows
 import openai

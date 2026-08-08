@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import importlib.util
 import sqlite3
 from pathlib import Path
@@ -10,6 +11,18 @@ import pytest
 
 
 ROOT = Path(__file__).resolve().parents[3]
+
+
+def test_database_uses_the_installed_projectb_package_for_unit_of_work() -> None:
+    tree = ast.parse((ROOT / "backend/projectb/storage/db.py").read_text(encoding="utf-8"))
+    imports = {
+        node.module
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module is not None
+    }
+
+    assert "projectb.repositories.uow" in imports
+    assert "backend.projectb.repositories.uow" not in imports
 
 
 def load_module(relative: str):
