@@ -1554,3 +1554,10 @@
 - **Task 与 skill**：执行 UI-05；使用 `subagent-driven-development`、`test-driven-development`、`requesting-code-review`、`receiving-code-review`、`systematic-debugging`、`verification-before-completion`。fresh Terra worker `/root/ui05_review` 完成首轮实现，spec reviewer `/root/ui05_spec_review` 只读评审，coordinator `/root` 修复评审问题并提交；`Human-Changes: none`。
 - **TDD 与评审**：首轮 RED 为 `ReviewView` 缺失。独立复跑发现测试未 cleanup、Shell 保留旧 unavailable 断言及嵌套 `<main>` axe 失败；补失败证据后修复。规格评审发现 `final`/`finals` 错配、非法 12 分钟预算、缺少考试日期/归档、静态 diff/recovery 与伪 source/mastery；新增 RED 后实现 30 分钟合法预算、canonical mastery、完整 hash、finals 间隔/截断、动态任务数与恢复状态。Critical=0；评审 Major 均已处理。
 - **验证与提交**：聚焦 Vitest `4 passed`；frontend 回归 `38 passed`；TypeScript、Vite build、`CREDENTIAL_SCAN_PASS files=440`、许可证检查和 `git diff --cached --check` 通过；系统 Chrome 在 360/768/1440 三个 viewport 中 Playwright `3 passed`，含键盘、预算/压缩、考试截断、恢复、overflow 与 axe。产品提交 `0f644dd5cf9d865d5c70fad0ce52d96ac3aad47b`。
+
+## 2026-08-09T12:17:10+08:00 - UI-06 安全本地设置页
+
+- **Task 与 skill**：执行 UI-06；使用 `subagent-driven-development`、`test-driven-development`、`receiving-code-review` 与 `verification-before-completion`。fresh worker `/root/ui06_settings` 完成首轮实现，read-only reviewer `/root/ui06_spec_rereview` 检查规格，coordinator `/root` 修复评审问题并提交；`Human-Changes: none`。
+- **TDD 与评审**：初始 RED 为缺少 `SettingsView`。评审发现伪删除完成状态、错误的 `/import` 删除入口，以及 demo profile 在异步确认前短暂显示并请求凭据；分别新增失败测试后，改为链接现有 `/mapping` 单材料删除流程，profile 初始为 unknown，只有确认 `local` 后才显示凭据控件并请求状态，demo/unavailable 均失败关闭。凭据 mutation 使用 session-bound CSRF，响应元数据严格校验，明文不回显。Critical=0；已知 Major 均已处理。
+- **验证与提交**：本次复跑 Settings/Shell Vitest `10 passed`；提交前完整 frontend runner 记录为 `42 passed`、Vite build PASS、`CREDENTIAL_SCAN_PASS files=448`、`LICENSE_VERIFICATION_PASS python=54 npm=166`；系统 Chrome 在 360/768/1440 三个 viewport 中 Playwright `6 passed`，覆盖键盘、demo 限制、overflow 与 axe。产品提交 `b67d6529fad1193177732513aba106198f13a2e6`。
+- **经验**：非凭据变量名也可能触发 assignment-secret 扫描；应改用准确的控制字段命名并保留扫描门禁，不得绕过扫描器。

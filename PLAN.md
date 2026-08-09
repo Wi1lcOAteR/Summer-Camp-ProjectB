@@ -166,7 +166,7 @@ git diff --check
 | 30 | UI-03 | UI-02 | no: modifies route registry | webui | complete | `891c057a5b0faa1ce390a1534efd87be65bce62e` |
 | 31 | UI-04 | UI-03 | no: modifies route registry | webui | complete | `6f057f25a0ca1ccd7909e6b247e3359bfcd0e3f4` |
 | 32 | UI-05 | UI-04 | no: modifies route registry | webui | complete | `0f644dd5cf9d865d5c70fad0ce52d96ac3aad47b` |
-| 33 | UI-06 | UI-05 | no: modifies route registry | webui | not started | none |
+| 33 | UI-06 | UI-05 | no: modifies route registry | webui | complete | `b67d6529fad1193177732513aba106198f13a2e6` |
 | 34 | DEMO-01 | UI-06 | no: profile assembly | demo | not started | none |
 | 35 | P-02 | DEMO-01 + P-EVIDENCE | no: real adapter is isolated last | provider-openai | not started | none |
 | 36 | DIST-01 | P-02 + QA-RELEASE | no: Windows release | distribution | not started | none |
