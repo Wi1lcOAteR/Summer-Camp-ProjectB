@@ -1567,3 +1567,8 @@
 - **Task 与 skill**：开始 DEMO-01；使用 `using-git-worktrees`、`subagent-driven-development`、`test-driven-development` 与 `systematic-debugging`。创建 `codex/demo-v1`，基线在 worktree-local `TEMP/TMP` 和保留的固定 Python/Node 工具链下为 backend `181 passed`、frontend `42 passed`、Vite build、凭据与许可证门禁通过。
 - **fresh worker 反馈**：`/root/demo01_impl` 在写代码前返回 `NEEDS_CONTEXT`。现有 `create_app` 固定使用 `LocalHttpPolicy` 并装配 upload/credential/provider 路由，settings 也固定发布 loopback；因此原任务文件集无法满足 demo 的能力缺席与公网 trust contract。
 - **协调修订**：只把证明必需的 `backend/projectb/api/app.py` 和 `backend/projectb/api/routes/settings.py` 加入 DEMO-01 串行所有权，要求 local 默认行为保持不变；未改变已确认的产品边界，`Human-Changes: none`。
+
+## 2026-08-09T14:53:38+08:00 - DEMO-01 Critical 评审修订
+
+- **规格评审**：fresh reviewer `/root/demo01_spec_review` 发现两个 Critical：trust validation 前创建并 seed session 可被无认证请求耗尽 CPU/磁盘，且 public demo UI 仍允许选择并发送文件。另有过期清理惰性/并发删除、egress 证明不足、公开状态误报和 E2E 全量 stub 等 Major。
+- **协调修订**：把实际 capability 消费者和测试加入任务所有权；要求拒绝请求零 session 副作用、独立清理与 active lease、失败删除可重试、Python 进程网络/子进程审计、公开状态真实，以及 E2E 启动真实 demo assembly。DIST-02 继续拥有容器级 egress 证明；未降低 AC-17，`Human-Changes: none`。
