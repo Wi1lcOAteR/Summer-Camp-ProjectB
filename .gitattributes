@@ -19,3 +19,6 @@ licenses/bootstrap/** -text -diff
 
 # PDF fixtures are binary artifacts; line-ending conversion corrupts their byte hashes.
 backend/tests/fixtures/**/*.pdf -text -diff
+
+# Demo fixtures are manifest-hashed byte artifacts and must match on every checkout.
+backend/projectb/demo/** -text
