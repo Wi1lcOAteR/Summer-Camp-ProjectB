@@ -1,10 +1,11 @@
 import { createRoot } from 'react-dom/client';
 import { LockKeyhole, Settings } from 'lucide-react';
-import { routeForPath, workbenchRoutes, type RouteMatch, type WorkbenchRouteId } from './routes';
+import { routeForPath, workbenchRoutes, type RouteMatch } from './routes';
 import { ImportView } from '../views/import/ImportView';
 import { LearningView } from '../views/learning/LearningView';
 import { MappingView } from '../views/mapping/MappingView';
 import { ReviewView } from '../views/review/ReviewView';
+import { SettingsView } from '../views/settings/SettingsView';
 import '../styles/global.css';
 
 export function App() {
@@ -57,26 +58,8 @@ function RouteContent({ route }: { route: RouteMatch }) {
   if (route.id === 'mapping') return <MappingView />;
   if (route.id === 'learning') return <LearningView />;
   if (route.id === 'review') return <ReviewView />;
-  if (route.id === 'not-found') return <NotFoundView />;
-  return <UnavailableView routeId={route.id} />;
-}
-
-const unavailableLabels: Record<Exclude<WorkbenchRouteId, 'import' | 'mapping' | 'learning' | 'not-found'>, string> = {
-  review: '\u590d\u4e60',
-  settings: '\u8bbe\u7f6e',
-};
-
-function UnavailableView({ routeId }: { routeId: keyof typeof unavailableLabels }) {
-  const label = unavailableLabels[routeId];
-  return (
-    <section className="pageIntro" aria-labelledby="page-title">
-      <div>
-        <p className="eyebrow">{'\u5f53\u524d\u9636\u6bb5'}</p>
-        <h1 id="page-title">{label}{'\u529f\u80fd\u6682\u4e0d\u53ef\u7528'}</h1>
-        <p className="introCopy">{'\u8be5\u9875\u9762\u5c1a\u672a\u542f\u7528\u3002'}</p>
-      </div>
-    </section>
-  );
+  if (route.id === 'settings') return <SettingsView />;
+  return <NotFoundView />;
 }
 
 function NotFoundView() {

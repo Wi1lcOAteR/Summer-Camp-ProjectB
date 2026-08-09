@@ -86,13 +86,12 @@ describe('ProjectB workbench shell', () => {
 });
 
 describe('explicit route states', () => {
-  it.each([
-    ['/settings', '\u8bbe\u7f6e\u529f\u80fd\u6682\u4e0d\u53ef\u7528'],
-  ])('renders an unavailable state for %s', (pathname, heading) => {
+  it('renders settings instead of falling through to an unavailable state', () => {
+    const pathname = '/settings';
     window.history.pushState({}, '', pathname);
     render(<App />);
 
-    expect(screen.getByRole('heading', { name: heading })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: /settings/i })).toBeTruthy();
   });
 
   it('renders not found instead of falling through for an unknown path', () => {
