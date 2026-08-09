@@ -1572,3 +1572,10 @@
 
 - **规格评审**：fresh reviewer `/root/demo01_spec_review` 发现两个 Critical：trust validation 前创建并 seed session 可被无认证请求耗尽 CPU/磁盘，且 public demo UI 仍允许选择并发送文件。另有过期清理惰性/并发删除、egress 证明不足、公开状态误报和 E2E 全量 stub 等 Major。
 - **协调修订**：把实际 capability 消费者和测试加入任务所有权；要求拒绝请求零 session 副作用、独立清理与 active lease、失败删除可重试、Python 进程网络/子进程审计、公开状态真实，以及 E2E 启动真实 demo assembly。DIST-02 继续拥有容器级 egress 证明；未降低 AC-17，`Human-Changes: none`。
+
+## 2026-08-09T17:58:52+08:00 - DEMO-01 隔离 mock 公共演示
+
+- **Task 与 skill**：fresh worker `/root/demo01_impl2` 实现，reviewers `/root/demo01_spec_review` 与 `/root/demo01_quality_review` 只读评审，coordinator `/root` 修复复审缺口并由主进程提交；使用 `subagent-driven-development`、`test-driven-development`、`systematic-debugging`、`receiving-code-review`、`requesting-code-review` 与 `verification-before-completion`；`Human-Changes: none`。
+- **TDD 与双评审**：实现 exact Host/Origin/cookie/CSRF、预检先于 session seed、30 分钟 idle/2 小时 absolute 会话、active lease、后台清理/失败重试、能力路由真实移除、CC0 hash-bound fixture、MockProvider 真实只读路径及真实 assembly E2E。复审的底层 `_socket`/`os.exec*` 绕过、lookup/scope 竞态、shutdown 遗留、SPA fallback 丢 Cookie/CSRF 四类 Major 均先取得 5 项 RED，再以 audit hook、原子 reservation、失败关闭清理和安全头透传修复；最终 Critical=0，Major=0。DIST-02 仍负责容器级网络隔离证明。
+- **验证与提交**：DEMO suite `22 passed`，显式 package-base mypy `45 source files` 无问题；最终 `scripts/test_all.py --all` 为 backend `203 passed`、frontend `48 passed`、Vite build PASS、`CREDENTIAL_SCAN_PASS files=448`、`LICENSE_VERIFICATION_PASS python=54 npm=166 direct_python=18 direct_npm=16`、`TEST_ALL_PASS mode=all`。系统 Chrome 的真实 demo assembly 在 360/768/1440 下 `6 passed`；默认 bundled Chromium 未安装，未声称通过。staged 范围 `20` 文件，staged 扫描 `CREDENTIAL_SCAN_PASS files=464`。产品提交 `47a236ff0dae1fa49667734dc2a6bf5314d09488`。
+- **清理与经验**：删除本轮 12 个明确命名的 `tmp/demo-*-20260809`/`frontend/test-results` 生成目录并确认 4173/7860 无监听；此前 9 个 `tmp/demo-e2e-*` 目录因 ACL 拒绝继续保留，未使用被禁止的 ACL 绕过。Python 包装层 monkeypatch 不是完整安全边界，底层审计与 DIST-02 容器网络策略必须分层；SPA fallback 也必须保留上游安全响应头。

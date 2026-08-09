@@ -167,7 +167,7 @@ git diff --check
 | 31 | UI-04 | UI-03 | no: modifies route registry | webui | complete | `6f057f25a0ca1ccd7909e6b247e3359bfcd0e3f4` |
 | 32 | UI-05 | UI-04 | no: modifies route registry | webui | complete | `0f644dd5cf9d865d5c70fad0ce52d96ac3aad47b` |
 | 33 | UI-06 | UI-05 | no: modifies route registry | webui | complete | `b67d6529fad1193177732513aba106198f13a2e6` |
-| 34 | DEMO-01 | UI-06 | no: profile assembly | demo | not started | none |
+| 34 | DEMO-01 | UI-06 | no: profile assembly | demo | complete | `47a236ff0dae1fa49667734dc2a6bf5314d09488` |
 | 35 | P-02 | DEMO-01 + P-EVIDENCE | no: real adapter is isolated last | provider-openai | not started | none |
 | 36 | DIST-01 | P-02 + QA-RELEASE | no: Windows release | distribution | not started | none |
 | 37 | DIST-02 | DIST-01 | no: consumes frozen frontend/runtime | distribution | not started | none |
