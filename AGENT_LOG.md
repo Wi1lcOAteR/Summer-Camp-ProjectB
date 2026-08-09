@@ -1561,3 +1561,9 @@
 - **TDD 与评审**：初始 RED 为缺少 `SettingsView`。评审发现伪删除完成状态、错误的 `/import` 删除入口，以及 demo profile 在异步确认前短暂显示并请求凭据；分别新增失败测试后，改为链接现有 `/mapping` 单材料删除流程，profile 初始为 unknown，只有确认 `local` 后才显示凭据控件并请求状态，demo/unavailable 均失败关闭。凭据 mutation 使用 session-bound CSRF，响应元数据严格校验，明文不回显。Critical=0；已知 Major 均已处理。
 - **验证与提交**：本次复跑 Settings/Shell Vitest `10 passed`；提交前完整 frontend runner 记录为 `42 passed`、Vite build PASS、`CREDENTIAL_SCAN_PASS files=448`、`LICENSE_VERIFICATION_PASS python=54 npm=166`；系统 Chrome 在 360/768/1440 三个 viewport 中 Playwright `6 passed`，覆盖键盘、demo 限制、overflow 与 axe。产品提交 `b67d6529fad1193177732513aba106198f13a2e6`。
 - **经验**：非凭据变量名也可能触发 assignment-secret 扫描；应改用准确的控制字段命名并保留扫描门禁，不得绕过扫描器。
+
+## 2026-08-09T12:37:48+08:00 - DEMO-01 任务所有权修复
+
+- **Task 与 skill**：开始 DEMO-01；使用 `using-git-worktrees`、`subagent-driven-development`、`test-driven-development` 与 `systematic-debugging`。创建 `codex/demo-v1`，基线在 worktree-local `TEMP/TMP` 和保留的固定 Python/Node 工具链下为 backend `181 passed`、frontend `42 passed`、Vite build、凭据与许可证门禁通过。
+- **fresh worker 反馈**：`/root/demo01_impl` 在写代码前返回 `NEEDS_CONTEXT`。现有 `create_app` 固定使用 `LocalHttpPolicy` 并装配 upload/credential/provider 路由，settings 也固定发布 loopback；因此原任务文件集无法满足 demo 的能力缺席与公网 trust contract。
+- **协调修订**：只把证明必需的 `backend/projectb/api/app.py` 和 `backend/projectb/api/routes/settings.py` 加入 DEMO-01 串行所有权，要求 local 默认行为保持不变；未改变已确认的产品边界，`Human-Changes: none`。
