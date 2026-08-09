@@ -46,9 +46,13 @@ async function credentialState(response: Response, expected?: boolean): Promise<
 async function settingsState(response: Response): Promise<SettingsState> {
   if (!response.ok) throw new Error('settings_unavailable');
   const value = await response.json() as Record<string, unknown>;
+  const bindHost = typeof value.bind_host === 'string' ? value.bind_host : '';
+  const validBindHost = value.profile === 'local'
+    ? bindHost === '127.0.0.1'
+    : value.profile === 'demo' && bindHost === '0.0.0.0';
   if (
     (value.profile !== 'local' && value.profile !== 'demo')
-    || value.bind_host !== '127.0.0.1'
+    || !validBindHost
     || (value.provider_mode !== 'L' && value.provider_mode !== 'L+P')
     || typeof value.provider_configured !== 'boolean'
   ) {
@@ -56,7 +60,7 @@ async function settingsState(response: Response): Promise<SettingsState> {
   }
   return {
     profile: value.profile,
-    bind_host: value.bind_host,
+    bind_host: bindHost,
     provider_mode: value.provider_mode,
     provider_configured: value.provider_configured,
   };
@@ -138,20 +142,22 @@ export function SettingsView() {
   }
 
   const profileLabel = settings === null
-    ? 'Checking local profile'
+    ? 'Checking profile capabilities'
     : settings.profile === 'demo'
       ? 'Demo'
       : settings.profile === 'local'
         ? 'Local'
         : 'Unavailable';
+  const isDemo = settings?.profile === 'demo';
+  const isLocal = settings?.profile === 'local';
 
   return (
     <div className={styles.view}>
       <section className="pageIntro" aria-labelledby="settings-title">
         <div>
-          <p className="eyebrow">Utility / Local configuration</p>
+          <p className="eyebrow">{isDemo ? 'Utility / Public demo' : isLocal ? 'Utility / Local configuration' : 'Utility / Profile'}</p>
           <h1 id="settings-title">Settings</h1>
-          <p className="introCopy">Control local access, provider credentials, privacy, and data lifecycle.</p>
+          <p className="introCopy">{isDemo ? 'Review public demo isolation and session lifecycle.' : isLocal ? 'Control local access, provider credentials, privacy, and data lifecycle.' : 'Review profile capabilities and data lifecycle.'}</p>
         </div>
         <p className={styles.status}><span>Profile</span><strong>{profileLabel}{settings ? ` / ${settings.bind_host}` : ''}</strong></p>
       </section>
@@ -160,11 +166,11 @@ export function SettingsView() {
         <div className={styles.primary}>
           <section className={styles.section} aria-labelledby="credential-title">
             <div className={styles.heading}>
-              <div><h2 id="credential-title">Provider credential</h2><p>First run keeps the value hidden and stores it locally.</p></div>
+              <div><h2 id="credential-title">{isDemo ? 'Demo restrictions' : isLocal ? 'Provider credential' : 'Profile capabilities'}</h2><p>{isDemo ? 'This profile has no credential or upload capability.' : isLocal ? 'First run keeps the value hidden and stores it locally.' : 'Capabilities remain unavailable until the profile is confirmed.'}</p></div>
               <KeyRound size={20} aria-hidden="true" />
             </div>
-            {settings === null ? <p className={styles.notice} role="status">Checking local profile before enabling credentials.</p>
-              : settings.profile === 'demo' ? <p className={styles.notice}>Demo restrictions: credentials and outbound providers are disabled.</p>
+            {settings === null ? <p className={styles.notice} role="status">Checking profile capabilities.</p>
+              : settings.profile === 'demo' ? <p className={styles.notice}>Demo restrictions: credentials, uploads, and outbound provider calls are unavailable.</p>
                 : settings.profile === 'unavailable' ? <p className={styles.notice} role="alert">Settings are unavailable. Credentials remain disabled.</p>
                   : <>
                     <label className={styles.field}>Provider API key<input aria-label="Provider API key" type="password" autoComplete="new-password" value={secret} onChange={(event) => setSecret(event.target.value)} /></label>
@@ -176,19 +182,23 @@ export function SettingsView() {
                   </>}
           </section>
           <section className={styles.section} aria-labelledby="privacy-title">
-            <div className={styles.heading}><div><h2 id="privacy-title">Privacy</h2><p>Local-first controls for your learning data.</p></div><ShieldCheck size={20} aria-hidden="true" /></div>
-            <ul className={styles.list}><li>Course files, profile data, and credentials remain on this device.</li><li>Provider mode is {settings?.provider_mode ?? 'unavailable'}; network calls require explicit consent.</li><li>Only source-bound, minimum data may leave the local profile.</li></ul>
+            <div className={styles.heading}><div><h2 id="privacy-title">Privacy</h2><p>{isDemo ? 'Ephemeral controls for public demo data.' : isLocal ? 'Local-first controls for your learning data.' : 'Privacy capabilities are not yet available.'}</p></div><ShieldCheck size={20} aria-hidden="true" /></div>
+            {isDemo
+              ? <ul className={styles.list}><li>Synthetic fixtures and changes are isolated to this browser session.</li><li>Idle sessions expire after 30 minutes and all sessions expire after 2 hours.</li><li>Uploads, credentials, and outbound calls are unavailable.</li></ul>
+              : isLocal
+                ? <ul className={styles.list}><li>Course files, profile data, and credentials remain on this device.</li><li>Provider mode is {settings.provider_mode}; network calls require explicit consent.</li><li>Only source-bound, minimum data may leave the local profile.</li></ul>
+                : <p className={styles.notice}>No privacy capability is enabled without a confirmed profile.</p>}
           </section>
           <section className={styles.section} aria-labelledby="deletion-title">
-            <div className={styles.heading}><div><h2 id="deletion-title">Delete local data</h2><p>Materials are deleted individually so shared content remains protected.</p></div><Trash2 size={20} aria-hidden="true" /></div>
-            <a className={styles.dangerLink} href="/mapping">Manage material deletion</a>
+            <div className={styles.heading}><div><h2 id="deletion-title">{isDemo ? 'Session data lifecycle' : isLocal ? 'Delete local data' : 'Data lifecycle'}</h2><p>{isDemo ? 'Session data is removed automatically at expiry.' : isLocal ? 'Materials are deleted individually so shared content remains protected.' : 'Data controls are unavailable without a confirmed profile.'}</p></div><Trash2 size={20} aria-hidden="true" /></div>
+            {(isDemo || isLocal) && <a className={styles.dangerLink} href="/mapping">{isDemo ? 'Manage session materials' : 'Manage material deletion'}</a>}
           </section>
         </div>
         <aside className={styles.aside}>
-          <section className={styles.section} aria-labelledby="profile-title"><div className={styles.heading}><h2 id="profile-title">Local profile</h2></div><dl className={styles.settings}><div><dt>Bind host</dt><dd>{settings?.bind_host ?? 'checking'}</dd></div><div><dt>Provider mode</dt><dd>{settings?.provider_mode ?? 'checking'}</dd></div><div><dt>Credential</dt><dd>{credential.configured ? 'Configured' : 'Not configured'}</dd></div></dl></section>
-          <section className={styles.section} aria-labelledby="caps-title"><div className={styles.heading}><h2 id="caps-title">Provider caps</h2></div><ul className={styles.list}><li>Local deterministic explanations</li><li>Maximum context is source-bound</li><li>No background network requests</li></ul></section>
-          <section className={styles.section} aria-labelledby="security-title"><div className={styles.heading}><h2 id="security-title">Data &amp; security</h2></div><p className={styles.muted}>Passwords use a hidden input. API responses contain status metadata only, never secret material.</p></section>
-          <section className={styles.section} aria-labelledby="demo-title"><div className={styles.heading}><h2 id="demo-title">Demo restrictions</h2></div><p className={styles.muted}>Demo mode uses synthetic data and disables uploads, credentials, external providers, and cross-session state.</p></section>
+          <section className={styles.section} aria-labelledby="profile-title"><div className={styles.heading}><h2 id="profile-title">{isDemo ? 'Demo profile' : isLocal ? 'Local profile' : 'Profile'}</h2></div><dl className={styles.settings}><div><dt>Bind host</dt><dd>{settings?.bind_host ?? 'checking'}</dd></div><div><dt>Provider mode</dt><dd>{settings?.provider_mode ?? 'checking'}</dd></div><div><dt>Credential</dt><dd>{isDemo || !isLocal ? 'Unavailable' : credential.configured ? 'Configured' : 'Not configured'}</dd></div></dl></section>
+          {isLocal && <section className={styles.section} aria-labelledby="caps-title"><div className={styles.heading}><h2 id="caps-title">Provider caps</h2></div><ul className={styles.list}><li>Local deterministic explanations</li><li>Maximum context is source-bound</li><li>No background network requests</li></ul></section>}
+          <section className={styles.section} aria-labelledby="security-title"><div className={styles.heading}><h2 id="security-title">Data &amp; security</h2></div><p className={styles.muted}>{isDemo ? 'Requests are bound to an isolated session and protected by same-origin checks.' : isLocal ? 'Passwords use a hidden input. API responses contain status metadata only, never secret material.' : 'Security metadata is unavailable without a confirmed profile.'}</p></section>
+          {isLocal && <section className={styles.section} aria-labelledby="demo-title"><div className={styles.heading}><h2 id="demo-title">Demo restrictions</h2></div><p className={styles.muted}>Demo mode uses synthetic data and disables uploads, credentials, external providers, and cross-session state.</p></section>}
         </aside>
       </div>
     </div>

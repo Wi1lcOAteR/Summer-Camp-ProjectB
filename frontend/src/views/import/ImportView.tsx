@@ -18,6 +18,7 @@ const acceptedExtensions = new Set(['pdf', 'txt', 'md']);
 
 interface ImportViewProps {
   api?: Pick<ApiClient, 'listCourses' | 'createCourse' | 'listMaterials' | 'importMaterials'>;
+  importEnabled?: boolean;
 }
 
 interface DisplayResult extends MaterialImportResult {
@@ -52,7 +53,7 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`;
 }
 
-export function ImportView({ api = defaultApi }: ImportViewProps) {
+export function ImportView({ api = defaultApi, importEnabled = true }: ImportViewProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [course, setCourse] = useState<CourseSummary>();
   const [materials, setMaterials] = useState<MaterialSummary[]>([]);
@@ -134,12 +135,14 @@ export function ImportView({ api = defaultApi }: ImportViewProps) {
         <div>
           <p className="eyebrow">第 1 阶段 · 课程材料</p>
           <h1 id="page-title">导入课程材料</h1>
-          <p className="introCopy">原文件只保存在当前设备，导入后可逐页或逐行核对来源。</p>
+          <p className="introCopy">{importEnabled
+            ? '原文件只保存在当前设备，导入后可逐页或逐行核对来源。'
+            : 'Public demo materials are synthetic and isolated to this browser session.'}</p>
         </div>
         <p className={styles.courseName}><span>当前课程</span><strong>{course?.name ?? '操作系统'}</strong></p>
       </section>
 
-      <section className={styles.limits} aria-labelledby="limits-heading">
+      {importEnabled && <section className={styles.limits} aria-labelledby="limits-heading">
         <div>
           <h2 id="limits-heading">导入限制</h2>
           <p>仅支持含可提取文字的数字 PDF、TXT 或 Markdown；扫描件与图片暂不支持。</p>
@@ -149,7 +152,7 @@ export function ImportView({ api = defaultApi }: ImportViewProps) {
           <li>单文件 20 MiB</li>
           <li>本批合计 50 MiB</li>
         </ul>
-      </section>
+      </section>}
 
       {pageError && (
         <section className={styles.error} role="alert">
@@ -159,7 +162,7 @@ export function ImportView({ api = defaultApi }: ImportViewProps) {
       )}
 
       <div className={styles.layout}>
-        <section aria-labelledby="select-heading">
+        {importEnabled && <section aria-labelledby="select-heading">
           <div className={styles.sectionHeading}>
             <div><h2 id="select-heading">选择文件</h2><p>按所选顺序逐个处理，每个文件独立提交。</p></div>
           </div>
@@ -209,7 +212,7 @@ export function ImportView({ api = defaultApi }: ImportViewProps) {
               <ul>{results.map((result) => <li key={result.filename} className={result.errorCode ? styles.failedResult : styles.successResult}><strong>{result.filename}</strong><span>{result.errorCode ? errorMessage(result.errorCode) : '导入完成'}</span></li>)}</ul>
             </section>
           )}
-        </section>
+        </section>}
 
         <section aria-labelledby="materials-heading">
           <div className={styles.sectionHeading}><div><h2 id="materials-heading">材料列表</h2><p>{materials.length} 份本地材料</p></div></div>

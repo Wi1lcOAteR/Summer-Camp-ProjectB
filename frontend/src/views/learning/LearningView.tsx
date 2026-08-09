@@ -13,6 +13,7 @@ import styles from './LearningView.module.css';
 
 interface LearningViewProps {
   api?: Pick<ApiClient, 'listCourses' | 'listMaterials' | 'listSources' | 'listConcepts'>;
+  providerEnabled?: boolean;
 }
 
 type LearningConcept = ConceptSummary & {
@@ -41,7 +42,7 @@ function errorCode(reason: unknown): string {
   return reason instanceof ApiRequestError ? reason.code : 'learning_unavailable';
 }
 
-export function LearningView({ api = defaultApi }: LearningViewProps) {
+export function LearningView({ api = defaultApi, providerEnabled = true }: LearningViewProps) {
   const [course, setCourse] = useState<CourseSummary>();
   const [concepts, setConcepts] = useState<LearningConcept[]>([]);
   const [conceptId, setConceptId] = useState('');
@@ -183,7 +184,7 @@ export function LearningView({ api = defaultApi }: LearningViewProps) {
             </fieldset>}
           </section>
 
-          <section className={styles.section} aria-labelledby="provider-heading">
+          {providerEnabled && <section className={styles.section} aria-labelledby="provider-heading">
             <div className={styles.heading}><div><h2 id="provider-heading">P 提供方辅助</h2><p>可选的外部文字辅助，与确定性评分和掌握度隔离。</p></div><span className={styles.providerLabel}>P · 外部提供方</span></div>
             <div className={styles.providerIntro}><Sparkles size={19} aria-hidden="true" /><p>可以基于已确认的来源片段请求解释措辞或练习候选。未确认时不会发送请求。</p><button type="button" className={styles.secondaryButton} onClick={previewProvider} disabled={!sourceBound}>查看 P 提供方预览</button></div>
             {providerPreview && source && <section className={styles.preview} aria-label="P 提供方预览">
@@ -193,7 +194,7 @@ export function LearningView({ api = defaultApi }: LearningViewProps) {
               <button type="button" className={styles.primaryButton} disabled={!providerConfirmed} onClick={confirmProvider}><Send size={17} aria-hidden="true" />确认预览</button>
               {providerStatus && <p className={styles.providerStatus} role="status">{providerStatus}</p>}
             </section>}
-          </section>
+          </section>}
         </div>
 
         <aside className={styles.evidenceColumn} aria-label="确定性检查与证据">

@@ -22,6 +22,14 @@ afterEach(() => {
 });
 
 describe('LearningView', () => {
+  it('renders deterministic demo learning without provider preview or consent controls', async () => {
+    render(<LearningView api={api} providerEnabled={false} />);
+
+    expect(await screen.findByText('version-1')).toBeTruthy();
+    expect(document.getElementById('provider-heading')).toBeNull();
+    expect(document.querySelector('input[type="checkbox"]')).toBeNull();
+  });
+
   it('loads current confirmed source identity and keeps evidence absent before submit', async () => {
     render(<LearningView api={api} />);
 

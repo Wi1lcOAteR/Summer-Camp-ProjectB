@@ -40,6 +40,15 @@ function createImportApi(overrides: Record<string, unknown> = {}) {
 }
 
 describe('ImportView', () => {
+  it('renders demo fixtures without any file-selection or upload capability', async () => {
+    const api = createImportApi();
+    render(<ImportView api={api} importEnabled={false} />);
+
+    expect(await screen.findByText(/\.pdf$/)).toBeTruthy();
+    expect(document.querySelector('input[type="file"]')).toBeNull();
+    expect(api.importMaterials).not.toHaveBeenCalled();
+  });
+
   it('loads the current course materials and imports selected v1 files', async () => {
     const user = userEvent.setup();
     const api = createImportApi();

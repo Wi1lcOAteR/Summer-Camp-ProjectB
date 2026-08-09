@@ -14,6 +14,58 @@ afterEach(() => {
 });
 
 describe('ProjectB workbench shell', () => {
+  it('keeps the shell truthful and capability controls closed while profile discovery is pending', () => {
+    const api = {
+      getCapabilities: vi.fn(() => new Promise<never>(() => undefined)),
+    };
+    window.history.replaceState({}, '', '/unknown');
+    render(<App api={api} />);
+
+    expect(screen.getByText('Checking profile')).toBeTruthy();
+    expect(document.querySelector('.course strong')?.textContent).toBe('Course pending');
+    expect(screen.queryByText('\u4ec5\u672c\u673a')).toBeNull();
+    expect(screen.queryByText('Public demo')).toBeNull();
+    expect(document.querySelector('input[type="file"]')).toBeNull();
+  });
+
+  it('publishes a truthful public demo shell and removes upload controls from the routed view', async () => {
+    const api = {
+      getCapabilities: vi.fn().mockResolvedValue({
+        profile: 'demo',
+        providerMode: 'L',
+        providerConfigured: false,
+        importEnabled: false,
+        credentialManagementEnabled: false,
+      }),
+    };
+    window.history.replaceState({}, '', '/import');
+    render(<App api={api} />);
+
+    expect(await screen.findByText('Public demo')).toBeTruthy();
+    expect(document.querySelector('.course strong')?.textContent).toBe('Concurrent Systems Demo');
+    expect(screen.getByText('Session-isolated synthetic data')).toBeTruthy();
+    expect(screen.queryByText('仅本机')).toBeNull();
+    expect(document.querySelector('input[type="file"]')).toBeNull();
+    expect(api.getCapabilities).toHaveBeenCalledTimes(1);
+  });
+
+  it('retains the local-only shell status for the local profile', async () => {
+    const api = {
+      getCapabilities: vi.fn().mockResolvedValue({
+        profile: 'local',
+        providerMode: 'L',
+        providerConfigured: false,
+        importEnabled: true,
+        credentialManagementEnabled: true,
+      }),
+    };
+    render(<App api={api} />);
+
+    expect(await screen.findByText('仅本机')).toBeTruthy();
+    expect(document.querySelector('.course strong')?.textContent).toBe('操作系统');
+    expect(screen.queryByText('Public demo')).toBeNull();
+  });
+
   it('publishes the four learning stages and settings through semantic landmarks', () => {
     render(<App />);
 

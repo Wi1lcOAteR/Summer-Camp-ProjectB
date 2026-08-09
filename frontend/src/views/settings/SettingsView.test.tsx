@@ -7,6 +7,17 @@ import { SettingsView } from './SettingsView';
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 describe('SettingsView', () => {
+  it('does not claim local or provider capabilities while settings are pending', () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(() => new Promise<Response>(() => undefined));
+    render(<SettingsView />);
+
+    expect(screen.getByText('Checking profile capabilities')).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: /provider credential/i })).toBeNull();
+    expect(screen.queryByRole('heading', { name: /provider caps/i })).toBeNull();
+    expect(screen.queryByRole('heading', { name: /local profile/i })).toBeNull();
+    expect(screen.queryByText(/course files, profile data, and credentials remain on this device/i)).toBeNull();
+  });
+
   it('shows first-run guidance, password semantics, profile caps, privacy, and deletion boundaries', async () => {
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
       if (String(input).includes('/api/session')) return new Response('{}', { status: 200, headers: { 'x-csrf-token': 'test-token' } });
@@ -68,12 +79,18 @@ describe('SettingsView', () => {
 
   it('keeps credentials unavailable in demo mode without requesting status', async () => {
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
-      if (String(input).includes('/api/settings')) return new Response(JSON.stringify({ profile: 'demo', bind_host: '127.0.0.1', provider_mode: 'L', provider_configured: false }), { status: 200 });
+      if (String(input).includes('/api/settings')) return new Response(JSON.stringify({ profile: 'demo', bind_host: '0.0.0.0', provider_mode: 'L', provider_configured: false }), { status: 200 });
       throw new Error('credential endpoint must not be requested in demo mode');
     });
     render(<SettingsView />);
 
     expect(await screen.findByText(/demo restrictions: credentials/i)).toBeTruthy();
+    expect(screen.getByText('Demo / 0.0.0.0')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: /demo profile/i })).toBeTruthy();
+    expect(screen.getByText(/synthetic fixtures and changes are isolated to this browser session/i)).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: /local profile/i })).toBeNull();
+    expect(screen.queryByText(/network calls require explicit consent/i)).toBeNull();
+    expect(screen.queryByText(/course files, profile data, and credentials remain on this device/i)).toBeNull();
     expect(screen.queryByLabelText(/provider api key/i)).toBeNull();
     expect(fetchMock.mock.calls.some(([input]) => String(input).includes('/api/credentials/provider'))).toBe(false);
   });

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "course": {
+    "name": "Concurrent Systems Demo",
+    "timezone": "UTC"
+  },
+  "concepts": [
+    {
+      "name": "Mutex",
+      "evaluator_id": "os.mutex.v1"
+    },
+    {
+      "name": "Race condition",
+      "evaluator_id": "os.race.v1"
+    },
+    {
+      "name": "Deadlock",
+      "evaluator_id": "os.deadlock.v1"
+    }
+  ]
+}

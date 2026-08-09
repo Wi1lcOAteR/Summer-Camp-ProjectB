@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "fixtures": [
+    {
+      "path": "course.json",
+      "license": "CC0-1.0",
+      "sha256": "a903de37e2990bac66c8a2819a3ef2e8754e2699e3b7a13541a52f50a99a51cf"
+    },
+    {
+      "path": "materials.md",
+      "license": "CC0-1.0",
+      "sha256": "e6fecfa19d2d3a43a35feef11e146c4610d4d5330560c7be7e213bc3974dbd65"
+    }
+  ]
+}

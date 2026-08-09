@@ -1,6 +1,9 @@
 import { createRoot } from 'react-dom/client';
 import { LockKeyhole, Settings } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { routeForPath, workbenchRoutes, type RouteMatch } from './routes';
+import { createApiClient, type ApiClient } from '../api/client';
+import type { ApiCapabilities } from '../api/capabilities';
 import { ImportView } from '../views/import/ImportView';
 import { LearningView } from '../views/learning/LearningView';
 import { MappingView } from '../views/mapping/MappingView';
@@ -8,9 +11,22 @@ import { ReviewView } from '../views/review/ReviewView';
 import { SettingsView } from '../views/settings/SettingsView';
 import '../styles/global.css';
 
-export function App() {
+const defaultApi = createApiClient();
+
+export function App({ api = defaultApi }: { api?: Pick<ApiClient, 'getCapabilities'> }) {
+  const [capabilities, setCapabilities] = useState<ApiCapabilities | undefined>();
+  useEffect(() => {
+    let active = true;
+    void api.getCapabilities()
+      .then((next) => { if (active) setCapabilities(next); })
+      .catch(() => { if (active) setCapabilities(undefined); });
+    return () => { active = false; };
+  }, [api]);
+
   const path = typeof window === 'undefined' ? '/import' : window.location.pathname;
   const current = routeForPath(path);
+  const isDemo = capabilities?.profile === 'demo';
+  const isLocal = capabilities?.profile === 'local';
   return (
     <div className="shell">
       <header className="shellHeader">
@@ -19,13 +35,16 @@ export function App() {
             <span className="brandMark" aria-hidden="true">PB</span>
             <div>
               <p className="brandName">ProjectB</p>
-              <p className="brandContext">{'\u672c\u5730\u5b66\u4e60\u5de5\u4f5c\u53f0'}</p>
+              <p className="brandContext">{isDemo ? 'Public demo workbench' : isLocal ? '\u672c\u5730\u5b66\u4e60\u5de5\u4f5c\u53f0' : 'ProjectB workbench'}</p>
             </div>
           </div>
-          <div className="course"><span>{'\u8bfe\u7a0b'}</span><strong>{'\u64cd\u4f5c\u7cfb\u7edf'}</strong></div>
+          <div className="course">
+            <span>{'\u8bfe\u7a0b'}</span>
+            <strong>{isDemo ? 'Concurrent Systems Demo' : isLocal ? '\u64cd\u4f5c\u7cfb\u7edf' : 'Course pending'}</strong>
+          </div>
           <div className="utilityStatus" aria-label={'\u8fd0\u884c\u72b6\u6001'}>
-            <span className="statusPill"><LockKeyhole size={15} aria-hidden="true" />{'\u4ec5\u672c\u673a'}</span>
-            <span className="statusPill"><span className="statusDot" aria-hidden="true" />{'\u672c\u5730\u6863\u6848\u6b63\u5e38'}</span>
+            <span className="statusPill"><LockKeyhole size={15} aria-hidden="true" />{isDemo ? 'Public demo' : isLocal ? '\u4ec5\u672c\u673a' : 'Checking profile'}</span>
+            <span className="statusPill"><span className="statusDot" aria-hidden="true" />{isDemo ? 'Session-isolated synthetic data' : isLocal ? '\u672c\u5730\u6863\u6848\u6b63\u5e38' : 'Capabilities unavailable'}</span>
           </div>
         </div>
         <nav className="workflow" aria-label={'\u5b66\u4e60\u6d41\u7a0b'}>
@@ -47,16 +66,16 @@ export function App() {
         </nav>
       </header>
       <main>
-        <div className="mainInner"><RouteContent route={current} /></div>
+        <div className="mainInner"><RouteContent route={current} capabilities={capabilities} /></div>
       </main>
     </div>
   );
 }
 
-function RouteContent({ route }: { route: RouteMatch }) {
-  if (route.id === 'import') return <ImportView />;
+function RouteContent({ route, capabilities }: { route: RouteMatch; capabilities?: ApiCapabilities }) {
+  if (route.id === 'import') return <ImportView importEnabled={capabilities?.profile === 'local' && capabilities.importEnabled} />;
   if (route.id === 'mapping') return <MappingView />;
-  if (route.id === 'learning') return <LearningView />;
+  if (route.id === 'learning') return <LearningView providerEnabled={capabilities?.profile === 'local'} />;
   if (route.id === 'review') return <ReviewView />;
   if (route.id === 'settings') return <SettingsView />;
   return <NotFoundView />;
