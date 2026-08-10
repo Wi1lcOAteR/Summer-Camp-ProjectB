@@ -91,6 +91,14 @@ def test_scanner_accepts_pyinstaller_spec_as_text(tmp_path: Path) -> None:
     assert result.stdout.strip() == "CREDENTIAL_SCAN_PASS files=1"
 
 
+def test_scanner_accepts_dockerfile_specific_ignore_as_text(tmp_path: Path) -> None:
+    target = tmp_path / "Dockerfile.dockerignore"
+    target.write_text("tmp/\n", encoding="utf-8")
+    result = run_script("scripts/scan_credentials.py", "--path", str(target))
+    assert result.returncode == 0
+    assert result.stdout.strip() == "CREDENTIAL_SCAN_PASS files=1"
+
+
 def test_scanner_skips_real_binary_fixture() -> None:
     fixture = REPO / "scripts/tests/fixtures/scanner/binary.png"
     assert fixture.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")

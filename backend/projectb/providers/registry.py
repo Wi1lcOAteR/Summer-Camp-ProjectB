@@ -3,9 +3,7 @@ from __future__ import annotations
 from typing import Literal
 
 from projectb.providers.mock import MockProvider
-from projectb.providers.openai_adapter import OpenAIAdapter
 from projectb.providers.port import ProviderError, ProviderPort
-
 
 class RegistryError(RuntimeError):
     def __init__(self, code: str) -> None:
@@ -28,6 +26,8 @@ class ProviderRegistry:
         if self.environment == "local" and isinstance(provider, MockProvider):
             raise RegistryError("mock_not_allowed")
         if self.environment == "local":
+            from projectb.providers.openai_adapter import OpenAIAdapter
+
             if type(provider) is not OpenAIAdapter:
                 raise RegistryError("dynamic_adapter_not_allowed")
             try:

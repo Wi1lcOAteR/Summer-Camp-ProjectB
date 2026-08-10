@@ -112,3 +112,42 @@ jobs:
         run: |
           python scripts/scan_credentials.py --path dist/ProjectB.exe
           Get-FileHash -Algorithm SHA256 -LiteralPath dist/ProjectB.exe
+
+  oci-package:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: OCI preflight
+        shell: bash
+        run: |
+          set -eu
+          test "$(docker version --format '{{.Server.Version}}')" != ""
+          docker info --format '{{.Driver}} {{.OSType}} {{.Architecture}}'
+          test "$(docker info --format '{{.OSType}}')" = "linux"
+          test "$(docker info --format '{{.Architecture}}')" = "x86_64"
+          test "$(docker info --format '{{.MemTotal}}')" -ge 4294967296
+          test "$(docker info --format '{{.SecurityOptions}}')" != "[]"
+      - name: Build linux amd64 demo image
+        shell: bash
+        run: docker build --platform linux/amd64 --file packaging/oci/Dockerfile --tag projectb-demo:ci .
+      - name: Inspect image contract
+        shell: bash
+        run: |
+          set -eu
+          test "$(docker image inspect --format '{{.Architecture}}' projectb-demo:ci)" = "amd64"
+          test "$(docker image inspect --format '{{.Config.User}}' projectb-demo:ci)" = "10001:10001"
+          docker run --rm --entrypoint /bin/sh projectb-demo:ci -c 'test -s /opt/projectb/licenses/sbom.spdx.json && test -s /opt/projectb/licenses/THIRD_PARTY_NOTICES.md && test -s /opt/projectb/licenses/OCI_THIRD_PARTY_NOTICES.md && test -s /opt/projectb/licenses/debian-packages.tsv'
+      - name: Run local OCI smoke
+        shell: bash
+        run: |
+          set -eu
+          cleanup() {
+            if docker inspect projectb-demo-ci >/dev/null 2>&1; then
+              docker rm -f projectb-demo-ci >/dev/null
+            fi
+          }
+          trap cleanup EXIT
+          docker run -d --rm --read-only --tmpfs /tmp/projectb-demo:rw,size=64m \
+            -e PROJECTB_DEMO_LOCAL_SMOKE=1 -p 127.0.0.1:7860:7860 \
+            --name projectb-demo-ci projectb-demo:ci
+          pwsh -NoProfile -File packaging/oci/smoke_test.ps1 -Container projectb-demo-ci -Image projectb-demo:ci -BaseUrl http://127.0.0.1:7860

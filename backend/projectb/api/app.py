@@ -217,14 +217,11 @@ def create_app(
     if "courses" in capabilities:
         app.include_router(courses.router)
     if "materials" in capabilities:
+        app.include_router(materials.router)
         if "upload" in capabilities:
-            app.include_router(materials.router)
-        else:
-            material_routes = APIRouter()
-            material_routes.routes.extend(
-                route for route in materials.router.routes if getattr(route, "name", None) != "import_materials"
-            )
-            app.include_router(material_routes)
+            from projectb.api.routes import materials_upload
+
+            app.include_router(materials_upload.router)
     if "learning" in capabilities:
         app.include_router(learning.router)
     if "providers" in capabilities:

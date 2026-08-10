@@ -188,7 +188,7 @@ def supports_text(path: str, source: str = "") -> bool:
     suffix = Path(path).suffix.lower()
     if suffix in BINARY_SUFFIXES:
         return False
-    if suffix not in TEXT_SUFFIXES and name not in EXTENSIONLESS:
+    if suffix not in TEXT_SUFFIXES and name not in EXTENSIONLESS and not name.lower().endswith(".dockerignore"):
         raise ScanError("unsupported_file_type", source, path)
     return True
 

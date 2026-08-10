@@ -11,10 +11,6 @@ import tempfile
 from pathlib import Path
 from typing import Any, Literal, Sequence
 
-import psutil
-from pypdf import PdfReader
-from pypdfium2 import PdfDocument  # type: ignore[import-untyped]
-
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
@@ -29,11 +25,13 @@ from projectb.domain.materials.models import (  # noqa: E402
 
 
 TEXT_CONTRACT = ParserContract("utf8-text", "1", "1")
-PDF_CONTRACT = ParserContract(
-    "pypdf+pypdfium2",
-    "+".join((importlib.metadata.version("pypdf"), importlib.metadata.version("pypdfium2"))),
-    "1",
-)
+
+def _pdf_contract() -> ParserContract:
+    return ParserContract(
+        "pypdf+pypdfium2",
+        "+".join((importlib.metadata.version("pypdf"), importlib.metadata.version("pypdfium2"))),
+        "1",
+    )
 _BINARY_SIGNATURES = (b"%PDF-", b"PK\x03\x04", b"GIF87a", b"GIF89a", b"\x89PNG\r\n\x1a\n", b"\xff\xd8\xff")
 
 
@@ -45,6 +43,8 @@ class ExtractionError(Exception):
 
 
 def _terminate_process_tree(pid: int) -> None:
+    import psutil
+
     try:
         parent = psutil.Process(pid)
     except psutil.NoSuchProcess:
@@ -93,6 +93,8 @@ def run_terminable_worker(
 
 
 def _pdfium_page_count(path: Path) -> int:
+    from pypdfium2 import PdfDocument  # type: ignore[import-untyped]
+
     document = PdfDocument(path)
     try:
         return len(document)
@@ -101,6 +103,8 @@ def _pdfium_page_count(path: Path) -> int:
 
 
 def _pypdf_pages(path: Path) -> list[str]:
+    from pypdf import PdfReader
+
     reader = PdfReader(path, strict=True)
     if reader.is_encrypted:
         raise ExtractionError("content_unreadable")
@@ -157,10 +161,11 @@ def _extract_sync(path: Path) -> dict[str, Any]:
         }
     if suffix == ".pdf":
         pages = extract_pdf_bytes(raw, path.name)
+        contract = _pdf_contract()
         return {
             "content_hash": content_hash,
             "media_type": "application/pdf",
-            "contract": list((PDF_CONTRACT.parser_id, PDF_CONTRACT.parser_version, PDF_CONTRACT.extraction_contract_version)),
+            "contract": list((contract.parser_id, contract.parser_version, contract.extraction_contract_version)),
             "texts": pages,
         }
     raise ExtractionError("unsupported_type")

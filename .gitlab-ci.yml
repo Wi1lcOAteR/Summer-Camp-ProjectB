@@ -47,3 +47,41 @@ frontend:
     - npm exec -- vitest run
     - npm exec -- tsc --noEmit
     - npm exec -- vite build
+
+oci-package:
+  stage: test
+  variables:
+    DOCKER_BUILDKIT: "1"
+  tags:
+    - projectb-docker-linux-amd64
+  script:
+    - test "$(docker version --format '{{.Server.Version}}')" = "29.1.2"
+    - test "$(docker info --format '{{.OSType}}')" = "linux"
+    - test "$(docker info --format '{{.Architecture}}')" = "x86_64"
+    - test "$(docker info --format '{{.MemTotal}}')" -ge 4294967296
+    - test "$DOCKER_BUILDKIT" = "1"
+    - test "${PROJECTB_RUNNER_PRIVILEGED:-unknown}" = "false"
+    - test "${PROJECTB_RUNNER_HOST_MOUNTS:-unknown}" = "none"
+    - docker buildx version
+    - docker info --format '{{.SecurityOptions}}' | grep -F 'name=seccomp'
+    - test ! -e /host/etc/shadow
+    - test ! -e /run/host/etc/shadow
+    - IMAGE_TAG="projectb-demo:${CI_COMMIT_SHA}-${CI_JOB_ID}"
+    - docker build --platform linux/amd64 --file packaging/oci/Dockerfile --tag "$IMAGE_TAG" .
+    - test "$(docker image inspect --format '{{.Architecture}}' "$IMAGE_TAG")" = "amd64"
+    - test "$(docker image inspect --format '{{.Config.User}}' "$IMAGE_TAG")" = "10001:10001"
+    - docker run --rm --entrypoint /bin/sh "$IMAGE_TAG" -c 'test -s /opt/projectb/licenses/sbom.spdx.json && test -s /opt/projectb/licenses/THIRD_PARTY_NOTICES.md && test -s /opt/projectb/licenses/OCI_THIRD_PARTY_NOTICES.md && test -s /opt/projectb/licenses/debian-packages.tsv'
+    - CONTAINER_NAME="projectb-demo-ci-${CI_JOB_ID}"
+    - HOST_PORT="$((20000 + CI_JOB_ID % 10000))"
+    - docker run -d --rm --read-only --tmpfs /tmp/projectb-demo:rw,size=64m -e PROJECTB_DEMO_LOCAL_SMOKE=1 -p 127.0.0.1:${HOST_PORT}:7860 --name "$CONTAINER_NAME" "$IMAGE_TAG"
+    - pwsh -NoProfile -File packaging/oci/smoke_test.ps1 -Container "$CONTAINER_NAME" -Image "$IMAGE_TAG" -BaseUrl "http://127.0.0.1:${HOST_PORT}"
+  after_script:
+    - |
+      CONTAINER_NAME="projectb-demo-ci-${CI_JOB_ID}"
+      IMAGE_TAG="projectb-demo:${CI_COMMIT_SHA}-${CI_JOB_ID}"
+      if docker inspect "$CONTAINER_NAME" >/dev/null 2>&1; then
+        docker rm -f "$CONTAINER_NAME"
+      fi
+      if docker image inspect "$IMAGE_TAG" >/dev/null 2>&1; then
+        docker image rm "$IMAGE_TAG"
+      fi

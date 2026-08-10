@@ -1,0 +1,2607 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "ProjectB-demo-oci",
+  "documentNamespace": "https://projectb.local/sbom/projectb-demo-oci",
+  "creationInfo": {
+    "created": "2026-08-10T00:00:00Z",
+    "creators": [
+      "Tool: scripts/generate_oci_sbom.py"
+    ]
+  },
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-ProjectB",
+      "name": "ProjectB",
+      "versionInfo": "local-demo",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-NodeBase",
+      "name": "node",
+      "versionInfo": "24.18.0-bookworm-slim@sha256:d45d78e7929b46875bbd4e29bea672d5bc48186c6c3588306521c815e78352d6",
+      "downloadLocation": "https://hub.docker.com/_/node",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-PythonBase",
+      "name": "python",
+      "versionInfo": "3.14.6-slim-bookworm@sha256:f70215e5dbe2a47dee6d23f9c6d358bf3c148f59cce2fd165b61118e9d80f2bb",
+      "downloadLocation": "https://hub.docker.com/_/python",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "PSF-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-DebianBase",
+      "name": "debian-base-bookworm",
+      "versionInfo": "bookworm (see debian-packages.tsv)",
+      "downloadLocation": "https://www.debian.org/releases/bookworm/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-DebianInventory",
+      "name": "debian-runtime-package-inventory",
+      "versionInfo": "generated-at-image-build",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Python-annotated-doc",
+      "name": "annotated-doc",
+      "versionInfo": "0.0.4",
+      "downloadLocation": "https://pypi.org/project/annotated-doc/0.0.4/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Python-annotated-types",
+      "name": "annotated-types",
+      "versionInfo": "0.7.0",
+      "downloadLocation": "https://pypi.org/project/annotated-types/0.7.0/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Python-anyio",
+      "name": "anyio",
+      "versionInfo": "4.14.2",
+      "downloadLocation": "https://pypi.org/project/anyio/4.14.2/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Python-click",
+      "name": "click",
+      "versionInfo": "8.4.2",
+      "downloadLocation": "https://pypi.org/project/click/8.4.2/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Python-fastapi",
+      "name": "fastapi",
+      "versionInfo": "0.139.2",
+      "downloadLocation": "https://pypi.org/project/fastapi/0.139.2/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Python-h11",
+      "name": "h11",
+      "versionInfo": "0.16.0",
+      "downloadLocation": "https://pypi.org/project/h11/0.16.0/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Python-idna",
+      "name": "idna",
+      "versionInfo": "3.18",
+      "downloadLocation": "https://pypi.org/project/idna/3.18/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Python-pydantic",
+      "name": "pydantic",
+      "versionInfo": "2.13.4",
+      "downloadLocation": "https://pypi.org/project/pydantic/2.13.4/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Python-pydantic-core",
+      "name": "pydantic-core",
+      "versionInfo": "2.46.4",
+      "downloadLocation": "https://pypi.org/project/pydantic-core/2.46.4/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Python-starlette",
+      "name": "starlette",
+      "versionInfo": "1.3.1",
+      "downloadLocation": "https://pypi.org/project/starlette/1.3.1/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Python-typing-extensions",
+      "name": "typing-extensions",
+      "versionInfo": "4.16.0",
+      "downloadLocation": "https://pypi.org/project/typing-extensions/4.16.0/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Python-typing-inspection",
+      "name": "typing-inspection",
+      "versionInfo": "0.4.2",
+      "downloadLocation": "https://pypi.org/project/typing-inspection/0.4.2/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Python-tzdata",
+      "name": "tzdata",
+      "versionInfo": "2026.3",
+      "downloadLocation": "https://pypi.org/project/tzdata/2026.3/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Python-uvicorn",
+      "name": "uvicorn",
+      "versionInfo": "0.51.0",
+      "downloadLocation": "https://pypi.org/project/uvicorn/0.51.0/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-asamuzakjp-css-color",
+      "name": "@asamuzakjp/css-color",
+      "versionInfo": "5.1.11",
+      "downloadLocation": "https://registry.npmjs.org/@asamuzakjp/css-color",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-asamuzakjp-dom-selector",
+      "name": "@asamuzakjp/dom-selector",
+      "versionInfo": "7.1.1",
+      "downloadLocation": "https://registry.npmjs.org/@asamuzakjp/dom-selector",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-asamuzakjp-generational-cache",
+      "name": "@asamuzakjp/generational-cache",
+      "versionInfo": "1.0.1",
+      "downloadLocation": "https://registry.npmjs.org/@asamuzakjp/generational-cache",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-asamuzakjp-nwsapi",
+      "name": "@asamuzakjp/nwsapi",
+      "versionInfo": "2.3.9",
+      "downloadLocation": "https://registry.npmjs.org/@asamuzakjp/nwsapi",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-axe-core-playwright",
+      "name": "@axe-core/playwright",
+      "versionInfo": "4.12.1",
+      "downloadLocation": "https://registry.npmjs.org/@axe-core/playwright",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-babel-code-frame",
+      "name": "@babel/code-frame",
+      "versionInfo": "7.29.7",
+      "downloadLocation": "https://registry.npmjs.org/@babel/code-frame",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-babel-helper-validator-identifier",
+      "name": "@babel/helper-validator-identifier",
+      "versionInfo": "7.29.7",
+      "downloadLocation": "https://registry.npmjs.org/@babel/helper-validator-identifier",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-babel-runtime",
+      "name": "@babel/runtime",
+      "versionInfo": "7.29.7",
+      "downloadLocation": "https://registry.npmjs.org/@babel/runtime",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-bramus-specificity",
+      "name": "@bramus/specificity",
+      "versionInfo": "2.4.2",
+      "downloadLocation": "https://registry.npmjs.org/@bramus/specificity",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-csstools-color-helpers",
+      "name": "@csstools/color-helpers",
+      "versionInfo": "6.1.0",
+      "downloadLocation": "https://registry.npmjs.org/@csstools/color-helpers",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT-0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-csstools-css-calc",
+      "name": "@csstools/css-calc",
+      "versionInfo": "3.2.1",
+      "downloadLocation": "https://registry.npmjs.org/@csstools/css-calc",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-csstools-css-color-parser",
+      "name": "@csstools/css-color-parser",
+      "versionInfo": "4.1.9",
+      "downloadLocation": "https://registry.npmjs.org/@csstools/css-color-parser",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-csstools-css-parser-algorithms",
+      "name": "@csstools/css-parser-algorithms",
+      "versionInfo": "4.0.0",
+      "downloadLocation": "https://registry.npmjs.org/@csstools/css-parser-algorithms",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-csstools-css-syntax-patches-for-csstree",
+      "name": "@csstools/css-syntax-patches-for-csstree",
+      "versionInfo": "1.1.6",
+      "downloadLocation": "https://registry.npmjs.org/@csstools/css-syntax-patches-for-csstree",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT-0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-csstools-css-tokenizer",
+      "name": "@csstools/css-tokenizer",
+      "versionInfo": "4.0.0",
+      "downloadLocation": "https://registry.npmjs.org/@csstools/css-tokenizer",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-emnapi-core",
+      "name": "@emnapi/core",
+      "versionInfo": "1.11.1",
+      "downloadLocation": "https://registry.npmjs.org/@emnapi/core",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-emnapi-runtime",
+      "name": "@emnapi/runtime",
+      "versionInfo": "1.11.1",
+      "downloadLocation": "https://registry.npmjs.org/@emnapi/runtime",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-emnapi-wasi-threads",
+      "name": "@emnapi/wasi-threads",
+      "versionInfo": "1.2.2",
+      "downloadLocation": "https://registry.npmjs.org/@emnapi/wasi-threads",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-exodus-bytes",
+      "name": "@exodus/bytes",
+      "versionInfo": "1.15.1",
+      "downloadLocation": "https://registry.npmjs.org/@exodus/bytes",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-jridgewell-sourcemap-codec",
+      "name": "@jridgewell/sourcemap-codec",
+      "versionInfo": "1.5.5",
+      "downloadLocation": "https://registry.npmjs.org/@jridgewell/sourcemap-codec",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-napi-rs-wasm-runtime",
+      "name": "@napi-rs/wasm-runtime",
+      "versionInfo": "1.1.6",
+      "downloadLocation": "https://registry.npmjs.org/@napi-rs/wasm-runtime",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-oxc-project-types",
+      "name": "@oxc-project/types",
+      "versionInfo": "0.139.0",
+      "downloadLocation": "https://registry.npmjs.org/@oxc-project/types",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-playwright-test",
+      "name": "@playwright/test",
+      "versionInfo": "1.61.1",
+      "downloadLocation": "https://registry.npmjs.org/@playwright/test",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-binding-android-arm64",
+      "name": "@rolldown/binding-android-arm64",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/binding-android-arm64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-binding-darwin-arm64",
+      "name": "@rolldown/binding-darwin-arm64",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/binding-darwin-arm64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-binding-darwin-x64",
+      "name": "@rolldown/binding-darwin-x64",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/binding-darwin-x64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-binding-freebsd-x64",
+      "name": "@rolldown/binding-freebsd-x64",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/binding-freebsd-x64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-binding-linux-arm-gnueabihf",
+      "name": "@rolldown/binding-linux-arm-gnueabihf",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/binding-linux-arm-gnueabihf",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-binding-linux-arm64-gnu",
+      "name": "@rolldown/binding-linux-arm64-gnu",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/binding-linux-arm64-gnu",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-binding-linux-arm64-musl",
+      "name": "@rolldown/binding-linux-arm64-musl",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/binding-linux-arm64-musl",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-binding-linux-ppc64-gnu",
+      "name": "@rolldown/binding-linux-ppc64-gnu",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/binding-linux-ppc64-gnu",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-binding-linux-s390x-gnu",
+      "name": "@rolldown/binding-linux-s390x-gnu",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/binding-linux-s390x-gnu",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-binding-linux-x64-gnu",
+      "name": "@rolldown/binding-linux-x64-gnu",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/binding-linux-x64-gnu",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-binding-linux-x64-musl",
+      "name": "@rolldown/binding-linux-x64-musl",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/binding-linux-x64-musl",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-binding-openharmony-arm64",
+      "name": "@rolldown/binding-openharmony-arm64",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/binding-openharmony-arm64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-binding-wasm32-wasi",
+      "name": "@rolldown/binding-wasm32-wasi",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/binding-wasm32-wasi",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-binding-win32-arm64-msvc",
+      "name": "@rolldown/binding-win32-arm64-msvc",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/binding-win32-arm64-msvc",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-binding-win32-x64-msvc",
+      "name": "@rolldown/binding-win32-x64-msvc",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/binding-win32-x64-msvc",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown-pluginutils",
+      "name": "@rolldown/pluginutils",
+      "versionInfo": "1.0.1",
+      "downloadLocation": "https://registry.npmjs.org/@rolldown/pluginutils",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-standard-schema-spec",
+      "name": "@standard-schema/spec",
+      "versionInfo": "1.1.0",
+      "downloadLocation": "https://registry.npmjs.org/@standard-schema/spec",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-testing-library-dom",
+      "name": "@testing-library/dom",
+      "versionInfo": "10.4.1",
+      "downloadLocation": "https://registry.npmjs.org/@testing-library/dom",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-testing-library-react",
+      "name": "@testing-library/react",
+      "versionInfo": "16.3.2",
+      "downloadLocation": "https://registry.npmjs.org/@testing-library/react",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-testing-library-user-event",
+      "name": "@testing-library/user-event",
+      "versionInfo": "14.6.1",
+      "downloadLocation": "https://registry.npmjs.org/@testing-library/user-event",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-tybys-wasm-util",
+      "name": "@tybys/wasm-util",
+      "versionInfo": "0.10.3",
+      "downloadLocation": "https://registry.npmjs.org/@tybys/wasm-util",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-types-aria-query",
+      "name": "@types/aria-query",
+      "versionInfo": "5.0.4",
+      "downloadLocation": "https://registry.npmjs.org/@types/aria-query",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-types-chai",
+      "name": "@types/chai",
+      "versionInfo": "5.2.3",
+      "downloadLocation": "https://registry.npmjs.org/@types/chai",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-types-deep-eql",
+      "name": "@types/deep-eql",
+      "versionInfo": "4.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@types/deep-eql",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-types-estree",
+      "name": "@types/estree",
+      "versionInfo": "1.0.9",
+      "downloadLocation": "https://registry.npmjs.org/@types/estree",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-types-node",
+      "name": "@types/node",
+      "versionInfo": "24.13.3",
+      "downloadLocation": "https://registry.npmjs.org/@types/node",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-types-react",
+      "name": "@types/react",
+      "versionInfo": "19.2.17",
+      "downloadLocation": "https://registry.npmjs.org/@types/react",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-types-react-dom",
+      "name": "@types/react-dom",
+      "versionInfo": "19.2.3",
+      "downloadLocation": "https://registry.npmjs.org/@types/react-dom",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-aix-ppc64",
+      "name": "@typescript/typescript-aix-ppc64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-aix-ppc64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-darwin-arm64",
+      "name": "@typescript/typescript-darwin-arm64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-darwin-arm64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-darwin-x64",
+      "name": "@typescript/typescript-darwin-x64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-darwin-x64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-freebsd-arm64",
+      "name": "@typescript/typescript-freebsd-arm64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-freebsd-arm64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-freebsd-x64",
+      "name": "@typescript/typescript-freebsd-x64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-freebsd-x64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-arm",
+      "name": "@typescript/typescript-linux-arm",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-linux-arm",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-arm64",
+      "name": "@typescript/typescript-linux-arm64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-linux-arm64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-loong64",
+      "name": "@typescript/typescript-linux-loong64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-linux-loong64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-mips64el",
+      "name": "@typescript/typescript-linux-mips64el",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-linux-mips64el",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-ppc64",
+      "name": "@typescript/typescript-linux-ppc64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-linux-ppc64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-riscv64",
+      "name": "@typescript/typescript-linux-riscv64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-linux-riscv64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-s390x",
+      "name": "@typescript/typescript-linux-s390x",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-linux-s390x",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-x64",
+      "name": "@typescript/typescript-linux-x64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-linux-x64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-netbsd-arm64",
+      "name": "@typescript/typescript-netbsd-arm64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-netbsd-arm64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-netbsd-x64",
+      "name": "@typescript/typescript-netbsd-x64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-netbsd-x64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-openbsd-arm64",
+      "name": "@typescript/typescript-openbsd-arm64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-openbsd-arm64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-openbsd-x64",
+      "name": "@typescript/typescript-openbsd-x64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-openbsd-x64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-sunos-x64",
+      "name": "@typescript/typescript-sunos-x64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-sunos-x64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-win32-arm64",
+      "name": "@typescript/typescript-win32-arm64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-win32-arm64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript-typescript-win32-x64",
+      "name": "@typescript/typescript-win32-x64",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/@typescript/typescript-win32-x64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-vitejs-plugin-react",
+      "name": "@vitejs/plugin-react",
+      "versionInfo": "6.0.3",
+      "downloadLocation": "https://registry.npmjs.org/@vitejs/plugin-react",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-vitest-expect",
+      "name": "@vitest/expect",
+      "versionInfo": "4.1.10",
+      "downloadLocation": "https://registry.npmjs.org/@vitest/expect",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-vitest-mocker",
+      "name": "@vitest/mocker",
+      "versionInfo": "4.1.10",
+      "downloadLocation": "https://registry.npmjs.org/@vitest/mocker",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-vitest-pretty-format",
+      "name": "@vitest/pretty-format",
+      "versionInfo": "4.1.10",
+      "downloadLocation": "https://registry.npmjs.org/@vitest/pretty-format",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-vitest-runner",
+      "name": "@vitest/runner",
+      "versionInfo": "4.1.10",
+      "downloadLocation": "https://registry.npmjs.org/@vitest/runner",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-vitest-snapshot",
+      "name": "@vitest/snapshot",
+      "versionInfo": "4.1.10",
+      "downloadLocation": "https://registry.npmjs.org/@vitest/snapshot",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-vitest-spy",
+      "name": "@vitest/spy",
+      "versionInfo": "4.1.10",
+      "downloadLocation": "https://registry.npmjs.org/@vitest/spy",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-vitest-utils",
+      "name": "@vitest/utils",
+      "versionInfo": "4.1.10",
+      "downloadLocation": "https://registry.npmjs.org/@vitest/utils",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-ansi-regex",
+      "name": "ansi-regex",
+      "versionInfo": "5.0.1",
+      "downloadLocation": "https://registry.npmjs.org/ansi-regex",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-ansi-styles",
+      "name": "ansi-styles",
+      "versionInfo": "5.2.0",
+      "downloadLocation": "https://registry.npmjs.org/ansi-styles",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-aria-query",
+      "name": "aria-query",
+      "versionInfo": "5.3.0",
+      "downloadLocation": "https://registry.npmjs.org/aria-query",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-assertion-error",
+      "name": "assertion-error",
+      "versionInfo": "2.0.1",
+      "downloadLocation": "https://registry.npmjs.org/assertion-error",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-axe-core",
+      "name": "axe-core",
+      "versionInfo": "4.12.1",
+      "downloadLocation": "https://registry.npmjs.org/axe-core",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-bidi-js",
+      "name": "bidi-js",
+      "versionInfo": "1.0.3",
+      "downloadLocation": "https://registry.npmjs.org/bidi-js",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-chai",
+      "name": "chai",
+      "versionInfo": "6.2.2",
+      "downloadLocation": "https://registry.npmjs.org/chai",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-convert-source-map",
+      "name": "convert-source-map",
+      "versionInfo": "2.0.0",
+      "downloadLocation": "https://registry.npmjs.org/convert-source-map",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-css-tree",
+      "name": "css-tree",
+      "versionInfo": "3.2.1",
+      "downloadLocation": "https://registry.npmjs.org/css-tree",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-csstype",
+      "name": "csstype",
+      "versionInfo": "3.2.3",
+      "downloadLocation": "https://registry.npmjs.org/csstype",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-data-urls",
+      "name": "data-urls",
+      "versionInfo": "7.0.0",
+      "downloadLocation": "https://registry.npmjs.org/data-urls",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-decimal.js",
+      "name": "decimal.js",
+      "versionInfo": "10.6.0",
+      "downloadLocation": "https://registry.npmjs.org/decimal.js",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-dequal",
+      "name": "dequal",
+      "versionInfo": "2.0.3",
+      "downloadLocation": "https://registry.npmjs.org/dequal",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-detect-libc",
+      "name": "detect-libc",
+      "versionInfo": "2.1.2",
+      "downloadLocation": "https://registry.npmjs.org/detect-libc",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-dom-accessibility-api",
+      "name": "dom-accessibility-api",
+      "versionInfo": "0.5.16",
+      "downloadLocation": "https://registry.npmjs.org/dom-accessibility-api",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-entities",
+      "name": "entities",
+      "versionInfo": "8.0.0",
+      "downloadLocation": "https://registry.npmjs.org/entities",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "BSD-2-Clause"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-es-module-lexer",
+      "name": "es-module-lexer",
+      "versionInfo": "2.3.1",
+      "downloadLocation": "https://registry.npmjs.org/es-module-lexer",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-estree-walker",
+      "name": "estree-walker",
+      "versionInfo": "3.0.3",
+      "downloadLocation": "https://registry.npmjs.org/estree-walker",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-expect-type",
+      "name": "expect-type",
+      "versionInfo": "1.4.0",
+      "downloadLocation": "https://registry.npmjs.org/expect-type",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-fdir",
+      "name": "fdir",
+      "versionInfo": "6.5.0",
+      "downloadLocation": "https://registry.npmjs.org/fdir",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-fsevents",
+      "name": "fsevents",
+      "versionInfo": "2.3.2",
+      "downloadLocation": "https://registry.npmjs.org/fsevents",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-html-encoding-sniffer",
+      "name": "html-encoding-sniffer",
+      "versionInfo": "6.0.0",
+      "downloadLocation": "https://registry.npmjs.org/html-encoding-sniffer",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-is-potential-custom-element-name",
+      "name": "is-potential-custom-element-name",
+      "versionInfo": "1.0.1",
+      "downloadLocation": "https://registry.npmjs.org/is-potential-custom-element-name",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-js-tokens",
+      "name": "js-tokens",
+      "versionInfo": "4.0.0",
+      "downloadLocation": "https://registry.npmjs.org/js-tokens",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-jsdom",
+      "name": "jsdom",
+      "versionInfo": "29.1.1",
+      "downloadLocation": "https://registry.npmjs.org/jsdom",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-lightningcss",
+      "name": "lightningcss",
+      "versionInfo": "1.33.0",
+      "downloadLocation": "https://registry.npmjs.org/lightningcss",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-lightningcss-android-arm64",
+      "name": "lightningcss-android-arm64",
+      "versionInfo": "1.33.0",
+      "downloadLocation": "https://registry.npmjs.org/lightningcss-android-arm64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-lightningcss-darwin-arm64",
+      "name": "lightningcss-darwin-arm64",
+      "versionInfo": "1.33.0",
+      "downloadLocation": "https://registry.npmjs.org/lightningcss-darwin-arm64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-lightningcss-darwin-x64",
+      "name": "lightningcss-darwin-x64",
+      "versionInfo": "1.33.0",
+      "downloadLocation": "https://registry.npmjs.org/lightningcss-darwin-x64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-lightningcss-freebsd-x64",
+      "name": "lightningcss-freebsd-x64",
+      "versionInfo": "1.33.0",
+      "downloadLocation": "https://registry.npmjs.org/lightningcss-freebsd-x64",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-lightningcss-linux-arm-gnueabihf",
+      "name": "lightningcss-linux-arm-gnueabihf",
+      "versionInfo": "1.33.0",
+      "downloadLocation": "https://registry.npmjs.org/lightningcss-linux-arm-gnueabihf",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-lightningcss-linux-arm64-gnu",
+      "name": "lightningcss-linux-arm64-gnu",
+      "versionInfo": "1.33.0",
+      "downloadLocation": "https://registry.npmjs.org/lightningcss-linux-arm64-gnu",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-lightningcss-linux-arm64-musl",
+      "name": "lightningcss-linux-arm64-musl",
+      "versionInfo": "1.33.0",
+      "downloadLocation": "https://registry.npmjs.org/lightningcss-linux-arm64-musl",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-lightningcss-linux-x64-gnu",
+      "name": "lightningcss-linux-x64-gnu",
+      "versionInfo": "1.33.0",
+      "downloadLocation": "https://registry.npmjs.org/lightningcss-linux-x64-gnu",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-lightningcss-linux-x64-musl",
+      "name": "lightningcss-linux-x64-musl",
+      "versionInfo": "1.33.0",
+      "downloadLocation": "https://registry.npmjs.org/lightningcss-linux-x64-musl",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-lightningcss-win32-arm64-msvc",
+      "name": "lightningcss-win32-arm64-msvc",
+      "versionInfo": "1.33.0",
+      "downloadLocation": "https://registry.npmjs.org/lightningcss-win32-arm64-msvc",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-lightningcss-win32-x64-msvc",
+      "name": "lightningcss-win32-x64-msvc",
+      "versionInfo": "1.33.0",
+      "downloadLocation": "https://registry.npmjs.org/lightningcss-win32-x64-msvc",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MPL-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-lru-cache",
+      "name": "lru-cache",
+      "versionInfo": "11.5.2",
+      "downloadLocation": "https://registry.npmjs.org/lru-cache",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "BlueOak-1.0.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-lucide-react",
+      "name": "lucide-react",
+      "versionInfo": "1.25.0",
+      "downloadLocation": "https://registry.npmjs.org/lucide-react",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "ISC"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-lz-string",
+      "name": "lz-string",
+      "versionInfo": "1.5.0",
+      "downloadLocation": "https://registry.npmjs.org/lz-string",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-magic-string",
+      "name": "magic-string",
+      "versionInfo": "0.30.21",
+      "downloadLocation": "https://registry.npmjs.org/magic-string",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-mdn-data",
+      "name": "mdn-data",
+      "versionInfo": "2.27.1",
+      "downloadLocation": "https://registry.npmjs.org/mdn-data",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "CC0-1.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-nanoid",
+      "name": "nanoid",
+      "versionInfo": "3.3.16",
+      "downloadLocation": "https://registry.npmjs.org/nanoid",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-obug",
+      "name": "obug",
+      "versionInfo": "2.1.4",
+      "downloadLocation": "https://registry.npmjs.org/obug",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-parse5",
+      "name": "parse5",
+      "versionInfo": "8.0.1",
+      "downloadLocation": "https://registry.npmjs.org/parse5",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-pathe",
+      "name": "pathe",
+      "versionInfo": "2.0.3",
+      "downloadLocation": "https://registry.npmjs.org/pathe",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-picocolors",
+      "name": "picocolors",
+      "versionInfo": "1.1.1",
+      "downloadLocation": "https://registry.npmjs.org/picocolors",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "ISC"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-picomatch",
+      "name": "picomatch",
+      "versionInfo": "4.0.5",
+      "downloadLocation": "https://registry.npmjs.org/picomatch",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-playwright",
+      "name": "playwright",
+      "versionInfo": "1.61.1",
+      "downloadLocation": "https://registry.npmjs.org/playwright",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-playwright-core",
+      "name": "playwright-core",
+      "versionInfo": "1.61.1",
+      "downloadLocation": "https://registry.npmjs.org/playwright-core",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-postcss",
+      "name": "postcss",
+      "versionInfo": "8.5.25",
+      "downloadLocation": "https://registry.npmjs.org/postcss",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-pretty-format",
+      "name": "pretty-format",
+      "versionInfo": "27.5.1",
+      "downloadLocation": "https://registry.npmjs.org/pretty-format",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-punycode",
+      "name": "punycode",
+      "versionInfo": "2.3.1",
+      "downloadLocation": "https://registry.npmjs.org/punycode",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-react",
+      "name": "react",
+      "versionInfo": "19.2.7",
+      "downloadLocation": "https://registry.npmjs.org/react",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-react-dom",
+      "name": "react-dom",
+      "versionInfo": "19.2.7",
+      "downloadLocation": "https://registry.npmjs.org/react-dom",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-react-is",
+      "name": "react-is",
+      "versionInfo": "17.0.2",
+      "downloadLocation": "https://registry.npmjs.org/react-is",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-require-from-string",
+      "name": "require-from-string",
+      "versionInfo": "2.0.2",
+      "downloadLocation": "https://registry.npmjs.org/require-from-string",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-rolldown",
+      "name": "rolldown",
+      "versionInfo": "1.1.5",
+      "downloadLocation": "https://registry.npmjs.org/rolldown",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-saxes",
+      "name": "saxes",
+      "versionInfo": "6.0.0",
+      "downloadLocation": "https://registry.npmjs.org/saxes",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "ISC"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-scheduler",
+      "name": "scheduler",
+      "versionInfo": "0.27.0",
+      "downloadLocation": "https://registry.npmjs.org/scheduler",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-siginfo",
+      "name": "siginfo",
+      "versionInfo": "2.0.0",
+      "downloadLocation": "https://registry.npmjs.org/siginfo",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "ISC"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-source-map-js",
+      "name": "source-map-js",
+      "versionInfo": "1.2.1",
+      "downloadLocation": "https://registry.npmjs.org/source-map-js",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "BSD-3-Clause"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-stackback",
+      "name": "stackback",
+      "versionInfo": "0.0.2",
+      "downloadLocation": "https://registry.npmjs.org/stackback",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-std-env",
+      "name": "std-env",
+      "versionInfo": "4.2.0",
+      "downloadLocation": "https://registry.npmjs.org/std-env",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-symbol-tree",
+      "name": "symbol-tree",
+      "versionInfo": "3.2.4",
+      "downloadLocation": "https://registry.npmjs.org/symbol-tree",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-tinybench",
+      "name": "tinybench",
+      "versionInfo": "2.9.0",
+      "downloadLocation": "https://registry.npmjs.org/tinybench",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-tinyexec",
+      "name": "tinyexec",
+      "versionInfo": "1.2.4",
+      "downloadLocation": "https://registry.npmjs.org/tinyexec",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-tinyglobby",
+      "name": "tinyglobby",
+      "versionInfo": "0.2.17",
+      "downloadLocation": "https://registry.npmjs.org/tinyglobby",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-tinyrainbow",
+      "name": "tinyrainbow",
+      "versionInfo": "3.1.0",
+      "downloadLocation": "https://registry.npmjs.org/tinyrainbow",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-tldts",
+      "name": "tldts",
+      "versionInfo": "7.4.9",
+      "downloadLocation": "https://registry.npmjs.org/tldts",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-tldts-core",
+      "name": "tldts-core",
+      "versionInfo": "7.4.9",
+      "downloadLocation": "https://registry.npmjs.org/tldts-core",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-tough-cookie",
+      "name": "tough-cookie",
+      "versionInfo": "6.0.2",
+      "downloadLocation": "https://registry.npmjs.org/tough-cookie",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "BSD-3-Clause"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-tr46",
+      "name": "tr46",
+      "versionInfo": "6.0.0",
+      "downloadLocation": "https://registry.npmjs.org/tr46",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-tslib",
+      "name": "tslib",
+      "versionInfo": "2.8.1",
+      "downloadLocation": "https://registry.npmjs.org/tslib",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "0BSD"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-typescript",
+      "name": "typescript",
+      "versionInfo": "7.0.2",
+      "downloadLocation": "https://registry.npmjs.org/typescript",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-undici",
+      "name": "undici",
+      "versionInfo": "7.29.0",
+      "downloadLocation": "https://registry.npmjs.org/undici",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-undici-types",
+      "name": "undici-types",
+      "versionInfo": "7.18.2",
+      "downloadLocation": "https://registry.npmjs.org/undici-types",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-vite",
+      "name": "vite",
+      "versionInfo": "8.1.5",
+      "downloadLocation": "https://registry.npmjs.org/vite",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-vite-node-modules-fsevents",
+      "name": "fsevents",
+      "versionInfo": "2.3.3",
+      "downloadLocation": "https://registry.npmjs.org/fsevents",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-vitest",
+      "name": "vitest",
+      "versionInfo": "4.1.10",
+      "downloadLocation": "https://registry.npmjs.org/vitest",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-w3c-xmlserializer",
+      "name": "w3c-xmlserializer",
+      "versionInfo": "5.0.0",
+      "downloadLocation": "https://registry.npmjs.org/w3c-xmlserializer",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-webidl-conversions",
+      "name": "webidl-conversions",
+      "versionInfo": "8.0.1",
+      "downloadLocation": "https://registry.npmjs.org/webidl-conversions",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "BSD-2-Clause"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-whatwg-mimetype",
+      "name": "whatwg-mimetype",
+      "versionInfo": "5.0.0",
+      "downloadLocation": "https://registry.npmjs.org/whatwg-mimetype",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-whatwg-url",
+      "name": "whatwg-url",
+      "versionInfo": "16.0.1",
+      "downloadLocation": "https://registry.npmjs.org/whatwg-url",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-why-is-node-running",
+      "name": "why-is-node-running",
+      "versionInfo": "2.3.0",
+      "downloadLocation": "https://registry.npmjs.org/why-is-node-running",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-xml-name-validator",
+      "name": "xml-name-validator",
+      "versionInfo": "5.0.0",
+      "downloadLocation": "https://registry.npmjs.org/xml-name-validator",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Npm-node-modules-xmlchars",
+      "name": "xmlchars",
+      "versionInfo": "2.2.0",
+      "downloadLocation": "https://registry.npmjs.org/xmlchars",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-ProjectB"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-NodeBase"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-PythonBase"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Package-DebianBase"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-DebianBase",
+      "relationshipType": "GENERATES",
+      "relatedSpdxElement": "SPDXRef-Package-DebianInventory"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Python-annotated-doc"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Python-annotated-types"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Python-anyio"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Python-click"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Python-fastapi"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Python-h11"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Python-idna"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Python-pydantic"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Python-pydantic-core"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Python-starlette"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Python-typing-extensions"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Python-typing-inspection"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Python-tzdata"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Python-uvicorn"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-asamuzakjp-css-color"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-asamuzakjp-dom-selector"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-asamuzakjp-generational-cache"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-asamuzakjp-nwsapi"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-axe-core-playwright"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-babel-code-frame"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-babel-helper-validator-identifier"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-babel-runtime"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-bramus-specificity"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-csstools-color-helpers"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-csstools-css-calc"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-csstools-css-color-parser"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-csstools-css-parser-algorithms"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-csstools-css-syntax-patches-for-csstree"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-csstools-css-tokenizer"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-emnapi-core"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-emnapi-runtime"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-emnapi-wasi-threads"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-exodus-bytes"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-jridgewell-sourcemap-codec"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-napi-rs-wasm-runtime"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-oxc-project-types"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-playwright-test"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-binding-android-arm64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-binding-darwin-arm64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-binding-darwin-x64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-binding-freebsd-x64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-binding-linux-arm-gnueabihf"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-binding-linux-arm64-gnu"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-binding-linux-arm64-musl"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-binding-linux-ppc64-gnu"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-binding-linux-s390x-gnu"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-binding-linux-x64-gnu"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-binding-linux-x64-musl"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-binding-openharmony-arm64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-binding-wasm32-wasi"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-binding-win32-arm64-msvc"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-binding-win32-x64-msvc"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown-pluginutils"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-standard-schema-spec"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-testing-library-dom"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-testing-library-react"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-testing-library-user-event"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-tybys-wasm-util"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-types-aria-query"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-types-chai"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-types-deep-eql"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-types-estree"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-types-node"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-types-react"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-types-react-dom"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-aix-ppc64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-darwin-arm64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-darwin-x64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-freebsd-arm64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-freebsd-x64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-arm"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-arm64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-loong64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-mips64el"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-ppc64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-riscv64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-s390x"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-linux-x64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-netbsd-arm64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-netbsd-x64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-openbsd-arm64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-openbsd-x64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-sunos-x64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-win32-arm64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript-typescript-win32-x64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-vitejs-plugin-react"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-vitest-expect"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-vitest-mocker"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-vitest-pretty-format"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-vitest-runner"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-vitest-snapshot"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-vitest-spy"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-vitest-utils"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-ansi-regex"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-ansi-styles"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-aria-query"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-assertion-error"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-axe-core"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-bidi-js"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-chai"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-convert-source-map"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-css-tree"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-csstype"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-data-urls"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-decimal.js"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-dequal"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-detect-libc"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-dom-accessibility-api"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-entities"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-es-module-lexer"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-estree-walker"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-expect-type"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-fdir"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-fsevents"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-html-encoding-sniffer"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-is-potential-custom-element-name"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-js-tokens"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-jsdom"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-lightningcss"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-lightningcss-android-arm64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-lightningcss-darwin-arm64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-lightningcss-darwin-x64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-lightningcss-freebsd-x64"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-lightningcss-linux-arm-gnueabihf"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-lightningcss-linux-arm64-gnu"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-lightningcss-linux-arm64-musl"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-lightningcss-linux-x64-gnu"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-lightningcss-linux-x64-musl"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-lightningcss-win32-arm64-msvc"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-lightningcss-win32-x64-msvc"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-lru-cache"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-lucide-react"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-lz-string"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-magic-string"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-mdn-data"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-nanoid"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-obug"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-parse5"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-pathe"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-picocolors"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-picomatch"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-playwright"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-playwright-core"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-postcss"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-pretty-format"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-punycode"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-react"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-react-dom"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-react-is"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-require-from-string"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-rolldown"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-saxes"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-scheduler"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-siginfo"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-source-map-js"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-stackback"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-std-env"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-symbol-tree"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-tinybench"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-tinyexec"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-tinyglobby"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-tinyrainbow"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-tldts"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-tldts-core"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-tough-cookie"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-tr46"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-tslib"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-typescript"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-undici"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-undici-types"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-vite"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-vite-node-modules-fsevents"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-vitest"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-w3c-xmlserializer"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-webidl-conversions"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-whatwg-mimetype"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-whatwg-url"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-why-is-node-running"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-xml-name-validator"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ProjectB",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Npm-node-modules-xmlchars"
+    }
+  ]
+}
