@@ -10,10 +10,10 @@ push, public URL, or deployment is claimed.
 {
   "task": "DIST-02",
   "implementationCommit": "12d709b",
-  "image": {"status": "blocked_external_network", "command": "docker build --platform linux/amd64 --file packaging/oci/Dockerfile --tag projectb-demo:local .", "engine": "29.1.2 linux/amd64", "blocker": "auth.docker.io anonymous-token timeout"},
+  "image": {"status": "blocked_external_network", "command": "docker build --platform linux/amd64 --file packaging/oci/Dockerfile --tag projectb-demo:local .", "engine": "29.1.2 linux/x86_64", "lastRetry": "2026-08-10T19:11:00+08:00", "blocker": "auth.docker.io anonymous-token timeout before base-image metadata"},
   "localSmoke": {"status": "not_executed", "command": "docker run -d --rm --read-only --tmpfs /tmp/projectb-demo:rw,size=64m"},
-  "publicUrl": {"status": "not_executed"},
-  "deployment": {"status": "not_executed"},
+  "publicUrl": {"status": "waived", "decision": "student_confirmed_local_only"},
+  "deployment": {"status": "waived", "decision": "student_confirmed_local_only"},
   "registryPush": {"status": "not_executed"}
 }
 ```
@@ -29,3 +29,8 @@ local smoke will additionally verify image history/resources, actual UID/GID,
 read-only root, tmpfs reset, demo settings, exact forbidden upload/provider/
 credential routes, mock fixture execution, process-level egress denial, and
 cleanup of the named container.
+
+The coordinator retried the exact build with approved Docker access at
+`2026-08-10T19:11:00+08:00`. The daemon was healthy, but both pinned Node and
+Python metadata requests failed before any layer build while connecting to
+`auth.docker.io`; no image, container, digest, run, or smoke receipt exists.

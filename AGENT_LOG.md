@@ -1,5 +1,11 @@
 # AGENT_LOG
 
+## 2026-08-10T19:12:30+08:00 - DIST-02 network retry and local-only evidence correction
+
+- **Task / skills:** `DIST-02`; `using-superpowers`, `systematic-debugging`, and `verification-before-completion`. Main coordinator performed all Docker/Git actions; no Luna agent and no subagent Git operation.
+- **Retry:** approved Docker access reported `29.1.2 linux/x86_64`; exact `docker build --platform linux/amd64 --file packaging/oci/Dockerfile --tag projectb-demo:local .` failed before any layer build because both pinned Node/Python metadata requests timed out at `auth.docker.io` anonymous-token authorization. Image/run/smoke/digest remain `not_executed`.
+- **Decision correction:** the student waived public deployment and public URL for this local-only project. DIST-02 evidence now records those fields as `waived`; registry push remains `not_executed` and the OCI runtime gate remains open.
+
 ## 2026-08-10T13:20:00+08:00 - DIST-02 OCI mock image (in progress)
 
 - **Task / skills:** `DIST-02`; `using-superpowers`, `executing-plans`, `test-driven-development`, `systematic-debugging`, and `verification-before-completion`. Main coordinator is implementing in isolated `codex/distribution-oci-v1`; no Luna agent and no subagent Git operation.
