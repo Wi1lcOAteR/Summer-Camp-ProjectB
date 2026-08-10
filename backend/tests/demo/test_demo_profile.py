@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import errno
 import hashlib
 import json
 import os
@@ -224,6 +225,52 @@ def test_demo_app_shutdown_removes_ephemeral_session_root(tmp_path: Path) -> Non
 
     _DEMO_LOOP.run_until_complete(exercise())
     assert not session_root.exists()
+
+
+def test_demo_shutdown_accepts_only_an_empty_read_only_mount_root(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    session_root = tmp_path / "mounted-sessions"
+    sessions = demo.DemoSessionManager(
+        session_root,
+        cleanup_interval_seconds=None,
+        remove_root_on_close=True,
+    )
+    sentinel = session_root / "restart-marker"
+    sentinel.write_text("ephemeral", encoding="utf-8")
+
+    def remove_mount_contents_then_reject_root(path: Path) -> None:
+        assert Path(path) == session_root
+        sentinel.unlink()
+        raise OSError(errno.EROFS, "read-only mount root")
+
+    monkeypatch.setattr(demo.shutil, "rmtree", remove_mount_contents_then_reject_root)
+    sessions.close()
+
+    assert session_root.is_dir()
+    assert not any(session_root.iterdir())
+
+
+def test_demo_shutdown_rejects_read_only_mount_root_with_residual_content(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    session_root = tmp_path / "mounted-sessions"
+    sessions = demo.DemoSessionManager(
+        session_root,
+        cleanup_interval_seconds=None,
+        remove_root_on_close=True,
+    )
+    (session_root / "residual").write_text("must not be ignored", encoding="utf-8")
+
+    def reject_mount_root(path: Path) -> None:
+        assert Path(path) == session_root
+        raise OSError(errno.EROFS, "read-only mount root")
+
+    monkeypatch.setattr(demo.shutil, "rmtree", reject_mount_root)
+    with pytest.raises(RuntimeError, match="demo_session_root_cleanup_failed"):
+        sessions.close()
 
 
 def test_demo_mock_runs_through_read_only_fixture_explanation_path(tmp_path: Path) -> None:

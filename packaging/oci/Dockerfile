@@ -21,6 +21,7 @@ ENV PYTHONPATH=/opt/projectb/backend:/opt/python-deps \
     PROJECTB_EGRESS_POLICY=deny \
     PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring \
     PROJECTB_DATA_ROOT=/tmp/projectb-demo \
+    TMPDIR=/tmp/projectb-demo \
     PROJECTB_BIND_HOST=0.0.0.0 \
     PROJECTB_PORT=7860
 COPY --from=python-deps /opt/python-deps /opt/python-deps
@@ -37,9 +38,9 @@ RUN mkdir -p /opt/projectb/licenses/debian-notices /tmp/projectb-demo \
     && cp -a /usr/share/doc/. /opt/projectb/licenses/debian-notices/ \
     && dpkg-query -W -f='${Package}\t${Version}\n' > /opt/projectb/licenses/debian-packages.tsv \
     && chmod -R a-w /opt/projectb/backend /opt/projectb/frontend_dist /opt/projectb/licenses \
-    && chmod 1770 /tmp/projectb-demo \
+    && chmod 1777 /tmp/projectb-demo \
     && chown 10001:10001 /tmp/projectb-demo \
-    && python -c "import socket; assert hasattr(socket, 'getaddrinfo') and hasattr(socket, 'connect')"
+    && python -c "import socket; assert hasattr(socket, 'getaddrinfo') and hasattr(socket.socket, 'connect')"
 # create_demo_app installs the Python socket.getaddrinfo/socket.connect guards.
 USER 10001:10001
 EXPOSE 7860
