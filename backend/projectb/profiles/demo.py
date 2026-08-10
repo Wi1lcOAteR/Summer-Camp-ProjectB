@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import errno
 import hashlib
 import json
 import os
@@ -396,7 +397,16 @@ class DemoSessionManager:
                 except FileNotFoundError:
                     pass
                 except OSError as error:
-                    raise RuntimeError("demo_session_root_cleanup_failed") from error
+                    try:
+                        retained_mount_is_empty = (
+                            error.errno == errno.EROFS
+                            and self.root.is_dir()
+                            and next(self.root.iterdir(), None) is None
+                        )
+                    except OSError:
+                        retained_mount_is_empty = False
+                    if not retained_mount_is_empty:
+                        raise RuntimeError("demo_session_root_cleanup_failed") from error
 
     def _cleanup_loop(self, interval_seconds: float) -> None:
         while not self._stop_cleanup.wait(interval_seconds):

@@ -1,36 +1,42 @@
 # DIST-02 Evidence
 
-Status: implementation and static contract are complete, but runtime closure is
-blocked by Docker Hub connectivity. Docker Desktop was started with approval and
-reported `29.1.2 linux/amd64`; the build then timed out while obtaining anonymous
-tokens for the exact pinned Node and Python digests. No registry login, image
-push, public URL, or deployment is claimed.
+Status: local OCI runtime closure is complete. Remote CI, registry push, and
+public deployment were not executed; public URL/deployment are explicitly waived
+for this local-only project.
 
 ```json
 {
   "task": "DIST-02",
-  "implementationCommit": "12d709b",
-  "image": {"status": "blocked_external_network", "command": "docker build --platform linux/amd64 --file packaging/oci/Dockerfile --tag projectb-demo:local .", "engine": "29.1.2 linux/x86_64", "lastRetry": "2026-08-10T19:11:00+08:00", "blocker": "auth.docker.io anonymous-token timeout before base-image metadata"},
-  "localSmoke": {"status": "not_executed", "command": "docker run -d --rm --read-only --tmpfs /tmp/projectb-demo:rw,size=64m"},
+  "implementationCommit": "pending_terminal_commit",
+  "image": {"status": "pass", "command": "docker build --platform linux/amd64 --file packaging/oci/Dockerfile --tag projectb-demo:local .", "engine": "29.1.2 linux/amd64", "builder": "ephemeral docker-container BuildKit with docker.m.daocloud.io mirror; exact pinned base digests unchanged", "id": "sha256:895b7df70ba3622c91d186c8856d9e97414a94bedc2e4d626791a7340d77d234", "size": 50910779, "platform": "linux/amd64", "user": "10001:10001"},
+  "localSmoke": {"status": "pass", "runCommand": "docker run -d --rm --name projectb-demo-smoke --read-only --tmpfs /tmp/projectb-demo:rw,size=64m -e PROJECTB_DEMO_LOCAL_SMOKE=1 -p 127.0.0.1:7860:7860 projectb-demo:local", "smokeCommand": "powershell -NoProfile -ExecutionPolicy Bypass -File packaging/oci/smoke_test.ps1 -Container projectb-demo-smoke -Image projectb-demo:local -BaseUrl http://127.0.0.1:7860", "finallyCommand": "docker rm -f projectb-demo-smoke", "receipt": "OCI_NETWORK_COUNT=0; OCI_SMOKE_PASS profile=demo user=10001:10001 readonly=true tmpfs=true; OCI_CONTAINER_CLEANUP_DONE name=projectb-demo-smoke"},
+  "localBrowser": {"status": "pass", "receipt": "DIST02_BROWSER_PASS chrome=system desktop=1440x900 mobile=360x800 routes=import,learning,settings"},
   "publicUrl": {"status": "waived", "decision": "student_confirmed_local_only"},
   "deployment": {"status": "waived", "decision": "student_confirmed_local_only"},
-  "registryPush": {"status": "not_executed"}
+  "registryPush": {"status": "not_executed"},
+  "remoteCI": {"status": "not_executed", "reason": "external Docker/GitLab runner evidence remains downstream"}
 }
 ```
 
-The static contract (`7 passed`) locks the reviewed linux/amd64 Node and Python digests,
-the hashed `requirements.linux-demo.lock`, demo-only mock provider settings,
-non-root UID/GID `10001:10001`, read-only runtime plus tmpfs data root,
-healthcheck, a deterministic 185-component/185-relationship SPDX graph, complete
-notice bundle, and push-triggered GitHub/GitLab OCI jobs. `scripts/test_all.py --all`
-passed with backend `254 passed`, frontend
-`60 passed`, Ruff, mypy, Vite, credential scan, and license verification. The
-local smoke will additionally verify image history/resources, actual UID/GID,
-read-only root, tmpfs reset, demo settings, exact forbidden upload/provider/
-credential routes, mock fixture execution, process-level egress denial, and
-cleanup of the named container.
+The static OCI contract (`7 passed`) plus the focused demo/OCI regression suite
+(`17 passed` combined) lock the reviewed linux/amd64 Node and Python digests, the hashed
+`requirements.linux-demo.lock`, demo-only mock provider settings, non-root UID/GID
+`10001:10001`, read-only runtime plus tmpfs data root, healthcheck, a deterministic
+185-component/185-relationship SPDX graph, complete notice bundle, and
+push-triggered GitHub/GitLab OCI jobs.
 
-The coordinator retried the exact build with approved Docker access at
-`2026-08-10T19:11:00+08:00`. The daemon was healthy, but both pinned Node and
-Python metadata requests failed before any layer build while connecting to
-`auth.docker.io`; no image, container, digest, run, or smoke receipt exists.
+`scripts/test_all.py --all` passed with backend `256 passed`, frontend `60 passed`,
+Ruff, mypy, Vite, credential scan (`files=508`), and license verification. The
+local smoke verified image history/resources, actual UID/GID, read-only root,
+tmpfs reset, demo settings, exact forbidden upload/provider/credential routes,
+mock fixture execution, process-level egress denial, zero established outbound
+PID 1 sockets after the probes, and cleanup of the exact named container. The
+egress and network-count probes are passed through stdin to Python so Windows
+CLI quoting cannot rewrite the tests. System Chrome then verified the real demo
+at desktop and mobile viewports across Import, Learning, and Settings.
+
+The initial direct Docker Hub attempts failed at `auth.docker.io` anonymous-token
+authorization. With approval, the coordinator used a disposable BuildKit registry
+mirror only for transport; the Dockerfile's exact base-image digests and lock
+files were unchanged. No registry login, image push, or public deployment was
+performed.

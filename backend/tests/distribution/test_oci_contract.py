@@ -52,7 +52,11 @@ def test_runtime_is_non_root_demo_only_and_health_checked() -> None:
     for literal in ("PROJECTB_PROFILE=demo", "PROJECTB_PROVIDER_ADAPTER=deterministic.mock", "PROJECTB_EGRESS_POLICY=deny", "PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring"):
         assert literal in dockerfile
         assert literal.split("=", 1)[0] in entrypoint
-    assert "socket.getaddrinfo" in dockerfile and "socket.connect" in dockerfile
+    assert "TMPDIR=/tmp/projectb-demo" in dockerfile
+    assert "hasattr(socket, 'getaddrinfo')" in dockerfile
+    assert "hasattr(socket.socket, 'connect')" in dockerfile
+    assert "hasattr(socket, 'connect')" not in dockerfile
+    assert "chmod 1777 /tmp/projectb-demo" in dockerfile
     assert "exec" in entrypoint
     assert "set -eu" in entrypoint or "set -euo pipefail" in entrypoint
     for literal in (
@@ -88,8 +92,8 @@ def test_context_and_evidence_are_closed() -> None:
     assert "dpkg-query" in dockerfile
     assert "frontend-package-lock.json" in dockerfile
     evidence = read_text(ROOT / "docs/engineering/DIST-02_EVIDENCE.md")
-    assert '"publicUrl": {"status": "not_executed"}' in evidence
-    assert '"deployment": {"status": "not_executed"}' in evidence
+    assert '"publicUrl": {"status": "waived", "decision": "student_confirmed_local_only"}' in evidence
+    assert '"deployment": {"status": "waived", "decision": "student_confirmed_local_only"}' in evidence
     assert "api_key" not in evidence.lower()
 
 
@@ -115,6 +119,16 @@ def test_both_push_ci_files_contain_oci_contract() -> None:
 
 def test_smoke_inspects_image_runtime_and_exact_forbidden_routes() -> None:
     smoke = read_text(OCI / "smoke_test.ps1")
+    assert "$imageInspect = @(Invoke-Docker" not in smoke
+    assert "$inspect = @(Invoke-Docker" not in smoke
+    assert "$image.Config.User" not in smoke
+    assert "socket.getaddrinfo('example.com', 443)" in smoke
+    assert "docker exec -i $Container /usr/local/bin/python -" in smoke
+    assert "/proc/1/net/tcp" in smoke
+    assert 'os.environ["PROJECTB_PORT"]' in smoke
+    assert "OCI_NETWORK_COUNT=0" in smoke
+    assert '"image", "inspect", "--format", "{{.Architecture}}", $Image' in smoke
+    assert '"inspect", "--format", "{{.HostConfig.ReadonlyRootfs}}", $Container' in smoke
     for literal in (
         '"image", "inspect"',
         "$Image",

@@ -38,11 +38,11 @@ function Wait-ContainerReady([string]$Name, [string]$Uri) {
     throw "oci_restart_not_running"
 }
 
-$imageInspect = @(Invoke-Docker @("image", "inspect", $Image) | ConvertFrom-Json)
-if ($imageInspect.Count -ne 1) { throw "oci_image_invalid" }
-$image = $imageInspect[0]
-if ($image.Architecture -ne "amd64" -or $image.Os -ne "linux") { throw "oci_architecture_invalid" }
-if ($image.Config.User -ne "10001:10001") { throw "oci_user_invalid" }
+$imageArchitecture = ((Invoke-Docker @("image", "inspect", "--format", "{{.Architecture}}", $Image)) -join "").Trim()
+$imageOs = ((Invoke-Docker @("image", "inspect", "--format", "{{.Os}}", $Image)) -join "").Trim()
+$imageUser = ((Invoke-Docker @("image", "inspect", "--format", "{{.Config.User}}", $Image)) -join "").Trim()
+if ($imageArchitecture -ne "amd64" -or $imageOs -ne "linux") { throw "oci_architecture_invalid" }
+if ($imageUser -ne "10001:10001") { throw "oci_user_invalid" }
 $history = ((Invoke-Docker @("history", "--no-trunc", "--format", "{{.CreatedBy}}", $Image)) -join "`n").ToLowerInvariant()
 if ($history -match "--mount=type=secret|arg\s+(api[_-]?key|token|password|secret)") { throw "oci_history_secret" }
 $resourceProbe = Invoke-Docker @(
@@ -50,12 +50,10 @@ $resourceProbe = Invoke-Docker @(
     "-c", "test -s /opt/projectb/licenses/sbom.spdx.json && test -s /opt/projectb/licenses/THIRD_PARTY_NOTICES.md && test -s /opt/projectb/licenses/OCI_THIRD_PARTY_NOTICES.md && test -s /opt/projectb/licenses/debian-packages.tsv"
 )
 
-$inspect = @(Invoke-Docker @("inspect", $Container) | ConvertFrom-Json)
-if ($inspect.Count -ne 1) { throw "oci_container_invalid" }
-$state = $inspect[0]
-if ($state.HostConfig.ReadonlyRootfs -ne $true) { throw "oci_readonly_root_invalid" }
-$tmpfs = @($state.HostConfig.Tmpfs.PSObject.Properties | Where-Object { $_.Name -eq "/tmp/projectb-demo" })
-if ($tmpfs.Count -ne 1 -or $tmpfs[0].Value -notmatch "rw" ) { throw "oci_tmpfs_invalid" }
+$readonlyRoot = ((Invoke-Docker @("inspect", "--format", "{{.HostConfig.ReadonlyRootfs}}", $Container)) -join "").Trim()
+if ($readonlyRoot -ne "true") { throw "oci_readonly_root_invalid" }
+$tmpfs = ((Invoke-Docker @("inspect", "--format", "{{json .HostConfig.Tmpfs}}", $Container)) -join "`n").Trim()
+if ($tmpfs -notmatch '"/tmp/projectb-demo"' -or $tmpfs -notmatch "rw") { throw "oci_tmpfs_invalid" }
 if (((Invoke-Docker @("exec", $Container, "id", "-u")) -join "").Trim() -ne "10001") { throw "oci_runtime_uid_invalid" }
 if (((Invoke-Docker @("exec", $Container, "id", "-g")) -join "").Trim() -ne "10001") { throw "oci_runtime_gid_invalid" }
 
@@ -87,13 +85,37 @@ from projectb.profiles.demo import DemoEgressDenied, install_demo_egress_guard
 
 install_demo_egress_guard()
 try:
-    socket.getaddrinfo("example.com", 443)
+    socket.getaddrinfo('example.com', 443)
 except DemoEgressDenied:
     print("OCI_EGRESS_DENIED")
 else:
     raise SystemExit("egress_not_denied")
 '@
-$egressProbe = (Invoke-Docker @("exec", $Container, "/usr/local/bin/python", "-c", $egressCode)) -join "`n"
+$egressResult = @($egressCode | & docker exec -i $Container /usr/local/bin/python - 2>&1)
+if ($LASTEXITCODE -ne 0) { throw "docker_failed:exec egress_probe" }
+$egressProbe = $egressResult -join "`n"
 if ($egressProbe.Trim() -ne "OCI_EGRESS_DENIED") { throw "oci_egress_guard_unverified" }
+
+$networkCode = @'
+import os
+from pathlib import Path
+
+service_port = int(os.environ["PROJECTB_PORT"])
+count = sum(
+    1
+    for table in (Path("/proc/1/net/tcp"), Path("/proc/1/net/tcp6"))
+    for line in table.read_text(encoding="ascii").splitlines()[1:]
+    if line.split()[3] == "01"
+    and int(line.split()[1].rsplit(":", 1)[1], 16) != service_port
+)
+print(f"OCI_NETWORK_COUNT={count}")
+if count:
+    raise SystemExit("network_count_nonzero")
+'@
+$networkResult = @($networkCode | & docker exec -i $Container /usr/local/bin/python - 2>&1)
+if ($LASTEXITCODE -ne 0) { throw "docker_failed:exec network_count_probe" }
+$networkProbe = ($networkResult -join "`n").Trim()
+if ($networkProbe -ne "OCI_NETWORK_COUNT=0") { throw ("oci_network_count_unverified:{0}" -f $networkProbe) }
+Write-Output $networkProbe
 
 Write-Output "OCI_SMOKE_PASS profile=demo user=10001:10001 readonly=true tmpfs=true"
