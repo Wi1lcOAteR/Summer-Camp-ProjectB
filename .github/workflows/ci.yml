@@ -10,6 +10,7 @@ permissions:
 jobs:
   scanner:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     container:
       image: mcr.microsoft.com/powershell:7.5-ubuntu-24.04@sha256:042240d57ec9e47e511033b92625a8d95875ee5860af3015992c248b58a8be81
     steps:
@@ -31,6 +32,7 @@ jobs:
 
   backend:
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     container:
       image: python:3.14.6-slim-bookworm@sha256:f70215e5dbe2a47dee6d23f9c6d358bf3c148f59cce2fd165b61118e9d80f2bb
     steps:
@@ -41,18 +43,11 @@ jobs:
         run: python -m pip install --require-hashes -r requirements.linux-ci.lock
       - name: Run current backend suite
         shell: sh
-        run: |
-          if [ -f scripts/test_all.py ]; then
-            python scripts/test_all.py --backend
-          elif [ -d backend/projectb ]; then
-            echo 'backend/projectb exists but scripts/test_all.py is missing' >&2
-            exit 1
-          else
-            echo runner_absent_pre_feature
-          fi
+        run: python scripts/test_all.py --backend
 
   frontend:
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     container:
       image: node:24.18.0-bookworm-slim@sha256:d45d78e7929b46875bbd4e29bea672d5bc48186c6c3588306521c815e78352d6
     defaults:
@@ -77,6 +72,7 @@ jobs:
 
   windows-package:
     runs-on: windows-2025
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
@@ -115,6 +111,7 @@ jobs:
 
   oci-package:
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: OCI preflight

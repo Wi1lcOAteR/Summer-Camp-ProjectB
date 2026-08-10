@@ -171,7 +171,7 @@ git diff --check
 | 35 | P-02 | DEMO-01 + P-EVIDENCE | no: real adapter is isolated last | provider-openai | complete | `8e6b23f` |
 | 36 | DIST-01 | P-02 + QA-RELEASE | no: Windows release | distribution | complete | `662a381` |
 | 37 | DIST-02 | DIST-01 | no: consumes frozen frontend/runtime | distribution | in progress | `12d709b` (runtime gate open) |
-| 38 | CI-01 | DIST-02 | no: consumes all commands | release | not started | none |
+| 38 | CI-01 | DIST-02 | no: consumes all commands | release | in progress | `ci-v1` (structural/local suites pass; DIST-02 runtime gate open) |
 | 39 | DOC-01 | CI-01 + DIST-01-VM-CLOSE | no: final verified guide | release | not started | none |
 
 ## 5. Foundation Tasks
