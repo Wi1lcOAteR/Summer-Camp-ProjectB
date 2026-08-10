@@ -26,12 +26,14 @@ if ($gitlab -notmatch '(?m)^\s*- npm exec -- vite build\s*$') { Fail 'gitlab_fro
 if (([regex]::Matches($gitlab, '(?m)^\s*rules\s*:')).Count -ne 1 -or $gitlab -match '(?m)^\s*(only|except|allow_failure|changes)\s*:|rules\s*:\s*[\s\S]{0,120}exists|when\s*:\s*(manual|delayed)|\|\|\s*true|passWithNoTests') { Fail 'gitlab_bypass' }
 
 foreach ($needle in @('push:', 'permissions:', 'contents: read', 'scanner:', 'backend:', 'frontend:', $checkout, $pwshImage, $pythonImage, $nodeImage, 'apt-get update', 'apt-get install -y --no-install-recommends git ca-certificates', 'scripts/tests/bootstrap_scanner_contract.ps1', 'scripts/tests/ci_seed_contract.ps1', 'scripts/bootstrap_scan_credentials.ps1 -Tracked', 'runner_absent_pre_feature', 'backend/projectb', 'npm ci --ignore-scripts', 'tsc --noEmit', 'vite build')) { Require-Literal $github $needle 'github_commands' }
+foreach ($needle in @('windows-package', 'windows-2025', 'actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065', 'python-version: 3.14.6', 'actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020', 'node-version: 24.18.0', 'packaging/windows/build.ps1', 'backend/tests/distribution/test_windows_contract.py', 'Get-FileHash -Algorithm SHA256', 'scripts/scan_credentials.py --path dist/ProjectB.exe')) { Require-Literal $github $needle 'github_windows_package' }
 if ($github -notmatch '(?m)^\s*run:\s*npm exec -- vitest run\s*$') { Fail 'github_frontend_all_tests' }
 if ($github -notmatch '(?m)^\s*run:\s*npm exec -- vite build\s*$') { Fail 'github_frontend_build' }
 if (([regex]::Matches($github, '(?m)^permissions:\s*$')).Count -ne 1 -or $github -notmatch '(?ms)^permissions:\r?\n  contents: read\r?\n\r?\njobs:') { Fail 'github_permissions' }
 $checkoutRefs = @([regex]::Matches($github, 'actions/checkout@(?<ref>[^\s]+)'))
-if ($checkoutRefs.Count -ne 3 -or @($checkoutRefs | Where-Object { $_.Groups['ref'].Value -cne $checkout.Substring('actions/checkout@'.Length) }).Count -ne 0) { Fail 'github_checkout_refs' }
+if ($checkoutRefs.Count -ne 4 -or @($checkoutRefs | Where-Object { $_.Groups['ref'].Value -cne $checkout.Substring('actions/checkout@'.Length) }).Count -ne 0) { Fail 'github_checkout_refs' }
 if ($github -notmatch '(?m)^\s*runs-on:\s*ubuntu-24\.04\s*$' -or $github -match 'actions/checkout@v|permissions:\s*write|continue-on-error:\s*true|paths(?:-ignore)?\s*:|branches(?:-ignore)?\s*:|if\s*:\s*false|\|\|\s*true|passWithNoTests') { Fail 'github_policy' }
+if ($github -notmatch '(?ms)^\s{2}windows-package:\r?\n\s{4}runs-on:\s*windows-2025\s*$' -or $github -match 'actions/upload-artifact|softprops/action-gh-release') { Fail 'github_windows_policy' }
 
 Write-Output 'push_and_pinned_images'
 Write-Output 'current_suite_and_empty_failure'

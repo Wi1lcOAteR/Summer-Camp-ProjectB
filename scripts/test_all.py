@@ -27,10 +27,15 @@ def run_child(command: list[str], *, cwd: Path) -> int:
 
 def npm_command(root: Path) -> str:
     if sys.platform == "win32":
-        runtimes = root / "tmp/toolchains/f01a/runtimes"
-        candidates = sorted(runtimes.glob("node-v24.18.0-win-x64/npm.cmd"))
-        if len(candidates) == 1 and candidates[0].is_file():
-            return str(candidates[0])
+        roots = [root.resolve(), *root.resolve().parents]
+        for candidate_root in roots:
+            candidate = (
+                candidate_root
+                / "tmp/toolchains/f01a/runtimes/node-v24.18.0-win-x64/npm.cmd"
+            )
+            if candidate.is_file():
+                return str(candidate)
+        return "npm.cmd"
     return "npm"
 
 

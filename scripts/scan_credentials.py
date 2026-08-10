@@ -33,7 +33,7 @@ ENCODED = (
 TEXT_SUFFIXES = {
     ".md", ".txt", ".json", ".jsonl", ".toml", ".yaml", ".yml", ".ini", ".cfg", ".conf", ".env",
     ".example", ".py", ".pyi", ".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx", ".html", ".css", ".scss",
-    ".sql", ".ps1", ".psm1", ".psd1", ".sh", ".bash", ".cmd", ".bat", ".lock", ".in",
+    ".sql", ".spec", ".ps1", ".psm1", ".psd1", ".sh", ".bash", ".cmd", ".bat", ".lock", ".in",
 }
 BINARY_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".pdf", ".ico", ".zip", ".gz", ".7z", ".exe", ".dll", ".pyd", ".so", ".woff", ".woff2", ".ttf", ".mp3", ".mp4", ".sqlite", ".db"}
 EXTENSIONLESS = {".gitignore", ".gitattributes", ".dockerignore", ".python-version", ".npmrc", "Dockerfile", "Makefile", "LICENSE", "NOTICE", "uv-LICENSE-APACHE", "uv-LICENSE-MIT", "cpython-LICENSE", "node-LICENSE", "npm-LICENSE"}
