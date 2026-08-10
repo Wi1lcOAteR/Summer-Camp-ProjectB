@@ -169,7 +169,7 @@ git diff --check
 | 33 | UI-06 | UI-05 | no: modifies route registry | webui | complete | `b67d6529fad1193177732513aba106198f13a2e6` |
 | 34 | DEMO-01 | UI-06 | no: profile assembly | demo | complete | `a160f72ad9cd60021e6d34b2f4438978a2c2ce5e` |
 | 35 | P-02 | DEMO-01 + P-EVIDENCE | no: real adapter is isolated last | provider-openai | complete | `8e6b23f` |
-| 36 | DIST-01 | P-02 + QA-RELEASE | no: Windows release | distribution | not started | none |
+| 36 | DIST-01 | P-02 + QA-RELEASE | no: Windows release | distribution | complete | `662a381` |
 | 37 | DIST-02 | DIST-01 | no: consumes frozen frontend/runtime | distribution | not started | none |
 | 38 | CI-01 | DIST-02 | no: consumes all commands | release | not started | none |
 | 39 | DOC-01 | CI-01 + DIST-01-VM-CLOSE | no: final verified guide | release | not started | none |
@@ -482,10 +482,10 @@ This is not a dispatch task and owns no file. From a clean worktree, run the com
 ### DIST-01: Windows x64 single-file distribution
 
 - **Dependencies / parallelism:** P-02 and QA-RELEASE; no, because it freezes the complete local application resources.
-- **Goal / files:** Create `packaging/windows/build.ps1`, `packaging/windows/ProjectB.spec`, `packaging/windows/hooks/hook-keyring.py`, `packaging/windows/hooks/hook-pypdfium2.py`, `packaging/windows/smoke_test.ps1`, `backend/tests/distribution/test_windows_contract.py`, and `docs/engineering/DIST-01_EVIDENCE.md`; serially modify `.github/workflows/ci.yml` and `scripts/tests/ci_seed_contract.ps1`. Build one `ProjectB.exe`; mutable data stays under `%LOCALAPPDATA%\ProjectB` or explicit data root; bind loopback only; embed WebUI and notices. Add a required push-triggered `windows-package` job on `windows-2025` that runs the same reviewed build/contract, scans the runner-local artifact, and prints its SHA-256; no upload action or remote publication occurs. The job exists in the distribution branch before its first push.
+- **Goal / files:** Create `packaging/windows/build.ps1`, `packaging/windows/ProjectB.spec`, `packaging/windows/launcher.py`, `packaging/windows/hooks/hook-keyring.py`, `packaging/windows/hooks/hook-pypdfium2.py`, `packaging/windows/smoke_test.ps1`, `backend/tests/distribution/test_windows_contract.py`, and `docs/engineering/DIST-01_EVIDENCE.md`; serially modify `.github/workflows/ci.yml`, `scripts/tests/ci_seed_contract.ps1`, and the worktree-aware npm resolver in `scripts/test_all.py`. Build one `ProjectB.exe`; mutable data stays under `%LOCALAPPDATA%\ProjectB` or explicit data root; bind loopback only; embed WebUI and notices. Add a required push-triggered `windows-package` job on `windows-2025` that runs the same reviewed build/contract, scans the runner-local artifact with the canonical binary-safe scanner, and prints its SHA-256; no upload action or remote publication occurs. The job exists in the distribution branch before its first push.
 - **Red:** `& $Py -m pytest backend/tests/distribution/test_windows_contract.py -q`; expect missing single-file/resource/data-root/bind/startup/WinVault/push-CI Windows artifact assertions. Then rerun the F-01D seed contract and require its new `windows-package` assertion to fail before the workflow edit.
 - **Green/refactor:** rerun the exact Red command; run `powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/build.ps1 -Python $Py -Output dist/ProjectB.exe`, scan index/worktree, and run `powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/smoke_test.ps1 -Artifact dist/ProjectB.exe -DataRoot tmp/dist01-smoke` on the development host.
-- **Done / commit:** local artifact hash, resource/data-root/bind behavior, no-secret scan, development-host smoke, and push-triggered Windows build contract are recorded. Commit `build(DIST-01): package windows single file [agent: worker]`. Clean-host startup/WinVault evidence is owned separately by `DIST-01-VM-CLOSE`.
+- **Done / commit:** local artifact hash, resource/data-root/bind behavior, no-secret scan, development-host smoke (including a data root containing spaces), and push-triggered Windows build contract are recorded. Commit `662a381` (`build(DIST-01): package windows single file [agent: coordinator]`). Clean-host startup/WinVault evidence is owned separately by `DIST-01-VM-CLOSE`.
 
 ### DIST-02: Reproducible linux/amd64 mock OCI image
 
