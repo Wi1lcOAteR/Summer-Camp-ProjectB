@@ -1,13 +1,13 @@
 # AI4SE Project B Requirements Compliance Matrix
 
-**Snapshot:** `2026-08-07`
+**Snapshot:** `2026-08-10`
 
-**SPEC:** `AEA67BB5544AD22932DC4304964F7FD266FE8A5DE7AA396EA8974D30867E8381`
+**SPEC:** `483EF900BF9F5ED90FDA6117607D8F2436F3BDA633033FE2A0CB64AD6CAFC72E`
 
 **PLAN pre-dispatch:** `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`
 
-**PLAN current evidence-only state:** `E12DE44BCCCDD5A72545EF66B0FDD791D1D07B59E7796A464995F62B652EF26A`
-**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC; PLAN contains 39 dispatchable tasks plus the non-dispatch `QA-RELEASE` gate. Same-byte mechanical audit and both reviews are PASS. Two fresh Claude Code sessions completed the current-hash intake and disposable `F-01S1A` red/green exercise. On 2026-08-03 the student explicitly approved G-04. Foundation, all three domain modules, the complete local FastAPI boundary, responsive WebUI shell and UI-02 import flow are committed; the current terminal product commit is `4c14231ad3511109929779d88a49f05969413eaa`. Container execution and remote pipeline receipts remain unverified.
+**PLAN current evidence-only state:** `F19C848126BEC81344D73C3B2763035BEF4E7FAE1DDB152BC381DDE74D0F5A96`
+**Stage:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`. The student confirmed the revised SPEC, approved G-04 on 2026-08-03, and confirmed local-only delivery on 2026-08-09. Foundation, all three domain modules, the complete local FastAPI boundary, responsive WebUI, isolated mock demo, and P-02 are committed; the current terminal product commit is `8e6b23f`. Windows/OCI distribution, CI-01, and DOC-01 remain unverified. Public deployment/public URL are waived for this project; remote pipeline receipts remain unverified.
 
 `verified` means current local evidence exists; `planned` means a named active task owns it; `blocked` means a named human/external gate remains; `not-started` means no product evidence exists. This is the only active course matrix. Archived plans are recovery evidence, never PASS evidence.
 
@@ -23,7 +23,7 @@
 | Host/Origin/CSRF/session boundary | local plus explicit public profile | local loopback policy, session-bound CSRF, safe errors and audit allowlist committed at `736292a`; public profile remains planned | DEMO-01 positive/negative tests |
 | Secret never enters DB/config/log/browser/Git | WinVault plus fail-closed scanner | Scanner verified at `1d6dcab`; value-free WinVault lifecycle, redacted failures, safe audit references and value-free API responses verified through `e41df6a` | UI-06 browser integration plus every-task scan |
 | First-run hidden credential status/update/clear | value-free settings contract | backend lifecycle and local API status/update/clear verified through `e41df6a`; first run remains unconfigured | UI-06, DIST-01 application lifecycle |
-| Optional model is consent-bound and non-authoritative | L+P; mock default; exact text fragments only | P-only evidence verified; adapter not started | P-01/P-02/API-02/UI-04 |
+| Optional model is consent-bound and non-authoritative | L+P; mock default; exact text fragments only | P-only evidence and governed adapter verified at `8e6b23f`; no real key/call | P-01/P-02/API-02/UI-04 |
 | No autonomous-agent overclaim | v1 has constrained request ports, no autonomous loop | verified specification boundary | P-01/P-02 contract tests |
 | Usable WebUI | import, mapping, learning, review, settings | responsive shell and import flow committed through `4c14231`; mapping/learning/review/settings remain planned | UI-03--06 |
 | Open Design workflow | `frontend-design`, `default`/Neutral Modern selected; environment PASS | verified: real project/run/artifact, immutable hashes and reviewed production screenshots in `docs/engineering/OPEN_DESIGN_RUN.md` | reuse reviewed tokens/components in UI-02--06 |
@@ -31,9 +31,9 @@
 | At least one reproducible distribution | Windows x64 single file and OCI mock demo | exact inputs verified; products not started | DIST-01/02; registry/pull closes at EXT-REMOTE-PREP |
 | Windows cold start <=10 seconds | clean reference VM contract | not-started; named environment gate | DIST-01-VM-CLOSE measured receipt |
 | Linux/amd64 dependency/base evidence | separate CI/demo hashed locks and OCI digests | verified planning input: 41 CI, 14 demo | F-01A exact-lock sync; DIST-02 build/SBOM/smoke |
-| Public HTTPS WebUI URL | immutable mock OCI image | blocked on student D-025 | D-025-HOST-CLOSE then DOC-01 |
-| One-command tests | `python scripts/test_all.py` | verified locally: `TEST_ALL_PASS mode=all`; quality-gate tests, frontend Vitest/tsc/Vite build, scanner and license verifier passed; F-01E committed in `ae152e3` | QA-RELEASE observes full pass |
-| Core automated tests | domain/storage/API/UI/E2E/security/performance | full run at API-03 was `163 passed`; UI-01 and UI-02 are committed, with UI-02 `3` focused Vitest plus `3` cross-viewport E2E passes | UI-03 through DEMO-01/P-02 |
+| Public HTTPS WebUI URL | local-only delivery decision | waived by student D-025; no public deployment evidence will be claimed | not applicable |
+| One-command tests | `python scripts/test_all.py` | verified locally at P-02: backend `243 passed`, frontend `60 passed`, `TEST_ALL_PASS mode=all`; scanner/license/build gates passed | QA-RELEASE observes full pass |
+| Core automated tests | domain/storage/API/UI/E2E/security/performance | P-02 full run is backend `243 passed`, frontend `60 passed`; system Chrome Learning/Settings E2E `9 passed` across 360/768/1440 | DIST-01/02, CI-01, DOC-01 |
 | Every push runs CI | F-01D seeds pinned scanner/backend/frontend current-suite workflows; CI-01 adds distribution | implemented locally at `069acb8541b8d59a7977a484f06d8f9abbefe780`; YAML and seed contract verified, remote push not executed | EXT-REMOTE-PREP branch-tip current-suite receipts |
 | GitLab job exactly `unit-test` | `.gitlab-ci.yml` | implemented locally and mechanically verified; remote pipeline not executed | CI-01, final NJU pipeline receipt |
 | GitHub repository visibility/access | public repo or private with TA collaborator | blocked on remote authorization | EXT-REMOTE-PREP visibility/collaborator receipt |
@@ -49,9 +49,9 @@
 | Stranger cold start with only SPEC/PLAN | two fresh non-Codex sessions intake then F-01S1A | verified: current hashes, empty ambiguities, exact red, two artifacts, PowerShell 7 green exit 0 | complete; disposable artifacts are not product implementation |
 | Cold-start repair then implementation approval | separate post-repair student gate | verified: G-03 complete; student explicitly approved G-04 on 2026-08-03 | local implementation active; remote/release gates remain separate |
 | `SPEC_PROCESS.md` process and cold-start diff | sections 1--2 contain >3 real question/answer/revision rounds; later sections retain G-03P/failures/final run | verified: final intake, segmented execution, red/green, hashes, line counts and limitations recorded | continue per-task evidence after G-04 |
-| `AGENT_LOG.md` timestamp/task/skill/context/output/hash/human edits/lesson | historical and current entries exist | current through UI-02 product commit `4c14231` | coordinator evidence commit, then continue |
+| `AGENT_LOG.md` timestamp/task/skill/context/output/hash/human edits/lesson | historical and current entries exist | current through P-02 product commit `8e6b23f` | coordinator evidence commit, then continue |
 | Student-written code declaration | conditional top-of-file/function comment plus trailer/log | F-01C records `Human-Changes: none`; no student-authored code claimed | per-task protocol step 5 |
-| README required sections | intro/install/run/distribution/tree/security/credentials/limits/deployment/licenses | not-started | DOC-01 after remote/host receipts |
+| README required sections | intro/install/run/distribution/tree/security/credentials/limits/local architecture/licenses | not-started | DOC-01 after local distribution/CI receipts |
 | Third-party sources/licenses | 63-row ledger, 54 Python/166 npm closure, Linux subset, five immutable bootstrap license rows | F-01A manifests/locks and F-01B exact license bytes implemented; F-01E notice inventory and baseline-license hash verifier pass (`python=54 npm=166`) | F-01E terminal commit, DIST SBOM, DOC-01 final index |
 | Student reflection 1500--2500 Chinese characters | AI may review only a supplied student draft | blocked on student | REFLECTION-CLOSE before EXT-REMOTE-FINAL exact final commit/CI |
 
@@ -69,7 +69,7 @@
 - Standard: `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`.
 - Linux supplement: `LINUX_EVIDENCE_PASS ci_packages=41 demo_packages=14 license_rows=41`.
 - P-only provider: `PROVIDER_V1_P_EVIDENCE_PASS rows=7 models=2 expires=2026-08-25`; evidence SHA-256 `35A3F46E036563E3FC681DF3190EB56336AB48B9D9817AD48F4D5DF42230F076`.
-- Strict distribution remains expected to fail only on the two D-025 hosting rows. No product test/build/package/CI/provider-call/deployment evidence exists.
+- Strict distribution remains expected to fail only on unexecuted remote/VM closure rows; the D-025 public-hosting row is explicitly waived. No public deployment or provider call is claimed.
 
 ## Deferred Boundary
 

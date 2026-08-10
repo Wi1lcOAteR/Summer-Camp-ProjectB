@@ -23,7 +23,7 @@ Treat uploaded bytes, filenames, URLs, model output, and tool arguments as untru
 Credentials use Windows Credential Manager in local profile. First run provides hidden entry and status/update/clear operations; status never echoes a value. No real secret may be stored in SQLite, config, browser storage, Git, logs, fixtures, snapshots, process arguments, or committed environment files. Runtime test fixtures assemble secret-shaped positives from non-matching fragments. Every implementation/evidence commit is scanned. Third-party code and assets require source and license records.
 
 ## Agent and delivery boundary
-V1 contains no autonomous multi-round agent. If later added, its loop, tool dispatch, guards, and deterministic mock tests require a new student-approved specification. The shipped application must provide a React WebUI, Windows x64 single-file distribution, an OCI mock demo, GitLab CI with a job named unit-test, GitHub CI evidence, one-command tests, and a final public HTTPS WebUI URL. D-025 remains the human hosting choice. Remote push, PR, deployment, paid resource creation, G-04 implementation approval, and student reflection remain human gates. REFLECTION.md must be written by the student; AI may only polish a supplied draft and declare assistance.
+V1 contains no autonomous multi-round agent. If later added, its loop, tool dispatch, guards, and deterministic mock tests require a new student-approved specification. The shipped application must provide a React WebUI, Windows x64 single-file distribution, an OCI mock demo, GitLab CI with a job named unit-test, GitHub CI evidence, and one-command tests. Delivery is local-only for this project: a local WebUI URL and architecture are required, while public HTTPS hosting and public URL evidence are waived by the student's D-025 decision. Remote push, PR, deployment, paid resource creation, G-04 implementation approval, and student reflection remain human gates. REFLECTION.md must be written by the student; AI may only polish a supplied draft and declare assistance.
 
 ## Baseline acceptance used by G-03
 Before product implementation, a fresh non-Codex intake session and a separate execution session receive only final SPEC.md and PLAN.md. Intake must report both full-file SHA-256 hashes, the complete two-file listing, effective language, target F-01S1A, acceptance ID F01S1A_SINGLE_RULE_SCANNER_V2, and ambiguities. Execution starts only when ambiguities are empty. It creates only scripts/tests/bootstrap_scanner_contract.ps1 and scripts/bootstrap_scan_credentials.ps1, implements the locked single-path protocol plus provider_api_key rule, demonstrates the exact missing-scanner red and unchanged-command green, stays within the artifact and final-summary budgets, and never commits or integrates output. Formal implementation repeats F-01S1A after G-04; F-01S1B serially adds the remaining direct rules.
@@ -54,7 +54,7 @@ ProjectB 是面向单个学生的本地优先课程学习工作台。它把材�
 - 至少提供 M1 材料与来源、M2 学习检查、M3 复习计划三个职责清晰的模块。
 - 用户可以从新安装的 Windows x64 应用完成“导入 -> 映射 -> 学习 -> 复习”全流程。
 - 核心规则在移除真实模型后仍可用 deterministic mock 和自动化测试验证。
-- 提供一键测试、GitLab/GitHub CI、Windows 单文件分发、OCI demo 和截止前可访问的 WebUI URL。
+- 提供一键测试、GitLab/GitHub CI、Windows 单文件分发、OCI demo 和可本地访问的 WebUI URL。
 
 ## 2. 用户故事
 
@@ -240,7 +240,7 @@ React/Vite WebUI
 ## 9. 分发、部署与 CI
 
 - 本地分发：Windows x64 单文件 `ProjectB.exe`，首次启动创建当前用户数据目录并打开 loopback WebUI；README 说明 SmartScreen、架构、数据目录、凭据录入和清除。
-- 公共演示：`linux/amd64` OCI 镜像，单条 `docker build` 与单条 `docker run` 启动 demo profile。最终托管平台由 D-025 决定；不得静默付费或创建云资源。
+- 本地演示：`linux/amd64` OCI 镜像，单条 `docker build` 与单条 `docker run` 启动 demo profile。公网托管由 D-025 明确 waived；不得静默付费或创建云资源。
 - GitLab：`.gitlab-ci.yml` 必须含名称严格为 `unit-test` 的 job，并在 push 运行测试；最终课程提交对应 pipeline 必须 PASS。
 - GitHub：镜像仓库保留 PR 历史和 Actions；每次 push 测试并构建相应分发产物。
 - README 最终必须包含项目简介、安装、运行、分发命令、目录结构、安全边界、凭据配置、已知限制、部署架构、第三方依赖与许可证。
@@ -291,7 +291,7 @@ G-03 intake 的目标固定为 `F-01S1A`，acceptance ID 固定为 `F01S1A_SINGL
 | AC-18 | `python scripts/test_all.py` 在干净项目环境运行全部核心测试并以非零退出表示任一失败 |
 | AC-19 | Windows 单文件在目标 Windows x64 干净环境启动并完成 smoke；README 说明安全配置和限制 |
 | AC-20 | OCI 镜像可由单条 build/run 启动；GitLab `unit-test` 与 GitHub CI 均通过 |
-| AC-21 | 最终提供可访问 HTTPS WebUI URL，README 记录部署架构和 CI/CD；D-025 有学生选择证据 |
+| AC-21 | 提供可本地访问的 WebUI URL，README 记录本地架构和 CI/CD；公网 HTTPS URL 由 D-025 明确 waived |
 | AC-22 | 每个实现 task 有红/绿/回归、两阶段评审、凭据扫描、commit hash 和 AGENT_LOG 记录 |
 | AC-23 | 不含真实凭据或未记录许可证；第三方来源与许可证在 README/清单中可追溯 |
 | AC-24 | 不同类型的新鲜编码智能体只凭最终 SPEC/PLAN 完成只读 intake，并在无歧义时由第二个全新 session 尝试原子任务 F-01S1A；字段语义、产物/摘要预算、问题、误解、diff、费用和独立红绿复验写入 SPEC_PROCESS；同类型 Codex 只能记为 G-03P 占位预审 |
@@ -312,7 +312,7 @@ G-03 intake 的目标固定为 `F-01S1A`，acceptance ID 固定为 `F01S1A_SINGL
 | 风险/决策 | 当前处理 |
 | --- | --- |
 | 已确认 SPEC 后发生范围漂移 | 任何产品条款变化必须形成明确 diff 并重新由学生确认；状态/证据元数据不得静默改变验收合同 |
-| D-025 公网托管 | 保持开放，仅阻塞 host-specific 发布和最终 URL；不阻塞本地实现 |
+| D-025 公网托管 | 学生已确认本项目本地交付，公网托管与公网 URL waived；不阻塞本地实现、分发或文档 |
 | Claude 冷启动曾空结束、504 及长时间 thinking | 保留真实失败；不猜测传输根因。用英文 capsule、原子 F-01S1A、锁定字段、产物/摘要预算、超时和产物后置条件失败关闭，再做一次受控复测 |
 | 真实课件许可未知 | 只允许本地私人使用；仓库、CI、分发和 demo 只能使用合成或明确许可 fixture |
 | Provider 能力/政策/价格会变化 | 每次实现/运行前刷新 allowlisted snapshot；无法证明时失败关闭 |

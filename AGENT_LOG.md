@@ -1,5 +1,13 @@
 # AGENT_LOG
 
+## 2026-08-10T11:10:00+08:00 - P-02 governed OpenAI adapter closeout
+
+- **Task / skills:** `P-02`; `subagent-driven-development`, `test-driven-development`, `receiving-code-review`, `systematic-debugging`, `requesting-code-review`, and `verification-before-completion`. Fresh worker `/root/p02_openai_adapter`; coordinator `/root` made the explicitly recorded SDK/UI/API and safety review fixes. `Human-Changes: coordinator SDK typing, consent binding, async UI, API error, WinVault marker, controller serialization, and E2E fixture fixes`.
+- **TDD/review:** provider policy verifier was green before implementation. Quality review found two Major defects: WinVault status read fetched the plaintext secret, and concurrent local P enable/disable could leave disk enabled while runtime reported L. New RED tests reproduced both; the implementation added a value-free status marker, serialized credential/controller state transitions, and fail-closed disk ordering. Targeted regression: `20 passed`; follow-up learning/API/security suites: `27 passed`.
+- **Verification:** `scripts/test_all.py --all` => backend `243 passed`, frontend `60 passed`, Ruff/mypy/build/pass, `CREDENTIAL_SCAN_PASS files=464`, `LICENSE_VERIFICATION_PASS python=54 npm=166 direct_python=18 direct_npm=16`, `TEST_ALL_PASS mode=all`. Provider verifier: `PROVIDER_V1_P_EVIDENCE_PASS rows=7 models=2 expires=2026-08-25`. System Chrome E2E: Learning/Settings across 360/768/1440, `9 passed`; bundled Chromium was not installed, so no bundled-browser claim is made. Staged scan: `CREDENTIAL_SCAN_PASS files=235`; `git diff --cached --check` passed.
+- **Commit:** `8e6b23f` (`feat(P-02): add governed openai p adapter [agent: worker]`). PLAN row 35 now records this hash and the task is complete. Student confirmed local-only delivery; public deployment/public URL gates are waived and remain recorded as not executed rather than used as local evidence.
+- **Lesson:** status checks must use a non-sensitive availability marker; explicit provider state changes need one serialized state machine and a disabled-on-disk intermediate to make concurrent outcomes and restart behavior agree.
+
 ## 2026-08-03T18:48:51+08:00 - MAINT-003 删除停用 G-03 runner
 
 - **Task 编号**：MAINT-003。
