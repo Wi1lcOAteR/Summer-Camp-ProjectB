@@ -18,8 +18,8 @@ class PreviewBase(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     locator_ids: list[str]
     profile_id: str
-    max_tokens: int
-    max_cost_microusd: int
+    max_tokens: int | None = None
+    max_cost_microusd: int | None = None
     nonce: str
 
 
@@ -55,7 +55,7 @@ class ExecutePayload(PreviewReference):
 
 @router.post("/previews/explanation")
 def preview_explanation(payload: ExplanationPreview, request: Request) -> dict[str, object]:
-    service = ConsentService(request.app.state.database)
+    service = _service(request)
     return _store(
         request,
         _consent_call(
@@ -72,7 +72,7 @@ def preview_explanation(payload: ExplanationPreview, request: Request) -> dict[s
 
 @router.post("/previews/practice")
 def preview_practice(payload: PracticePreview, request: Request) -> dict[str, object]:
-    service = ConsentService(request.app.state.database)
+    service = _service(request)
     return _store(
         request,
         _consent_call(
@@ -90,7 +90,7 @@ def preview_practice(payload: PracticePreview, request: Request) -> dict[str, ob
 
 @router.post("/previews/feedback")
 def preview_feedback(payload: FeedbackPreview, request: Request) -> dict[str, object]:
-    service = ConsentService(request.app.state.database)
+    service = _service(request)
     rubric = tuple(sorted((RubricItem(item.code, item.passed, item.detail_code) for item in payload.rubric), key=lambda item: item.code))
     return _store(
         request,
@@ -111,16 +111,18 @@ def preview_feedback(payload: FeedbackPreview, request: Request) -> dict[str, ob
 def grant_consent(payload: PreviewReference, request: Request) -> dict[str, object]:
     preview = _preview(request, payload.preview_id)
     try:
-        return asdict(ConsentService(request.app.state.database).grant(preview))
+        return asdict(_service(request).grant(preview))
     except ConsentError as error:
         raise _api_error(error) from None
+    except ProviderError as error:
+        raise _provider_error(error) from None
 
 
 @router.post("/execute")
 def execute(payload: ExecutePayload, request: Request) -> dict[str, object]:
     preview = _preview(request, payload.preview_id)
     try:
-        candidate = ConsentService(request.app.state.database).execute(
+        candidate = _service(request).execute(
             payload.consent_id,
             preview,
             request.app.state.provider_registry,
@@ -128,7 +130,7 @@ def execute(payload: ExecutePayload, request: Request) -> dict[str, object]:
     except ConsentError as error:
         raise _api_error(error) from None
     except ProviderError as error:
-        raise ApiError(error.code, 503, retryable=error.code in {"provider_timeout", "provider_error"}) from None
+        raise _provider_error(error) from None
     return asdict(candidate)
 
 
@@ -139,11 +141,19 @@ def _store(request: Request, preview: ConsentPreview) -> dict[str, object]:
         "preview_id": preview_id,
         "operation": preview.operation,
         "profile_id": preview.profile_id,
+        "adapter_id": preview.adapter_id,
+        "model_id": preview.model_id,
         "policy_fingerprint": preview.policy_fingerprint,
+        "config_fingerprint": preview.config_fingerprint,
+        "input_token_cap": preview.input_token_cap,
         "max_tokens": preview.max_tokens,
         "max_cost_microusd": preview.max_cost_microusd,
         "sources": [asdict(source) for source in preview.request.sources],
     }
+
+
+def _service(request: Request) -> ConsentService:
+    return ConsentService(request.app.state.database, request.app.state.provider_registry)
 
 
 def _preview(request: Request, preview_id: str) -> ConsentPreview:
@@ -158,6 +168,12 @@ def _consent_call(function, **kwargs):  # type: ignore[no-untyped-def]
         return function(**kwargs)
     except ConsentError as error:
         raise _api_error(error) from None
+    except ProviderError as error:
+        raise _provider_error(error) from None
+
+
+def _provider_error(error: ProviderError) -> ApiError:
+    return ApiError(error.code, 503, retryable=error.code in {"provider_timeout", "provider_error"})
 
 
 def _api_error(error: ConsentError) -> ApiError:

@@ -41,7 +41,7 @@ test('settings keeps credential private across keyboard and responsive flows', a
 test('demo settings keeps credential management disabled', async ({ page }) => {
   let credentialStatusRequested = false;
   await page.route('**/api/settings', async (route) => {
-    await route.fulfill({ json: { profile: 'demo', bind_host: '127.0.0.1', provider_mode: 'L', provider_configured: false } });
+    await route.fulfill({ json: { profile: 'demo', bind_host: '0.0.0.0', provider_mode: 'L', provider_configured: false } });
   });
   await page.route('**/api/credentials/provider', async (route) => {
     credentialStatusRequested = true;

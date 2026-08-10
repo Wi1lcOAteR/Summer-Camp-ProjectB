@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import json
 import sys
+import threading
+from datetime import datetime
 from pathlib import Path
 
+import httpx
 from fastapi.testclient import TestClient
 
 
@@ -12,6 +16,8 @@ if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
 
 from projectb.api.app import create_app  # noqa: E402
+from projectb.profiles.local import create_local_app  # noqa: E402
+from projectb.providers import openai_adapter  # noqa: E402
 from projectb.security.credentials import CredentialService  # noqa: E402
 
 
@@ -20,9 +26,14 @@ class FakeCredentialBackend:
 
     def __init__(self) -> None:
         self.value: str | None = None
+        self.reads = 0
 
     def has_secret(self, target: str) -> bool:
         return self.value is not None
+
+    def get_secret(self, target: str) -> str | None:
+        self.reads += 1
+        return self.value
 
     def set_secret(self, target: str, value: str) -> None:
         self.value = value
@@ -135,3 +146,248 @@ def test_settings_publish_local_profile_without_secret_or_mock(tmp_path: Path) -
         "provider_mode": "L",
         "provider_configured": False,
     }
+
+
+def _local_client(
+    tmp_path: Path,
+    backend: FakeCredentialBackend,
+    *,
+    utc_now=None,  # type: ignore[no-untyped-def]
+) -> tuple[TestClient, dict[str, str]]:
+    def no_network(request: httpx.Request) -> httpx.Response:
+        raise AssertionError("provider network must not run during settings lifecycle")
+
+    app = create_local_app(
+        tmp_path,
+        credential_service=CredentialService(backend, target="provider-openai"),
+        provider_transport=httpx.MockTransport(no_network),
+        utc_now=utc_now or (lambda: datetime.fromisoformat("2026-08-09T12:00:00+08:00")),
+    )
+    client = TestClient(app, base_url="http://127.0.0.1")
+    session = client.get("/api/session")
+    headers = {"origin": "http://127.0.0.1", "x-csrf-token": session.headers["x-csrf-token"]}
+    return client, headers
+
+
+def test_explicit_openai_enable_persists_and_restarts_without_secret_in_config(tmp_path: Path) -> None:
+    backend = FakeCredentialBackend()
+    client, headers = _local_client(tmp_path, backend)
+    assert client.get("/api/settings").json()["provider_mode"] == "L"
+
+    blocked = client.post(
+        "/api/settings/provider",
+        json={"model_id": "gpt-5.6-terra"},
+        headers=headers,
+    )
+    assert blocked.status_code == 409
+    assert blocked.json()["error"]["code"] == "credential_unconfigured"
+
+    client.put("/api/credentials/provider", json={"value": "unit-test-credential"}, headers=headers)
+    enabled = client.post(
+        "/api/settings/provider",
+        json={"model_id": "gpt-5.6-terra"},
+        headers=headers,
+    )
+    assert enabled.status_code == 200
+    settings = enabled.json()
+    assert settings["provider_mode"] == "L+P"
+    assert settings["provider_configured"] is True
+    assert settings["provider_profile"]["adapter_id"] == "openai"
+    assert settings["provider_profile"]["model_id"] == "gpt-5.6-terra"
+    assert settings["provider_profile"]["input_token_cap"] == 20_000
+    assert settings["provider_profile"]["output_token_cap"] == 3_000
+    assert settings["provider_profile"]["max_cost_microusd"] == 118_250
+    profile_id = settings["provider_profile"]["profile_id"]
+    assert client.app.state.provider_registry.resolve(profile_id) is not None
+
+    config_text = (tmp_path / "provider.json").read_text(encoding="utf-8")
+    assert "unit-test-credential" not in config_text
+    assert json.loads(config_text)["enabled"] is True
+
+    restarted, _ = _local_client(tmp_path, backend)
+    restarted_settings = restarted.get("/api/settings").json()
+    assert restarted_settings == settings
+    assert restarted.app.state.provider_registry.resolve(profile_id) is not None
+
+
+def test_disable_and_credential_clear_both_return_persisted_local_mode(tmp_path: Path) -> None:
+    backend = FakeCredentialBackend()
+    client, headers = _local_client(tmp_path, backend)
+    client.put("/api/credentials/provider", json={"value": "unit-test-credential"}, headers=headers)
+    enabled = client.post(
+        "/api/settings/provider",
+        json={"model_id": "gpt-5.6-luna"},
+        headers=headers,
+    ).json()
+    profile_id = enabled["provider_profile"]["profile_id"]
+
+    disabled = client.delete("/api/settings/provider", headers=headers)
+    assert disabled.json()["provider_mode"] == "L"
+    assert client.app.state.provider_registry.resolve(profile_id) is None
+    assert json.loads((tmp_path / "provider.json").read_text(encoding="utf-8")) == {
+        "enabled": False,
+        "schema_version": 1,
+    }
+
+    client.post("/api/settings/provider", json={"model_id": "gpt-5.6-luna"}, headers=headers)
+    cleared = client.delete("/api/credentials/provider", headers=headers)
+    assert cleared.json()["configured"] is False
+    assert client.get("/api/settings").json()["provider_mode"] == "L"
+    assert client.app.state.provider_registry.resolve(profile_id) is None
+
+    restarted, _ = _local_client(tmp_path, backend)
+    assert restarted.get("/api/settings").json()["provider_mode"] == "L"
+
+
+def test_concurrent_enable_and_disable_leave_runtime_and_disk_disabled(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:  # type: ignore[no-untyped-def]
+    backend = FakeCredentialBackend()
+    backend.value = "unit-test-credential"
+    client, _ = _local_client(tmp_path, backend)
+    controller = client.app.state.provider_controller
+    original_write = controller._write_config
+    enable_paused = threading.Event()
+    release_enable = threading.Event()
+    disable_write_seen = threading.Event()
+    outcomes: dict[str, dict[str, object]] = {}
+    failures: list[BaseException] = []
+
+    def interleaved_write(value: dict[str, object]) -> None:
+        if value.get("enabled") is True:
+            enable_paused.set()
+            assert release_enable.wait(timeout=2)
+        elif threading.current_thread().name == "disable-provider":
+            disable_write_seen.set()
+        original_write(value)
+
+    def invoke(name: str, operation) -> None:  # type: ignore[no-untyped-def]
+        try:
+            outcomes[name] = operation()
+        except BaseException as error:
+            failures.append(error)
+
+    monkeypatch.setattr(controller, "_write_config", interleaved_write)
+    enable_thread = threading.Thread(
+        target=invoke,
+        args=("enable", lambda: controller.enable("gpt-5.6-terra")),
+        name="enable-provider",
+    )
+    enable_thread.start()
+    assert enable_paused.wait(timeout=2)
+    disable_thread = threading.Thread(
+        target=invoke,
+        args=("disable", controller.disable),
+        name="disable-provider",
+    )
+    disable_thread.start()
+    disable_write_seen.wait(timeout=1)
+    release_enable.set()
+    enable_thread.join(timeout=2)
+    disable_thread.join(timeout=2)
+
+    assert failures == []
+    assert not enable_thread.is_alive()
+    assert not disable_thread.is_alive()
+    assert outcomes["enable"]["provider_mode"] == "L+P"
+    assert outcomes["disable"]["provider_mode"] == "L"
+    assert controller.snapshot()["provider_mode"] == "L"
+    assert json.loads((tmp_path / "provider.json").read_text(encoding="utf-8")) == {
+        "enabled": False,
+        "schema_version": 1,
+    }
+
+
+def test_policy_expiry_after_enable_degrades_settings_to_local_without_provider(tmp_path: Path) -> None:
+    backend = FakeCredentialBackend()
+    observed_now = [datetime.fromisoformat("2026-08-09T12:00:00+08:00")]
+    client, headers = _local_client(tmp_path, backend, utc_now=lambda: observed_now[0])
+    client.put("/api/credentials/provider", json={"value": "unit-test-credential"}, headers=headers)
+    enabled = client.post(
+        "/api/settings/provider",
+        json={"model_id": "gpt-5.6-terra"},
+        headers=headers,
+    ).json()
+    profile_id = enabled["provider_profile"]["profile_id"]
+
+    observed_now[0] = datetime.fromisoformat("2026-08-25T00:00:00+08:00")
+    expired = client.get("/api/settings")
+
+    assert expired.status_code == 200
+    assert expired.json()["provider_mode"] == "L"
+    assert expired.json()["provider_profile"] is None
+    assert client.app.state.provider_registry.resolve(profile_id) is None
+
+
+def test_evidence_hash_mismatch_after_enable_degrades_settings_to_local(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:  # type: ignore[no-untyped-def]
+    backend = FakeCredentialBackend()
+    client, headers = _local_client(tmp_path, backend)
+    client.put("/api/credentials/provider", json={"value": "unit-test-credential"}, headers=headers)
+    enabled = client.post(
+        "/api/settings/provider",
+        json={"model_id": "gpt-5.6-terra"},
+        headers=headers,
+    ).json()
+    profile_id = enabled["provider_profile"]["profile_id"]
+    backend.reads = 0
+
+    monkeypatch.setattr(openai_adapter, "_canonical_text_sha256", lambda _path: "0" * 64)
+    mismatched = client.get("/api/settings")
+
+    assert mismatched.status_code == 200
+    assert mismatched.json()["provider_mode"] == "L"
+    assert mismatched.json()["provider_profile"] is None
+    assert client.app.state.provider_registry.resolve(profile_id) is None
+    assert backend.reads == 0
+
+
+def test_expired_policy_enable_returns_retryable_unavailable_without_secret_read(tmp_path: Path) -> None:
+    backend = FakeCredentialBackend()
+    client, headers = _local_client(
+        tmp_path,
+        backend,
+        utc_now=lambda: datetime.fromisoformat("2026-08-25T00:00:00+08:00"),
+    )
+    client.put("/api/credentials/provider", json={"value": "unit-test-credential"}, headers=headers)
+
+    response = client.post(
+        "/api/settings/provider",
+        json={"model_id": "gpt-5.6-terra"},
+        headers=headers,
+    )
+
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "provider_unavailable"
+    assert response.json()["error"]["retryable"] is True
+    assert backend.reads == 0
+
+
+def test_credential_clear_maps_provider_config_failure_after_secret_is_removed(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:  # type: ignore[no-untyped-def]
+    backend = FakeCredentialBackend()
+    client, headers = _local_client(tmp_path, backend)
+    client.put("/api/credentials/provider", json={"value": "unit-test-credential"}, headers=headers)
+    enabled = client.post(
+        "/api/settings/provider",
+        json={"model_id": "gpt-5.6-terra"},
+        headers=headers,
+    ).json()
+    profile_id = enabled["provider_profile"]["profile_id"]
+
+    def unavailable_config(_value) -> None:  # type: ignore[no-untyped-def]
+        raise OSError("config unavailable")
+
+    monkeypatch.setattr(client.app.state.provider_controller, "_write_config", unavailable_config)
+    response = client.delete("/api/credentials/provider", headers=headers)
+
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "provider_config_unavailable"
+    assert response.json()["error"]["retryable"] is True
+    assert backend.value is None
+    assert client.app.state.provider_registry.resolve(profile_id) is None

@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "adapter_id": "openai",
+  "endpoint": "https://api.openai.com/v1/responses",
+  "evidence": {
+    "path": "docs/engineering/PROVIDER_POLICY_V1_P_EVIDENCE.md",
+    "sha256": "35a3f46e036563e3fc681df3190eb56336ab48b9d9817ad48f4d5df42230f076",
+    "verified_at": "2026-07-25T00:00:00+08:00",
+    "expires_at": "2026-08-25T00:00:00+08:00"
+  },
+  "caps": {
+    "max_input_tokens": 20000,
+    "max_output_tokens": 3000
+  },
+  "regional_reserve": "1.10",
+  "models": {
+    "gpt-5.6-terra": {
+      "input_rate_per_million_usd": "2.50",
+      "cache_write_rate_per_million_usd": "3.125",
+      "cached_input_rate_per_million_usd": "0.25",
+      "output_rate_per_million_usd": "15"
+    },
+    "gpt-5.6-luna": {
+      "input_rate_per_million_usd": "1",
+      "cache_write_rate_per_million_usd": "1.25",
+      "cached_input_rate_per_million_usd": "0.10",
+      "output_rate_per_million_usd": "6"
+    }
+  },
+  "request": {
+    "allowed_top_level_fields": [
+      "background",
+      "input",
+      "instructions",
+      "max_output_tokens",
+      "model",
+      "reasoning",
+      "service_tier",
+      "store",
+      "text",
+      "tools"
+    ],
+    "store": false,
+    "background": false,
+    "tools": [],
+    "service_tier": "default",
+    "reasoning_effort": "low",
+    "timeout_seconds": 60,
+    "automatic_retries": 0
+  },
+  "retention_notice": {
+    "training_default": "not_used_unless_opted_in",
+    "abuse_monitoring_max_days": 30,
+    "prompt_cache_max_hours": 24,
+    "store_false_is_zdr": false
+  }
+}

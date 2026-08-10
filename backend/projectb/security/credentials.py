@@ -7,6 +7,7 @@ import secrets
 import sys
 from collections.abc import Callable
 from datetime import UTC, datetime
+from threading import RLock
 from typing import NamedTuple, Protocol
 
 from projectb.observability.audit import build_audit_record
@@ -28,6 +29,8 @@ class CredentialBackend(Protocol):
 
     def has_secret(self, target: str) -> bool: ...
 
+    def get_secret(self, target: str) -> str | None: ...
+
     def set_secret(self, target: str, value: str) -> None: ...
 
     def delete_secret(self, target: str) -> None: ...
@@ -44,21 +47,36 @@ class WindowsCredentialBackend:
         from keyring.backends.Windows import WinVaultKeyring
 
         self._service_name = service_name
+        self._status_service_name = f"{service_name}.status"
         self._vault = WinVaultKeyring()
 
     def has_secret(self, target: str) -> bool:
-        return self._vault.get_password(self._service_name, target) is not None
+        return self._vault.get_password(self._status_service_name, target) == "configured-v1"
+
+    def get_secret(self, target: str) -> str | None:
+        return self._vault.get_password(self._service_name, target)
 
     def set_secret(self, target: str, value: str) -> None:
-        self._vault.set_password(self._service_name, target, value)
+        from keyring.errors import PasswordDeleteError
+
+        self._vault.set_password(self._status_service_name, target, "configured-v1")
+        try:
+            self._vault.set_password(self._service_name, target, value)
+        except Exception:
+            try:
+                self._vault.delete_password(self._status_service_name, target)
+            except PasswordDeleteError:
+                pass
+            raise
 
     def delete_secret(self, target: str) -> None:
         from keyring.errors import PasswordDeleteError
 
-        try:
-            self._vault.delete_password(self._service_name, target)
-        except PasswordDeleteError:
-            pass
+        for service_name in (self._status_service_name, self._service_name):
+            try:
+                self._vault.delete_password(service_name, target)
+            except PasswordDeleteError:
+                pass
 
 
 class CredentialService:
@@ -80,36 +98,53 @@ class CredentialService:
         self._utc_now = utc_now or (lambda: datetime.now(UTC))
         self._updated_at: str | None = None
         self._fingerprint = hashlib.sha256(f"{backend.name}:{target}".encode()).hexdigest()
+        self._lock = RLock()
 
     def status(self) -> CredentialStatus:
-        try:
-            configured = self._backend.has_secret(self._target)
-        except Exception:
-            raise CredentialError("credential_unavailable") from None
+        with self._lock:
+            try:
+                configured = self._backend.has_secret(self._target)
+            except Exception:
+                raise CredentialError("credential_unavailable") from None
+            updated_at = self._updated_at
         self._emit_audit(self._build_audit("credential.status", configured))
-        return CredentialStatus(configured=configured, updated_at=self._updated_at)
+        return CredentialStatus(configured=configured, updated_at=updated_at)
+
+    def read_for_provider(self) -> str:
+        """Return the secret only to the in-process provider adapter."""
+
+        with self._lock:
+            try:
+                value = self._backend.get_secret(self._target)
+            except Exception:
+                raise CredentialError("credential_unavailable") from None
+        if not isinstance(value, str) or not value or len(value) > 4096 or "\0" in value:
+            raise CredentialError("credential_unconfigured")
+        return value
 
     def update(self, value: str) -> CredentialStatus:
         if not isinstance(value, str) or not value or len(value) > 4096 or "\0" in value:
             raise CredentialError("credential_invalid")
         updated_at = self._format_utc(self._utc_now())
         audit_record = self._build_audit("credential.update", True)
-        try:
-            self._backend.set_secret(self._target, value)
-        except Exception:
-            raise CredentialError("credential_unavailable") from None
-        self._updated_at = updated_at
+        with self._lock:
+            try:
+                self._backend.set_secret(self._target, value)
+            except Exception:
+                raise CredentialError("credential_unavailable") from None
+            self._updated_at = updated_at
         self._emit_audit(audit_record)
         return CredentialStatus(configured=True, updated_at=self._updated_at)
 
     def clear(self) -> CredentialStatus:
         updated_at = self._format_utc(self._utc_now())
         audit_record = self._build_audit("credential.clear", False)
-        try:
-            self._backend.delete_secret(self._target)
-        except Exception:
-            raise CredentialError("credential_unavailable") from None
-        self._updated_at = updated_at
+        with self._lock:
+            try:
+                self._backend.delete_secret(self._target)
+            except Exception:
+                raise CredentialError("credential_unavailable") from None
+            self._updated_at = updated_at
         self._emit_audit(audit_record)
         return CredentialStatus(configured=False, updated_at=self._updated_at)
 

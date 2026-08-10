@@ -1,5 +1,5 @@
 import { Check, KeyRound, ShieldCheck, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './SettingsView.module.css';
 
 type Profile = 'local' | 'demo' | 'unavailable';
@@ -9,6 +9,18 @@ interface SettingsState {
   bind_host: string;
   provider_mode: 'L' | 'L+P';
   provider_configured: boolean;
+  provider_profile: ProviderProfileState | null;
+}
+
+interface ProviderProfileState {
+  profile_id: string;
+  adapter_id: 'openai';
+  model_id: 'gpt-5.6-terra' | 'gpt-5.6-luna';
+  input_token_cap: number;
+  output_token_cap: number;
+  max_cost_microusd: number;
+  config_fingerprint: string;
+  policy_fingerprint: string;
 }
 
 interface CredentialState {
@@ -21,6 +33,7 @@ const unavailable: SettingsState = {
   bind_host: 'unavailable',
   provider_mode: 'L',
   provider_configured: false,
+  provider_profile: null,
 };
 
 async function csrfToken(): Promise<string> {
@@ -55,14 +68,32 @@ async function settingsState(response: Response): Promise<SettingsState> {
     || !validBindHost
     || (value.provider_mode !== 'L' && value.provider_mode !== 'L+P')
     || typeof value.provider_configured !== 'boolean'
+    || (value.provider_mode === 'L+P' && (value.profile !== 'local' || value.provider_configured !== true))
+    || (value.provider_mode === 'L' && value.provider_profile != null)
   ) {
     throw new Error('invalid_settings_response');
+  }
+  let providerProfile: ProviderProfileState | null = null;
+  if (value.provider_mode === 'L+P') {
+    const profile = value.provider_profile as Record<string, unknown> | null;
+    if (!profile || profile.adapter_id !== 'openai'
+      || (profile.model_id !== 'gpt-5.6-terra' && profile.model_id !== 'gpt-5.6-luna')
+      || typeof profile.profile_id !== 'string' || !profile.profile_id.trim()
+      || !Number.isInteger(profile.input_token_cap) || Number(profile.input_token_cap) <= 0
+      || !Number.isInteger(profile.output_token_cap) || Number(profile.output_token_cap) <= 0
+      || !Number.isInteger(profile.max_cost_microusd) || Number(profile.max_cost_microusd) <= 0
+      || typeof profile.config_fingerprint !== 'string' || !/^[0-9a-f]{64}$/.test(profile.config_fingerprint)
+      || typeof profile.policy_fingerprint !== 'string' || !/^[0-9a-f]{64}$/.test(profile.policy_fingerprint)) {
+      throw new Error('invalid_settings_response');
+    }
+    providerProfile = profile as unknown as ProviderProfileState;
   }
   return {
     profile: value.profile,
     bind_host: bindHost,
     provider_mode: value.provider_mode,
     provider_configured: value.provider_configured,
+    provider_profile: providerProfile,
   };
 }
 
@@ -71,31 +102,50 @@ export function SettingsView() {
   const [credential, setCredential] = useState<CredentialState>({ configured: false, updated_at: null });
   const [secret, setSecret] = useState('');
   const [message, setMessage] = useState('');
+  const [modelId, setModelId] = useState<'gpt-5.6-terra' | 'gpt-5.6-luna'>('gpt-5.6-terra');
+  const [mutationPending, setMutationPending] = useState(false);
+  const mutationPendingRef = useRef(false);
+  const settingsRequestId = useRef(0);
+  const credentialRequestId = useRef(0);
+
+  function beginMutation(): boolean {
+    if (mutationPendingRef.current) return false;
+    mutationPendingRef.current = true;
+    setMutationPending(true);
+    return true;
+  }
+
+  function endMutation() {
+    mutationPendingRef.current = false;
+    setMutationPending(false);
+  }
 
   useEffect(() => {
     let active = true;
 
     async function load() {
+      const settingsId = ++settingsRequestId.current;
       let profile: SettingsState;
       try {
         profile = await settingsState(await fetch('/api/settings', {
           credentials: 'same-origin',
           headers: { accept: 'application/json' },
         }));
-        if (!active) return;
+        if (!active || settingsId !== settingsRequestId.current) return;
         setSettings(profile);
       } catch {
-        if (active) setSettings(unavailable);
+        if (active && settingsId === settingsRequestId.current) setSettings(unavailable);
         return;
       }
 
       if (!active || profile.profile !== 'local') return;
+      const credentialId = ++credentialRequestId.current;
       try {
         const status = await credentialState(await fetch('/api/credentials/provider', {
           credentials: 'same-origin',
           headers: { accept: 'application/json' },
         }));
-        if (active) setCredential(status);
+        if (active && credentialId === credentialRequestId.current) setCredential(status);
       } catch {
         // The local profile remains usable; an unavailable status is unconfigured.
       }
@@ -110,23 +160,34 @@ export function SettingsView() {
       setMessage('Enter a credential before saving.');
       return;
     }
+    if (!beginMutation()) return;
+    const credentialId = ++credentialRequestId.current;
+    const submittedSecret = secret;
+    setSecret('');
     try {
       const csrfHeader = await csrfToken();
       const response = await fetch('/api/credentials/provider', {
         method: 'PUT',
         credentials: 'same-origin',
         headers: { accept: 'application/json', 'content-type': 'application/json', 'x-csrf-token': csrfHeader },
-        body: JSON.stringify({ value: secret }),
+        body: JSON.stringify({ value: submittedSecret }),
       });
-      setCredential(await credentialState(response, true));
-      setMessage('Credential status updated. The value was not displayed.');
+      const nextCredential = await credentialState(response, true);
+      if (credentialId === credentialRequestId.current) {
+        setCredential(nextCredential);
+        setMessage('Credential status updated. The value was not displayed.');
+      }
     } catch {
-      setMessage('Credential could not be updated.');
+      if (credentialId === credentialRequestId.current) setMessage('Credential could not be updated.');
+    } finally {
+      endMutation();
     }
-    setSecret('');
   }
 
   async function clearCredential() {
+    if (!beginMutation()) return;
+    const credentialId = ++credentialRequestId.current;
+    const settingsId = ++settingsRequestId.current;
     try {
       const csrfHeader = await csrfToken();
       const response = await fetch('/api/credentials/provider', {
@@ -134,10 +195,59 @@ export function SettingsView() {
         credentials: 'same-origin',
         headers: { accept: 'application/json', 'x-csrf-token': csrfHeader },
       });
-      setCredential(await credentialState(response, false));
+      const nextCredential = await credentialState(response, false);
+      if (credentialId === credentialRequestId.current) setCredential(nextCredential);
+      if (settingsId === settingsRequestId.current) {
+        setSettings((current) => current ? { ...current, provider_mode: 'L', provider_profile: null, provider_configured: false } : current);
+      }
       setMessage('Stored credential cleared.');
     } catch {
       setMessage('Credential could not be cleared.');
+    } finally {
+      endMutation();
+    }
+  }
+
+  async function enableProvider() {
+    if (!beginMutation()) return;
+    const settingsId = ++settingsRequestId.current;
+    try {
+      const csrfHeader = await csrfToken();
+      const response = await fetch('/api/settings/provider', {
+        method: 'POST', credentials: 'same-origin',
+        headers: { accept: 'application/json', 'content-type': 'application/json', 'x-csrf-token': csrfHeader },
+        body: JSON.stringify({ model_id: modelId }),
+      });
+      const nextSettings = await settingsState(response);
+      if (settingsId === settingsRequestId.current) {
+        setSettings(nextSettings);
+        setMessage('P provider enabled. Each request still requires exact consent.');
+      }
+    } catch {
+      if (settingsId === settingsRequestId.current) setMessage('P provider could not be enabled.');
+    } finally {
+      endMutation();
+    }
+  }
+
+  async function disableProvider() {
+    if (!beginMutation()) return;
+    const settingsId = ++settingsRequestId.current;
+    try {
+      const csrfHeader = await csrfToken();
+      const response = await fetch('/api/settings/provider', {
+        method: 'DELETE', credentials: 'same-origin',
+        headers: { accept: 'application/json', 'x-csrf-token': csrfHeader },
+      });
+      const nextSettings = await settingsState(response);
+      if (settingsId === settingsRequestId.current) {
+        setSettings(nextSettings);
+        setMessage('P provider disabled.');
+      }
+    } catch {
+      if (settingsId === settingsRequestId.current) setMessage('P provider could not be disabled.');
+    } finally {
+      endMutation();
     }
   }
 
@@ -175,10 +285,12 @@ export function SettingsView() {
                   : <>
                     <label className={styles.field}>Provider API key<input aria-label="Provider API key" type="password" autoComplete="new-password" value={secret} onChange={(event) => setSecret(event.target.value)} /></label>
                     <div className={styles.actions}>
-                      <button type="button" className={styles.primaryButton} onClick={saveCredential}>Save provider credential</button>
-                      <button type="button" className={styles.secondaryButton} onClick={clearCredential} disabled={!credential.configured}>Clear stored credential</button>
+                      <button type="button" className={styles.primaryButton} onClick={saveCredential} disabled={mutationPending}>Save provider credential</button>
+                      <button type="button" className={styles.secondaryButton} onClick={clearCredential} disabled={!credential.configured || mutationPending}>Clear stored credential</button>
                     </div>
                     <p className={styles.muted} role="status">Status: {credential.configured ? 'configured' : 'not configured'}{credential.updated_at ? ' / updated recently' : ''}. Secret values are never shown.</p>
+                    <label className={styles.field}>OpenAI model<select aria-label="OpenAI model" value={modelId} disabled={mutationPending} onChange={(event) => setModelId(event.target.value as typeof modelId)}><option value="gpt-5.6-terra">gpt-5.6-terra</option><option value="gpt-5.6-luna">gpt-5.6-luna</option></select></label>
+                    <div className={styles.actions}><button type="button" className={styles.primaryButton} onClick={enableProvider} disabled={!credential.configured || mutationPending}>Enable P provider</button><button type="button" className={styles.secondaryButton} onClick={disableProvider} disabled={settings.provider_mode !== 'L+P' || mutationPending}>Disable P provider</button></div>
                   </>}
           </section>
           <section className={styles.section} aria-labelledby="privacy-title">
@@ -196,7 +308,7 @@ export function SettingsView() {
         </div>
         <aside className={styles.aside}>
           <section className={styles.section} aria-labelledby="profile-title"><div className={styles.heading}><h2 id="profile-title">{isDemo ? 'Demo profile' : isLocal ? 'Local profile' : 'Profile'}</h2></div><dl className={styles.settings}><div><dt>Bind host</dt><dd>{settings?.bind_host ?? 'checking'}</dd></div><div><dt>Provider mode</dt><dd>{settings?.provider_mode ?? 'checking'}</dd></div><div><dt>Credential</dt><dd>{isDemo || !isLocal ? 'Unavailable' : credential.configured ? 'Configured' : 'Not configured'}</dd></div></dl></section>
-          {isLocal && <section className={styles.section} aria-labelledby="caps-title"><div className={styles.heading}><h2 id="caps-title">Provider caps</h2></div><ul className={styles.list}><li>Local deterministic explanations</li><li>Maximum context is source-bound</li><li>No background network requests</li></ul></section>}
+          {isLocal && <section className={styles.section} aria-labelledby="caps-title"><div className={styles.heading}><h2 id="caps-title">Provider caps</h2></div>{settings.provider_profile ? <ul className={styles.list}><li>{settings.provider_profile.model_id}</li><li>{settings.provider_profile.input_token_cap.toLocaleString('en-US')} input tokens</li><li>{settings.provider_profile.output_token_cap.toLocaleString('en-US')} output tokens</li><li>USD {(settings.provider_profile.max_cost_microusd / 1_000_000).toFixed(5)} maximum</li></ul> : <ul className={styles.list}><li>P provider disabled</li><li>Choose only a reviewed OpenAI model</li><li>No background network requests</li></ul>}</section>}
           <section className={styles.section} aria-labelledby="security-title"><div className={styles.heading}><h2 id="security-title">Data &amp; security</h2></div><p className={styles.muted}>{isDemo ? 'Requests are bound to an isolated session and protected by same-origin checks.' : isLocal ? 'Passwords use a hidden input. API responses contain status metadata only, never secret material.' : 'Security metadata is unavailable without a confirmed profile.'}</p></section>
           {isLocal && <section className={styles.section} aria-labelledby="demo-title"><div className={styles.heading}><h2 id="demo-title">Demo restrictions</h2></div><p className={styles.muted}>Demo mode uses synthetic data and disables uploads, credentials, external providers, and cross-session state.</p></section>}
         </aside>

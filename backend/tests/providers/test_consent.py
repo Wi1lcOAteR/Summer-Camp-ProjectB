@@ -3,8 +3,10 @@ from __future__ import annotations
 import json
 import sys
 from dataclasses import replace
+from datetime import datetime
 from pathlib import Path
 
+import httpx
 import pytest
 
 
@@ -15,11 +17,17 @@ if str(BACKEND) not in sys.path:
 
 from projectb.domain.learning.evaluators.schemas import RubricItem  # noqa: E402
 from projectb.providers.mock import MockProvider  # noqa: E402
-from projectb.providers.port import ExplanationInput, ProviderError  # noqa: E402
+from projectb.providers.openai_adapter import OpenAIAdapter  # noqa: E402
+from projectb.providers.port import ExplanationCandidate, ExplanationInput, ProviderError  # noqa: E402
 from projectb.providers.registry import ProviderRegistry  # noqa: E402
 from projectb.repositories.provider_profiles import ProviderProfileRepository  # noqa: E402
 from projectb.services.providers.consent import ConsentError, ConsentService  # noqa: E402
 from projectb.storage.db import Database  # noqa: E402
+
+
+FRESH_NOW = datetime.fromisoformat("2026-08-09T12:00:00+08:00")
+POLICY_PATH = ROOT / "backend" / "projectb" / "providers" / "policy.v1.json"
+EVIDENCE_PATH = ROOT / "docs" / "engineering" / "PROVIDER_POLICY_V1_P_EVIDENCE.md"
 
 
 def setup_system(tmp_path: Path) -> tuple[Database, ConsentService, ProviderRegistry, MockProvider]:
@@ -278,3 +286,172 @@ def test_provider_failure_is_isolated_and_spends_consent(tmp_path: Path, mode: s
 
     assert failing.network_count == 1
     assert authority_counts(database) == before
+
+
+def _openai_response(text: str) -> httpx.Response:
+    return httpx.Response(
+        200,
+        json={
+            "id": "response-opaque",
+            "object": "response",
+            "created_at": 1,
+            "model": "gpt-5.6-terra",
+            "status": "completed",
+            "output": [
+                {
+                    "id": "message-opaque",
+                    "type": "message",
+                    "role": "assistant",
+                    "status": "completed",
+                    "content": [
+                        {
+                            "type": "output_text",
+                            "text": json.dumps({"text": text}),
+                            "annotations": [],
+                        }
+                    ],
+                }
+            ],
+        },
+    )
+
+
+def setup_bound_openai(tmp_path: Path):  # type: ignore[no-untyped-def]
+    database, _, registry, _ = setup_system(tmp_path)
+    connection = database.connect()
+    try:
+        connection.execute("DELETE FROM provider_profile WHERE profile_id = 'profile-1'")
+    finally:
+        connection.close()
+    calls = {"network": 0, "credential": 0}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls["network"] += 1
+        return _openai_response("Bound candidate")
+
+    def credential() -> str:
+        calls["credential"] += 1
+        return "unit-test-credential"
+
+    adapter = OpenAIAdapter(
+        model_id="gpt-5.6-terra",
+        input_token_cap=20_000,
+        output_token_cap=3_000,
+        credential_ref="provider-openai",
+        credential_configured=True,
+        credential_supplier=credential,
+        transport=httpx.MockTransport(handler),
+        policy_path=POLICY_PATH,
+        evidence_path=EVIDENCE_PATH,
+        utc_now=lambda: FRESH_NOW,
+    )
+    binding = adapter.binding
+    ProviderProfileRepository(database).add(
+        profile_id="profile-1",
+        adapter_id=binding.adapter_id,
+        model_id=binding.model_id,
+        budget_limit=binding.max_cost_microusd,
+        credential_ref=binding.credential_ref,
+        config_fingerprint=binding.config_fingerprint,
+        policy_fingerprint=binding.policy_fingerprint,
+    )
+    registry.register("profile-1", adapter)
+    return database, ConsentService(database, registry), registry, adapter, calls
+
+
+def test_bound_preview_derives_exact_caps_cost_and_profile_before_one_call(tmp_path: Path) -> None:
+    _, service, registry, adapter, calls = setup_bound_openai(tmp_path)
+
+    preview = service.preview_explanation(
+        locator_ids=("locator-1",),
+        profile_id="profile-1",
+        instruction="Explain",
+        nonce="bound-1",
+    )
+
+    assert preview.adapter_id == "openai"
+    assert preview.model_id == "gpt-5.6-terra"
+    assert preview.input_token_cap == 20_000
+    assert preview.max_tokens == 3_000
+    assert preview.max_cost_microusd == 118_250
+    assert preview.config_fingerprint == adapter.binding.config_fingerprint
+    consent = service.grant(preview)
+    assert service.execute(consent.consent_id, preview, registry) == ExplanationCandidate("Bound candidate")
+    assert calls == {"network": 1, "credential": 1}
+
+
+def test_bound_preview_rejects_client_understatement_before_credential_or_network(tmp_path: Path) -> None:
+    _, service, _, _, calls = setup_bound_openai(tmp_path)
+
+    with pytest.raises(ConsentError, match="consent_policy_mismatch"):
+        service.preview_explanation(
+            locator_ids=("locator-1",),
+            profile_id="profile-1",
+            instruction="Explain",
+            max_tokens=1,
+            max_cost_microusd=1,
+            nonce="bound-2",
+        )
+    assert calls == {"network": 0, "credential": 0}
+
+
+def test_adapter_binding_drift_after_grant_fails_before_credential_or_network(tmp_path: Path) -> None:
+    _, service, registry, _, calls = setup_bound_openai(tmp_path)
+    preview = service.preview_explanation(
+        locator_ids=("locator-1",),
+        profile_id="profile-1",
+        instruction="Explain",
+        nonce="bound-3",
+    )
+    consent = service.grant(preview)
+    drift_calls = {"network": 0, "credential": 0}
+
+    def drift_handler(request: httpx.Request) -> httpx.Response:
+        drift_calls["network"] += 1
+        return _openai_response("wrong")
+
+    def drift_credential() -> str:
+        drift_calls["credential"] += 1
+        return "unit-test-credential"
+
+    drifted = OpenAIAdapter(
+        model_id="gpt-5.6-luna",
+        input_token_cap=20_000,
+        output_token_cap=3_000,
+        credential_ref="provider-openai",
+        credential_configured=True,
+        credential_supplier=drift_credential,
+        transport=httpx.MockTransport(drift_handler),
+        policy_path=POLICY_PATH,
+        evidence_path=EVIDENCE_PATH,
+        utc_now=lambda: FRESH_NOW,
+    )
+    registry.register("profile-1", drifted)
+
+    with pytest.raises(ConsentError, match="consent_policy_mismatch"):
+        service.execute(consent.consent_id, preview, registry)
+    assert calls == {"network": 0, "credential": 0}
+    assert drift_calls == {"network": 0, "credential": 0}
+
+
+def test_profile_credential_ref_drift_before_grant_fails_without_credential_or_network(tmp_path: Path) -> None:
+    database, service, _, _, calls = setup_bound_openai(tmp_path)
+    preview = service.preview_explanation(
+        locator_ids=("locator-1",),
+        profile_id="profile-1",
+        instruction="Explain",
+        nonce="bound-credential-drift",
+    )
+    connection = database.connect()
+    try:
+        connection.execute(
+            "UPDATE provider_profile SET credential_ref = ? WHERE profile_id = ?",
+            ("different-credential", "profile-1"),
+        )
+        connection.commit()
+    finally:
+        connection.close()
+
+    with pytest.raises(ConsentError, match="consent_policy_mismatch"):
+        service.grant(preview)
+    assert calls == {"network": 0, "credential": 0}

@@ -46,6 +46,12 @@ def credential_update(payload: CredentialUpdate, request: Request) -> dict[str, 
 @router.delete("/provider")
 def credential_clear(request: Request) -> dict[str, object]:
     try:
-        return _payload(_service(request).clear())
+        payload = _payload(_service(request).clear())
+        controller = request.app.state.provider_controller
+        if controller is not None:
+            controller.disable()
+        return payload
     except CredentialError as error:
         raise ApiError(error.code, 503, retryable=True) from None
+    except RuntimeError as error:
+        raise ApiError(str(error), 503, retryable=True) from None

@@ -59,6 +59,22 @@ class FailingBackend(FakeBackend):
         super().delete_secret(target)
 
 
+class CountingVault:
+    def __init__(self) -> None:
+        self.values: dict[tuple[str, str], str] = {}
+        self.reads: list[tuple[str, str]] = []
+
+    def get_password(self, service: str, target: str) -> str | None:
+        self.reads.append((service, target))
+        return self.values.get((service, target))
+
+    def set_password(self, service: str, target: str, value: str) -> None:
+        self.values[(service, target)] = value
+
+    def delete_password(self, service: str, target: str) -> None:
+        self.values.pop((service, target), None)
+
+
 def test_first_run_update_status_and_clear_never_return_plaintext() -> None:
     credentials = load_credentials_module()
     backend = FakeBackend()
@@ -141,6 +157,21 @@ def test_audit_uses_fixed_reference_and_sink_failure_does_not_misreport_mutation
     assert credential_target in backend.values
     assert service.clear().configured is False
     assert credential_target not in backend.values
+
+
+def test_windows_status_uses_separate_value_free_marker() -> None:
+    credentials = load_credentials_module()
+    vault = CountingVault()
+    backend = object.__new__(credentials.WindowsCredentialBackend)
+    backend._service_name = "ProjectB"
+    backend._status_service_name = "ProjectB.status"
+    backend._vault = vault
+    target = "provider-openai"
+    vault.values[("ProjectB", target)] = "plaintext-provider-value"
+    vault.values[("ProjectB.status", target)] = "configured-v1"
+
+    assert backend.has_secret(target) is True
+    assert vault.reads == [("ProjectB.status", target)]
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="WinVault integration requires Windows")

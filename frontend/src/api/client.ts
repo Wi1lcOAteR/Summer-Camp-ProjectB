@@ -58,6 +58,48 @@ export interface ConceptSummary {
   coverage?: CoverageSummary;
 }
 
+export interface ProviderProfileSummary {
+  profileId: string;
+  adapterId: 'openai';
+  modelId: 'gpt-5.6-terra' | 'gpt-5.6-luna';
+  inputTokenCap: number;
+  outputTokenCap: number;
+  maxCostMicrousd: number;
+  configFingerprint: string;
+  policyFingerprint: string;
+}
+
+export interface ProviderSettingsSummary {
+  providerMode: 'L' | 'L+P';
+  providerProfile: ProviderProfileSummary | null;
+}
+
+export interface ProviderPreviewSummary {
+  previewId: string;
+  operation: 'generate_explanation';
+  profileId: string;
+  adapterId: 'openai';
+  modelId: string;
+  inputTokenCap: number;
+  outputTokenCap: number;
+  maxCostMicrousd: number;
+  configFingerprint: string;
+  policyFingerprint: string;
+  sources: ProviderPreviewSourceSummary[];
+}
+
+export interface ProviderPreviewSourceSummary {
+  locatorId: string;
+  materialVersionId: string;
+  contentHash: string;
+  text: string;
+}
+
+export interface ProviderCandidateSummary {
+  text: string;
+  authoritative: false;
+}
+
 export class ApiRequestError extends Error {
   constructor(
     public readonly code: string,
@@ -106,6 +148,25 @@ function requirePositiveInteger(record: Record<string, unknown>, key: string, er
   const value = record[key];
   if (!Number.isInteger(value) || Number(value) < 1) throw new ApiRequestError(errorCode);
   return Number(value);
+}
+
+function toProviderProfile(value: unknown): ProviderProfileSummary {
+  const profile = requireRecord(value, 'invalid_provider_settings');
+  const adapterId = requireString(profile, 'adapter_id', 'invalid_provider_settings');
+  const modelId = requireString(profile, 'model_id', 'invalid_provider_settings');
+  if (adapterId !== 'openai' || (modelId !== 'gpt-5.6-terra' && modelId !== 'gpt-5.6-luna')) {
+    throw new ApiRequestError('invalid_provider_settings');
+  }
+  return {
+    profileId: requireNonEmptyString(profile, 'profile_id', 'invalid_provider_settings'),
+    adapterId,
+    modelId,
+    inputTokenCap: requirePositiveInteger(profile, 'input_token_cap', 'invalid_provider_settings'),
+    outputTokenCap: requirePositiveInteger(profile, 'output_token_cap', 'invalid_provider_settings'),
+    maxCostMicrousd: requirePositiveInteger(profile, 'max_cost_microusd', 'invalid_provider_settings'),
+    configFingerprint: requireNonEmptyString(profile, 'config_fingerprint', 'invalid_provider_settings'),
+    policyFingerprint: requireNonEmptyString(profile, 'policy_fingerprint', 'invalid_provider_settings'),
+  };
 }
 
 function toCourse(value: unknown): CourseSummary {
@@ -168,6 +229,18 @@ function toSource(value: unknown): SourceLocatorSummary {
   return { ...base, kind: 'text_lines', lineStart, lineEnd };
 }
 
+function toProviderPreviewSource(value: unknown): ProviderPreviewSourceSummary {
+  const source = requireRecord(value, 'invalid_provider_preview');
+  const contentHash = requireNonEmptyString(source, 'content_hash', 'invalid_provider_preview');
+  if (!/^[0-9a-f]{64}$/.test(contentHash)) throw new ApiRequestError('invalid_provider_preview');
+  return {
+    locatorId: requireNonEmptyString(source, 'locator_id', 'invalid_provider_preview'),
+    materialVersionId: requireNonEmptyString(source, 'material_version_id', 'invalid_provider_preview'),
+    contentHash,
+    text: requireNonEmptyString(source, 'text', 'invalid_provider_preview'),
+  };
+}
+
 function toConcept(value: unknown): ConceptSummary {
   const concept = requireRecord(value, 'invalid_concepts_response');
   const state = requireString(concept, 'state', 'invalid_concepts_response');
@@ -215,6 +288,78 @@ export function createApiClient(options: ApiClientOptions = {}) {
   }
 
   return {
+    async getProviderSettings(): Promise<ProviderSettingsSummary> {
+      const response = await fetchImpl('/api/settings', {
+        credentials: 'same-origin', headers: { accept: 'application/json' },
+      });
+      if (!response.ok) throw await requestError(response, 'provider_settings_unavailable');
+      const payload = requireRecord(await response.json(), 'invalid_provider_settings');
+      if (payload.provider_mode === 'L') return { providerMode: 'L', providerProfile: null };
+      if (payload.provider_mode !== 'L+P') throw new ApiRequestError('invalid_provider_settings');
+      return { providerMode: 'L+P', providerProfile: toProviderProfile(payload.provider_profile) };
+    },
+    async previewExplanation(input: {
+      locatorIds: readonly string[];
+      profileId: string;
+      instruction: string;
+      nonce: string;
+    }): Promise<ProviderPreviewSummary> {
+      const csrfHeader = await csrfToken();
+      const response = await fetchImpl('/api/providers/previews/explanation', {
+        method: 'POST', credentials: 'same-origin',
+        headers: { accept: 'application/json', 'content-type': 'application/json', 'x-csrf-token': csrfHeader },
+        body: JSON.stringify({
+          locator_ids: input.locatorIds,
+          profile_id: input.profileId,
+          instruction: input.instruction,
+          nonce: input.nonce,
+        }),
+      });
+      if (!response.ok) throw await requestError(response, 'provider_preview_failed');
+      const payload = requireRecord(await response.json(), 'invalid_provider_preview');
+      if (payload.operation !== 'generate_explanation' || payload.adapter_id !== 'openai') {
+        throw new ApiRequestError('invalid_provider_preview');
+      }
+      if (!Array.isArray(payload.sources) || payload.sources.length === 0) {
+        throw new ApiRequestError('invalid_provider_preview');
+      }
+      return {
+        previewId: requireNonEmptyString(payload, 'preview_id', 'invalid_provider_preview'),
+        operation: 'generate_explanation',
+        profileId: requireNonEmptyString(payload, 'profile_id', 'invalid_provider_preview'),
+        adapterId: 'openai',
+        modelId: requireNonEmptyString(payload, 'model_id', 'invalid_provider_preview'),
+        inputTokenCap: requirePositiveInteger(payload, 'input_token_cap', 'invalid_provider_preview'),
+        outputTokenCap: requirePositiveInteger(payload, 'max_tokens', 'invalid_provider_preview'),
+        maxCostMicrousd: requirePositiveInteger(payload, 'max_cost_microusd', 'invalid_provider_preview'),
+        configFingerprint: requireNonEmptyString(payload, 'config_fingerprint', 'invalid_provider_preview'),
+        policyFingerprint: requireNonEmptyString(payload, 'policy_fingerprint', 'invalid_provider_preview'),
+        sources: payload.sources.map(toProviderPreviewSource),
+      };
+    },
+    async grantProviderConsent(previewId: string): Promise<{ consentId: string }> {
+      const csrfHeader = await csrfToken();
+      const response = await fetchImpl('/api/providers/consents', {
+        method: 'POST', credentials: 'same-origin',
+        headers: { accept: 'application/json', 'content-type': 'application/json', 'x-csrf-token': csrfHeader },
+        body: JSON.stringify({ preview_id: previewId }),
+      });
+      if (!response.ok) throw await requestError(response, 'provider_consent_failed');
+      const payload = requireRecord(await response.json(), 'invalid_provider_consent');
+      return { consentId: requireNonEmptyString(payload, 'consent_id', 'invalid_provider_consent') };
+    },
+    async executeProvider(previewId: string, consentId: string): Promise<ProviderCandidateSummary> {
+      const csrfHeader = await csrfToken();
+      const response = await fetchImpl('/api/providers/execute', {
+        method: 'POST', credentials: 'same-origin',
+        headers: { accept: 'application/json', 'content-type': 'application/json', 'x-csrf-token': csrfHeader },
+        body: JSON.stringify({ preview_id: previewId, consent_id: consentId }),
+      });
+      if (!response.ok) throw await requestError(response, 'provider_execute_failed');
+      const payload = requireRecord(await response.json(), 'invalid_provider_candidate');
+      if (payload.authoritative !== false) throw new ApiRequestError('invalid_provider_candidate');
+      return { text: requireNonEmptyString(payload, 'text', 'invalid_provider_candidate'), authoritative: false };
+    },
     async getCapabilities(): Promise<ApiCapabilities> {
       const response = await fetchImpl('/api/settings', {
         credentials: 'same-origin',

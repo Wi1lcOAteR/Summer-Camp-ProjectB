@@ -17,6 +17,18 @@ class ProviderError(RuntimeError):
 
 
 @dataclass(frozen=True, slots=True)
+class ProviderBinding:
+    adapter_id: str
+    model_id: str
+    input_token_cap: int
+    output_token_cap: int
+    max_cost_microusd: int
+    credential_ref: str
+    config_fingerprint: str
+    policy_fingerprint: str
+
+
+@dataclass(frozen=True, slots=True)
 class SourceFragment:
     locator_id: str
     material_version_id: str

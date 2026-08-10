@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { BadgeCheck, BookOpenText, CircleAlert, FileCheck2, Send, ShieldCheck, Sparkles } from 'lucide-react';
 import {
   ApiRequestError,
@@ -7,12 +7,15 @@ import {
   type ConceptSummary,
   type CourseSummary,
   type MaterialSummary,
+  type ProviderCandidateSummary,
+  type ProviderPreviewSummary,
+  type ProviderSettingsSummary,
   type SourceLocatorSummary,
 } from '../../api/client';
 import styles from './LearningView.module.css';
 
 interface LearningViewProps {
-  api?: Pick<ApiClient, 'listCourses' | 'listMaterials' | 'listSources' | 'listConcepts'>;
+  api?: Pick<ApiClient, 'listCourses' | 'listMaterials' | 'listSources' | 'listConcepts' | 'getProviderSettings' | 'previewExplanation' | 'grantProviderConsent' | 'executeProvider'>;
   providerEnabled?: boolean;
 }
 
@@ -28,8 +31,6 @@ const rubric = [
   { code: 'witness_matches', detail: '检查选择的结论是否与给出的执行轨迹一致。' },
 ] as const;
 
-const maxTokens = 320;
-const maxCost = 'USD 0.01';
 const defaultApi = createApiClient();
 
 function sourceIsCurrent(concept: LearningConcept): concept is LearningConcept & { source: LearningSource } {
@@ -49,11 +50,14 @@ export function LearningView({ api = defaultApi, providerEnabled = true }: Learn
   const [holds, setHolds] = useState('true');
   const [answer, setAnswer] = useState('');
   const [checked, setChecked] = useState(false);
-  const [providerPreview, setProviderPreview] = useState(false);
+  const [providerSettings, setProviderSettings] = useState<ProviderSettingsSummary>();
+  const [providerPreview, setProviderPreview] = useState<ProviderPreviewSummary>();
   const [providerConfirmed, setProviderConfirmed] = useState(false);
+  const [providerCandidate, setProviderCandidate] = useState<ProviderCandidateSummary>();
   const [providerStatus, setProviderStatus] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const previewRequestId = useRef(0);
 
   useEffect(() => {
     let active = true;
@@ -61,9 +65,13 @@ export function LearningView({ api = defaultApi, providerEnabled = true }: Learn
       try {
         const selectedCourse = (await api.listCourses())[0];
         if (!selectedCourse) throw new ApiRequestError('course_unavailable');
-        const [materials, conceptRows] = await Promise.all([
+        const providerRequest: Promise<ProviderSettingsSummary | undefined> = providerEnabled
+          ? api.getProviderSettings().catch((): ProviderSettingsSummary => ({ providerMode: 'L', providerProfile: null }))
+          : Promise.resolve(undefined);
+        const [materials, conceptRows, provider] = await Promise.all([
           api.listMaterials(selectedCourse.courseId),
           api.listConcepts(selectedCourse.courseId),
+          providerRequest,
         ]);
         const sourcesByMaterial = await Promise.all(materials.map(async (material) => (
           [material, await api.listSources(material.materialId)] as const
@@ -80,6 +88,7 @@ export function LearningView({ api = defaultApi, providerEnabled = true }: Learn
         setCourse(selectedCourse);
         setConcepts(nextConcepts);
         setConceptId(nextConcepts[0]?.conceptId ?? '');
+        setProviderSettings(provider);
       } catch (reason) {
         if (active) setError(errorCode(reason));
       } finally {
@@ -88,7 +97,7 @@ export function LearningView({ api = defaultApi, providerEnabled = true }: Learn
     }
     void load();
     return () => { active = false; };
-  }, [api]);
+  }, [api, providerEnabled]);
 
   const concept = useMemo(
     () => concepts.find((item) => item.conceptId === conceptId) ?? concepts[0],
@@ -100,26 +109,59 @@ export function LearningView({ api = defaultApi, providerEnabled = true }: Learn
   const deterministicPass = holds === 'true';
 
   function changeConcept(nextId: string) {
+    previewRequestId.current += 1;
     setConceptId(nextId);
     setChecked(false);
     setAnswer('');
-    setProviderPreview(false);
+    setProviderPreview(undefined);
     setProviderConfirmed(false);
     setProviderStatus('');
+    setProviderCandidate(undefined);
   }
 
-  function previewProvider() {
-    if (!sourceBound) {
+  async function previewProvider() {
+    const profile = providerSettings?.providerProfile;
+    if (!sourceBound || !source || !profile || !concept) {
       setError('source_unavailable');
       return;
     }
-    setProviderPreview(true);
+    const requestId = ++previewRequestId.current;
+    setProviderPreview(undefined);
     setProviderConfirmed(false);
+    setProviderCandidate(undefined);
     setProviderStatus('');
+    try {
+      const preview = await api.previewExplanation({
+        locatorIds: [source.locatorId],
+        profileId: profile.profileId,
+        instruction: `Explain ${concept.name} from the confirmed source fragment.`,
+        nonce: `preview-${Date.now()}`,
+      });
+      if (requestId !== previewRequestId.current) return;
+      setProviderPreview(preview);
+      setProviderConfirmed(false);
+      setProviderCandidate(undefined);
+      setProviderStatus('');
+    } catch (reason) {
+      if (requestId !== previewRequestId.current) return;
+      setProviderStatus(`预览失败：${errorCode(reason)}`);
+    }
   }
 
-  function confirmProvider() {
-    setProviderStatus('已确认预览；当前未发送任何提供方请求。');
+  async function confirmProvider() {
+    if (!providerPreview || !providerConfirmed) return;
+    const requestId = previewRequestId.current;
+    try {
+      const consent = await api.grantProviderConsent(providerPreview.previewId);
+      if (requestId !== previewRequestId.current) return;
+      const candidate = await api.executeProvider(providerPreview.previewId, consent.consentId);
+      if (requestId !== previewRequestId.current) return;
+      setProviderCandidate(candidate);
+      setProviderStatus('外部候选已返回；不参与评分或掌握度。');
+    } catch (reason) {
+      if (requestId !== previewRequestId.current) return;
+      setProviderStatus(`提供方请求失败：${errorCode(reason)}`);
+    }
   }
 
   function submitCheck() {
@@ -184,15 +226,16 @@ export function LearningView({ api = defaultApi, providerEnabled = true }: Learn
             </fieldset>}
           </section>
 
-          {providerEnabled && <section className={styles.section} aria-labelledby="provider-heading">
+          {providerEnabled && providerSettings?.providerMode === 'L+P' && providerSettings.providerProfile && <section className={styles.section} aria-labelledby="provider-heading">
             <div className={styles.heading}><div><h2 id="provider-heading">P 提供方辅助</h2><p>可选的外部文字辅助，与确定性评分和掌握度隔离。</p></div><span className={styles.providerLabel}>P · 外部提供方</span></div>
             <div className={styles.providerIntro}><Sparkles size={19} aria-hidden="true" /><p>可以基于已确认的来源片段请求解释措辞或练习候选。未确认时不会发送请求。</p><button type="button" className={styles.secondaryButton} onClick={previewProvider} disabled={!sourceBound}>查看 P 提供方预览</button></div>
-            {providerPreview && source && <section className={styles.preview} aria-label="P 提供方预览">
+            {providerPreview && <section className={styles.preview} aria-label="P 提供方预览">
               <h3>发送前预览</h3>
-              <dl><div><dt>来源 locator</dt><dd>{source.locatorId}</dd></div><div><dt>材料版本</dt><dd>{source.materialVersionId}</dd></div><div><dt>内容 hash</dt><dd>{source.contentHash}</dd></div><div><dt>抽取片段</dt><dd>{source.text}</dd></div><div><dt>端口</dt><dd>generate_explanation</dd></div><div><dt>模型 profile</dt><dd>P / OpenAI adapter</dd></div><div><dt>上限</dt><dd>最多 {maxTokens} tokens，最高 {maxCost}</dd></div><div><dt>政策</dt><dd>仅发送已确认片段；store=false；无文件、工具或整份材料上传。</dd></div><div><dt>排除</dt><dd>不包含原始答案、评分结果、掌握度或本地文件。</dd></div></dl>
+              <dl>{providerPreview.sources.map((previewSource) => <div key={`${previewSource.locatorId}:${previewSource.contentHash}`}><dt>确认来源</dt><dd>locator {previewSource.locatorId}；材料版本 {previewSource.materialVersionId}；内容 hash {previewSource.contentHash}；抽取片段 {previewSource.text}</dd></div>)}<div><dt>端口</dt><dd>generate_explanation</dd></div><div><dt>模型 profile</dt><dd>{providerPreview.modelId} / OpenAI adapter</dd></div><div><dt>上限</dt><dd>{providerPreview.inputTokenCap.toLocaleString('en-US')} input tokens，{providerPreview.outputTokenCap.toLocaleString('en-US')} output tokens，最高 USD {(providerPreview.maxCostMicrousd / 1_000_000).toFixed(5)}</dd></div><div><dt>政策</dt><dd>仅发送已确认片段；store=false；无文件、工具或整份材料上传。默认不用于训练；滥用监控最长 30 天；加密 prompt cache 可能最长 24 小时；store=false 不代表 ZDR。</dd></div><div><dt>排除</dt><dd>不包含原始答案、评分结果、掌握度或本地文件。</dd></div></dl>
               <label className={styles.consent}><input type="checkbox" checked={providerConfirmed} onChange={(event) => setProviderConfirmed(event.target.checked)} />我确认以上预览内容可以发送</label>
               <button type="button" className={styles.primaryButton} disabled={!providerConfirmed} onClick={confirmProvider}><Send size={17} aria-hidden="true" />确认预览</button>
               {providerStatus && <p className={styles.providerStatus} role="status">{providerStatus}</p>}
+              {providerCandidate && <p className={styles.providerStatus}><strong>外部候选（非权威）</strong>：<span>{providerCandidate.text}</span></p>}
             </section>}
           </section>}
         </div>

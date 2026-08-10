@@ -110,6 +110,7 @@ def create_app(
     app.state.provider_registry = provider_registry or ProviderRegistry("local")
     app.state.provider_previews = {}
     app.state.credential_service = credential_service
+    app.state.provider_controller = None
     app.state.profile_name = profile_name
     app.state.published_settings = _validated_published_settings(published_settings, profile_name=profile_name)
     session_manager = getattr(policy, "sessions", None)

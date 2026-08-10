@@ -12,6 +12,7 @@ from projectb.providers.port import (
     ExplanationInput,
     FeedbackInput,
     PracticeInput,
+    ProviderBinding,
     ProviderCandidate,
     ProviderInput,
     ProviderOperation,
@@ -34,7 +35,12 @@ class ConsentError(RuntimeError):
 class ConsentPreview:
     operation: ProviderOperation
     profile_id: str
+    adapter_id: str
+    model_id: str
     policy_fingerprint: str
+    config_fingerprint: str
+    credential_ref: str
+    input_token_cap: int
     max_tokens: int
     max_cost_microusd: int
     nonce: str
@@ -51,9 +57,10 @@ class ConsentRecord:
 
 
 class ConsentService:
-    def __init__(self, database: Any) -> None:
+    def __init__(self, database: Any, registry: ProviderRegistry | None = None) -> None:
         self.database = database
         self.profiles = ProviderProfileRepository(database)
+        self.registry = registry
 
     def preview_explanation(
         self,
@@ -61,8 +68,8 @@ class ConsentService:
         locator_ids: tuple[str, ...],
         profile_id: str,
         instruction: str,
-        max_tokens: int,
-        max_cost_microusd: int,
+        max_tokens: int | None = None,
+        max_cost_microusd: int | None = None,
         nonce: str,
     ) -> ConsentPreview:
         request = ExplanationInput(self._sources(locator_ids), instruction)
@@ -75,8 +82,8 @@ class ConsentService:
         profile_id: str,
         evaluator_id: str,
         variant_id: str,
-        max_tokens: int,
-        max_cost_microusd: int,
+        max_tokens: int | None = None,
+        max_cost_microusd: int | None = None,
         nonce: str,
     ) -> ConsentPreview:
         request = PracticeInput(self._sources(locator_ids), evaluator_id, variant_id)
@@ -89,8 +96,8 @@ class ConsentService:
         profile_id: str,
         outcome: Outcome,
         rubric: tuple[RubricItem, ...],
-        max_tokens: int,
-        max_cost_microusd: int,
+        max_tokens: int | None = None,
+        max_cost_microusd: int | None = None,
         nonce: str,
     ) -> ConsentPreview:
         request = FeedbackInput(self._sources(locator_ids), outcome, rubric)
@@ -100,8 +107,9 @@ class ConsentService:
         if self._request_hash(preview) != preview.request_hash:
             raise ConsentError("consent_mismatch")
         profile = self._profile(preview.profile_id)
-        if profile.policy_fingerprint != preview.policy_fingerprint or preview.max_cost_microusd > profile.budget_limit:
+        if not self._profile_matches_preview(profile, preview):
             raise ConsentError("consent_policy_mismatch")
+        self._validate_current_binding(preview)
         consent_id = "consent-" + hashlib.sha256(f"{preview.nonce}:{preview.request_hash}".encode()).hexdigest()
         source_metadata = {
             "max_cost_microusd": preview.max_cost_microusd,
@@ -141,6 +149,7 @@ class ConsentService:
     ) -> ProviderCandidate:
         if self._request_hash(preview) != preview.request_hash:
             raise ConsentError("consent_mismatch")
+        self._validate_current_binding(preview)
         connection = self.database.connect()
         try:
             connection.execute("BEGIN IMMEDIATE")
@@ -195,21 +204,48 @@ class ConsentService:
         operation: ProviderOperation,
         profile_id: str,
         request: ProviderInput,
-        max_tokens: int,
-        max_cost_microusd: int,
+        max_tokens: int | None,
+        max_cost_microusd: int | None,
         nonce: str,
     ) -> ConsentPreview:
         profile = self._profile(profile_id)
         if OPAQUE_PATTERN.fullmatch(nonce) is None:
             raise ConsentError("nonce_invalid")
-        if type(max_tokens) is not int or max_tokens <= 0 or type(max_cost_microusd) is not int or max_cost_microusd < 0:
-            raise ConsentError("budget_invalid")
+        binding = self._binding(profile_id)
+        if binding is not None:
+            if (max_tokens is not None and max_tokens != binding.output_token_cap) or (
+                max_cost_microusd is not None and max_cost_microusd != binding.max_cost_microusd
+            ):
+                raise ConsentError("consent_policy_mismatch")
+            max_tokens = binding.output_token_cap
+            max_cost_microusd = binding.max_cost_microusd
+            if not self._profile_matches_binding(profile, binding):
+                raise ConsentError("consent_policy_mismatch")
+        else:
+            if type(max_tokens) is not int or max_tokens <= 0 or type(max_cost_microusd) is not int or max_cost_microusd < 0:
+                raise ConsentError("budget_invalid")
+            binding = ProviderBinding(
+                adapter_id=profile.adapter_id,
+                model_id=profile.model_id,
+                input_token_cap=max_tokens,
+                output_token_cap=max_tokens,
+                max_cost_microusd=max_cost_microusd,
+                credential_ref=profile.credential_ref,
+                config_fingerprint=profile.config_fingerprint,
+                policy_fingerprint=profile.policy_fingerprint,
+            )
+        assert isinstance(max_tokens, int) and isinstance(max_cost_microusd, int)
         if max_cost_microusd > profile.budget_limit:
             raise ConsentError("budget_exceeded")
         provisional = ConsentPreview(
             operation,
             profile_id,
+            binding.adapter_id,
+            binding.model_id,
             profile.policy_fingerprint,
+            binding.config_fingerprint,
+            binding.credential_ref,
+            binding.input_token_cap,
             max_tokens,
             max_cost_microusd,
             nonce,
@@ -217,13 +253,32 @@ class ConsentService:
             "",
         )
         request_hash = self._request_hash(provisional)
-        return ConsentPreview(operation, profile_id, profile.policy_fingerprint, max_tokens, max_cost_microusd, nonce, request, request_hash)
+        return ConsentPreview(
+            operation,
+            profile_id,
+            binding.adapter_id,
+            binding.model_id,
+            profile.policy_fingerprint,
+            binding.config_fingerprint,
+            binding.credential_ref,
+            binding.input_token_cap,
+            max_tokens,
+            max_cost_microusd,
+            nonce,
+            request,
+            request_hash,
+        )
 
     @staticmethod
     def _request_hash(preview: ConsentPreview) -> str:
         identity = {
+            "adapter_id": preview.adapter_id,
+            "config_fingerprint": preview.config_fingerprint,
+            "credential_ref": preview.credential_ref,
+            "input_token_cap": preview.input_token_cap,
             "max_cost_microusd": preview.max_cost_microusd,
             "max_tokens": preview.max_tokens,
+            "model_id": preview.model_id,
             "nonce": preview.nonce,
             "operation": preview.operation,
             "policy_fingerprint": preview.policy_fingerprint,
@@ -256,6 +311,60 @@ class ConsentService:
             return self.profiles.get(profile_id)
         except ProviderProfileError as error:
             raise ConsentError(error.code) from None
+
+    def _binding(self, profile_id: str) -> ProviderBinding | None:
+        if self.registry is None:
+            return None
+        provider = self.registry.resolve(profile_id)
+        if provider is None:
+            raise ConsentError("provider_unconfigured")
+        binding = getattr(provider, "binding", None)
+        if not isinstance(binding, ProviderBinding):
+            if self.registry.environment in {"test", "demo"}:
+                return None
+            raise ConsentError("consent_policy_mismatch")
+        return binding
+
+    @staticmethod
+    def _profile_matches_binding(profile, binding: ProviderBinding) -> bool:  # type: ignore[no-untyped-def]
+        return (
+            profile.adapter_id == binding.adapter_id
+            and profile.model_id == binding.model_id
+            and profile.budget_limit == binding.max_cost_microusd
+            and profile.credential_ref == binding.credential_ref
+            and profile.config_fingerprint == binding.config_fingerprint
+            and profile.policy_fingerprint == binding.policy_fingerprint
+        )
+
+    def _profile_matches_preview(self, profile, preview: ConsentPreview) -> bool:  # type: ignore[no-untyped-def]
+        return (
+            profile.adapter_id == preview.adapter_id
+            and profile.model_id == preview.model_id
+            and (
+                profile.budget_limit == preview.max_cost_microusd
+                if preview.adapter_id == "openai"
+                else preview.max_cost_microusd <= profile.budget_limit
+            )
+            and profile.config_fingerprint == preview.config_fingerprint
+            and profile.credential_ref == preview.credential_ref
+            and profile.policy_fingerprint == preview.policy_fingerprint
+        )
+
+    def _validate_current_binding(self, preview: ConsentPreview) -> None:
+        binding = self._binding(preview.profile_id)
+        if binding is None:
+            return
+        if (
+            binding.adapter_id != preview.adapter_id
+            or binding.model_id != preview.model_id
+            or binding.input_token_cap != preview.input_token_cap
+            or binding.output_token_cap != preview.max_tokens
+            or binding.max_cost_microusd != preview.max_cost_microusd
+            or binding.credential_ref != preview.credential_ref
+            or binding.config_fingerprint != preview.config_fingerprint
+            or binding.policy_fingerprint != preview.policy_fingerprint
+        ):
+            raise ConsentError("consent_policy_mismatch")
 
     def _sources(self, locator_ids: tuple[str, ...]) -> tuple[SourceFragment, ...]:
         connection = self.database.connect()
