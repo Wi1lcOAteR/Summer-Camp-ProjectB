@@ -1,6 +1,6 @@
 # DIST-01 Evidence
 
-Status: local development verification complete; clean-host close remains separate.
+Status: current optimized artifact passes local development verification; clean-host performance retest is pending.
 
 The Windows package is a single `ProjectB.exe` produced by the pinned
 PyInstaller recipe. The executable embeds the Vite build and the complete
@@ -9,9 +9,11 @@ third-party notice bundle, writes SQLite/content below the explicit data root
 `127.0.0.1` only. The smoke script checks value-free credential status through
 the application endpoint and never prints a credential value.
 
-The clean Windows 11 x64 / WinVault lifecycle gate is owned by
-`DIST-01-VM-CLOSE` and remains `not executed` until that environment is
-available.
+The clean Windows 11 x64 environment was created and exercised with the prior
+artifact, but the required readiness measurement did not meet the `<=10.0`
+second threshold. The current smaller artifact has not yet been copied into
+that guest and remeasured. The WinVault lifecycle is therefore not represented
+as a completed gate.
 
 ## Development receipt (2026-08-10)
 
@@ -39,5 +41,45 @@ PDFium DLL, and keyring resources.
 The GitHub `windows-package` job is push-triggered, pins the Windows runner,
 Python/Node/action revisions, runs the same contract/build, scans the local
 artifact, and prints its hash. It does not upload or publish the executable.
-The clean Windows 11 x64 / WinVault lifecycle gate remains
-`DIST-01-VM-CLOSE: not executed`; no clean-host or SmartScreen claim is made.
+## Clean Windows VM attempt (2026-08-11)
+
+The coordinator rebuilt the release worktree with Python 3.14.6 and
+PyInstaller 6.21.0. The artifact measured in this attempt was `36,640,080` bytes with SHA-256
+`DAC2D69B27D85C65BBC32F068EA7D55AD8876237CFC177ACBB40D5F3584F09AB`.
+
+The test guest was Windows 11 Enterprise Evaluation x64 build 26200 with 2
+logical processors, 8 GiB RAM, an 80 GiB virtual disk reported by Windows as
+SSD, and no installed Python, Node.js, or Docker runtime. Python Store aliases
+were excluded only after confirming they reported version `0.0.0.0` and were
+located under `Microsoft\WindowsApps`.
+
+Observed readiness measurements included `23.554`, `14.664`, and `11.487`
+seconds; strict ten-second runs also returned `startup_timeout`. Windows Update
+and VirtualBox Guest Control load were isolated, and the same artifact was
+rerun from a background guest process, but the threshold still did not pass.
+An AHCI experiment booted once but later became unresponsive during shutdown;
+the VM was returned to its retained IDE attachment and powered off. No product
+or credential file was removed.
+
+Because readiness failed, the script's real WinVault set/status/clear section
+was not counted as a completed receipt. SmartScreen was not interactively
+observed, so no warning-free claim is made. `DIST-01-VM-CLOSE` remains blocked
+on a representative clean Windows host that can produce a fresh `<=10.0`
+second receipt for the current reviewed artifact.
+
+## Current optimized artifact (2026-08-11)
+
+Archive inspection showed that optional Pillow image extensions occupied about
+7.4 MB of the single-file package even though the production PDF validator only
+opens `pypdfium2.PdfDocument` to count pages. With every `PIL` import blocked,
+the real two-page PDF fixture still returned page count 2 and loaded no Pillow
+module. A new packaging contract first failed because `PIL` was absent from the
+PyInstaller exclusion list; after the minimal exclusion, the Windows contract
+and PDF extraction tests returned `7 passed`.
+
+The rebuilt current artifact is `29,220,439` bytes with SHA-256
+`12C6131CA956FD23C5A0C14C18F74D399E09F811F0B0DA4AF9303A851C316201`.
+PyInstaller archive inspection returned no `PIL` entry, and the development
+smoke returned `WINDOWS_SMOKE_PASS profile=local credential_configured=False`.
+No clean-VM startup, SmartScreen, or WinVault PASS is claimed for this rebuilt
+artifact until the exact file is measured in the retained guest.
