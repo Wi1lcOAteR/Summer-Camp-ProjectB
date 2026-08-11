@@ -1,5 +1,12 @@
 # AGENT_LOG
 
+## 2026-08-11T20:20:00+08:00 - DIST-01 frozen migration repair
+
+- **Task / skills:** reopened `DIST-01` after the first real student-preview browser run; used `systematic-debugging`, `test-driven-development`, `requesting-code-review`, and `verification-before-completion`.
+- **Root cause / RED:** the frozen app returned 500 for `GET /api/courses` with `sqlite3.OperationalError: no such table: course`. `create_app` did call `Database.initialize()`, but `ProjectB.spec` omitted `backend/projectb/storage/migrations/*.sql`. The first contract RED returned `2 failed`; the second fail-closed package-manifest RED returned `1 failed, 1 passed`.
+- **GREEN / artifact:** commit `e06a863` adds both migrations to PyInstaller `datas`, requires their exact paths in `PKG-00.toc`, and makes Windows smoke validate `/api/courses`. Pinned PyInstaller 6.21.0 returned `WINDOWS_BUILD_PASS`; archive inspection lists `001_core.sql` and `002_learning.sql`; smoke returned `WINDOWS_SMOKE_PASS profile=local credential_configured=False`. Final artifact is `29,215,426` bytes, SHA-256 `6A6A6C890EDD434798A0CB016A13463B2B4414ED4035230683A979B872704A98`.
+- **Verification / review:** focused distribution contract `2 passed`; browser reload at `http://127.0.0.1:4173/` showed no alert and a usable empty material list; full gate returned backend `284 passed`, frontend `60 passed`, Ruff/mypy/Vite green, credential scan `files=524`, license closure green, and `TEST_ALL_PASS mode=all`. Final two-stage review returned `PASS; Critical=0, Major=0`. No new dependency or license obligation was introduced.
+
 ## 2026-08-11T18:35:00+08:00 - D-026 student waiver and submission packaging start
 
 - **Decision / skill:** the student explicitly waived the current-artifact clean-VM and `<=10` second internal gate after the coordinator distinguished it from the course's distribution and final-CI requirements. `brainstorming` was used as a bounded decision check; a new `docs/superpowers/` design file was not created because repository policy retires that tree and the student had already approved the exact outcome.

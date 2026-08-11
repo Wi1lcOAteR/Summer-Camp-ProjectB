@@ -748,3 +748,10 @@
 - **修订前：** 当前产物必须再次复制到指定干净 Windows VM，并取得 `<=10.0` 秒、SmartScreen 和 WinVault 同次收据，才能关闭 DOC-01。
 - **修订后：** D-026 取消当前产物再次干净机复测和 `<=10` 秒提交门禁。保留上一版产物在无 Python/Node/Docker 的 Windows 11 VM 成功启动及最低 `11.487` 秒的真实记录，保留当前产物的确定性构建、归档检查、开发机 smoke、凭据测试和 README 限制；不把 waived 写成 PASS。
 - **影响：** 本地提交包可闭合。学生进一步明确 ProjectB 是本地单文件应用，FastAPI 仅提供 loopback WebUI；按课程第 4.11 节“如做带服务端的项目”的条件条款，D-025 不要求公网部署。课程最终 CI 的真实远端 PASS 仍需 NJU GitLab/GitHub 外部仓库与 runner，未执行时必须继续标注 `not executed`。
+
+## 24. 2026-08-11 冻结包迁移资源修复
+
+- **触发：** 首次把当前 `ProjectB.exe` 作为学生预览入口打开时，首页显示导入失败；真实 `GET /api/courses` 返回 500，日志为 `sqlite3.OperationalError: no such table: course`。
+- **根因：** 源码 `create_app` 已调用 `Database.initialize()`，但 PyInstaller spec 没有把 `backend/projectb/storage/migrations/*.sql` 放入单文件归档；冻结运行时只能创建 `schema_migrations`，无法创建业务表。
+- **修订前后：** RED 合同要求迁移目录、两份精确 SQL 资源和 `/api/courses` smoke；实现把 migrations 加入 `datas`，让 `build.ps1` 对 `PKG-00.toc` 失败关闭，并让 smoke 实际解析课程列表。终端提交为 `e06a863`。
+- **结果：** 归档列出 `001_core.sql`、`002_learning.sql`；Windows smoke、浏览器空数据首屏、完整后端/前端门禁和两阶段复审均通过。该修复不改变产品范围、D-025/D-026 或远端 CI 状态。

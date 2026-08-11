@@ -30,7 +30,7 @@ CPython runtime and a worktree-local temporary root:
 | Artifact | `dist/ProjectB.exe`, 36,634,645 bytes |
 | Artifact SHA-256 | `1E256C07B675F8C4F5B434452FED0AA9B1969E5ED932C3CCB5BC1BB9D9ABF64B` |
 | Artifact credential scan | `CREDENTIAL_SCAN_PASS files=0` (the canonical scanner intentionally skips `.exe`; this is not an embedded-binary string scan) |
-| Development smoke | `WINDOWS_SMOKE_PASS profile=local credential_configured=False` on `127.0.0.1`; WebUI root and SQLite data-root checks passed |
+| Development smoke | `WINDOWS_SMOKE_PASS profile=local credential_configured=False` on `127.0.0.1`; WebUI root, SQLite migrations/data root, `/api/courses`, and credential-status checks passed |
 | Cleanup | smoke left no owned `ProjectB` process or listener on the test port and removed only its disposable `tmp` run directory; a pre-existing exact-artifact process is rejected and retained |
 | Full local gate | backend `246 passed`; frontend `60 passed`; `TEST_ALL_PASS mode=all`; license and credential gates passed |
 
@@ -78,10 +78,17 @@ module. A new packaging contract first failed because `PIL` was absent from the
 PyInstaller exclusion list; after the minimal exclusion, the Windows contract
 and PDF extraction tests returned `7 passed`.
 
-The rebuilt current artifact is `29,220,439` bytes with SHA-256
-`12C6131CA956FD23C5A0C14C18F74D399E09F811F0B0DA4AF9303A851C316201`.
-PyInstaller archive inspection returned no `PIL` entry, and the development
-smoke returned `WINDOWS_SMOKE_PASS profile=local credential_configured=False`.
+The rebuilt current artifact is `29,215,426` bytes with SHA-256
+`6A6A6C890EDD434798A0CB016A13463B2B4414ED4035230683A979B872704A98`.
+The first browser handoff exposed a real frozen-package failure:
+`GET /api/courses` returned 500 because the PyInstaller archive omitted
+`001_core.sql` and `002_learning.sql`. The RED distribution contract returned
+`2 failed`; terminal repair `e06a863` adds both migrations to `datas`, makes
+`build.ps1` verify both exact `PKG-00.toc` paths, and makes the smoke call
+`/api/courses`. The rebuilt archive lists both SQL files, the focused contract
+returns `2 passed`, and the development smoke returns
+`WINDOWS_SMOKE_PASS profile=local credential_configured=False`. Browser
+revalidation shows no alert and an empty usable material list.
 No clean-VM startup, SmartScreen, WinVault, or `<=10` second PASS is claimed for
 this rebuilt artifact. D-026 makes that exact rerun non-blocking for the local
 submission package.

@@ -44,7 +44,7 @@ python scripts/test_all.py
 powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/build.ps1 -Python C:\Python314\python.exe -Output dist/ProjectB.exe
 ```
 
-产物内嵌 WebUI、后端和许可证文件，只监听 `127.0.0.1`。当前重新构建产物 SHA-256 为 `12C6131CA956FD23C5A0C14C18F74D399E09F811F0B0DA4AF9303A851C316201`，大小为 `29,220,439` 字节。它未进行 Authenticode 签名，Windows 可能显示 SmartScreen 警告；不要把该制品描述为已签名正式发布版。
+产物内嵌 WebUI、后端、SQLite 迁移和许可证文件，只监听 `127.0.0.1`。当前重新构建产物 SHA-256 为 `6A6A6C890EDD434798A0CB016A13463B2B4414ED4035230683A979B872704A98`，大小为 `29,215,426` 字节。它未进行 Authenticode 签名，Windows 可能显示 SmartScreen 警告；不要把该制品描述为已签名正式发布版。
 
 ## OCI 本地演示
 
