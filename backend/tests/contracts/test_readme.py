@@ -39,8 +39,9 @@ def test_readme_records_required_delivery_contract_without_false_completion_clai
     ):
         assert literal in text
 
-    assert "干净 Windows VM 的 10 秒启动门槛尚未通过" in text
-    assert "公网部署已按项目决策豁免" in text
+    assert "D-026 豁免当前 29.22 MB 产物的再次干净机复测" in text
+    assert "该豁免不等于性能 PASS" in text
+    assert "不需要远程服务端或公网部署" in text
     assert "远端 GitLab/GitHub CI 尚未执行" in text
     assert "CI 已全部通过" not in text
     assert "正式发布已完成" not in text

@@ -1,6 +1,6 @@
 # DIST-01 Evidence
 
-Status: current optimized artifact passes local development verification; clean-host performance retest is pending.
+Status: current optimized artifact passes local development verification; exact-artifact clean-host performance retest was waived by student decision D-026.
 
 The Windows package is a single `ProjectB.exe` produced by the pinned
 PyInstaller recipe. The executable embeds the Vite build and the complete
@@ -10,10 +10,11 @@ third-party notice bundle, writes SQLite/content below the explicit data root
 the application endpoint and never prints a credential value.
 
 The clean Windows 11 x64 environment was created and exercised with the prior
-artifact, but the required readiness measurement did not meet the `<=10.0`
-second threshold. The current smaller artifact has not yet been copied into
-that guest and remeasured. The WinVault lifecycle is therefore not represented
-as a completed gate.
+artifact, but the readiness measurement did not meet the former `<=10.0`
+second threshold. The student explicitly waived copying the current smaller
+artifact into that guest for another timing run. The WinVault lifecycle is not
+represented as a clean-VM PASS; separate deterministic credential tests and
+the development-host lifecycle remain the available evidence.
 
 ## Development receipt (2026-08-10)
 
@@ -63,9 +64,9 @@ or credential file was removed.
 
 Because readiness failed, the script's real WinVault set/status/clear section
 was not counted as a completed receipt. SmartScreen was not interactively
-observed, so no warning-free claim is made. `DIST-01-VM-CLOSE` remains blocked
-on a representative clean Windows host that can produce a fresh `<=10.0`
-second receipt for the current reviewed artifact.
+observed, so no warning-free claim is made. On 2026-08-11 the student closed
+`DIST-01-VM-CLOSE` by waiver D-026 rather than by a current-artifact performance
+PASS; the historical measurements remain evidence, not a successful threshold.
 
 ## Current optimized artifact (2026-08-11)
 
@@ -81,5 +82,6 @@ The rebuilt current artifact is `29,220,439` bytes with SHA-256
 `12C6131CA956FD23C5A0C14C18F74D399E09F811F0B0DA4AF9303A851C316201`.
 PyInstaller archive inspection returned no `PIL` entry, and the development
 smoke returned `WINDOWS_SMOKE_PASS profile=local credential_configured=False`.
-No clean-VM startup, SmartScreen, or WinVault PASS is claimed for this rebuilt
-artifact until the exact file is measured in the retained guest.
+No clean-VM startup, SmartScreen, WinVault, or `<=10` second PASS is claimed for
+this rebuilt artifact. D-026 makes that exact rerun non-blocking for the local
+submission package.

@@ -55,7 +55,7 @@ docker build --platform linux/amd64 --file packaging/oci/Dockerfile --tag projec
 docker run --rm --read-only --tmpfs /tmp/projectb-demo:rw,size=64m -e PROJECTB_DEMO_LOCAL_SMOKE=1 -p 127.0.0.1:7860:7860 projectb-demo:local
 ```
 
-镜像以 UID/GID `10001:10001` 运行，根文件系统只读，临时状态位于 64 MiB tmpfs，并在进程内拒绝外发网络。已验证的本地镜像与 smoke 证据见 [DIST-02_EVIDENCE.md](docs/engineering/DIST-02_EVIDENCE.md)。公网部署已按项目决策豁免。
+镜像以 UID/GID `10001:10001` 运行，根文件系统只读，临时状态位于 64 MiB tmpfs，并在进程内拒绝外发网络。已验证的本地镜像与 smoke 证据见 [DIST-02_EVIDENCE.md](docs/engineering/DIST-02_EVIDENCE.md)。本项目按 D-025 作为本地应用交付，不创建公网部署。
 
 ## 安全与凭据
 
@@ -96,8 +96,8 @@ python scripts/verify_licenses.py
 
 ## 已知限制与交付状态
 
-- 干净 Windows VM 的 10 秒启动门槛尚未通过。上一版 36.64 MB 产物在 VirtualBox/Hyper-V 双核环境中的最低实测为 `11.487` 秒；当前 29.22 MB 优化产物已通过开发机 smoke，但尚未在该干净 VM 重新计时，因此不能声称 `DIST-01-VM-CLOSE` 完成。
+- 上一版 36.64 MB 产物曾在无 Python/Node/Docker 的 Windows 11 VM 启动，最低实测为 `11.487` 秒。学生已通过 D-026 豁免当前 29.22 MB 产物的再次干净机复测及 `<=10` 秒内部指标；当前产物已通过确定性构建、归档检查和开发机 smoke，但该豁免不等于性能 PASS。
 - Windows 产物未签名；SmartScreen 的实际表现依机器信誉而异。
-- 公网部署已按项目决策豁免；OCI 只作为本地确定性演示，不接受材料上传或真实提供方凭据。
+- 项目决策 D-025 将 `ProjectB.exe` 归类为本地应用；浏览器访问 loopback WebUI，不需要远程服务端或公网部署。OCI 只作为本地确定性演示，不接受材料上传或真实提供方凭据。
 - 远端 GitLab/GitHub CI 尚未执行；本地 CI 合同通过不能替代课程提交对应 commit 的远端绿色流水线。
 - 真实 OpenAI 路径需要用户自备凭据并承担费用；自动测试只使用 mock transport，不进行付费调用。

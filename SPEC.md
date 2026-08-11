@@ -23,7 +23,7 @@ Treat uploaded bytes, filenames, URLs, model output, and tool arguments as untru
 Credentials use Windows Credential Manager in local profile. First run provides hidden entry and status/update/clear operations; status never echoes a value. No real secret may be stored in SQLite, config, browser storage, Git, logs, fixtures, snapshots, process arguments, or committed environment files. Runtime test fixtures assemble secret-shaped positives from non-matching fragments. Every implementation/evidence commit is scanned. Third-party code and assets require source and license records.
 
 ## Agent and delivery boundary
-V1 contains no autonomous multi-round agent. If later added, its loop, tool dispatch, guards, and deterministic mock tests require a new student-approved specification. The shipped application must provide a React WebUI, Windows x64 single-file distribution, an OCI mock demo, GitLab CI with a job named unit-test, GitHub CI evidence, and one-command tests. Delivery is local-only for this project: a local WebUI URL and architecture are required, while public HTTPS hosting and public URL evidence are waived by the student's D-025 decision. Remote push, PR, deployment, paid resource creation, G-04 implementation approval, and student reflection remain human gates. REFLECTION.md must be written by the student; AI may only polish a supplied draft and declare assistance.
+V1 contains no autonomous multi-round agent. If later added, its loop, tool dispatch, guards, and deterministic mock tests require a new student-approved specification. The shipped application must provide a React WebUI, Windows x64 single-file distribution, an OCI mock demo, GitLab CI with a job named unit-test, GitHub CI evidence, and one-command tests. Delivery is local-only for this project by the student's D-025 decision: `ProjectB.exe` runs the loopback FastAPI process and serves the React WebUI at a local URL. Under the student's interpretation of the course's conditional cloud-deployment clause for server-hosted projects, no public host is required for this local binary application. Remote push, PR, paid resource creation, G-04 implementation approval, and student reflection remain human gates. REFLECTION.md must be written by the student; AI may only polish a supplied draft and declare assistance.
 
 ## Baseline acceptance used by G-03
 Before product implementation, a fresh non-Codex intake session and a separate execution session receive only final SPEC.md and PLAN.md. Intake must report both full-file SHA-256 hashes, the complete two-file listing, effective language, target F-01S1A, acceptance ID F01S1A_SINGLE_RULE_SCANNER_V2, and ambiguities. Execution starts only when ambiguities are empty. It creates only scripts/tests/bootstrap_scanner_contract.ps1 and scripts/bootstrap_scan_credentials.ps1, implements the locked single-path protocol plus provider_api_key rule, demonstrates the exact missing-scanner red and unchanged-command green, stays within the artifact and final-summary budgets, and never commits or integrates output. Formal implementation repeats F-01S1A after G-04; F-01S1B serially adds the remaining direct rules.
@@ -168,7 +168,7 @@ WebUI 使用 Open Design 的 `frontend-design` skill 与 `default` / Neutral Mod
 - 已缓存的本地非导入 API 在合成数据下 p95 小于 500 ms。
 - 单文件导入最长 30 秒；超时返回可重试错误且不提交半完成版本。
 - provider 请求默认 60 秒超时、一次显式重试上限为 0；用户可重新发起并生成新的 consent。
-- Windows 应用在参考环境冷启动后 10 秒内提供可访问 WebUI。
+- Windows 应用须提供可访问 WebUI；D-026 已由学生豁免当前产物再次进入干净 VM 及 `<=10` 秒的内部性能门禁。保留上一版产物的干净机启动事实、当前产物的开发机 smoke 与已知限制，不把豁免表述为性能 PASS。
 - SQLite 写入使用事务；重复导入、attempt 和 plan generation 有确定性幂等键。
 
 ### 5.2 可观测性与错误处理
@@ -240,7 +240,7 @@ React/Vite WebUI
 ## 9. 分发、部署与 CI
 
 - 本地分发：Windows x64 单文件 `ProjectB.exe`，首次启动创建当前用户数据目录并打开 loopback WebUI；README 说明 SmartScreen、架构、数据目录、凭据录入和清除。
-- 本地演示：`linux/amd64` OCI 镜像，单条 `docker build` 与单条 `docker run` 启动 demo profile。公网托管由 D-025 明确 waived；不得静默付费或创建云资源。
+- 本地演示：`linux/amd64` OCI 镜像，单条 `docker build` 与单条 `docker run` 启动 demo profile。D-025 将本项目归类为本地二进制应用，不创建公网托管；不得静默付费或创建云资源。
 - GitLab：`.gitlab-ci.yml` 必须含名称严格为 `unit-test` 的 job，并在 push 运行测试；最终课程提交对应 pipeline 必须 PASS。
 - GitHub：镜像仓库保留 PR 历史和 Actions；每次 push 测试并构建相应分发产物。
 - README 最终必须包含项目简介、安装、运行、分发命令、目录结构、安全边界、凭据配置、已知限制、部署架构、第三方依赖与许可证。
@@ -289,9 +289,9 @@ G-03 intake 的目标固定为 `F-01S1A`，acceptance ID 固定为 `F01S1A_SINGL
 | AC-16 | 四阶段 WebUI 在 360/768/1440 px 无溢出，键盘可用且 axe 无 serious/critical 违规 |
 | AC-17 | demo 使用许可 fixture + mock，禁止上传、凭据、provider 出网和跨 session 持久化 |
 | AC-18 | `python scripts/test_all.py` 在干净项目环境运行全部核心测试并以非零退出表示任一失败 |
-| AC-19 | Windows 单文件在目标 Windows x64 干净环境启动并完成 smoke；README 说明安全配置和限制 |
+| AC-19 | Windows x64 单文件通过确定性构建与开发机 smoke；上一版产物已在无 Python/Node/Docker 的 Windows 11 VM 启动，当前产物的精确干净机复测与 `<=10` 秒阈值由 D-026 waived；README 说明安全配置、未签名状态和限制 |
 | AC-20 | OCI 镜像可由单条 build/run 启动；GitLab `unit-test` 与 GitHub CI 均通过 |
-| AC-21 | 提供可本地访问的 WebUI URL，README 记录本地架构和 CI/CD；公网 HTTPS URL 由 D-025 明确 waived |
+| AC-21 | `ProjectB.exe` 提供可本地访问的 loopback WebUI URL，README 记录本地架构和 CI/CD；D-025 按课程“如做带服务端项目”的条件条款不要求公网部署 |
 | AC-22 | 每个实现 task 有红/绿/回归、两阶段评审、凭据扫描、commit hash 和 AGENT_LOG 记录 |
 | AC-23 | 不含真实凭据或未记录许可证；第三方来源与许可证在 README/清单中可追溯 |
 | AC-24 | 不同类型的新鲜编码智能体只凭最终 SPEC/PLAN 完成只读 intake，并在无歧义时由第二个全新 session 尝试原子任务 F-01S1A；字段语义、产物/摘要预算、问题、误解、diff、费用和独立红绿复验写入 SPEC_PROCESS；同类型 Codex 只能记为 G-03P 占位预审 |
@@ -312,7 +312,8 @@ G-03 intake 的目标固定为 `F-01S1A`，acceptance ID 固定为 `F01S1A_SINGL
 | 风险/决策 | 当前处理 |
 | --- | --- |
 | 已确认 SPEC 后发生范围漂移 | 任何产品条款变化必须形成明确 diff 并重新由学生确认；状态/证据元数据不得静默改变验收合同 |
-| D-025 公网托管 | 学生已确认本项目本地交付，公网托管与公网 URL waived；不阻塞本地实现、分发或文档 |
+| D-025 公网托管 | 学生确认本项目是本地单文件应用，FastAPI 仅为 loopback UI 服务；按课程云部署条件条款不做公网托管，本地 WebUI URL 作为应用入口 |
+| D-026 Windows VM 性能门禁 | 学生于 2026-08-11 明确豁免当前产物再次进入干净 VM 和 `<=10` 秒阈值；历史测量与当前本地 smoke 如实保留，不宣称性能 PASS |
 | Claude 冷启动曾空结束、504 及长时间 thinking | 保留真实失败；不猜测传输根因。用英文 capsule、原子 F-01S1A、锁定字段、产物/摘要预算、超时和产物后置条件失败关闭，再做一次受控复测 |
 | 真实课件许可未知 | 只允许本地私人使用；仓库、CI、分发和 demo 只能使用合成或明确许可 fixture |
 | Provider 能力/政策/价格会变化 | 每次实现/运行前刷新 allowlisted snapshot；无法证明时失败关闭 |

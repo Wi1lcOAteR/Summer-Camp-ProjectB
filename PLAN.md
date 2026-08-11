@@ -31,9 +31,9 @@ A candidate execution has exactly the two input documents and two allowed artifa
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` or `superpowers:executing-plans` to execute one task at a time. Every behavior task uses `superpowers:test-driven-development`; unexpected failures use `superpowers:systematic-debugging`; reviews use `superpowers:requesting-code-review` and `superpowers:receiving-code-review`; completion claims use `superpowers:verification-before-completion`; each worktree group closes with `superpowers:finishing-a-development-branch`.
 
-**Status:** `G-03 COMPLETE / G-04 APPROVED / IMPLEMENTATION ACTIVE`
+**Status:** `LOCAL IMPLEMENTATION COMPLETE / EXTERNAL CI PENDING`
 
-**SPEC binding:** the student confirmed the complete G-03 atomic SPEC on 2026-08-03 and later confirmed local-only delivery on 2026-08-09. Current SPEC SHA-256 is `483EF900BF9F5ED90FDA6117607D8F2436F3BDA633033FE2A0CB64AD6CAFC72E`; prior reviews and intake do not transfer to these bytes.
+**SPEC binding:** the student confirmed the complete G-03 atomic SPEC on 2026-08-03, local-only delivery on 2026-08-09, and D-026 removal of the current-artifact clean-VM/10-second internal gate on 2026-08-11. Current SPEC SHA-256 is `312851CC77CA1E5E83CD87BEFF9A43539A87E656C85C9EF03541F53B6928F90A`; prior reviews and intake do not transfer to these bytes.
 
 **Goal:** Build the reduced v1 local study workbench: source-grounded material import and mapping, deterministic learning evidence for mutex/race/deadlock, and continuous/finals review planning, with an optional consent-bound OpenAI P adapter and a local-only mock demo.
 
@@ -50,7 +50,7 @@ No formal task dispatch, task-status change, implementation commit, or integrati
 3. The repaired SPEC/PLAN snapshot is re-reviewed if either file changes.
 4. `G-04`: after reading the cold-start record and repairs, the student explicitly approves implementation. The earlier SPEC confirmation is not G-04.
 
-The student has confirmed local-only delivery for this project; D-025 public hosting and public URL evidence are waived and do not block local implementation or local release. `EXT-REMOTE-PREP`/`EXT-REMOTE-FINAL` remain unexecuted remote-mutation gates and cannot be represented as local evidence.
+The student has confirmed local-only delivery for this project. D-025 classifies `ProjectB.exe` as a local binary application whose loopback FastAPI process serves its WebUI, so the course's conditional cloud-deployment clause for server-hosted projects does not require a public host. D-026 waives current-artifact clean-VM/10-second evidence. Neither decision blocks local implementation or the local submission package. `EXT-REMOTE-PREP`/`EXT-REMOTE-FINAL` remain unexecuted remote repository and CI gates and cannot be represented as local evidence.
 
 ## 2. Worktrees, Ownership, and Order
 
@@ -66,7 +66,7 @@ After G-04, the coordinator creates these worktrees in order. `codex/foundation-
 | `codex/demo-v1` | DEMO-01 | next branch starts only at its reviewed terminal tip |
 | `codex/provider-openai-v1` | P-02 | next branch starts only at its reviewed terminal tip |
 | `codex/distribution-v1` | DIST-01 -> DIST-02 | next branch starts only at its reviewed terminal tip |
-| `codex/release-v1` | CI-01 -> PREP/HOST/VM closures -> DOC-01 -> compliance -> REFLECTION-CLOSE -> EXT-REMOTE-FINAL | no push, MR, PR, deployment, publication, reflection commit, retarget, or merge without its named gate |
+| `codex/release-v1` | CI-01 -> D-025/D-026 decisions -> DOC-01 -> compliance -> REFLECTION-CLOSE -> EXT-REMOTE-FINAL | no push, MR, PR, deployment, publication, retarget, or merge without its named gate |
 
 Only the root coordinator edits `PLAN.md`, `AGENT_LOG.md`, `SPEC_PROCESS.md`, or the compliance audit. Workers never stage those paths. Shared evidence updates happen after a terminal reviewed implementation hash exists. DOC-01 therefore does not own the compliance audit; the coordinator updates it in the scanned evidence commit after DOC-01 review.
 
@@ -172,7 +172,7 @@ git diff --check
 | 36 | DIST-01 | P-02 + QA-RELEASE | no: Windows release | distribution | complete | `662a381` |
 | 37 | DIST-02 | DIST-01 | no: consumes frozen frontend/runtime | distribution | complete | `5145fea` |
 | 38 | CI-01 | DIST-02 | no: consumes all commands | release | complete | `3a51c7b` |
-| 39 | DOC-01 | CI-01 + DIST-01-VM-CLOSE | no: final verified guide | release | in progress: guide/reflection committed; exact current-artifact VM performance and remote CI pending | `9908799` (local docs; VM gate open) |
+| 39 | DOC-01 | CI-01 + D-026 | no: final verified guide | release | complete | `9908799` |
 
 ## 5. Foundation Tasks
 
@@ -505,11 +505,11 @@ This is not a dispatch task and owns no file. From a clean worktree, run the com
 
 ### DOC-01: Final README, compliance, notices, and release evidence
 
-- **Dependencies / parallelism:** CI-01 and DIST-01-VM-CLOSE; no, because it records observed local release facts and must not predict remote or public deployment facts.
+- **Dependencies / parallelism:** CI-01 and the recorded D-025/D-026 decisions; no, because it records observed local release facts and must not predict remote or public deployment facts.
 - **Goal / files:** Create/finalize `README.md`, serially finalize `licenses/THIRD_PARTY_NOTICES.md`, create `scripts/verify_links.py` and `backend/tests/contracts/test_readme.py`. The root coordinator, not this worker, owns `docs/REQUIREMENTS_COMPLIANCE_AUDIT.md`. `REFLECTION.md` remains student-authored and is never created or filled by this task.
 - **Red:** `& $Py -m pytest backend/tests/contracts/test_readme.py -q`; expect missing project/install/run/distribution/tree/security/credential/limits/local-architecture/CI/license sections or unverified status claims.
-- **Green/refactor:** after the prerequisite receipts, rerun the exact Red command, `& $Py scripts/verify_links.py`, `BE-REGRESSION`, `FE-REGRESSION`, `LICENSE-SECURITY-GATE`, strict evidence checks, and external-browser HTTPS acceptance against the exact deployed image digest.
-- **Done / commit:** README contains only observed local commands/results, local architecture, CI/CD, credential guidance, third-party sources/licenses, and limitations; public deployment is recorded as waived/not executed per D-025 and compliance rows are implemented/verified or honestly gated. Commit `docs(DOC-01): publish verified project guide [agent: worker]`.
+- **Green/refactor:** after the prerequisite receipts, rerun the exact Red command, `& $Py scripts/verify_links.py`, `BE-REGRESSION`, `FE-REGRESSION`, `LICENSE-SECURITY-GATE`, strict evidence checks, and local-browser acceptance. Record public HTTPS deployment as `not applicable` under D-025's local-binary classification; never claim that it was executed.
+- **Done / commit:** README contains only observed local commands/results, local architecture, CI/CD, credential guidance, third-party sources/licenses, and limitations; public deployment is recorded as waived/not executed per D-025 and compliance rows are implemented/verified or honestly gated. Commit `9908799` (`docs(DOC-01): publish verified project guide [agent: coordinator]`).
 
 ## 11. External Closure Gates
 
@@ -517,9 +517,9 @@ This is not a dispatch task and owns no file. From a clean worktree, run the com
 | --- | --- | --- | --- |
 | `P-EVIDENCE` | closed locally on 2026-07-25; coordinator refreshes only after expiry or official drift, with no account/key/call | evidence SHA-256 `35a3f46e036563e3fc681df3190eb56336ab48b9d9817ad48f4d5df42230f076`; `PROVIDER_V1_P_EVIDENCE_PASS rows=7 models=2 expires=2026-08-25`; no F/File/tool behavior | P-02 only if the snapshot expires |
 | `BOOTSTRAP-LICENSE-EVIDENCE` | closed locally 2026-07-27: coordinator resolved official GitHub tags to commits and hashed Contents-API bytes; F-01B re-verifies immutable commit URLs | `docs/engineering/BOOTSTRAP_LICENSE_EVIDENCE.md` SHA-256 `FD65C5D2F8421F7B99AE4D540B80A8BBED1C28C78EF45851F7C6E5051034F310`; five URL/commit/blob/byte/hash/license rows | F-01B if evidence drifts |
-| `DIST-01-VM-CLOSE` | coordinator or student supplies a clean Windows 11 x64 VM with 2 vCPU, 8 GiB RAM, SSD, and no Python/Node/Docker; run the exact DIST-01 artifact hash, <=10.0-second readiness measurement, and disposable real WinVault lifecycle with `finally` cleanup | artifact hash, OS build/CPU/RAM/storage, startup duration, SmartScreen observation, WinVault value-free receipt, cleanup and no-secret scan | DOC-01 and final distribution claim |
-| `EXT-REMOTE-PREP` | after explicit authorization, coordinator configures NJU GitLab, GitHub mirror, and public OCI registry; before any push it proves the NJU project has a protected runner tagged only `projectb-docker-linux-amd64` with the exact DIST-02 preflight capabilities. It then pushes the nine reviewed branch tips (all contain F-01D push CI) and opens the same stacked base chain on both hosts: `foundation -> default`, `m1 -> foundation`, `m2 -> m1`, `m3-api -> m2`, `webui -> m3-api`, `demo -> webui`, `provider -> demo`, `distribution -> provider`, `release -> distribution`. It publishes/pulls the reviewed DIST-02 digest without rebuilding and does not merge yet | remote URLs; value-free GitLab runner/tag/version/arch/memory/BuildKit receipt; nine branch/commit/base/MR/PR mappings per host; visibility evidence showing GitHub public or named TA collaborator on private repo; push-trigger/current-suite/artifact-build receipts for every branch tip; public image digest/SBOM; clean pull/run receipts | deployment prerequisite and DOC-01 |
-| `D-025-HOST-CLOSE` | waived by the student for this local-only project; no host, public registry, paid resource, or public URL is required | `not applicable`/`not executed` record with the local-only decision | none |
+| `DIST-01-VM-CLOSE` / `D-026` | waived by the student on 2026-08-11 after the prior clean guest started the superseded artifact with a best observed `11.487` seconds and the current smaller artifact passed deterministic build, archive inspection, tests, and development-host smoke | historical measurements plus explicit waiver; no current-artifact clean-VM, SmartScreen, WinVault, or `<=10` second PASS is claimed | none |
+| `EXT-REMOTE-PREP` | after explicit authorization, coordinator configures NJU GitLab and the GitHub mirror; before any push it proves the NJU project has a protected runner tagged only `projectb-docker-linux-amd64` with the exact DIST-02 preflight capabilities. It then pushes the nine reviewed branch tips (all contain F-01D push CI) and opens the same stacked base chain on both hosts: `foundation -> default`, `m1 -> foundation`, `m2 -> m1`, `m3-api -> m2`, `webui -> m3-api`, `demo -> webui`, `provider -> demo`, `distribution -> provider`, `release -> distribution`. CI builds the reviewed Windows/OCI recipes without publishing an image or deployment, and the coordinator does not merge yet | remote repository URLs; value-free GitLab runner/tag/version/arch/memory/BuildKit receipt; nine branch/commit/base/MR/PR mappings per host; visibility evidence showing GitHub public or named TA collaborator on private repo; push-trigger/current-suite/artifact-build receipts for every branch tip | EXT-REMOTE-FINAL |
+| `D-025-HOST-CLOSE` | closed by the student's local-binary classification: the loopback FastAPI process is an implementation detail of `ProjectB.exe`, not a remotely hosted service; do not create a host, public registry, paid resource, or public URL without a new explicit decision | local WebUI URL and architecture receipt; public deployment `not applicable` under the conditional cloud-deployment clause | none |
 | `REFLECTION-CLOSE` | after DOC-01, the student writes `REFLECTION.md` in 1500--2500 Chinese characters as required by the course text; AI may only review a supplied draft and record assistance. The coordinator stages that student-authored file only after the declaration is present | student-authored file, character count, assistance declaration, and scanner-clean staged receipt | EXT-REMOTE-FINAL |
 | `EXT-REMOTE-FINAL` | after DOC-01, coordinator compliance update, and REFLECTION-CLOSE, coordinator commits those final docs on `codex/release-v1`, scans, pushes, and requires both hosts green. On each host, merge in dependency order: `foundation`, `m1`, `m2`, `m3-api`, `webui`, `demo`, `provider`, `distribution`, `release`. Before each merge after foundation, retarget that existing stacked MR/PR from its predecessor branch to the default branch and verify the diff contains only that worktree's reviewed commits. Use the host's ordinary merge-commit strategy; forbid squash/rebase/history rewrite and preserve every terminal task commit as an ancestor. Do not delete a source branch until its mapping and green receipt are recorded | final release source commit containing README/compliance/student reflection; nine terminal-task-to-source/base/MR/PR mappings and nine merged closures per host; each merged default-branch commit and ancestry proof; authoritative NJU `unit-test` PASS and GitHub Actions PASS for their respective exact final default-branch merge commits; immutable IDs/timestamps | final course submission/completion claim |
 
@@ -547,9 +547,9 @@ No gate permits paid resources, real-key disclosure, history rewrite, force-push
 | AC-16 | UI-01--UI-06 and QA-RELEASE |
 | AC-17 | DEMO-01 and DIST-02 |
 | AC-18 | F-01E, F-01D current-suite CI, and QA-RELEASE |
-| AC-19 | DIST-01, DIST-01-VM-CLOSE, and DOC-01 |
+| AC-19 | DIST-01, D-026, and DOC-01 |
 | AC-20 | DIST-02, CI-01, EXT-REMOTE-PREP, and EXT-REMOTE-FINAL |
-| AC-21 | Local WebUI URL and architecture in DOC-01; public HTTPS URL waived by D-025 |
+| AC-21 | Local `ProjectB.exe` WebUI URL and architecture in DOC-01; public HTTPS hosting is not applicable under D-025's local-binary classification |
 | AC-22 | per-task protocol and coordinator evidence commits |
 | AC-23 | F-01S1A--F-01S4/F-01A/F-01B/F-01E, all scans/reviews, DIST-01/02, DOC-01 |
 | AC-24 | G-03 and `SPEC_PROCESS.md` |

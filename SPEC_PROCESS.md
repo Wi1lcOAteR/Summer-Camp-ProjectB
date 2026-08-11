@@ -741,3 +741,10 @@
 - **关键修订 diff：** 合同增加内存 transport harness，分别验证 API 成功不触发 raw、API 传输失败后逐项 raw 回退、API 元数据错误禁止回退、API/raw 错误字节、双传输失败、已有 partial 文件和 junction 输出根；实现区分“API 传输不可用”与“API 返回不可信元数据”，只对前者回退。
 - **字节边界：** 五份许可证严格保持证据表的 byte count、SHA-256 和 Git blob ID。Node 上游许可证含合法 space-before-tab，仓库以 `-text -diff` 保存这组哈希产物；scanner 仅增加五个精确 extensionless 文件名，不放宽未知文件失败策略。
 - **结果与范围：** F-01B 合同、标准证据验证、离线 bootstrap、全仓凭据扫描和 staged diff 均通过。该修订只闭合 bootstrap 许可证，不改变 SPEC、依赖版本、应用功能或远程授权门禁。
+
+## 23. 2026-08-11 D-026 Windows 性能门禁收束
+
+- **学生问题与决定：** 学生询问干净 VM 验证是否为课程硬性要求。协调器区分了课程要求的可分发/可运行证据与 SPEC 自设的 `<=10` 秒指标；学生随后明确回复“那就豁免，把其他的补完然后整理成课程要求的提交包”。
+- **修订前：** 当前产物必须再次复制到指定干净 Windows VM，并取得 `<=10.0` 秒、SmartScreen 和 WinVault 同次收据，才能关闭 DOC-01。
+- **修订后：** D-026 取消当前产物再次干净机复测和 `<=10` 秒提交门禁。保留上一版产物在无 Python/Node/Docker 的 Windows 11 VM 成功启动及最低 `11.487` 秒的真实记录，保留当前产物的确定性构建、归档检查、开发机 smoke、凭据测试和 README 限制；不把 waived 写成 PASS。
+- **影响：** 本地提交包可闭合。学生进一步明确 ProjectB 是本地单文件应用，FastAPI 仅提供 loopback WebUI；按课程第 4.11 节“如做带服务端的项目”的条件条款，D-025 不要求公网部署。课程最终 CI 的真实远端 PASS 仍需 NJU GitLab/GitHub 外部仓库与 runner，未执行时必须继续标注 `not executed`。

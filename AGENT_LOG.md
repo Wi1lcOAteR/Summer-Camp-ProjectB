@@ -1,5 +1,13 @@
 # AGENT_LOG
 
+## 2026-08-11T18:35:00+08:00 - D-026 student waiver and submission packaging start
+
+- **Decision / skill:** the student explicitly waived the current-artifact clean-VM and `<=10` second internal gate after the coordinator distinguished it from the course's distribution and final-CI requirements. `brainstorming` was used as a bounded decision check; a new `docs/superpowers/` design file was not created because repository policy retires that tree and the student had already approved the exact outcome.
+- **Normative diff:** SPEC, PLAN, compliance, README, DIST-01 evidence, DECISIONS_NEEDED, and SPEC_PROCESS now preserve historical measurements while marking D-026 `waived`, never `PASS`. DOC-01 is complete at `9908799`; remote final CI remains external and unexecuted.
+- **D-025 clarification:** after review surfaced an apparent conflict between the final checklist and course section 4.11, the student explicitly classified ProjectB as a local single-file application. The FastAPI process is loopback-only WebUI infrastructure, not a remotely hosted service. Current docs therefore treat public deployment as not applicable under the conditional cloud-deployment clause while retaining the local URL receipt; no deployment, account, registry, or paid-resource action occurred.
+- **Final verification / review:** `python scripts/test_all.py --all` passed on current bytes: backend `284 passed`, frontend `60 passed`, Vite build, Ruff, mypy, credential scan `files=524`, and license closure `python=54 npm=166 direct_python=18 direct_npm=16`. Final two-stage release-doc review returned `PASS; Critical=0, Major=0` against SPEC `312851CC...8F90A` and PLAN `A5824E3B...1644D9`.
+- **Next:** build a credential-clean course submission archive from the final committed release tree, include the Windows artifact and immutable manifest, verify extraction/content/hashes, then start the loopback WebUI for student inspection.
+
 ## 2026-08-11T18:16:00+08:00 - Local release Git closure
 
 - **Approval / Git:** after the student restored `Request approval`, the root coordinator requested elevation and used the ordinary worktree index. No alternate index, ACL change, subagent commit, or student-run command was used.

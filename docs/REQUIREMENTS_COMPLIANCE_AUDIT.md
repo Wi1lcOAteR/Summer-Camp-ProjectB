@@ -2,12 +2,12 @@
 
 **Snapshot:** `2026-08-11`
 
-**SPEC:** `483EF900BF9F5ED90FDA6117607D8F2436F3BDA633033FE2A0CB64AD6CAFC72E`
+**SPEC:** `312851CC77CA1E5E83CD87BEFF9A43539A87E656C85C9EF03541F53B6928F90A`
 
 **PLAN pre-dispatch:** `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`
 
-**PLAN current evidence-only state:** `36F140A01F2EB6EBAA16713AFD85F93CD390B6E3237410957B12F4B3084BBFD1`.
-**Stage:** `LOCAL IMPLEMENTATION VERIFIED / RELEASE EVIDENCE IN PROGRESS`. Foundation, all three domain modules, local FastAPI, responsive WebUI, isolated mock demo, P-02, Windows/OCI recipes, and local CI contracts are implemented. DOC-01 files and the student reflection are committed at `9908799`; the startup/package repair is committed at `b3446d1`. Public deployment/public URL are waived; remote pipelines remain unexecuted. `DIST-01-VM-CLOSE` remains open: the prior artifact missed the ten-second threshold and the current smaller artifact still requires an exact clean-VM retest.
+**PLAN current evidence-only state:** `A5824E3BA1E1941C81D2EE884FDC4E6E7750B9B64EA604CE149A037B0C1644D9`.
+**Stage:** `LOCAL IMPLEMENTATION VERIFIED / SUBMISSION PACKAGE READYING`. Foundation, all three domain modules, local FastAPI, responsive WebUI, isolated mock demo, P-02, Windows/OCI recipes, and local CI contracts are implemented. DOC-01 files and the student reflection are committed at `9908799`; the startup/package repair is committed at `b3446d1`. D-025 classifies ProjectB as a local binary application whose FastAPI process serves only a loopback WebUI, so the conditional cloud-deployment clause is not applicable; current-artifact clean-VM/10-second evidence is waived by D-026; remote pipelines remain unexecuted.
 
 `verified` means current local evidence exists; `planned` means a named active task owns it; `blocked` means a named human/external gate remains; `not-started` means no product evidence exists. This is the only active course matrix. Archived plans are recovery evidence, never PASS evidence.
 
@@ -15,8 +15,8 @@
 | --- | --- | --- | --- |
 | Real useful problem explainable in 30 seconds | SPEC 1.1--1.3 | verified document | implementation evidence after G-04 |
 | At least three clear modules | M1 materials, M2 learning, M3 review | M1, M2 and M3 domain/repository flows complete through `3a93f27` | API-01--03 and UI integration |
-| At least five INVEST stories | US-01--US-08 | verified document; current-hash SR-08 revalidation pending | implementation evidence after G-04 |
-| Module contracts and objective acceptance | SPEC 3 and AC-01--24 | planned; each AC mapped in PLAN 12 | named task/gate per AC |
+| At least five INVEST stories | US-01--US-08 | verified document; eight stories retained in current SPEC | local implementation evidence complete; remote acceptance remains external |
+| Module contracts and objective acceptance | SPEC 3 and AC-01--24 | all 39 local PLAN tasks complete; D-025/D-026 are explicit waivers | remote CI receipt only |
 | Architecture/data flow/data model | SPEC 6--7 | core and learning schema plus M1/M2/M3 repositories and complete local API implemented through `e41df6a` | UI-01--06 integration |
 | Performance/reliability/errors/observability | SPEC 5 | cached non-import API p95 contract verified at `e41df6a`; release measurements remain planned | QA-RELEASE, DIST-01 |
 | Input validation and safe deletion | SPEC 3.1 and 8 | parser/type/timeout/limits plus shared/last-ref deletion, source invalidation and retryable tombstone verified through `aa2a6da` | API-01, UI-03/06 integration |
@@ -28,10 +28,10 @@
 | Usable WebUI | import, mapping, learning, review, settings | all five views and the responsive shell are implemented; frontend suite `60 passed` and Vite build passed in the current full local gate | remote/manual course acceptance remains external |
 | Open Design workflow | `frontend-design`, `default`/Neutral Modern selected; environment PASS | verified: real project/run/artifact, immutable hashes and reviewed production screenshots in `docs/engineering/OPEN_DESIGN_RUN.md` | reuse reviewed tokens/components in UI-02--06 |
 | Responsive/keyboard/accessibility | 360/768/1440, visible focus, axe | UI-01 Playwright `12 passed`; UI-02 focused E2E `3 passed` across 360/768/1440 with keyboard focus, no overflow and no serious/critical axe findings | UI-03--06 plus QA-RELEASE |
-| At least one reproducible distribution | Windows x64 single file and OCI mock demo | Windows build/development smoke and local OCI build/run/smoke are verified; public registry/pull is unexecuted | remote publication remains external |
-| Windows cold start <=10 seconds | clean reference VM contract | open: the prior 36.64 MB artifact measured `23.554`, `14.664`, and `11.487` seconds plus strict timeouts; the current 29.22 MB artifact (`12C6131...6201`) passes local smoke but has not been clean-VM timed | DIST-01-VM-CLOSE requires an exact current-artifact clean-host receipt |
+| At least one reproducible distribution | Windows x64 single file and OCI mock demo | Windows build/development smoke and local OCI build/run/smoke are verified; no registry publication is required for local delivery | complete locally |
+| Windows clean-host / former <=10-second target | D-026 student decision | waived, not passed: the prior 36.64 MB artifact measured `23.554`, `14.664`, and `11.487` seconds plus strict timeouts; the current 29.22 MB artifact (`12C6131...6201`) passes local smoke but was not clean-VM timed | not required for local submission package; retain limitation |
 | Linux/amd64 dependency/base evidence | separate CI/demo hashed locks and OCI digests | verified planning input: 41 CI, 14 demo | F-01A exact-lock sync; DIST-02 build/SBOM/smoke |
-| Public HTTPS WebUI URL | local-only delivery decision | waived by student D-025; no public deployment evidence will be claimed | not applicable |
+| WebUI access / conditional cloud deployment | D-025 local-binary classification and course section 4.11 | verified local loopback WebUI at `http://127.0.0.1:4173/`; no remotely hosted service, so public cloud deployment is not applicable | local browser receipt in submission handoff |
 | One-command tests | `python scripts/test_all.py` | current release bytes: backend `284 passed`, frontend `60 passed`, Ruff/mypy/Vite, credential and license gates passed | final commit reruns the same command |
 | Core automated tests | domain/storage/API/UI/E2E/security/performance | current full local gate is backend `284 passed`, frontend `60 passed`; prior system Chrome Learning/Settings E2E `9 passed` across 360/768/1440 | remote CI remains external |
 | Every push runs CI | F-01D seeds pinned scanner/backend/frontend current-suite workflows; CI-01 adds distribution | implemented locally at `069acb8541b8d59a7977a484f06d8f9abbefe780`; YAML and seed contract verified, remote push not executed | EXT-REMOTE-PREP branch-tip current-suite receipts |
@@ -39,26 +39,26 @@
 | GitHub repository visibility/access | public repo or private with TA collaborator | blocked on remote authorization | EXT-REMOTE-PREP visibility/collaborator receipt |
 | GitHub Actions and PR evidence | workflow plus full-SHA actions | workflow implemented locally with exact checkout SHA and least permissions; PR/remote run not executed | CI-01, EXT-REMOTE-PREP, EXT-REMOTE-FINAL |
 | Final course CI PASS | authoritative NJU GitLab plus mirror evidence on final docs commit | blocked on remote authorization | EXT-REMOTE-FINAL |
-| Incremental commits and PR/MR history | 39 task commits, scanned coordinator evidence commits, 9 stacked worktree branches | planned | per-task protocol and EXT-REMOTE-PREP/FINAL sequential retarget-and-merge closure |
+| Incremental commits and PR/MR history | 39 task rows, scanned coordinator evidence commits, 9 stacked worktree branches | local branch/commit history preserved; remote PR/MR creation and merge are unexecuted | EXT-REMOTE-PREP/FINAL sequential retarget-and-merge closure |
 | Fresh subagent per PLAN task | one clean session/task | fresh worker `/root/m1_01_impl` completed M1-01; earlier deviations and reviewer identities remain recorded | continue every behavior task |
-| TDD red-green-refactor | exact red/green command in all 39 cards; shared assertion-level 2--5 minute step expansion | verified through UI-02, including missing-view RED and unknown import-status fail-closed RED | continue every behavior task |
-| SPEC review then quality/security/license review | terminal hash-bound review loop | verified through UI-02; coordinator review found and closed unknown import status being shown as success; Critical=0, Major=0 | every-task protocol; Critical stops sequence |
-| Required Superpowers order | brainstorming -> plan -> worktree -> TDD -> reviews -> finish | brainstorming/writing-plans/G-03 evidenced; implementation stages gated | explicit G-04, then task protocol |
-| `SPEC.md` required sections | 14 sections, 8 stories, 24 AC, risks/deferred scope | current bytes confirmed by student; same-byte SR-08 PASS | implementation evidence after G-04 |
-| `PLAN.md` exact task fields | exactly 39 tasks; dependency/parallel/files/red/green/done in each | mechanical audit and dual review PASS | explicit G-04, then ledger execution |
+| TDD red-green-refactor | exact red/green command in all 39 cards; shared assertion-level 2--5 minute step expansion | local implementation tasks retain RED/GREEN receipts; current full gate is green | remote CI replay remains external |
+| SPEC review then quality/security/license review | terminal hash-bound review loop | local tasks received staged spec and quality review; resolved Critical/Major findings are recorded in AGENT_LOG | final release-doc review and remote CI receipt |
+| Required Superpowers order | brainstorming -> plan -> worktree -> TDD -> reviews -> finish | local workflow and deviations are recorded; release branch is at local finishing stage | remote integration remains external |
+| `SPEC.md` required sections | 14 sections, 8 stories, 24 AC, risks/deferred scope | current bytes confirmed by student; final release-doc two-stage revalidation PASS with Critical=0, Major=0 | complete locally |
+| `PLAN.md` exact task fields | exactly 39 tasks; dependency/parallel/files/red/green/done in each | 39/39 local task rows are marked complete with commit evidence | remote release gates remain separate |
 | Stranger cold start with only SPEC/PLAN | two fresh non-Codex sessions intake then F-01S1A | verified: current hashes, empty ambiguities, exact red, two artifacts, PowerShell 7 green exit 0 | complete; disposable artifacts are not product implementation |
 | Cold-start repair then implementation approval | separate post-repair student gate | verified: G-03 complete; student explicitly approved G-04 on 2026-08-03 | local implementation active; remote/release gates remain separate |
 | `SPEC_PROCESS.md` process and cold-start diff | sections 1--2 contain >3 real question/answer/revision rounds; later sections retain G-03P/failures/final run | verified: final intake, segmented execution, red/green, hashes, line counts and limitations recorded | continue per-task evidence after G-04 |
 | `AGENT_LOG.md` timestamp/task/skill/context/output/hash/human edits/lesson | historical and current entries exist | current through startup repair `b3446d1` and local docs `9908799` | final evidence sync, then external gates |
 | Student-written code declaration | conditional top-of-file/function comment plus trailer/log | F-01C records `Human-Changes: none`; no student-authored code claimed | per-task protocol step 5 |
-| README required sections | intro/install/run/distribution/tree/security/credentials/limits/local architecture/licenses | committed at `9908799`; README contract `1 passed`; link verifier `LINK_VERIFICATION_PASS files=2 links=5`; VM and remote gaps are stated | exact current-artifact VM receipt and remote final gate |
+| README required sections | intro/install/run/distribution/tree/security/credentials/limits/local architecture/licenses | committed at `9908799`; README contract `1 passed`; link verifier `LINK_VERIFICATION_PASS files=2 links=5`; D-025/D-026 waivers and remote gaps are stated | remote final gate |
 | Third-party sources/licenses | 63-row ledger, 54 Python/166 npm closure, Linux subset, five immutable bootstrap license rows | F-01A manifests/locks and F-01B exact license bytes implemented; F-01E notice inventory and baseline-license hash verifier pass (`python=54 npm=166`) | F-01E terminal commit, DIST SBOM, DOC-01 final index |
 | Student reflection 1500--2500 Chinese characters | AI may review only a supplied student draft | supplied student draft lightly polished; `1938` CJK characters, explicit AI-assistance declaration, committed at `9908799` | remote final gate |
 
 ## Evidence Receipts
 
-- Current mechanical: `PLAN_MECHANICAL_PASS Tasks=39 Ledger=39 Fields=5 AcRows=24 Placeholders=0 Unknown=0 Self=0 Cycle=0 DependencyEdges=38` against SPEC `AEA67BB5...E8381` / PLAN `910A3AEC...9E923`.
-- Current SR-08 revalidation: same-byte SPEC review and quality/security/license review both returned `Critical=0, Major=0`. Current evidence includes fixed acceptance ID, Bash-only execution, exact ordered tool-use/tool-result evidence, pre-key live bubblewrap checks, cleared child environment, bounded output, contract mutation replay, and a coordinator behavior oracle. Minor follow-ups (CR-only line counting, unknown tool event negatives, and direct runtime over-limit test) are recorded as non-blocking hardening items; no product PASS is inherited.
+- Pre-dispatch mechanical baseline: `PLAN_MECHANICAL_PASS Tasks=39 Ledger=39 Fields=5 AcRows=24 Placeholders=0 Unknown=0 Self=0 Cycle=0 DependencyEdges=38` against the recorded pre-dispatch SPEC/PLAN bytes. Current evidence-only edits preserve the 39-row ledger while adding completion hashes and D-025/D-026 decisions.
+- Current D-025/D-026 normative revalidation PASS: the first read-only review caught a stale README assertion and surfaced the course-text ambiguity; the student then explicitly classified ProjectB as a local app under the conditional server-project clause. After repairing the README contract and removing public-registry/HTTPS contradictions, final two-stage review returned Critical=0, Major=0 against SPEC `312851CC...8F90A` and PLAN `A5824E3B...1644D9`.
 - Historical Stage B reviews: `/root/plan_spec_review` and `/root/plan_quality_review` both returned `PASS; Critical=0, Major=0, Minor=0` against SPEC `79579162...7862` and PLAN `6FDD69...A05D`; these verdicts do not transfer to current bytes.
 - Failed reviews: the first pair returned `Critical=0, Major=3, Minor=2` and `Critical=1, Major=10, Minor=1` against SPEC `600395...ED71` / PLAN `8A4BE...AFD`. The second pair returned `Critical=0, Major=3, Minor=0` and `Critical=0, Major=6, Minor=2` against SPEC `69A534...855E` / PLAN `47624A...225A`. Findings were repaired but verdicts are not reused.
 - Current G-03P remediation: fresh projectless task `019fa331-3da1-7f80-a37c-ac7abb135a46` used SPEC `6A0DB7...11E56` / predecessor PLAN `D574B8...1D742`, produced exact missing-scanner red and eight-group green with eleven helpers, then its optional self-scan found `credential_assignment` in both contract sources. Final PLAN `E96C...` makes exact `files=4` self-scan cleanliness mandatory; focused dual review passed. This remains same-family evidence and does not close G-03.
@@ -69,7 +69,7 @@
 - Standard: `EVIDENCE_VALIDATION_PASS rows=63 explicitly_blocked=2 python_pins=54 npm_packages=166`.
 - Linux supplement: `LINUX_EVIDENCE_PASS ci_packages=41 demo_packages=14 license_rows=41`.
 - P-only provider: `PROVIDER_V1_P_EVIDENCE_PASS rows=7 models=2 expires=2026-08-25`; evidence SHA-256 `35A3F46E036563E3FC681DF3190EB56336AB48B9D9817AD48F4D5DF42230F076`.
-- Strict distribution remains expected to fail only on unexecuted remote/VM closure rows; the D-025 public-hosting row is explicitly waived. No public deployment or provider call is claimed.
+- Strict course completion remains expected to fail only on unexecuted remote repository/CI rows. D-025 closes public hosting as not applicable to this local binary application, and D-026 waives current-artifact clean-VM timing. No public deployment or provider call is claimed.
 
 ## Deferred Boundary
 
