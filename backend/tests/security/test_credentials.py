@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import importlib
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from threading import Barrier, Event, Lock, RLock
+from types import ModuleType
 from uuid import uuid4
 
 import pytest
@@ -73,6 +76,174 @@ class CountingVault:
 
     def delete_password(self, service: str, target: str) -> None:
         self.values.pop((service, target), None)
+
+
+class FakePasswordDeleteError(Exception):
+    pass
+
+
+def install_fake_keyring(
+    monkeypatch: pytest.MonkeyPatch,
+    factory,
+) -> ModuleType:  # type: ignore[no-untyped-def]
+    keyring = ModuleType("keyring")
+    keyring.__path__ = []  # type: ignore[attr-defined]
+    backends = ModuleType("keyring.backends")
+    backends.__path__ = []  # type: ignore[attr-defined]
+    windows = ModuleType("keyring.backends.Windows")
+    windows.WinVaultKeyring = factory  # type: ignore[attr-defined]
+    errors = ModuleType("keyring.errors")
+    errors.PasswordDeleteError = FakePasswordDeleteError  # type: ignore[attr-defined]
+    keyring.backends = backends  # type: ignore[attr-defined]
+    keyring.errors = errors  # type: ignore[attr-defined]
+    backends.Windows = windows  # type: ignore[attr-defined]
+    for name, module in (
+        ("keyring", keyring),
+        ("keyring.backends", backends),
+        ("keyring.backends.Windows", windows),
+        ("keyring.errors", errors),
+    ):
+        monkeypatch.setitem(sys.modules, name, module)
+    return windows
+
+
+def windows_backend(credentials, monkeypatch: pytest.MonkeyPatch, factory):  # type: ignore[no-untyped-def]
+    monkeypatch.setattr(credentials.sys, "platform", "win32")
+    install_fake_keyring(monkeypatch, factory)
+    return credentials.WindowsCredentialBackend()
+
+
+def test_windows_vault_initializes_once_for_concurrent_callers(monkeypatch: pytest.MonkeyPatch) -> None:
+    credentials = load_credentials_module()
+    barrier = Barrier(8)
+    factory_started = Event()
+    release_factory = Event()
+    constructions = 0
+
+    class ObservedLock:
+        def __init__(self) -> None:
+            self._lock = RLock()
+            self._counter_lock = Lock()
+            self.attempts = 0
+            self.all_attempted = Event()
+
+        def __enter__(self):  # type: ignore[no-untyped-def]
+            with self._counter_lock:
+                self.attempts += 1
+                if self.attempts == 8:
+                    self.all_attempted.set()
+            self._lock.acquire()
+            return self
+
+        def __exit__(self, *args):  # type: ignore[no-untyped-def]
+            self._lock.release()
+
+    def factory() -> CountingVault:
+        nonlocal constructions
+        constructions += 1
+        factory_started.set()
+        assert release_factory.wait(5)
+        return CountingVault()
+
+    backend = windows_backend(credentials, monkeypatch, factory)
+    observed_lock = ObservedLock()
+    backend._vault_lock = observed_lock
+
+    def read_status() -> bool:
+        barrier.wait(timeout=5)
+        return backend.has_secret("provider-openai")
+
+    try:
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            futures = [executor.submit(read_status) for _ in range(8)]
+            assert factory_started.wait(5)
+            assert observed_lock.all_attempted.wait(5)
+            release_factory.set()
+            assert [future.result(timeout=5) for future in futures] == [False] * 8
+    finally:
+        release_factory.set()
+
+    assert constructions == 1
+
+
+def test_windows_vault_import_failure_leaves_initialization_retryable(monkeypatch: pytest.MonkeyPatch) -> None:
+    credentials = load_credentials_module()
+    constructions = 0
+
+    def factory() -> CountingVault:
+        nonlocal constructions
+        constructions += 1
+        return CountingVault()
+
+    monkeypatch.setattr(credentials.sys, "platform", "win32")
+    windows = install_fake_keyring(monkeypatch, factory)
+    del windows.WinVaultKeyring  # type: ignore[attr-defined]
+    backend = credentials.WindowsCredentialBackend()
+
+    with pytest.raises(ImportError):
+        backend.has_secret("provider-openai")
+
+    windows.WinVaultKeyring = factory  # type: ignore[attr-defined]
+    assert backend.has_secret("provider-openai") is False
+    assert constructions == 1
+
+
+def test_windows_vault_constructor_failure_leaves_initialization_retryable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    credentials = load_credentials_module()
+    attempts = 0
+
+    def factory() -> CountingVault:
+        nonlocal attempts
+        attempts += 1
+        if attempts == 1:
+            raise RuntimeError("vault unavailable")
+        return CountingVault()
+
+    backend = windows_backend(credentials, monkeypatch, factory)
+
+    with pytest.raises(RuntimeError, match="vault unavailable"):
+        backend.has_secret("provider-openai")
+
+    assert backend.has_secret("provider-openai") is False
+    assert attempts == 2
+
+
+@pytest.mark.parametrize("cleanup_error", [False, True])
+def test_windows_secret_write_failure_rolls_back_marker_and_preserves_error(
+    monkeypatch: pytest.MonkeyPatch,
+    cleanup_error: bool,
+) -> None:
+    credentials = load_credentials_module()
+    secret_error = RuntimeError("secret write failed")
+
+    class FailingSecretVault(CountingVault):
+        def __init__(self) -> None:
+            super().__init__()
+            self.deletes: list[tuple[str, str]] = []
+
+        def set_password(self, service: str, target: str, value: str) -> None:
+            if service == "ProjectB":
+                raise secret_error
+            super().set_password(service, target, value)
+
+        def delete_password(self, service: str, target: str) -> None:
+            self.deletes.append((service, target))
+            if cleanup_error:
+                raise FakePasswordDeleteError("marker already absent")
+            super().delete_password(service, target)
+
+    vault = FailingSecretVault()
+    backend = windows_backend(credentials, monkeypatch, lambda: vault)
+
+    with pytest.raises(RuntimeError, match="secret write failed") as caught:
+        backend.set_secret("provider-openai", "private-value")
+
+    assert caught.value is secret_error
+    assert vault.deletes == [("ProjectB.status", "provider-openai")]
+    if not cleanup_error:
+        assert ("ProjectB.status", "provider-openai") not in vault.values
 
 
 def test_first_run_update_status_and_clear_never_return_plaintext() -> None:

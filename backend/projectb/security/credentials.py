@@ -36,6 +36,14 @@ class CredentialBackend(Protocol):
     def delete_secret(self, target: str) -> None: ...
 
 
+class _WindowsCredentialVault(Protocol):
+    def get_password(self, service: str, target: str) -> str | None: ...
+
+    def set_password(self, service: str, target: str, value: str) -> None: ...
+
+    def delete_password(self, service: str, target: str) -> None: ...
+
+
 class WindowsCredentialBackend:
     """Use WinVault directly instead of whichever global keyring is selected."""
 
@@ -44,27 +52,27 @@ class WindowsCredentialBackend:
     def __init__(self, *, service_name: str = "ProjectB") -> None:
         if sys.platform != "win32":
             raise CredentialError("credential_backend_unsupported")
-        from keyring.backends.Windows import WinVaultKeyring
-
         self._service_name = service_name
         self._status_service_name = f"{service_name}.status"
-        self._vault = WinVaultKeyring()
+        self._vault: _WindowsCredentialVault | None = None
+        self._vault_lock = RLock()
 
     def has_secret(self, target: str) -> bool:
-        return self._vault.get_password(self._status_service_name, target) == "configured-v1"
+        return self._vault_instance().get_password(self._status_service_name, target) == "configured-v1"
 
     def get_secret(self, target: str) -> str | None:
-        return self._vault.get_password(self._service_name, target)
+        return self._vault_instance().get_password(self._service_name, target)
 
     def set_secret(self, target: str, value: str) -> None:
         from keyring.errors import PasswordDeleteError
 
-        self._vault.set_password(self._status_service_name, target, "configured-v1")
+        vault = self._vault_instance()
+        vault.set_password(self._status_service_name, target, "configured-v1")
         try:
-            self._vault.set_password(self._service_name, target, value)
+            vault.set_password(self._service_name, target, value)
         except Exception:
             try:
-                self._vault.delete_password(self._status_service_name, target)
+                vault.delete_password(self._status_service_name, target)
             except PasswordDeleteError:
                 pass
             raise
@@ -72,11 +80,25 @@ class WindowsCredentialBackend:
     def delete_secret(self, target: str) -> None:
         from keyring.errors import PasswordDeleteError
 
+        vault = self._vault_instance()
         for service_name in (self._status_service_name, self._service_name):
             try:
-                self._vault.delete_password(service_name, target)
+                vault.delete_password(service_name, target)
             except PasswordDeleteError:
                 pass
+
+    def _vault_instance(self) -> _WindowsCredentialVault:
+        vault = self._vault
+        if vault is not None:
+            return vault
+        with self._vault_lock:
+            vault = self._vault
+            if vault is None:
+                from keyring.backends.Windows import WinVaultKeyring
+
+                vault = WinVaultKeyring()
+                self._vault = vault
+            return vault
 
 
 class CredentialService:

@@ -31,7 +31,7 @@ a = Analysis(
     hookspath=[str(Path(SPECPATH).resolve() / "hooks")],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=["pytest", "tests", "playwright"],
+    excludes=["pytest", "tests", "playwright", "PIL"],
     noarchive=False,
 )
 pyz = PYZ(a.pure)

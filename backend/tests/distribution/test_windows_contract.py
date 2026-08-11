@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 
 
@@ -9,6 +10,18 @@ WINDOWS = ROOT / "packaging" / "windows"
 
 def _text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
+
+def _analysis_excludes(spec: str) -> set[str]:
+    tree = ast.parse(spec)
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Name) or node.func.id != "Analysis":
+            continue
+        for keyword in node.keywords:
+            if keyword.arg == "excludes":
+                value = ast.literal_eval(keyword.value)
+                return {str(item) for item in value}
+    raise AssertionError("analysis_excludes_missing")
 
 
 def test_windows_distribution_files_and_resource_contract_exist() -> None:
@@ -34,6 +47,7 @@ def test_windows_distribution_files_and_resource_contract_exist() -> None:
     assert "PKG-00.toc" in build and "package_resource_missing" in build
     assert "frontend_build_failed" in build and "$LASTEXITCODE -ne 0" in build
     assert "frontend_dist" in spec and "THIRD_PARTY_NOTICES.md" in spec
+    assert "PIL" in _analysis_excludes(spec)
     assert "127.0.0.1" in launcher
     assert "LOCALAPPDATA" in launcher or "data-dir" in launcher
 

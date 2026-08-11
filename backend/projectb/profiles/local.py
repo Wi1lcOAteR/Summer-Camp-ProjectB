@@ -6,17 +6,21 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from threading import RLock
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import httpx
 import uvicorn
 
 from projectb.api.app import create_app
-from projectb.providers.openai_adapter import OpenAIAdapter
 from projectb.providers.port import ProviderBinding, ProviderError
 from projectb.providers.registry import ProviderRegistry
 from projectb.repositories.provider_profiles import ProviderProfileError, ProviderProfileRepository
 from projectb.security.credentials import CredentialError, CredentialService, WindowsCredentialBackend
+
+
+if TYPE_CHECKING:
+    import httpx
+
+    from projectb.providers.openai_adapter import OpenAIAdapter
 
 
 LOCAL_BIND_HOST = "127.0.0.1"
@@ -157,6 +161,8 @@ class LocalProviderController:
         self.active_profile_id = None
 
     def _adapter(self, model_id: str) -> OpenAIAdapter:
+        from projectb.providers.openai_adapter import OpenAIAdapter
+
         return OpenAIAdapter(
             model_id=model_id,
             input_token_cap=20_000,
