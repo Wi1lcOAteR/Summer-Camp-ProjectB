@@ -6,8 +6,8 @@
 
 **PLAN pre-dispatch:** `910A3AEC9B4CEDCC119675C5D862879D178E3FE062CEE39C2AD62AF07219E923`
 
-**PLAN current evidence-only state:** refresh pending after the final local evidence commit.
-**Stage:** `LOCAL IMPLEMENTATION VERIFIED / RELEASE EVIDENCE IN PROGRESS`. Foundation, all three domain modules, local FastAPI, responsive WebUI, isolated mock demo, P-02, Windows/OCI recipes, and local CI contracts are implemented. DOC-01 files and the student reflection are locally verified but uncommitted. Public deployment/public URL are waived; remote pipelines remain unexecuted. `DIST-01-VM-CLOSE` remains open: the prior artifact missed the ten-second threshold and the current smaller artifact still requires an exact clean-VM retest.
+**PLAN current evidence-only state:** `36F140A01F2EB6EBAA16713AFD85F93CD390B6E3237410957B12F4B3084BBFD1`.
+**Stage:** `LOCAL IMPLEMENTATION VERIFIED / RELEASE EVIDENCE IN PROGRESS`. Foundation, all three domain modules, local FastAPI, responsive WebUI, isolated mock demo, P-02, Windows/OCI recipes, and local CI contracts are implemented. DOC-01 files and the student reflection are committed at `9908799`; the startup/package repair is committed at `b3446d1`. Public deployment/public URL are waived; remote pipelines remain unexecuted. `DIST-01-VM-CLOSE` remains open: the prior artifact missed the ten-second threshold and the current smaller artifact still requires an exact clean-VM retest.
 
 `verified` means current local evidence exists; `planned` means a named active task owns it; `blocked` means a named human/external gate remains; `not-started` means no product evidence exists. This is the only active course matrix. Archived plans are recovery evidence, never PASS evidence.
 
@@ -49,11 +49,11 @@
 | Stranger cold start with only SPEC/PLAN | two fresh non-Codex sessions intake then F-01S1A | verified: current hashes, empty ambiguities, exact red, two artifacts, PowerShell 7 green exit 0 | complete; disposable artifacts are not product implementation |
 | Cold-start repair then implementation approval | separate post-repair student gate | verified: G-03 complete; student explicitly approved G-04 on 2026-08-03 | local implementation active; remote/release gates remain separate |
 | `SPEC_PROCESS.md` process and cold-start diff | sections 1--2 contain >3 real question/answer/revision rounds; later sections retain G-03P/failures/final run | verified: final intake, segmented execution, red/green, hashes, line counts and limitations recorded | continue per-task evidence after G-04 |
-| `AGENT_LOG.md` timestamp/task/skill/context/output/hash/human edits/lesson | historical and current entries exist | current through P-02 product commit `8e6b23f` | coordinator evidence commit, then continue |
+| `AGENT_LOG.md` timestamp/task/skill/context/output/hash/human edits/lesson | historical and current entries exist | current through startup repair `b3446d1` and local docs `9908799` | final evidence sync, then external gates |
 | Student-written code declaration | conditional top-of-file/function comment plus trailer/log | F-01C records `Human-Changes: none`; no student-authored code claimed | per-task protocol step 5 |
-| README required sections | intro/install/run/distribution/tree/security/credentials/limits/local architecture/licenses | locally verified: README contract `1 passed`; link verifier `LINK_VERIFICATION_PASS files=2 links=5`; VM and remote gaps are stated | DOC-01 commit pending |
+| README required sections | intro/install/run/distribution/tree/security/credentials/limits/local architecture/licenses | committed at `9908799`; README contract `1 passed`; link verifier `LINK_VERIFICATION_PASS files=2 links=5`; VM and remote gaps are stated | exact current-artifact VM receipt and remote final gate |
 | Third-party sources/licenses | 63-row ledger, 54 Python/166 npm closure, Linux subset, five immutable bootstrap license rows | F-01A manifests/locks and F-01B exact license bytes implemented; F-01E notice inventory and baseline-license hash verifier pass (`python=54 npm=166`) | F-01E terminal commit, DIST SBOM, DOC-01 final index |
-| Student reflection 1500--2500 Chinese characters | AI may review only a supplied student draft | supplied student draft lightly polished; `1938` CJK characters and explicit AI-assistance declaration; commit pending | REFLECTION-CLOSE commit then remote final gate |
+| Student reflection 1500--2500 Chinese characters | AI may review only a supplied student draft | supplied student draft lightly polished; `1938` CJK characters, explicit AI-assistance declaration, committed at `9908799` | remote final gate |
 
 ## Evidence Receipts
 

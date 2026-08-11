@@ -172,7 +172,7 @@ git diff --check
 | 36 | DIST-01 | P-02 + QA-RELEASE | no: Windows release | distribution | complete | `662a381` |
 | 37 | DIST-02 | DIST-01 | no: consumes frozen frontend/runtime | distribution | complete | `5145fea` |
 | 38 | CI-01 | DIST-02 | no: consumes all commands | release | complete | `3a51c7b` |
-| 39 | DOC-01 | CI-01 + DIST-01-VM-CLOSE | no: final verified guide | release | in progress: local guide/tests green; VM performance and Git commit pending | none |
+| 39 | DOC-01 | CI-01 + DIST-01-VM-CLOSE | no: final verified guide | release | in progress: guide/reflection committed; exact current-artifact VM performance and remote CI pending | `9908799` (local docs; VM gate open) |
 
 ## 5. Foundation Tasks
 

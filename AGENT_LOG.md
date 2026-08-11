@@ -1,5 +1,12 @@
 # AGENT_LOG
 
+## 2026-08-11T18:16:00+08:00 - Local release Git closure
+
+- **Approval / Git:** after the student restored `Request approval`, the root coordinator requested elevation and used the ordinary worktree index. No alternate index, ACL change, subagent commit, or student-run command was used.
+- **Commits:** startup/import and package-size repair `b3446d1` (`perf(DIST-01): reduce frozen startup payload [agent: coordinator]`); README, student reflection, link contract, and local evidence `9908799` (`docs(DOC-01): publish verified project guide [agent: coordinator]`).
+- **Pre-commit evidence:** staged credential scan `CREDENTIAL_SCAN_PASS files=262`; staged diff check passed; README test `1 passed`; link verifier `LINK_VERIFICATION_PASS files=2 links=5`. The fresh full gate before staging returned backend `284 passed`, frontend `60 passed`, Ruff/mypy/Vite green, credential and license gates green, and `TEST_ALL_PASS mode=all`.
+- **Remaining gates:** `DIST-01-VM-CLOSE` needs the exact current artifact's clean-VM timing/SmartScreen/WinVault receipt; remote repositories and final CI remain unconfigured and unexecuted. Public deployment remains student-waived.
+
 ## 2026-08-11T18:00:00+08:00 - DIST-01 bounded package-size repair
 
 - **Task / skills:** continued `DIST-01-VM-CLOSE` with `systematic-debugging`, `test-driven-development`, and `verification-before-completion`; no subagent or Git operation was used for this coordinator-owned review repair.
