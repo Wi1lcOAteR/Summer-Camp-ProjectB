@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -37,6 +38,20 @@ GITHUB_JOBS = {"scanner", "backend", "frontend", "windows-package", "oci-package
 GITLAB_JOBS = {"unit-test", "backend", "frontend", "oci-package"}
 GITHUB_TIMEOUTS = {"scanner": 10, "backend": 20, "frontend": 20, "windows-package": 30, "oci-package": 30}
 GITLAB_TIMEOUTS = {"unit-test": "10m", "backend": "20m", "frontend": "20m", "oci-package": "30m"}
+# Digest updates require a reviewed CI edit and a negative contract proving the intended drift.
+GITHUB_JOB_DIGESTS = {
+    "backend": "9f921b54e3b168fc9f3a166bd3da8dec8940b69d52579e87a5b196605c3ebd85",
+    "frontend": "f0dd700abc2e07d0d72e9edba5871795d0ec68ad0069a60e36ad25d9bab06ac6",
+    "oci-package": "fa4b85d1701cf7bbbd4657817bb98305bb49f49d0e5b4899cd5beea686bc1ccb",
+    "scanner": "4fe6ed216b8d963efad37520ed6f6e7c2030edde22749b5b3f9b5a2f226f1f2f",
+    "windows-package": "573d1ad290963e33b815a5ddb1db71544924358b6a38760030486a2220e5ed3b",
+}
+GITLAB_JOB_DIGESTS = {
+    "backend": "c4224eae168e2de937b5269d0e6dfcac1770da1b5e409afbd0db79011bb569f9",
+    "frontend": "267474b8939a71e1c190c8c1b1b503767c815e8b4664bded4fcf7a57ff36f148",
+    "oci-package": "5733a4cb468e50e80c64daaecf90e4865941e9a766af616fd1381e08832b13cb",
+    "unit-test": "d158e23fd9c8f178ade649edb56429d0ae5aa587b62ebe8f062a1c6eed209f42",
+}
 
 
 class ContractError(Exception):
@@ -45,6 +60,11 @@ class ContractError(Exception):
     def __init__(self, code: str) -> None:
         super().__init__(code)
         self.code = code
+
+
+def _structural_digest(value: Any) -> str:
+    payload = json.dumps(value, ensure_ascii=True, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
 
 
 def _unquote(value: str) -> str:
@@ -271,16 +291,25 @@ def _direct_run_lines(steps: list[Any]) -> set[str]:
                 depth += line.count("{") - line.count("}")
                 depth = max(0, depth)
                 continue
-            closes = line.startswith(("fi", "done", "esac"))
+            closes = bool(re.match(r"^(?:fi|done|esac)(?:\s*;?\s*(?:#.*)?)?$", line)) or line in {"}", ")"}
             if closes:
                 depth = max(0, depth - 1)
-            control = line.startswith(("if ", "for ", "while ", "case "))
+            function_start = bool(
+                re.match(
+                    r"^(?:(?:function\s+)[A-Za-z_][A-Za-z0-9_]*(?:\s*\(\s*\))?|[A-Za-z_][A-Za-z0-9_]*\s*\(\s*\))\s*\{\s*$",
+                    line,
+                )
+            )
+            group_start = line in {"{", "("}
+            control = line.startswith(("if ", "for ", "while ", "until ", "case ")) or function_start or group_start
             if depth == 0 and not closes and not control:
                 direct.add(line)
             if control and (
                 " then" in line
                 or line.endswith("then")
-                or line.startswith(("for ", "while ", "case "))
+                or line.startswith(("for ", "while ", "until ", "case "))
+                or function_start
+                or group_start
             ):
                 depth += 1
     return direct
@@ -307,7 +336,7 @@ def _walk(value: Any, path: str = "") -> list[tuple[str, Any]]:
 
 
 def _check_no_bypass(data: dict[str, Any], platform: str, jobs: dict[str, Any]) -> None:
-    bad_keys = {"allow_failure", "continue-on-error", "only", "except", "changes", "paths", "paths-ignore", "branches", "branches-ignore"}
+    bad_keys = {"allow_failure", "continue-on-error", "only", "except", "changes", "paths", "paths-ignore", "branches", "branches-ignore", "rules"}
     for path, value in _walk(data):
         if path == "workflow.rules" or path.startswith("workflow.rules["):
             continue
@@ -451,6 +480,8 @@ def _check_github(path: Path) -> dict[str, Any]:
             for command_name, command in direct_oci.items():
                 if command not in direct_lines:
                     raise ContractError(f"oci_command:github:direct:{command_name}")
+        if _structural_digest(job) != GITHUB_JOB_DIGESTS[name]:
+            raise ContractError(f"github_steps_drift:{name}")
     if action_refs.count(CHECKOUT) != 5 or action_refs.count(SETUP_PYTHON) != 1 or action_refs.count(SETUP_NODE) != 1 or len(action_refs) != 7:
         raise ContractError("github_action_refs")
     if any(ref not in {CHECKOUT, SETUP_PYTHON, SETUP_NODE} for ref in action_refs):
@@ -460,10 +491,12 @@ def _check_github(path: Path) -> dict[str, Any]:
 
 def _check_gitlab(path: Path) -> dict[str, Any]:
     data = load_yaml(path)
-    allowed_root = {"stages", "workflow", "variables", *GITLAB_JOBS}
+    allowed_root = {"stages", "workflow", *GITLAB_JOBS}
     unknown_root = sorted(set(data) - allowed_root)
     if unknown_root:
         raise ContractError(f"unknown_job:gitlab:{unknown_root[0]}")
+    if data.get("stages") != ["test"]:
+        raise ContractError("gitlab_stages")
     workflow = _as_mapping(data.get("workflow"), "gitlab_workflow_missing")
     rules = _as_list(workflow.get("rules"), "gitlab_workflow_rules")
     if len(rules) != 2 or rules[0] != {"if": '$CI_PIPELINE_SOURCE == "push"'} or rules[1] != {"when": "never"}:
@@ -471,6 +504,7 @@ def _check_gitlab(path: Path) -> dict[str, Any]:
     jobs = {name: data[name] for name in GITLAB_JOBS if name in data}
     if set(jobs) != GITLAB_JOBS:
         raise ContractError("gitlab_jobs_incomplete")
+    _check_no_bypass(data, "gitlab", jobs)
     for name, raw in jobs.items():
         job = _as_mapping(raw, f"gitlab_job_invalid:{name}")
         if job.get("timeout") != GITLAB_TIMEOUTS[name]:
@@ -532,7 +566,10 @@ def _check_gitlab(path: Path) -> dict[str, Any]:
             for command_name, command in direct_oci.items():
                 if command not in _direct_run_lines([{"run": item} for item in _as_list(job.get("script"), "gitlab_script_invalid")]):
                     raise ContractError(f"oci_command:gitlab:direct:{command_name}")
-    _check_no_bypass(data, "gitlab", jobs)
+        if _structural_digest(job) != GITLAB_JOB_DIGESTS[name]:
+            if set(job) - {"stage", "timeout", "image", "script", "variables", "tags", "after_script"}:
+                raise ContractError(f"gitlab_job_keys:{name}")
+            raise ContractError(f"gitlab_script_drift:{name}")
     return jobs
 
 
@@ -555,6 +592,17 @@ def build_mapping(github_path: Path, gitlab_path: Path) -> dict[str, Any]:
             "frontend": {
                 "github": "npm exec -- vitest run; npm exec -- tsc --noEmit; npm exec -- vite build",
                 "gitlab": "npm exec -- vitest run; npm exec -- tsc --noEmit; npm exec -- vite build",
+            },
+            "scanner": {
+                "github": "pwsh bootstrap contract; seed contract; tracked credential scan",
+                "gitlab": "pwsh bootstrap contract; seed contract; tracked credential scan",
+            },
+            "windows": {
+                "github": "distribution contract; build.ps1; credential scan; SHA256",
+            },
+            "oci": {
+                "github": "linux/amd64 build; inspect; resource check; smoke",
+                "gitlab": "linux/amd64 build; inspect; resource check; smoke",
             },
         },
         "requirements": {

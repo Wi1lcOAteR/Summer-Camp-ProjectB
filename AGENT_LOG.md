@@ -1,5 +1,24 @@
 # AGENT_LOG
 
+## 2026-08-11T10:31:00+08:00 - CI-01 fail-closed job structure binding
+
+- **Review / root cause:** fresh SPEC review showed heuristic shell parsing still accepted heredocs, command substitutions, command-shadowing functions, GitLab `before_script`, and wrapped lock/preflight commands. The root cause was attempting to prove arbitrary shell execution from selected lines instead of binding the complete reviewed job structure.
+- **TDD / implementation:** three new groups first failed (`3 failed, 17 deselected`). The verifier now retains semantic command checks and additionally binds every GitHub/GitLab job to a canonical JSON SHA-256 structural digest; unknown steps, scripts, keys, wrappers, or ordering drift fail closed. GitLab root variables are no longer accepted implicitly, and its stage list must remain exactly `test`. Separate REDs proved `find` incorrectly matched the old `fi` prefix close rule and an added `deploy` stage was accepted; closing tokens now require exact `fi`/`done`/`esac` syntax and stage drift is rejected.
+- **Verification:** CI contracts `21 passed`; `scripts/verify_ci_contract.py` => `CI_CONTRACT_PASS`; `CI_SEED_CONTRACT_PASS`; current-byte `scripts/test_all.py --all` => backend `277 passed`, frontend `60 passed`, Ruff/mypy/Vite pass, `CREDENTIAL_SCAN_PASS files=514`, license pass, and `TEST_ALL_PASS mode=all`; `git diff --check` passes. Human changes: coordinator fail-closed verifier/test/evidence repair only; no Git operation was delegated.
+- **Two-stage review:** independent SPEC reviewer `/root/ci01_final_spec` found the heredoc/substitution/shadow/before-script and lock/preflight gaps that triggered this repair. After the final structural changes, the collaboration dispatch surface was unavailable, so the coordinator performed the frozen-byte SPEC/task-card review and then the correctness/maintainability/security/test/license review. Both found no remaining Critical/Major in the four-file scope. This reduced reviewer independence is recorded as a process deviation rather than represented as a fresh-agent PASS.
+
+## 2026-08-11T10:03:30+08:00 - CI-01 no-parentheses Bash function closure
+
+- **Review / TDD:** final SPEC rereview proved `function run_backend { ... }` could hide the required backend command because the parser required `()`. A new negative assertion first failed with verifier exit `0`/`CI_CONTRACT_PASS`; the function-declaration matcher now recognizes both `name() {` and `function name {` forms. The targeted RED became `1 passed`, and the complete CI contract suite remains `17 passed`.
+- **Verification:** `scripts/verify_ci_contract.py` => `CI_CONTRACT_PASS`; `CI_SEED_CONTRACT_PASS`; current-byte `scripts/test_all.py --all` => backend `273 passed`, frontend `60 passed`, Ruff/mypy/Vite pass, `CREDENTIAL_SCAN_PASS files=514`, license pass, and `TEST_ALL_PASS mode=all`; `git diff --check` passes. Human changes: coordinator regex repair and regression assertion only; no Git operation was delegated.
+
+## 2026-08-10T23:01:41+08:00 - CI-01 terminal verifier repair
+
+- **Task / skills:** `CI-01`; `receiving-code-review`, `test-driven-development`, `systematic-debugging`, `requesting-code-review`, and `verification-before-completion`. The main coordinator applied the final review fixes; no Luna agent and no subagent Git operation.
+- **TDD RED:** current focused tests first produced `3 failed, 14 passed`: GitLab `rules: [{when: never}]` was accepted, an uninvoked Bash function preserved a required command as direct, and the stable mapping omitted scanner/Windows/OCI command groups. Additional assertions cover `until`, subshell, and brace-group wrappers.
+- **GREEN / verification:** focused CI contracts `17 passed`; `scripts/verify_ci_contract.py` => `CI_CONTRACT_PASS` with all five command groups; `CI_SEED_CONTRACT_PASS`; `scripts/test_all.py --all` => backend `273 passed`, frontend `60 passed`, Ruff/mypy/Vite pass, `CREDENTIAL_SCAN_PASS files=514`, license pass, and `TEST_ALL_PASS mode=all`; `git diff --check` passes.
+- **Predecessor / boundary:** DIST-02 local OCI gates are complete at `5145fea` with exact image/smoke/network/browser receipts. Remote GitHub Actions and GitLab execution, registry push, and publication remain `not_executed`; public URL/deployment remains student-waived. Human changes: coordinator review repair, merge conflict resolution, and evidence synchronization described above.
+
 ## 2026-08-10T21:55:57+08:00 - DIST-02 local OCI runtime closure
 
 - **Task / skills:** `DIST-02`; `test-driven-development`, `systematic-debugging`, `receiving-code-review`, `requesting-code-review`, and `verification-before-completion`. The main coordinator performed Docker and Git operations; no Luna agent and no subagent Git operation.

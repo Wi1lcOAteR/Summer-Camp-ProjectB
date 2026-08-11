@@ -48,6 +48,7 @@ def test_ci_verifier_emits_stable_structural_mapping_and_receipt() -> None:
         "github": "python scripts/test_all.py --backend",
         "gitlab": "python scripts/test_all.py --backend",
     }
+    assert set(mapping["commands"]) == {"backend", "frontend", "oci", "scanner", "windows"}
 
 
 def test_ci_verifier_rejects_unknown_job_without_mutating_repository(tmp_path: Path) -> None:
@@ -68,6 +69,32 @@ def test_ci_verifier_rejects_bypass_and_reports_stable_code(tmp_path: Path) -> N
     result = run_verifier("--gitlab", str(candidate))
     assert result.returncode == 2
     assert result.stdout.strip() == "CI_CONTRACT_RED bypass:gitlab:backend:allow_failure"
+
+
+def test_ci_verifier_rejects_gitlab_job_rules(tmp_path: Path) -> None:
+    gitlab = ROOT / ".gitlab-ci.yml"
+    candidate = tmp_path / ".gitlab-ci.yml"
+    text = gitlab.read_text(encoding="utf-8").replace(
+        "backend:\n  stage: test",
+        "backend:\n  rules:\n    - when: never\n  stage: test",
+        1,
+    )
+    candidate.write_text(text, encoding="utf-8")
+    result = run_verifier("--gitlab", str(candidate))
+    assert result.returncode == 2
+    assert result.stdout.strip() == "CI_CONTRACT_RED bypass:gitlab:backend:rules"
+
+
+def test_ci_verifier_rejects_gitlab_stage_drift(tmp_path: Path) -> None:
+    gitlab = ROOT / ".gitlab-ci.yml"
+    candidate = tmp_path / ".gitlab-ci.yml"
+    candidate.write_text(
+        gitlab.read_text(encoding="utf-8").replace("stages:\n  - test", "stages:\n  - test\n  - deploy", 1),
+        encoding="utf-8",
+    )
+    result = run_verifier("--gitlab", str(candidate))
+    assert result.returncode == 2
+    assert result.stdout.strip() == "CI_CONTRACT_RED gitlab_stages"
 
 
 def test_ci_verifier_requires_backend_suite_as_a_direct_command(tmp_path: Path) -> None:
@@ -213,6 +240,164 @@ def test_ci_verifier_rejects_multiline_bypass_wrappers(tmp_path: Path) -> None:
     gitlab_result = run_verifier("--gitlab", str(gitlab_candidate))
     assert gitlab_result.returncode == 2
     assert gitlab_result.stdout.strip() == "CI_CONTRACT_RED scanner_command:gitlab:direct:pwsh -NoProfile -File scripts/bootstrap_scan_credentials.ps1 -Tracked"
+
+
+def test_ci_verifier_rejects_function_and_until_wrappers(tmp_path: Path) -> None:
+    github = ROOT / ".github" / "workflows" / "ci.yml"
+    github_candidate = tmp_path / "ci.yml"
+    github_text = github.read_text(encoding="utf-8").replace(
+        "        run: python scripts/test_all.py --backend",
+        "        run: |\n          run_backend() {\n            python scripts/test_all.py --backend\n          }",
+        1,
+    )
+    github_candidate.write_text(github_text, encoding="utf-8")
+    github_result = run_verifier("--github", str(github_candidate))
+    assert github_result.returncode == 2
+    assert github_result.stdout.strip() == "CI_CONTRACT_RED backend_command:github:direct"
+
+    no_parens_candidate = tmp_path / "function-no-parens.yml"
+    no_parens_text = github.read_text(encoding="utf-8").replace(
+        "        run: python scripts/test_all.py --backend",
+        "        run: |\n          function run_backend {\n            python scripts/test_all.py --backend\n          }",
+        1,
+    )
+    no_parens_candidate.write_text(no_parens_text, encoding="utf-8")
+    no_parens_result = run_verifier("--github", str(no_parens_candidate))
+    assert no_parens_result.returncode == 2
+    assert no_parens_result.stdout.strip() == "CI_CONTRACT_RED backend_command:github:direct"
+
+    close_prefix_candidate = tmp_path / "function-close-prefix.yml"
+    close_prefix_text = github.read_text(encoding="utf-8").replace(
+        "        run: python scripts/test_all.py --backend",
+        "        run: |\n          function run_backend {\n            find . -maxdepth 0\n            python scripts/test_all.py --backend\n          }",
+        1,
+    )
+    close_prefix_candidate.write_text(close_prefix_text, encoding="utf-8")
+    close_prefix_result = run_verifier("--github", str(close_prefix_candidate))
+    assert close_prefix_result.returncode == 2
+    assert close_prefix_result.stdout.strip() == "CI_CONTRACT_RED backend_command:github:direct"
+
+    for name, opener, closer in (("subshell", "(", ")"), ("brace", "{", "}")):
+        grouped_candidate = tmp_path / f"{name}.yml"
+        grouped_text = github.read_text(encoding="utf-8").replace(
+            "        run: python scripts/test_all.py --backend",
+            f"        run: |\n          {opener}\n            python scripts/test_all.py --backend\n          {closer}",
+            1,
+        )
+        grouped_candidate.write_text(grouped_text, encoding="utf-8")
+        grouped_result = run_verifier("--github", str(grouped_candidate))
+        assert grouped_result.returncode == 2
+        assert grouped_result.stdout.strip() == "CI_CONTRACT_RED backend_command:github:direct"
+
+    gitlab = ROOT / ".gitlab-ci.yml"
+    gitlab_candidate = tmp_path / ".gitlab-ci.yml"
+    gitlab_text = gitlab.read_text(encoding="utf-8").replace(
+        "    - pwsh -NoProfile -File scripts/bootstrap_scan_credentials.ps1 -Tracked",
+        "    - |\n      until true; do\n        pwsh -NoProfile -File scripts/bootstrap_scan_credentials.ps1 -Tracked\n      done",
+        1,
+    )
+    gitlab_candidate.write_text(gitlab_text, encoding="utf-8")
+    gitlab_result = run_verifier("--gitlab", str(gitlab_candidate))
+    assert gitlab_result.returncode == 2
+    assert gitlab_result.stdout.strip() == "CI_CONTRACT_RED scanner_command:gitlab:direct:pwsh -NoProfile -File scripts/bootstrap_scan_credentials.ps1 -Tracked"
+
+
+def test_ci_verifier_rejects_heredoc_and_command_substitution(tmp_path: Path) -> None:
+    github = ROOT / ".github" / "workflows" / "ci.yml"
+    for name, replacement in (
+        (
+            "heredoc",
+            "        run: |\n          cat <<'COMMAND'\n          python scripts/test_all.py --backend\n          COMMAND",
+        ),
+        (
+            "substitution",
+            "        run: |\n          ignored=$(\n            python scripts/test_all.py --backend\n          )",
+        ),
+    ):
+        candidate = tmp_path / f"{name}.yml"
+        candidate.write_text(
+            github.read_text(encoding="utf-8").replace(
+                "        run: python scripts/test_all.py --backend",
+                replacement,
+                1,
+            ),
+            encoding="utf-8",
+        )
+        result = run_verifier("--github", str(candidate))
+        assert result.returncode == 2
+        assert result.stdout.strip() == "CI_CONTRACT_RED github_steps_drift:backend"
+
+
+def test_ci_verifier_rejects_gitlab_shell_shadow_and_before_script(tmp_path: Path) -> None:
+    gitlab = ROOT / ".gitlab-ci.yml"
+    shadow_candidate = tmp_path / "shadow.yml"
+    shadow_candidate.write_text(
+        gitlab.read_text(encoding="utf-8").replace(
+            "  script:\n    - python --version",
+            "  script:\n    - 'python() { return 0; }'\n    - python --version",
+            1,
+        ),
+        encoding="utf-8",
+    )
+    shadow_result = run_verifier("--gitlab", str(shadow_candidate))
+    assert shadow_result.returncode == 2
+    assert shadow_result.stdout.strip() == "CI_CONTRACT_RED gitlab_script_drift:backend"
+
+    before_candidate = tmp_path / "before.yml"
+    before_candidate.write_text(
+        gitlab.read_text(encoding="utf-8").replace(
+            "backend:\n  stage: test",
+            "backend:\n  before_script:\n    - 'python() { return 0; }'\n  stage: test",
+            1,
+        ),
+        encoding="utf-8",
+    )
+    before_result = run_verifier("--gitlab", str(before_candidate))
+    assert before_result.returncode == 2
+    assert before_result.stdout.strip() == "CI_CONTRACT_RED gitlab_job_keys:backend"
+
+
+def test_ci_verifier_rejects_wrapped_lock_and_preflight_commands(tmp_path: Path) -> None:
+    github = ROOT / ".github" / "workflows" / "ci.yml"
+    gitlab = ROOT / ".gitlab-ci.yml"
+    lock_candidate = tmp_path / "github-lock.yml"
+    lock_candidate.write_text(
+        github.read_text(encoding="utf-8").replace(
+            "        run: python -m pip install --require-hashes -r requirements.linux-ci.lock",
+            "        run: |\n          if false; then\n            python -m pip install --require-hashes -r requirements.linux-ci.lock\n          fi",
+            1,
+        ),
+        encoding="utf-8",
+    )
+    lock_result = run_verifier("--github", str(lock_candidate))
+    assert lock_result.returncode == 2
+    assert lock_result.stdout.strip() == "CI_CONTRACT_RED github_steps_drift:backend"
+
+    preflight_candidate = tmp_path / "github-preflight.yml"
+    preflight_candidate.write_text(
+        github.read_text(encoding="utf-8").replace(
+            "          test \"$(docker info --format '{{.OSType}}')\" = \"linux\"",
+            "          if false; then test \"$(docker info --format '{{.OSType}}')\" = \"linux\"; fi",
+            1,
+        ),
+        encoding="utf-8",
+    )
+    preflight_result = run_verifier("--github", str(preflight_candidate))
+    assert preflight_result.returncode == 2
+    assert preflight_result.stdout.strip() == "CI_CONTRACT_RED github_steps_drift:oci-package"
+
+    gitlab_candidate = tmp_path / "gitlab-lock.yml"
+    gitlab_candidate.write_text(
+        gitlab.read_text(encoding="utf-8").replace(
+            "    - python -m pip install --require-hashes -r requirements.linux-ci.lock",
+            "    - if false; then python -m pip install --require-hashes -r requirements.linux-ci.lock; fi",
+            1,
+        ),
+        encoding="utf-8",
+    )
+    gitlab_result = run_verifier("--gitlab", str(gitlab_candidate))
+    assert gitlab_result.returncode == 2
+    assert gitlab_result.stdout.strip() == "CI_CONTRACT_RED gitlab_script_drift:backend"
 
 
 def test_ci_verifier_rejects_case_wrapped_oci_command(tmp_path: Path) -> None:
