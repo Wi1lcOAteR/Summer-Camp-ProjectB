@@ -9,8 +9,8 @@ claim.
 ```json
 {
   "task": "CI-01",
-  "status": "ready_for_terminal_review",
-  "implementationCommit": "pending_terminal_commit",
+  "status": "complete",
+  "implementationCommit": "3a51c7b",
   "verifier": {
     "status": "pass",
     "command": "python scripts/verify_ci_contract.py",
