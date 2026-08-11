@@ -53,6 +53,11 @@ try {
     }
     $webResponse = Invoke-WebRequest -UseBasicParsing -Uri ("http://127.0.0.1:{0}/" -f $Port)
     if ($webResponse.StatusCode -ne 200 -or $webResponse.Content -notmatch 'id="root"') { throw "webui_resource_contract" }
+    $coursesResponse = Invoke-WebRequest -UseBasicParsing -Uri ("http://127.0.0.1:{0}/api/courses" -f $Port)
+    $courses = $coursesResponse.Content | ConvertFrom-Json
+    if ($coursesResponse.StatusCode -ne 200 -or "courses" -notin $courses.PSObject.Properties.Name) {
+        throw "courses_contract"
+    }
     $credentialResponse = Invoke-WebRequest -UseBasicParsing -Uri ("http://127.0.0.1:{0}/api/credentials/provider" -f $Port)
     $credential = $credentialResponse.Content | ConvertFrom-Json
     if ($credential.configured -ne $false) { throw "credential_status_contract" }

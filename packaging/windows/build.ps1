@@ -63,7 +63,14 @@ if (-not (Test-Path -LiteralPath $outputPath -PathType Leaf)) { throw "artifact_
 $packageManifest = Join-Path $workDirectory "ProjectB\PKG-00.toc"
 if (-not (Test-Path -LiteralPath $packageManifest -PathType Leaf)) { throw "package_manifest_missing" }
 $packageText = [IO.File]::ReadAllText($packageManifest, [Text.UTF8Encoding]::new($false, $true))
-foreach ($resource in @("frontend_dist\\index.html", "frontend_dist\\assets", "licenses\\THIRD_PARTY_NOTICES.md", "pypdfium2_raw\\pdfium.dll")) {
+foreach ($resource in @(
+    "frontend_dist\\index.html",
+    "frontend_dist\\assets",
+    "licenses\\THIRD_PARTY_NOTICES.md",
+    "projectb\\storage\\migrations\\001_core.sql",
+    "projectb\\storage\\migrations\\002_learning.sql",
+    "pypdfium2_raw\\pdfium.dll"
+)) {
     if (-not $packageText.Contains($resource)) { throw "package_resource_missing:$resource" }
 }
 Write-Output ("WINDOWS_BUILD_PASS artifact={0}" -f $outputPath)

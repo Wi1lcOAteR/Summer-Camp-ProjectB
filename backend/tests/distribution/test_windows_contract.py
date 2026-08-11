@@ -45,8 +45,12 @@ def test_windows_distribution_files_and_resource_contract_exist() -> None:
     assert "windows_x64_required" in build and "python_3_14_6_required" in build and "python_x64_required" in build
     assert "pyinstaller_6_21_0_required" in build and "Assert-NoReparse" in build
     assert "PKG-00.toc" in build and "package_resource_missing" in build
+    assert 'projectb\\\\storage\\\\migrations\\\\001_core.sql' in build
+    assert 'projectb\\\\storage\\\\migrations\\\\002_learning.sql' in build
     assert "frontend_build_failed" in build and "$LASTEXITCODE -ne 0" in build
     assert "frontend_dist" in spec and "THIRD_PARTY_NOTICES.md" in spec
+    assert 'MIGRATIONS = BACKEND / "projectb" / "storage" / "migrations"' in spec
+    assert '(str(MIGRATIONS), "projectb/storage/migrations")' in spec
     assert "PIL" in _analysis_excludes(spec)
     assert "127.0.0.1" in launcher
     assert "LOCALAPPDATA" in launcher or "data-dir" in launcher
@@ -58,6 +62,7 @@ def test_windows_smoke_and_ci_are_fail_closed() -> None:
     seed = _text(ROOT / "scripts" / "tests" / "ci_seed_contract.ps1")
     assert "127.0.0.1" in smoke
     assert "webui_resource_contract" in smoke and 'id="root"' in smoke
+    assert "/api/courses" in smoke and "courses_contract" in smoke
     assert "WinVault" in smoke or "credential" in smoke.lower()
     assert "finally" in smoke.lower() and "Stop-Process" in smoke and "Get-Process -Name" in smoke
     assert "Get-NetTCPConnection -OwningProcess" in smoke

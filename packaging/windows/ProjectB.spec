@@ -8,11 +8,13 @@ from PyInstaller.utils.hooks import collect_submodules
 ROOT = Path(SPECPATH).resolve().parents[1]
 BACKEND = ROOT / "backend"
 FRONTEND_DIST = ROOT / "frontend" / "dist"
+MIGRATIONS = BACKEND / "projectb" / "storage" / "migrations"
 NOTICES = ROOT / "licenses" / "THIRD_PARTY_NOTICES.md"
 LAUNCHER = Path(SPECPATH).resolve() / "launcher.py"
 
 datas = [
     (str(FRONTEND_DIST), "frontend_dist"),
+    (str(MIGRATIONS), "projectb/storage/migrations"),
     (str(NOTICES), "licenses"),
 ]
 hiddenimports = [
