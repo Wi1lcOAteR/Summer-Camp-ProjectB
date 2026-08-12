@@ -61,6 +61,20 @@ def test_github_git_consumers_install_git_before_checkout() -> None:
         assert section.index(bootstrap) < section.index(checkout)
 
 
+def test_github_git_consumers_trust_only_the_current_workspace() -> None:
+    github = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    trust = (
+        "    env:\n"
+        "      GIT_CONFIG_COUNT: 1\n"
+        "      GIT_CONFIG_KEY_0: safe.directory\n"
+        "      GIT_CONFIG_VALUE_0: ${{ github.workspace }}\n"
+    )
+
+    for job_name, next_job in (("scanner", "backend"), ("backend", "frontend")):
+        section = github.split(f"  {job_name}:\n", 1)[1].split(f"\n  {next_job}:\n", 1)[0]
+        assert trust in section
+
+
 def test_ci_verifier_rejects_unknown_job_without_mutating_repository(tmp_path: Path) -> None:
     github = ROOT / ".github" / "workflows" / "ci.yml"
     candidate = tmp_path / "ci.yml"
