@@ -1,5 +1,13 @@
 # DIST-01 Evidence
 
+## Review-enabled release closure (2026-08-12)
+
+- The release WebUI no longer uses the former hard-coded Review fixture. It consumes the existing persisted review revision/task API and exposes working generate, complete, skip, and recover actions.
+- Frontend verification before the final artifact rebuild: Review focused Vitest `3 passed`; complete frontend gate `8 files passed, 59 tests passed`; TypeScript unused checks and Vite production build passed.
+- Pinned PyInstaller `6.21.0` rebuilt the same source bytes successfully. Final `ProjectB.exe`: `29,225,145` bytes; SHA-256 `CB463E179FE2D3367ED0BA96B0621A5E32CF01319F39DB0AB74FC9FCC237F6A3`.
+- Disposable-data smoke returned `WINDOWS_SMOKE_PASS profile=local credential_configured=False`. The retained local course then generated a real five-task revision. Browser acceptance executed start, skip, and recover and returned to five pending/zero skipped tasks, so persistence was exercised without consuming student progress.
+- The older artifact receipt below remains historical evidence and must not be presented as the final review-enabled binary.
+
 Status: current optimized artifact passes local development verification; exact-artifact clean-host performance retest was waived by student decision D-026.
 
 The Windows package is a single `ProjectB.exe` produced by the pinned
@@ -80,6 +88,12 @@ and PDF extraction tests returned `7 passed`.
 
 The rebuilt current artifact is `29,215,426` bytes with SHA-256
 `6A6A6C890EDD434798A0CB016A13463B2B4414ED4035230683A979B872704A98`.
+
+## 2026-08-12 frozen material-worker repair
+
+The student-preview run exposed that the one-file executable launched itself with the source module path when parsing an imported material. The launcher did not recognize that worker invocation, so every frozen TXT/PDF import ended as `content_unreadable` even though source-mode tests passed. A frozen-mode regression test now binds the executable command to `--material-worker`; the launcher handles that private entry point without starting the WebUI server.
+
+Focused material and Windows distribution tests returned `9 passed`; scoped Ruff passed. PyInstaller `6.21.0` returned `WINDOWS_BUILD_PASS`. A fresh disposable-data instance of the rebuilt executable imported the synthetic TXT fixture with `status=imported`, and Edge acceptance then completed import, confirmed source mapping, deterministic mutex evaluation, and evidence creation. The current artifact is `29,223,634` bytes with SHA-256 `8B89717EDCA32720009750783B918130EA27A9BDE62CE159C11BE9721458047E`.
 The first browser handoff exposed a real frozen-package failure:
 `GET /api/courses` returned 500 because the PyInstaller archive omitted
 `001_core.sql` and `002_learning.sql`. The RED distribution contract returned

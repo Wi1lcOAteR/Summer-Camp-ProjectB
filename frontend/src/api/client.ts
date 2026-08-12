@@ -58,6 +58,31 @@ export interface ConceptSummary {
   coverage?: CoverageSummary;
 }
 
+export type ReviewTaskStatus = 'pending' | 'skipped' | 'completed';
+
+export interface ReviewTaskSummary {
+  taskId: string;
+  revisionId: string;
+  conceptId: string;
+  dueLocalDate: string;
+  durationMinutes: number;
+  status: ReviewTaskStatus;
+  sourceRefs: string[];
+  evidenceRefs: string[];
+  completedAt: string | null;
+  createdAt: string;
+}
+
+export interface ReviewRevisionSummary {
+  revisionId: string;
+  courseId: string;
+  inputHash: string;
+  parentRevisionId: string | null;
+  createdAt: string;
+  tasks: ReviewTaskSummary[];
+  diff: { added: string[]; removed: string[]; changed: string[]; retained: string[] };
+}
+
 export interface ProviderProfileSummary {
   profileId: string;
   adapterId: 'openai';
@@ -274,6 +299,58 @@ function toConcept(value: unknown): ConceptSummary {
   };
 }
 
+function requireStringArray(record: Record<string, unknown>, key: string, errorCode: string): string[] {
+  const value = record[key];
+  if (!Array.isArray(value) || value.some((item) => typeof item !== 'string' || !item)) {
+    throw new ApiRequestError(errorCode);
+  }
+  return [...value];
+}
+
+function toReviewTask(value: unknown): ReviewTaskSummary {
+  const task = requireRecord(value, 'invalid_review_response');
+  const status = requireString(task, 'status', 'invalid_review_response');
+  if (status !== 'pending' && status !== 'skipped' && status !== 'completed') {
+    throw new ApiRequestError('invalid_review_response');
+  }
+  const completedAt = task.completed_at;
+  if (completedAt !== null && typeof completedAt !== 'string') throw new ApiRequestError('invalid_review_response');
+  return {
+    taskId: requireNonEmptyString(task, 'task_id', 'invalid_review_response'),
+    revisionId: requireNonEmptyString(task, 'revision_id', 'invalid_review_response'),
+    conceptId: requireNonEmptyString(task, 'concept_id', 'invalid_review_response'),
+    dueLocalDate: requireNonEmptyString(task, 'due_local_date', 'invalid_review_response'),
+    durationMinutes: requirePositiveInteger(task, 'duration_minutes', 'invalid_review_response'),
+    status,
+    sourceRefs: requireStringArray(task, 'source_refs', 'invalid_review_response'),
+    evidenceRefs: requireStringArray(task, 'evidence_refs', 'invalid_review_response'),
+    completedAt,
+    createdAt: requireNonEmptyString(task, 'created_at', 'invalid_review_response'),
+  };
+}
+
+function toReviewRevision(value: unknown): ReviewRevisionSummary {
+  const revision = requireRecord(value, 'invalid_review_response');
+  if (!Array.isArray(revision.tasks)) throw new ApiRequestError('invalid_review_response');
+  const diff = requireRecord(revision.diff, 'invalid_review_response');
+  const parent = revision.parent_revision_id;
+  if (parent !== null && typeof parent !== 'string') throw new ApiRequestError('invalid_review_response');
+  return {
+    revisionId: requireNonEmptyString(revision, 'revision_id', 'invalid_review_response'),
+    courseId: requireNonEmptyString(revision, 'course_id', 'invalid_review_response'),
+    inputHash: requireNonEmptyString(revision, 'input_hash', 'invalid_review_response'),
+    parentRevisionId: parent,
+    createdAt: requireNonEmptyString(revision, 'created_at', 'invalid_review_response'),
+    tasks: revision.tasks.map(toReviewTask),
+    diff: {
+      added: requireStringArray(diff, 'added', 'invalid_review_response'),
+      removed: requireStringArray(diff, 'removed', 'invalid_review_response'),
+      changed: requireStringArray(diff, 'changed', 'invalid_review_response'),
+      retained: requireStringArray(diff, 'retained', 'invalid_review_response'),
+    },
+  };
+}
+
 export function createApiClient(options: ApiClientOptions = {}) {
   const fetchImpl = options.fetchImpl ?? fetch;
   async function csrfToken(): Promise<string> {
@@ -470,6 +547,58 @@ export function createApiClient(options: ApiClientOptions = {}) {
         throw new ApiRequestError('invalid_delete_response');
       }
       return { status: payload.status, retryable: payload.retryable === true };
+    },
+    async generateReviewRevision(input: {
+      courseId: string;
+      mode: 'continuous' | 'finals';
+      timezone: string;
+      dailyBudgetMinutes: number;
+      examDate?: string;
+      generatedAt: string;
+    }): Promise<ReviewRevisionSummary> {
+      const csrfHeader = await csrfToken();
+      const response = await fetchImpl('/api/review/revisions', {
+        method: 'POST', credentials: 'same-origin',
+        headers: { accept: 'application/json', 'content-type': 'application/json', 'x-csrf-token': csrfHeader },
+        body: JSON.stringify({
+          course_id: input.courseId,
+          mode: input.mode,
+          timezone: input.timezone,
+          daily_budget_minutes: input.dailyBudgetMinutes,
+          exam_date: input.examDate,
+          generated_at: input.generatedAt,
+        }),
+      });
+      if (!response.ok) throw await requestError(response, 'review_revision_failed');
+      return toReviewRevision(await response.json());
+    },
+    async completeReviewTask(taskId: string, completedAt: string): Promise<ReviewTaskSummary> {
+      const csrfHeader = await csrfToken();
+      const response = await fetchImpl(`/api/review/tasks/${encodeURIComponent(taskId)}/complete`, {
+        method: 'POST', credentials: 'same-origin',
+        headers: { accept: 'application/json', 'content-type': 'application/json', 'x-csrf-token': csrfHeader },
+        body: JSON.stringify({ completed_at: completedAt }),
+      });
+      if (!response.ok) throw await requestError(response, 'review_task_failed');
+      return toReviewTask(await response.json());
+    },
+    async skipReviewTask(taskId: string): Promise<ReviewTaskSummary> {
+      const csrfHeader = await csrfToken();
+      const response = await fetchImpl(`/api/review/tasks/${encodeURIComponent(taskId)}/skip`, {
+        method: 'POST', credentials: 'same-origin',
+        headers: { accept: 'application/json', 'x-csrf-token': csrfHeader },
+      });
+      if (!response.ok) throw await requestError(response, 'review_task_failed');
+      return toReviewTask(await response.json());
+    },
+    async recoverReviewTask(taskId: string): Promise<ReviewTaskSummary> {
+      const csrfHeader = await csrfToken();
+      const response = await fetchImpl(`/api/review/tasks/${encodeURIComponent(taskId)}/recover`, {
+        method: 'POST', credentials: 'same-origin',
+        headers: { accept: 'application/json', 'x-csrf-token': csrfHeader },
+      });
+      if (!response.ok) throw await requestError(response, 'review_task_failed');
+      return toReviewTask(await response.json());
     },
   };
 }

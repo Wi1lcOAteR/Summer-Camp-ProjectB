@@ -19,6 +19,7 @@ from projectb.domain.materials.models import (  # noqa: E402
     PdfPageLocator,
     TextLinesLocator,
 )
+from projectb.services.materials import extract_text  # noqa: E402
 from projectb.services.materials.extract_text import ExtractionError, extract_material  # noqa: E402
 
 
@@ -41,6 +42,33 @@ def test_text_hashes_raw_bytes_and_normalizes_lines(tmp_path: Path) -> None:
     ]
     assert all(part.locator.content_hash == result.content_hash for part in result.sources)
     assert all(part.locator.material_version_id == result.version.version_id for part in result.sources)
+
+
+def test_frozen_extraction_dispatches_to_executable_worker(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    source = tmp_path / "notes.txt"
+    source.write_text("mutex\n", encoding="utf-8")
+    captured: list[str] = []
+    captured_outputs: list[Path] = []
+
+    monkeypatch.setattr(extract_text.sys, "frozen", True, raising=False)
+    monkeypatch.setattr(extract_text.sys, "executable", "ProjectB.exe")
+
+    def capture(command: list[str], *, output_path: Path, deadline_seconds: float) -> None:
+        captured.extend(command)
+        captured_outputs.append(output_path)
+        output_path.write_text(
+            '{"ok":true,"result":{"content_hash":"' + ("a" * 64)
+            + '","media_type":"text/plain","contract":["utf8-text","1","1"],"texts":["mutex"]}}',
+            encoding="utf-8",
+        )
+
+    monkeypatch.setattr(extract_text, "run_terminable_worker", capture)
+
+    result = extract_material(source, material_id="material-frozen")
+
+    assert captured[:3] == ["ProjectB.exe", "--material-worker", str(source)]
+    assert Path(captured[3]) == captured_outputs[0]
+    assert result.sources[0].text == "mutex"
 
 
 @pytest.mark.parametrize("name", ["notes.txt", "notes.md"])

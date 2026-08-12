@@ -1,63 +1,83 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ReviewView } from './ReviewView';
+
+const revision = {
+  revisionId: 'revision-1',
+  courseId: 'course-1',
+  inputHash: 'b'.repeat(64),
+  parentRevisionId: null,
+  createdAt: '2026-08-12T12:00:00Z',
+  tasks: [
+    {
+      taskId: 'task-1', revisionId: 'revision-1', conceptId: 'concept-1', dueLocalDate: '2026-08-13',
+      durationMinutes: 10, status: 'pending' as const, sourceRefs: ['locator-1'], evidenceRefs: ['evidence-1'],
+      completedAt: null, createdAt: '2026-08-12T12:00:00Z',
+    },
+    {
+      taskId: 'task-2', revisionId: 'revision-1', conceptId: 'concept-1', dueLocalDate: '2026-08-15',
+      durationMinutes: 10, status: 'skipped' as const, sourceRefs: ['locator-1'], evidenceRefs: ['evidence-1'],
+      completedAt: null, createdAt: '2026-08-12T12:00:00Z',
+    },
+  ],
+  diff: { added: ['concept-1@2026-08-13'], removed: [], changed: [], retained: [] },
+};
+
+function api() {
+  return {
+    listCourses: vi.fn().mockResolvedValue([{ courseId: 'course-1', name: '操作系统', timezone: 'Asia/Shanghai' }]),
+    listConcepts: vi.fn().mockResolvedValue([
+      { conceptId: 'concept-1', name: '互斥', evaluatorId: 'os.mutex.v1', state: 'active', version: 1 },
+    ]),
+    generateReviewRevision: vi.fn().mockResolvedValue(revision),
+    completeReviewTask: vi.fn().mockResolvedValue({ ...revision.tasks[0], status: 'completed', completedAt: '2026-08-12T12:30:00Z' }),
+    skipReviewTask: vi.fn().mockResolvedValue({ ...revision.tasks[0], status: 'skipped' }),
+    recoverReviewTask: vi.fn().mockResolvedValue({ ...revision.tasks[1], status: 'pending' }),
+  };
+}
 
 afterEach(cleanup);
 
 describe('ReviewView', () => {
-  it('renders deterministic review budget, source identity, mastery, and controls', () => {
-    render(<ReviewView />);
+  it('renders the real backend revision without fixture sources or hashes', async () => {
+    const client = api();
+    render(<ReviewView api={client} now={() => new Date('2026-08-12T12:00:00Z')} />);
 
-    expect(screen.getByRole('heading', { name: '复习计划' })).toBeTruthy();
-    expect(screen.getByText('今日预算')).toBeTruthy();
-    expect(screen.getAllByText('30 分钟').length).toBeGreaterThan(0);
-    expect(screen.getByText('3 个来源')).toBeTruthy();
-    expect(screen.getByText('操作系统讲义.txt')).toBeTruthy();
-    expect(screen.getByText('掌握度')).toBeTruthy();
-    expect(screen.getByRole('radiogroup', { name: '复习模式' })).toBeTruthy();
-    expect(screen.getByLabelText('压缩重复项')).toBeTruthy();
-    expect(screen.getByLabelText('截止时间')).toBeTruthy();
-    expect(screen.getByLabelText('每日预算（分钟）')).toBeTruthy();
-    expect(screen.getByRole('region', { name: '计划修订差异' })).toBeTruthy();
+    expect(await screen.findByText('待复习 · 互斥')).toBeTruthy();
+    expect(screen.getByText('2026-08-13 · 10 分钟')).toBeTruthy();
+    expect(screen.getByText('1 个已确认来源')).toBeTruthy();
+    expect(screen.queryByText('操作系统讲义.txt')).toBeNull();
+    expect(screen.queryByText(/aaaaaaaa/)).toBeNull();
+    expect(client.generateReviewRevision).toHaveBeenCalledWith(expect.objectContaining({
+      courseId: 'course-1', mode: 'continuous', timezone: 'Asia/Shanghai', dailyBudgetMinutes: 30,
+    }));
   });
 
-  it('updates the local plan and preserves completed work when recovery is used', async () => {
+  it('starts the first pending task and persists completion', async () => {
+    const client = api();
     const user = userEvent.setup();
-    render(<ReviewView />);
+    render(<ReviewView api={client} now={() => new Date('2026-08-12T12:30:00Z')} />);
 
-    await user.click(screen.getByRole('radio', { name: '最终复习' }));
-    expect(screen.getByText('最终复习已选择')).toBeTruthy();
-    await user.click(screen.getByRole('button', { name: '恢复未完成项' }));
-    expect(screen.getByText('已恢复 2 个未完成项；已完成任务保持不变')).toBeTruthy();
-    expect(screen.getByText('已完成 · 互斥')).toBeTruthy();
-    expect(screen.getByRole('button', { name: '开始复习' })).toBeTruthy();
+    await screen.findByText('待复习 · 互斥');
+    await user.click(screen.getByRole('button', { name: '开始复习' }));
+    expect(screen.getByRole('status').textContent).toContain('正在复习：互斥');
+    await user.click(screen.getByRole('button', { name: '完成当前任务' }));
+
+    expect(client.completeReviewTask).toHaveBeenCalledWith('task-1', '2026-08-12T12:30:00.000Z');
+    expect(await screen.findByText('已完成 · 互斥')).toBeTruthy();
   });
 
-  it('uses the finals policy value, exposes an exam date, and fails closed for past exams', async () => {
+  it('persists skip and recovery instead of changing only local copy', async () => {
+    const client = api();
     const user = userEvent.setup();
-    render(<ReviewView />);
+    render(<ReviewView api={client} now={() => new Date('2026-08-12T12:00:00Z')} />);
 
-    const finals = screen.getByRole('radio', { name: '最终复习' });
-    expect(finals.getAttribute('value')).toBe('finals');
-    await user.click(finals);
-    const examDate = screen.getByLabelText('考试日期');
-    expect(examDate.getAttribute('type')).toBe('date');
-    await user.clear(examDate);
-    await user.type(examDate, '2026-08-01');
-    expect(screen.getByRole('alert').textContent).toContain('考试日期已过去');
-    expect(screen.getByText('可安排任务').parentElement?.textContent).toContain('0');
-  });
-
-  it('updates revision contents and marks recovered work without changing completed state', async () => {
-    const user = userEvent.setup();
-    render(<ReviewView />);
-
-    await user.click(screen.getByLabelText('压缩重复项'));
-    expect(screen.getByText('未压缩重复项，保留完整练习轨迹。')).toBeTruthy();
-    await user.click(screen.getByRole('button', { name: '恢复未完成项' }));
-    expect(screen.getByText('恢复中 · 竞态条件')).toBeTruthy();
-    expect(screen.getByText('已完成 · 互斥')).toBeTruthy();
+    await screen.findByText('待复习 · 互斥');
+    await user.click(screen.getByRole('button', { name: '跳过当前任务' }));
+    expect(client.skipReviewTask).toHaveBeenCalledWith('task-1');
+    await user.click(screen.getByRole('button', { name: '恢复已跳过任务' }));
+    expect(client.recoverReviewTask).toHaveBeenCalledWith('task-1');
   });
 });

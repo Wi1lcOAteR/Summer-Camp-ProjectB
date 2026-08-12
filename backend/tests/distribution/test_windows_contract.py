@@ -54,6 +54,7 @@ def test_windows_distribution_files_and_resource_contract_exist() -> None:
     assert "PIL" in _analysis_excludes(spec)
     assert "127.0.0.1" in launcher
     assert "LOCALAPPDATA" in launcher or "data-dir" in launcher
+    assert "--material-worker" in launcher
 
 
 def test_windows_smoke_and_ci_are_fail_closed() -> None:

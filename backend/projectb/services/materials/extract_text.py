@@ -221,7 +221,11 @@ def extract_material(
     os.close(handle)
     output_path = Path(output_name)
     output_path.unlink(missing_ok=True)
-    command = [sys.executable, str(Path(__file__).resolve()), "--worker", str(source), str(output_path)]
+    command = (
+        [sys.executable, "--material-worker", str(source), str(output_path)]
+        if getattr(sys, "frozen", False)
+        else [sys.executable, str(Path(__file__).resolve()), "--worker", str(source), str(output_path)]
+    )
     try:
         run_terminable_worker(command, output_path=output_path, deadline_seconds=deadline_seconds)
         try:
@@ -242,6 +246,10 @@ def _main() -> int:
     if not arguments.worker:
         return 2
     return _write_worker_result(arguments.path, arguments.output)
+
+
+def run_material_worker(path: Path, output_path: Path) -> int:
+    return _write_worker_result(path, output_path)
 
 
 if __name__ == "__main__":

@@ -1,23 +1,52 @@
-# ProjectB
+# ProjectB 本地智能学习工作台
 
-ProjectB 是面向操作系统课程材料的本地学习工作台。它把用户导入的讲义转成可追溯的概念与来源，提供确定性的理解练习，并按掌握度生成连续复习或期末复习计划。真实模型只在本地模式下由用户显式启用；没有真实模型时，核心学习流程仍可运行。
+ProjectB 面向需要从课程材料中建立知识结构、完成理解练习并持续复习的学生。它将 PDF、TXT 或 Markdown 讲义保存在本机，记录材料版本和精确来源，提供确定性练习与证据，再依据这些证据生成可完成、跳过和恢复的复习任务。
 
-当前产品规约见 [SPEC.md](SPEC.md)，任务与验收状态见 [PLAN.md](PLAN.md)，文档入口见 [docs/INDEX.md](docs/INDEX.md)。
+项目以 **Windows 本地应用** 交付：`ProjectB.exe` 在本机启动 FastAPI、SQLite 和 WebUI，仅监听 `127.0.0.1`。浏览器只是应用界面，不需要公网服务器，也不会把课程材料自动上传到远端。
 
-- 源码仓库：<https://github.com/Wi1lcOAteR/Summer-Camp-ProjectB>
-- GitHub Actions：<https://github.com/Wi1lcOAteR/Summer-Camp-ProjectB/actions>
-- Release 入口：<https://github.com/Wi1lcOAteR/Summer-Camp-ProjectB/releases>（发布附件创建前请按下方命令从源码构建）
+- 源码仓库：[GitHub](https://github.com/Wi1lcOAteR/Summer-Camp-ProjectB)
+- 自动化检查：[GitHub Actions](https://github.com/Wi1lcOAteR/Summer-Camp-ProjectB/actions)
+- 发布页：[GitHub Releases](https://github.com/Wi1lcOAteR/Summer-Camp-ProjectB/releases)
+- 详细规约：[SPEC.md](SPEC.md)
+- 文档索引：[docs/INDEX.md](docs/INDEX.md)
 
 ## 功能模块
 
-- **材料与来源**：导入课程材料，保存材料版本、内容哈希和精确 locator，映射结果可确认、拒绝或重新检查。
-- **理解与练习**：围绕 mutex、race、deadlock 等概念生成来源绑定的解释与练习；确定性 evaluator 负责评分，模型文本不成为权威答案。
-- **复习计划**：根据掌握度、时间预算和截止时间生成连续或期末计划，保留已完成任务并记录修订差异。
-- **设置与凭据**：查看本地/演示 profile、配置或清除提供方凭据、启停真实提供方，并显示不回显明文的状态。
+1. **材料导入**：创建课程并导入数字版 PDF、TXT、Markdown；保存材料版本、内容哈希和精确 locator。
+2. **概念映射**：把讲义片段映射到知识点，确认或拒绝来源覆盖，避免无来源解释成为权威答案。
+3. **学习与证据**：对互斥、竞态和死锁运行本地确定性检查；答案和结果形成可追踪 evidence。
+4. **复习计划**：按当前课程、来源和学习证据生成真实 revision；支持连续/期末模式、每日预算、完成、跳过和恢复，状态写入本地 SQLite。
+5. **设置与凭据**：查看本地运行状态；可选配置 OpenAI 提供方。密钥写入 Windows Credential Manager，界面和 API 不回显明文。
+
+核心学习闭环在没有 API key、没有真实模型、没有网络服务时仍可运行。
+
+## 最快体验
+
+课程提交包中的 Windows x64 单文件应用位于：
+
+```text
+dist/ProjectB.exe
+```
+
+双击运行后访问：
+
+```text
+http://127.0.0.1:4173/
+```
+
+首次使用建议按以下顺序操作：
+
+1. 在“导入”页创建课程并导入一份 UTF-8 TXT、Markdown 或数字版 PDF。
+2. 在“映射”页创建知识点，选择对应原文片段并确认来源。
+3. 在“学习”页提交确定性练习，查看检查结果和 evidence ID。
+4. 在“复习”页生成 revision，点击“开始复习”，再完成、跳过或恢复任务。
+5. 需要外部解释候选时，再在“设置”页录入自己的 API key 并显式启用提供方。
+
+应用数据默认保存在 `%LOCALAPPDATA%\ProjectB`。关闭应用后再次启动，课程和任务状态仍会保留。
 
 ## 安装与开发运行
 
-开发环境锁定为 Python 3.14.6、Node.js 24.18.0 和 npm 11.16.0。Windows PowerShell 示例：
+开发环境基线为 Python 3.14.6、Node.js 24.18.0、npm 11.16.0。PowerShell 示例：
 
 ```powershell
 $Py = "C:\Python314\python.exe"
@@ -28,80 +57,114 @@ $env:PYTHONPATH = (Resolve-Path backend).Path
 & $Py packaging/windows/launcher.py --data-dir tmp/dev-data --port 4173
 ```
 
-浏览器访问 `http://127.0.0.1:4173/`。`tmp/dev-data` 仅用于本地开发；打包版默认把数据写到 `%LOCALAPPDATA%\ProjectB`。
-
 ## 测试
 
-一键测试命令：
+一键执行后端、前端、静态检查、凭据扫描和许可证验证：
 
 ```powershell
-python scripts/test_all.py
+python scripts/test_all.py --all
 ```
 
-该命令运行后端测试、前端 Vitest/TypeScript/Vite、Ruff、mypy、凭据扫描和许可证验证。也可使用 `--backend` 或 `--frontend` 限定范围。当前源码快照的主进程复验结果为后端 `284 passed`、前端 `60 passed`；后续提交仍应以当次输出为准。
+也可分别运行：
+
+```powershell
+python scripts/test_all.py --backend
+python scripts/test_all.py --frontend
+python scripts/scan_credentials.py --tracked
+python scripts/verify_licenses.py
+```
 
 ## Windows 单文件分发
 
-构建目标是 Windows x64 单文件 `ProjectB.exe`，最终用户不需要安装 Python、Node.js 或 Docker：
+构建 Windows 单文件应用：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/build.ps1 -Python C:\Python314\python.exe -Output dist/ProjectB.exe
+powershell -NoProfile -ExecutionPolicy Bypass -File packaging/windows/build.ps1 `
+  -Python C:\Python314\python.exe `
+  -Output dist/ProjectB.exe
 ```
 
-产物内嵌 WebUI、后端、SQLite 迁移和许可证文件，只监听 `127.0.0.1`。当前重新构建产物 SHA-256 为 `6A6A6C890EDD434798A0CB016A13463B2B4414ED4035230683A979B872704A98`，大小为 `29,215,426` 字节。它未进行 Authenticode 签名，Windows 可能显示 SmartScreen 警告；不要把该制品描述为已签名正式发布版。
+产物内嵌 WebUI、后端、SQLite 迁移和第三方许可证文件，最终用户不需要安装 Python、Node.js 或 Docker。
+
+当前最终构建产物为 `29,225,145` 字节，SHA-256：
+
+```text
+CB463E179FE2D3367ED0BA96B0621A5E32CF01319F39DB0AB74FC9FCC237F6A3
+```
 
 ## OCI 本地演示
 
-OCI 镜像只提供无上传、无真实凭据、无真实提供方网络访问的确定性演示 profile：
+OCI 镜像仅用于无上传、无真实凭据和无真实提供方网络访问的确定性演示：
 
 ```powershell
 docker build --platform linux/amd64 --file packaging/oci/Dockerfile --tag projectb-demo:local .
-docker run --rm --read-only --tmpfs /tmp/projectb-demo:rw,size=64m -e PROJECTB_DEMO_LOCAL_SMOKE=1 -p 127.0.0.1:7860:7860 projectb-demo:local
+docker run --rm --read-only --tmpfs /tmp/projectb-demo:rw,size=64m -p 127.0.0.1:7860:7860 projectb-demo:local
 ```
 
-镜像以 UID/GID `10001:10001` 运行，根文件系统只读，临时状态位于 64 MiB tmpfs，并在进程内拒绝外发网络。已验证的本地镜像与 smoke 证据见 [DIST-02_EVIDENCE.md](docs/engineering/DIST-02_EVIDENCE.md)。本项目按 D-025 作为本地应用交付，不创建公网部署。
+它不是主要分发方式，也不替代 Windows 本地应用。
 
 ## 安全与凭据
 
-- 本地服务固定监听 `127.0.0.1`，拒绝转发头，并使用 session cookie 与 CSRF 保护写操作。
-- API key 只通过隐藏输入写入 Windows Credential Manager；状态接口只返回是否配置和更新时间，不回显明文。
-- 正式路径不读取 `.env`，仓库、日志、SQLite、浏览器状态和测试快照不得包含真实凭据。
-- 真实提供方默认关闭。启用时，预览绑定 profile、模型、来源哈希、token 上限和费用上限；每次同意只能使用一次。
-- 上传文件、模型输出、locator 和工具参数均按不可信输入处理，包含大小、类型、路径、超时和错误脱敏限制。
+- 服务固定监听 `127.0.0.1`，拒绝转发头，并使用 session cookie 与 CSRF 保护写操作。
+- 课程材料、答案、学习证据和 SQLite 数据默认只保存在本机。
+- API key 通过隐藏输入写入 Windows Credential Manager；状态接口只返回是否配置和更新时间。
+- 真实提供方默认关闭。启用时，每次调用预览会绑定 profile、模型、来源版本/哈希、token 上限和费用上限，并要求一次性确认。
+- 上传文件、locator、模型输出和工具参数均作为不可信输入处理，执行类型、大小、路径、超时和错误脱敏检查。
+- 提交前运行凭据扫描；仓库和测试夹具不得包含真实密钥。
 
 ## 目录结构
 
+```text
+ProjectB.exe / launcher
+        |
+        +-- React WebUI
+        +-- FastAPI API
+        +-- domain services: materials / mapping / learning / review
+        +-- local SQLite + Windows Credential Manager
+```
+
 | 路径 | 职责 |
 | --- | --- |
-| `backend/projectb/` | FastAPI API、领域规则、存储、凭据与提供方端口 |
-| `frontend/src/` | React WebUI、路由、视图和 API client |
-| `backend/tests/`, `frontend/e2e/` | 后端、前端和浏览器合同测试 |
+| `backend/projectb/` | API、领域规则、存储、凭据与可选提供方端口 |
+| `frontend/src/` | React WebUI、路由、视图与 API client |
+| `backend/tests/`, `frontend/e2e/` | 单元、集成、合同和浏览器测试 |
 | `packaging/windows/` | Windows 单文件构建与 smoke |
-| `packaging/oci/` | 本地演示镜像、SBOM、notice 与 smoke |
-| `scripts/` | 一键测试、扫描、许可证及 CI 合同验证 |
-| `docs/` | 当前工程证据、研究材料和历史归档 |
-| `licenses/` | 完整第三方 notice |
-| `tmp/` | 可删除的本地运行输出，不是课程证据或产品源码 |
+| `packaging/oci/` | 可选的本地确定性演示镜像、SBOM 与 notice |
+| `scripts/` | 一键测试、凭据扫描、许可证和 CI 合同验证 |
+| `docs/` | 工程证据、设计记录、计划和历史归档 |
+| `licenses/` | 第三方依赖与许可证清单 |
 
 ## CI/CD
 
-- `.gitlab-ci.yml` 保留名称严格为 `unit-test` 的 job，并包含后端、前端和 OCI 构建合同。
-- `.github/workflows/ci.yml` 保留对应的 GitHub Actions 检查及 Windows 单文件构建合同。
-- 两份配置均由 `scripts/verify_ci_contract.py` 做结构化校验；本地验证通过不等于远端平台已运行。
-- GitHub Actions 已在每次 push 自动运行，当前提交的最终状态以[仓库 Actions 页](https://github.com/Wi1lcOAteR/Summer-Camp-ProjectB/actions)为准。GitLab CI 尚未执行，也未推送 registry 或创建公网部署。
+- `.github/workflows/ci.yml` 在 GitHub push/PR 时运行当前测试和构建合同。
+- `.gitlab-ci.yml` 保留课程要求的 `unit-test` job；尚未在课程 GitLab 平台执行时，不把本地合同验证写成远端通过。
+- 主要分发方式是未签名的 Windows x64 单文件应用。Windows SmartScreen 可能因发行者未签名而提示警告。
+- OCI 镜像仅用于无上传、无真实凭据、无真实提供方网络访问的本地演示，不是本项目的主要交付入口。
+- 本项目没有远程业务服务端。根据课程“如做带服务端项目才需要远程部署”的适用范围，当前选择本地应用交付，不需要远程服务端或公网部署。
+- GitHub Actions 已启用；GitLab CI 尚未执行。最终远端状态仍以对应平台页面为准。
+
+## 已知限制与交付状态
+
+- 支持数字版 PDF、TXT 和 Markdown；暂不支持扫描件 OCR、图片材料和批量文件夹导入。
+- 确定性 evaluator 当前覆盖互斥、竞态和死锁；其他知识点可保存来源并查看解释，但不会伪造自动评分。
+- 当前界面默认操作本地数据库中的第一个课程，尚未提供多用户、账号体系或跨设备同步。
+- 复习页已经连接真实 review revision/task API，完成、跳过和恢复会持久化；它不是科学最优的记忆算法，而是可解释、可复现的课程项目调度规则。
+- OpenAI 路径为可选能力，需要用户自备凭据并承担费用；自动化测试使用 mock transport，不发起付费调用。
+- Windows 可执行文件未做 Authenticode 签名；学生通过 D-026 豁免当前 29.22 MB 产物的再次干净机复测，该豁免不等于性能 PASS，也不宣称满足内部 `<=10s` 指标。
+- GitHub Actions 状态以仓库 Actions 页面为准；课程 GitLab CI 在实际运行前仍记为“尚未执行”。
 
 ## 第三方依赖与许可证
 
-直接依赖记录在 `pyproject.toml` 和 `frontend/package.json`，精确版本与哈希记录在锁文件中。完整依赖闭包、许可证和再分发义务见 [licenses/THIRD_PARTY_NOTICES.md](licenses/THIRD_PARTY_NOTICES.md)；OCI 额外 notice 与 SPDX SBOM 位于 `packaging/oci/`。运行：
+直接依赖声明在 `pyproject.toml` 和 `frontend/package.json`，精确版本与哈希记录在锁文件中。完整依赖闭包、许可证和再分发义务见 [licenses/THIRD_PARTY_NOTICES.md](licenses/THIRD_PARTY_NOTICES.md)；OCI 的 SPDX SBOM 位于 `packaging/oci/`。
 
 ```powershell
 python scripts/verify_licenses.py
 ```
 
-## 已知限制与交付状态
+## 课程过程材料
 
-- 上一版 36.64 MB 产物曾在无 Python/Node/Docker 的 Windows 11 VM 启动，最低实测为 `11.487` 秒。学生已通过 D-026 豁免当前 29.22 MB 产物的再次干净机复测及 `<=10` 秒内部指标；当前产物已通过确定性构建、归档检查和开发机 smoke，但该豁免不等于性能 PASS。
-- Windows 产物未签名；SmartScreen 的实际表现依机器信誉而异。
-- 项目决策 D-025 将 `ProjectB.exe` 归类为本地应用；浏览器访问 loopback WebUI，不需要远程服务端或公网部署。OCI 只作为本地确定性演示，不接受材料上传或真实提供方凭据。
-- GitHub Actions 已启用；课程提交仍应确认最终 commit 的远端流水线为绿色。GitLab CI 尚未执行，本地 CI 合同通过不能替代课程平台要求的最终流水线。
-- 真实 OpenAI 路径需要用户自备凭据并承担费用；自动测试只使用 mock transport，不进行付费调用。
+- `SPEC.md`：产品规约与验收标准
+- `PLAN.md`：任务与验证状态
+- `SPEC_PROCESS.md`：规约演进与冷启动记录
+- `AGENT_LOG.md`：实现、测试、评审和人工决策记录
+- `REFLECTION.md`：项目反思
