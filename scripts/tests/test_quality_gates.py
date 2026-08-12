@@ -362,9 +362,12 @@ def test_frontend_exposes_plan_build_command() -> None:
 
 def test_planned_e2e_command_loads_all_viewport_projects() -> None:
     runner = load_module("scripts/test_all.py")
+    npm = runner.npm_command(REPO)
+    if not Path(npm).is_file() and shutil.which(npm) is None:
+        pytest.skip("frontend runtime is verified by the frontend CI job")
     result = subprocess.run(
         [
-            runner.npm_command(REPO),
+            npm,
             "--prefix",
             "frontend",
             "exec",

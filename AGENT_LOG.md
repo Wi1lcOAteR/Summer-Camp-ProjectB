@@ -1,5 +1,11 @@
 # AGENT_LOG
 
+## 2026-08-12T19:10:00+08:00 - Linux backend test portability repair
+
+- **Remote RED:** run `31590628188` after scanner parity commit `c3b36ff` passed scanner, frontend, OCI, and Windows; backend failed with `280 passed, 1 skipped, 5 failed`. A clean Linux checkout reproduced the failures and separated three invalid mounted-worktree path assumptions from two real test portability defects.
+- **Real defects:** `test_planned_e2e_command_loads_all_viewport_projects` executed `npm` inside the backend-only Python container, and `test_ownership_and_worktrees_retain_a_tracked_path_below_a_junction` unconditionally invoked Windows `cmd /c mklink` on Linux. The other three failures came only from the local Windows worktree `.git` pointer or are absent in a native checkout.
+- **Repair / GREEN:** the E2E enumeration test now skips when the frontend runtime is unavailable (frontend CI remains the owner of actual E2E execution); the junction test uses the native POSIX symlink path and keeps the Windows junction path. Windows-focused tests and Ruff passed. A native Linux checkout built from `git archive`, with these two test files overlaid, returned `284 passed, 2 skipped`, Linux mypy clean for 47 files, `CREDENTIAL_SCAN_PASS files=524`, `LICENSE_VERIFICATION_PASS python=54 npm=166 direct_python=18 direct_npm=16`, and `TEST_ALL_PASS mode=backend`.
+
 ## 2026-08-12T18:05:00+08:00 - GitHub scanner allowlist parity follow-up
 
 - **Remote RED / root cause:** after commit `c205021`, GitHub run `31582939691` advanced the tracked scan past `packaging/oci/Dockerfile.dockerignore` and then failed on the next canonical text type, `packaging/windows/ProjectB.spec`. The canonical Python scanner already includes `.spec`; the bootstrap PowerShell scanner omitted it from its independent suffix list.

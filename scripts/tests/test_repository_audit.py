@@ -207,14 +207,17 @@ def test_ownership_and_worktrees_retain_a_tracked_path_below_a_junction(tmp_path
     external.mkdir()
     (external / "record.py").write_text("external = 2\n", encoding="utf-8")
     tracked.parent.rename(checkout / "nested-original")
-    result = subprocess.run(
-        ["cmd", "/c", "mklink", "/J", str(checkout / "nested"), str(external)],
-        capture_output=True,
-        text=True,
-        check=False,
-        timeout=30,
-    )
-    assert result.returncode == 0, result.stderr
+    if os.name == "nt":
+        result = subprocess.run(
+            ["cmd", "/c", "mklink", "/J", str(checkout / "nested"), str(external)],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=30,
+        )
+        assert result.returncode == 0, result.stderr
+    else:
+        os.symlink(external, checkout / "nested", target_is_directory=True)
 
     inventory = audit.build_inventory(checkout, tmp_path)
 
