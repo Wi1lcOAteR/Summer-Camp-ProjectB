@@ -4,6 +4,10 @@ ProjectB 是面向操作系统课程材料的本地学习工作台。它把用�
 
 当前产品规约见 [SPEC.md](SPEC.md)，任务与验收状态见 [PLAN.md](PLAN.md)，文档入口见 [docs/INDEX.md](docs/INDEX.md)。
 
+- 源码仓库：<https://github.com/Wi1lcOAteR/Summer-Camp-ProjectB>
+- GitHub Actions：<https://github.com/Wi1lcOAteR/Summer-Camp-ProjectB/actions>
+- Release 入口：<https://github.com/Wi1lcOAteR/Summer-Camp-ProjectB/releases>（发布附件创建前请按下方命令从源码构建）
+
 ## 功能模块
 
 - **材料与来源**：导入课程材料，保存材料版本、内容哈希和精确 locator，映射结果可确认、拒绝或重新检查。
@@ -84,7 +88,7 @@ docker run --rm --read-only --tmpfs /tmp/projectb-demo:rw,size=64m -e PROJECTB_D
 - `.gitlab-ci.yml` 保留名称严格为 `unit-test` 的 job，并包含后端、前端和 OCI 构建合同。
 - `.github/workflows/ci.yml` 保留对应的 GitHub Actions 检查及 Windows 单文件构建合同。
 - 两份配置均由 `scripts/verify_ci_contract.py` 做结构化校验；本地验证通过不等于远端平台已运行。
-- 远端 GitLab/GitHub CI 尚未执行，也未推送 registry 或创建公网部署。提交前需要用户提供并授权远端仓库/runner 后才能取得课程平台的最终 PASS。
+- GitHub Actions 已在每次 push 自动运行，当前提交的最终状态以[仓库 Actions 页](https://github.com/Wi1lcOAteR/Summer-Camp-ProjectB/actions)为准。GitLab CI 尚未执行，也未推送 registry 或创建公网部署。
 
 ## 第三方依赖与许可证
 
@@ -99,5 +103,5 @@ python scripts/verify_licenses.py
 - 上一版 36.64 MB 产物曾在无 Python/Node/Docker 的 Windows 11 VM 启动，最低实测为 `11.487` 秒。学生已通过 D-026 豁免当前 29.22 MB 产物的再次干净机复测及 `<=10` 秒内部指标；当前产物已通过确定性构建、归档检查和开发机 smoke，但该豁免不等于性能 PASS。
 - Windows 产物未签名；SmartScreen 的实际表现依机器信誉而异。
 - 项目决策 D-025 将 `ProjectB.exe` 归类为本地应用；浏览器访问 loopback WebUI，不需要远程服务端或公网部署。OCI 只作为本地确定性演示，不接受材料上传或真实提供方凭据。
-- 远端 GitLab/GitHub CI 尚未执行；本地 CI 合同通过不能替代课程提交对应 commit 的远端绿色流水线。
+- GitHub Actions 已启用；课程提交仍应确认最终 commit 的远端流水线为绿色。GitLab CI 尚未执行，本地 CI 合同通过不能替代课程平台要求的最终流水线。
 - 真实 OpenAI 路径需要用户自备凭据并承担费用；自动测试只使用 mock transport，不进行付费调用。
