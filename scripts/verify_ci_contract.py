@@ -40,10 +40,10 @@ GITHUB_TIMEOUTS = {"scanner": 10, "backend": 20, "frontend": 20, "windows-packag
 GITLAB_TIMEOUTS = {"unit-test": "10m", "backend": "20m", "frontend": "20m", "oci-package": "30m"}
 # Digest updates require a reviewed CI edit and a negative contract proving the intended drift.
 GITHUB_JOB_DIGESTS = {
-    "backend": "9f921b54e3b168fc9f3a166bd3da8dec8940b69d52579e87a5b196605c3ebd85",
+    "backend": "4b12580e582ab87fd526b9ce8cbe010f46a72bdb787c14f94c7f4ab3ecef6714",
     "frontend": "f0dd700abc2e07d0d72e9edba5871795d0ec68ad0069a60e36ad25d9bab06ac6",
     "oci-package": "fa4b85d1701cf7bbbd4657817bb98305bb49f49d0e5b4899cd5beea686bc1ccb",
-    "scanner": "4fe6ed216b8d963efad37520ed6f6e7c2030edde22749b5b3f9b5a2f226f1f2f",
+    "scanner": "c7ef0a0bc9954b7c1a5c2869299d60b1f25e588f74fc2dc2deddcc1807876be6",
     "windows-package": "573d1ad290963e33b815a5ddb1db71544924358b6a38760030486a2220e5ed3b",
 }
 GITLAB_JOB_DIGESTS = {
@@ -394,6 +394,16 @@ def _check_github(path: Path) -> dict[str, Any]:
         if "permissions" in job:
             raise ContractError(f"permissions:github:{name}")
         steps = _as_list(job.get("steps"), f"github_steps_invalid:{name}")
+        if name in {"scanner", "backend"}:
+            git_bootstrap = "apt-get update && apt-get install -y --no-install-recommends git"
+            if (
+                len(steps) < 2
+                or not isinstance(steps[0], dict)
+                or steps[0].get("run") != git_bootstrap
+                or not isinstance(steps[1], dict)
+                or steps[1].get("uses") != CHECKOUT
+            ):
+                raise ContractError(f"git_before_checkout:github:{name}")
         for step in steps:
             if not isinstance(step, dict):
                 raise ContractError(f"github_step_invalid:{name}")

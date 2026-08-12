@@ -51,6 +51,16 @@ def test_ci_verifier_emits_stable_structural_mapping_and_receipt() -> None:
     assert set(mapping["commands"]) == {"backend", "frontend", "oci", "scanner", "windows"}
 
 
+def test_github_git_consumers_install_git_before_checkout() -> None:
+    github = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    bootstrap = "run: apt-get update && apt-get install -y --no-install-recommends git"
+    checkout = "uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683"
+
+    for job_name, next_job in (("scanner", "backend"), ("backend", "frontend")):
+        section = github.split(f"  {job_name}:\n", 1)[1].split(f"\n  {next_job}:\n", 1)[0]
+        assert section.index(bootstrap) < section.index(checkout)
+
+
 def test_ci_verifier_rejects_unknown_job_without_mutating_repository(tmp_path: Path) -> None:
     github = ROOT / ".github" / "workflows" / "ci.yml"
     candidate = tmp_path / "ci.yml"

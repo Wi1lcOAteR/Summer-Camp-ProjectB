@@ -1,5 +1,12 @@
 # AGENT_LOG
 
+## 2026-08-12T16:10:00+08:00 - GitHub first-push CI repair
+
+- **Task / context:** the student authorized pushing the local-app release to `https://github.com/Wi1lcOAteR/Summer-Camp-ProjectB.git`. Commit `7abeae7` added a root-only ignore for the separately submitted `submission.jsonc`; the file containing grading identity was not tracked or pushed. The branch was pushed as remote `main` without public deployment.
+- **Remote evidence / root cause:** GitHub Actions run `31576023980` completed with `frontend`, `windows-package`, and `oci-package` green; `scanner` failed at `Scan tracked worktree` with exit 3 and `backend` failed at `Run current backend suite` with exit 1. Both jobs use minimal containers and placed `actions/checkout` before installing Git, so checkout could not leave the `.git` state required by the credential scanners and quality-gate tests.
+- **RED / GREEN:** adding pre-checkout Git bootstrap changed the locked job structures and produced `CI_CONTRACT_RED github_steps_drift:scanner`. The reviewed contract now requires scanner/backend step 0 to install Git directly and step 1 to use the pinned checkout action. Focused verification returned `22 passed`, `CI_CONTRACT_PASS`, `CI_SEED_CONTRACT_PASS`, scoped Ruff green, and three clean single-file credential scans.
+- **Process boundary:** the student explicitly waived Superpowers for this bounded repository handoff. No subagent was used. Browser access to the authenticated GitHub job page was denied, so only public GitHub API status, failure annotations, and locally reproducible contract evidence are recorded. The next push and its remote CI result remain to be observed before final completion is claimed.
+
 ## 2026-08-11T20:20:00+08:00 - DIST-01 frozen migration repair
 
 - **Task / skills:** reopened `DIST-01` after the first real student-preview browser run; used `systematic-debugging`, `test-driven-development`, `requesting-code-review`, and `verification-before-completion`.
