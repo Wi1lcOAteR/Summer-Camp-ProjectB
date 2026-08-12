@@ -1,5 +1,11 @@
 # AGENT_LOG
 
+## 2026-08-12T18:05:00+08:00 - GitHub scanner allowlist parity follow-up
+
+- **Remote RED / root cause:** after commit `c205021`, GitHub run `31582939691` advanced the tracked scan past `packaging/oci/Dockerfile.dockerignore` and then failed on the next canonical text type, `packaging/windows/ProjectB.spec`. The canonical Python scanner already includes `.spec`; the bootstrap PowerShell scanner omitted it from its independent suffix list.
+- **Repair / verification:** added `.spec` to the bootstrap text suffixes and its staged allowlist contract. A complete tracked-file classification against the bootstrap rules returned `BOOTSTRAP_TRACKED_TYPE_COVERAGE_PASS`; PowerShell AST parsing returned `BOOTSTRAP_SCANNER_PARSE_PASS`; both changed scripts passed the canonical credential scanner and `git diff --check`. The host still lacks PowerShell 7, so the full cross-platform bootstrap contract is delegated to the next GitHub scanner job and is not claimed locally.
+- **Backend isolation:** local mypy with explicit `--platform linux` returned no issues for all 47 source files. The exact GitHub log endpoint requires repository-admin API authentication and Edge access to GitHub is blocked by the user's saved browser permission. No permission bypass was attempted. The scanner parity repair is therefore kept isolated so the next run can distinguish the remaining backend failure without speculative source changes.
+
 ## 2026-08-12T17:23:36+08:00 - GitHub Linux gate compatibility repair
 
 - **Remote RED / root cause:** GitHub Actions run `31580360480` reached the real scanner and backend gates after the container Git ownership repair. The scanner rejected tracked `packaging/oci/Dockerfile.dockerignore` as `unsupported_file_type`; the bootstrap PowerShell scanner accepted only the exact `.dockerignore` name while the canonical Python scanner already accepted `*.dockerignore`. The backend gate reported 11 Linux mypy errors: Windows-only lazy keyring imports/attributes in `credentials.py` and the Windows-only `subprocess.CREATE_NEW_PROCESS_GROUP` attribute in `extract_text.py`.
