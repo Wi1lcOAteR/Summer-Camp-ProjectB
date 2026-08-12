@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib
 import secrets
 import sys
 from collections.abc import Callable
@@ -48,6 +49,10 @@ class WindowsCredentialBackend:
     """Use WinVault directly instead of whichever global keyring is selected."""
 
     name = "winvault"
+    _service_name: str
+    _status_service_name: str
+    _vault: _WindowsCredentialVault | None
+    _vault_lock: RLock
 
     def __init__(self, *, service_name: str = "ProjectB") -> None:
         if sys.platform != "win32":
@@ -64,7 +69,7 @@ class WindowsCredentialBackend:
         return self._vault_instance().get_password(self._service_name, target)
 
     def set_secret(self, target: str, value: str) -> None:
-        from keyring.errors import PasswordDeleteError
+        password_delete_error = self._password_delete_error()
 
         vault = self._vault_instance()
         vault.set_password(self._status_service_name, target, "configured-v1")
@@ -73,19 +78,26 @@ class WindowsCredentialBackend:
         except Exception:
             try:
                 vault.delete_password(self._status_service_name, target)
-            except PasswordDeleteError:
+            except password_delete_error:
                 pass
             raise
 
     def delete_secret(self, target: str) -> None:
-        from keyring.errors import PasswordDeleteError
+        password_delete_error = self._password_delete_error()
 
         vault = self._vault_instance()
         for service_name in (self._status_service_name, self._service_name):
             try:
                 vault.delete_password(service_name, target)
-            except PasswordDeleteError:
+            except password_delete_error:
                 pass
+
+    @staticmethod
+    def _password_delete_error() -> type[Exception]:
+        error_type = getattr(importlib.import_module("keyring.errors"), "PasswordDeleteError", None)
+        if not isinstance(error_type, type) or not issubclass(error_type, Exception):
+            raise ImportError("keyring.errors.PasswordDeleteError is unavailable")
+        return error_type
 
     def _vault_instance(self) -> _WindowsCredentialVault:
         vault = self._vault
@@ -94,9 +106,10 @@ class WindowsCredentialBackend:
         with self._vault_lock:
             vault = self._vault
             if vault is None:
-                from keyring.backends.Windows import WinVaultKeyring
-
-                vault = WinVaultKeyring()
+                factory = getattr(importlib.import_module("keyring.backends.Windows"), "WinVaultKeyring", None)
+                if not callable(factory):
+                    raise ImportError("keyring.backends.Windows.WinVaultKeyring is unavailable")
+                vault = factory()
                 self._vault = vault
             return vault
 

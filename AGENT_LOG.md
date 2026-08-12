@@ -1,5 +1,12 @@
 # AGENT_LOG
 
+## 2026-08-12T17:23:36+08:00 - GitHub Linux gate compatibility repair
+
+- **Remote RED / root cause:** GitHub Actions run `31580360480` reached the real scanner and backend gates after the container Git ownership repair. The scanner rejected tracked `packaging/oci/Dockerfile.dockerignore` as `unsupported_file_type`; the bootstrap PowerShell scanner accepted only the exact `.dockerignore` name while the canonical Python scanner already accepted `*.dockerignore`. The backend gate reported 11 Linux mypy errors: Windows-only lazy keyring imports/attributes in `credentials.py` and the Windows-only `subprocess.CREATE_NEW_PROCESS_GROUP` attribute in `extract_text.py`.
+- **Repair:** aligned the bootstrap scanner with the canonical suffix rule and added `Dockerfile.dockerignore` to its tracked allowlist contract. Kept WinVault lazy-loading by resolving the Windows-only keyring modules through `importlib` with runtime shape checks and explicit instance attributes. Read the process-group flag through a typed, platform-safe `getattr`; Windows behavior is unchanged.
+- **GREEN:** local mypy returned `Success: no issues found in 47 source files`; focused credential/material/startup tests returned `46 passed`; full `python scripts/test_all.py --backend` returned `286 passed`, Ruff green, `CREDENTIAL_SCAN_PASS files=524`, `LICENSE_VERIFICATION_PASS python=54 npm=166 direct_python=18 direct_npm=16`, and `TEST_ALL_PASS mode=backend`. PowerShell AST parsing returned `BOOTSTRAP_SCANNER_PARSE_PASS`. The host lacks PowerShell 7, so the PowerShell 7-only complete scanner contract remains for the next GitHub run; no pass is claimed for that local command.
+- **Process:** this was a bounded CI compatibility repair based on student-supplied GitHub logs. The student explicitly waived Superpowers for this handoff; no subagent, dependency installation, credential value, or alternate Git index was used.
+
 ## 2026-08-12T16:10:00+08:00 - GitHub first-push CI repair
 
 - **Task / context:** the student authorized pushing the local-app release to `https://github.com/Wi1lcOAteR/Summer-Camp-ProjectB.git`. Commit `7abeae7` added a root-only ignore for the separately submitted `submission.jsonc`; the file containing grading identity was not tracked or pushed. The branch was pushed as remote `main` without public deployment.

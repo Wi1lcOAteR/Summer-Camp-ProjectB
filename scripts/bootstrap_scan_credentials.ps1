@@ -464,7 +464,7 @@ function Invoke-BootstrapScan {
             continue
         }
         $name = [IO.Path]::GetFileName($item.path)
-        if ($extension -notin $textExtensions -and $name -notin $extensionlessNames) {
+        if ($extension -notin $textExtensions -and $name -notin $extensionlessNames -and -not $name.ToLowerInvariant().EndsWith('.dockerignore')) {
             Fail-Scan 'unsupported_file_type' $item.source $item.path
         }
         $scannedCount++

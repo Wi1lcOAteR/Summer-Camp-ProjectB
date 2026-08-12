@@ -73,7 +73,7 @@ def run_terminable_worker(
     if deadline_seconds <= 0:
         raise ValueError("deadline_seconds_must_be_positive")
     output_path.unlink(missing_ok=True)
-    creationflags = subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
+    creationflags = int(getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)) if os.name == "nt" else 0
     process = subprocess.Popen(
         list(command),
         stdin=subprocess.DEVNULL,
